@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Approvals — LocalBoost</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="localboost.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="LocalBoost.dc.html#top" class="nav-logo"><span class="nav-dot"></span>LocalBoost</a>
+  <div class="nav-links">
+    <a href="LocalBoost.dc.html#drop">The drop</a>
+    <a href="LocalBoost.dc.html#engine">Engine</a>
+    <a href="LocalBoost.dc.html#pricing">Pricing</a>
+  </div>
+  <a href="login.html" id="nav-account" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px">Account</a>
+  <a href="signup.html" class="nav-cta" id="nav-cta">Start free drop</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow">APPROVALS</div>
+  <h1 id="page-title">This week's drop, waiting on your <em>yes</em>.</h1>
+  <p id="page-sub">Every creative the engine rendered for you. Keep what fits, kill what doesn't — only what you approve gets published.</p>
+</header>
+
+<section class="section-tight">
+  <div class="wrap-wide">
+
+    <!-- Signed out -->
+    <div id="signed-out" class="card" hidden style="max-width:440px;margin:0 auto;text-align:center">
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">NOT SIGNED IN</div>
+      <h3 style="margin:14px 0 8px">Log in to see your drop.</h3>
+      <p style="margin:0">Your creatives are tied to your account — sign in and this week's batch loads here.</p>
+      <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <a href="login.html" class="btn">Log in<span class="mono" style="font-size:13px">&rarr;</span></a>
+        <a href="signup.html" class="btn-ghost">Create account</a>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="empty">
+      <div class="mono">LOADING YOUR DROP</div>
+    </div>
+
+    <!-- Main board -->
+    <div id="board" hidden>
+      <div class="approve-head">
+        <div>
+          <h2 id="drop-title">Your creatives</h2>
+          <div id="drop-meta" class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d;margin-top:8px">&mdash;</div>
+        </div>
+        <div class="counts" id="counts"></div>
+      </div>
+
+      <div class="dropbar" id="dropbar"></div>
+      <div class="dropbar" id="filterbar">
+        <button data-filter="pending" class="active">Waiting on you</button>
+        <button data-filter="approved">Approved</button>
+        <button data-filter="rejected">Rejected</button>
+        <button data-filter="all">Everything</button>
+      </div>
+
+      <div id="board-notice" class="notice" hidden style="margin-bottom:20px"></div>
+
+      <div class="creative-grid" id="grid"></div>
+
+      <div id="empty-filter" class="empty" hidden>
+        <div class="mono">NOTHING HERE</div>
+        <h3 id="empty-filter-title">All caught up.</h3>
+        <p id="empty-filter-text">Nothing in this view right now.</p>
+      </div>
+    </div>
+
+    <!-- No drops at all -->
+    <div id="no-drops" class="empty" hidden>
+      <div class="mono">NO DROP YET</div>
+      <h3>Your first batch is still rendering.</h3>
+      <p>Drops land Monday morning. As soon as the engine finishes your week, every creative shows up here for approval.</p>
+      <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <button id="demo-btn" class="btn-ghost" type="button">See a sample drop</button>
+        <a href="login.html" class="btn-ghost">Account settings</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="divider" style="margin:16px auto 40px"></div>
+    <p style="font-size:13.5px;color:#4c5056">Every image on this page is AI-generated and published only after you approve it. Read the <a href="ai-disclosure.html">AI disclosure</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="approvals.html">Approvals</a><a href="LocalBoost.dc.html#control">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+  </div>
+  <div class="foot-bottom"><span>&copy; 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+(function () {
+  var loading   = document.getElementById("loading");
+  var board     = document.getElementById("board");
+  var signedOut = document.getElementById("signed-out");
+  var noDrops   = document.getElementById("no-drops");
+  var grid      = document.getElementById("grid");
+  var dropbar   = document.getElementById("dropbar");
+  var filterbar = document.getElementById("filterbar");
+  var notice    = document.getElementById("board-notice");
+  var emptyView = document.getElementById("empty-filter");
+
+  var drops = [];         // newest week first
+  var creatives = [];     // every creative on this account
+  var currentDrop = null; // a drop id, or "all"
+  var currentFilter = "pending";
+  var demoMode = false;
+
+  function say(message) {
+    notice.hidden = false;
+    notice.textContent = message;
+  }
+
+  function fmtWeek(value) {
+    return new Date(value + "T00:00:00").toLocaleDateString("en-US", {
+      month: "short", day: "numeric", year: "numeric"
+    });
+  }
+
+  function visibleCreatives() {
+    return creatives.filter(function (creative) {
+      if (currentDrop !== "all" && creative.drop_id !== currentDrop) return false;
+      if (currentFilter === "all") return true;
+      if (currentFilter === "approved") {
+        return creative.status === "approved" || creative.status === "published";
+      }
+      return creative.status === currentFilter;
+    });
+  }
+
+  function renderDropbar() {
+    dropbar.innerHTML = "";
+    if (drops.length < 2) return;
+
+    drops.forEach(function (drop) {
+      var button = document.createElement("button");
+      button.textContent = "Week of " + fmtWeek(drop.week_starting);
+      if (drop.id === currentDrop) button.classList.add("active");
+      button.addEventListener("click", function () {
+        currentDrop = drop.id;
+        renderAll();
+      });
+      dropbar.appendChild(button);
+    });
+
+    var all = document.createElement("button");
+    all.textContent = "All weeks";
+    if (currentDrop === "all") all.classList.add("active");
+    all.addEventListener("click", function () {
+      currentDrop = "all";
+      renderAll();
+    });
+    dropbar.appendChild(all);
+  }
+
+  function renderHeader() {
+    var scoped = creatives.filter(function (creative) {
+      return currentDrop === "all" || creative.drop_id === currentDrop;
+    });
+    var drop = drops.filter(function (d) { return d.id === currentDrop; })[0];
+
+    document.getElementById("drop-title").textContent =
+      demoMode ? "Sample drop"
+        : drop && drop.theme ? drop.theme
+        : currentDrop === "all" ? "Every creative"
+        : "This week's drop";
+
+    var meta = [];
+    if (demoMode) meta.push("PREVIEW ONLY — NOT SAVED");
+    else if (drop) meta.push("WEEK OF " + fmtWeek(drop.week_starting).toUpperCase());
+    else meta.push("ALL WEEKS");
+    meta.push(scoped.length + " CREATIVE" + (scoped.length === 1 ? "" : "S"));
+    document.getElementById("drop-meta").textContent = meta.join("  ·  ");
+
+    function count(status) {
+      return scoped.filter(function (creative) { return creative.status === status; }).length;
+    }
+    document.getElementById("counts").innerHTML =
+      "<span>WAITING <b>" + count("pending") + "</b></span>" +
+      "<span>APPROVED <b>" + (count("approved") + count("published")) + "</b></span>" +
+      "<span>REJECTED <b>" + count("rejected") + "</b></span>";
+  }
+
+  var STATUS_LABEL = {
+    pending: "WAITING",
+    approved: "APPROVED",
+    rejected: "REJECTED",
+    published: "PUBLISHED"
+  };
+
+  function buildCard(creative) {
+    var card = document.createElement("article");
+    card.className = "creative-card is-" + creative.status;
+
+    var media = document.createElement("div");
+    media.className = "creative-media";
+    var placeholder = document.createElement("div");
+    placeholder.className = "ph";
+    placeholder.textContent = creative.image_url ? "LOADING" : "NO IMAGE YET";
+    media.appendChild(placeholder);
+
+    if (creative.image_url) {
+      var img = new Image();
+      img.alt = creative.headline || "AI-generated creative";
+      img.addEventListener("load", function () { img.classList.add("loaded"); });
+      img.addEventListener("error", function () { placeholder.textContent = "IMAGE UNAVAILABLE"; });
+      img.src = creative.image_url;
+      media.appendChild(img);
+      media.addEventListener("click", function () { openLightbox(creative.image_url); });
+    } else {
+      media.style.cursor = "default";
+    }
+
+    var badge = document.createElement("div");
+    badge.className = "badge";
+    badge.textContent = [creative.channel, creative.format].filter(Boolean).join(" · ").toUpperCase();
+    media.appendChild(badge);
+
+    var chip = document.createElement("div");
+    chip.className = "status-chip " + creative.status;
+    chip.textContent = STATUS_LABEL[creative.status] || String(creative.status).toUpperCase();
+    media.appendChild(chip);
+
+    card.appendChild(media);
+
+    var body = document.createElement("div");
+    body.className = "creative-body";
+    var headline = document.createElement("div");
+    headline.className = "headline";
+    headline.textContent = creative.headline || "Untitled creative";
+    body.appendChild(headline);
+    if (creative.caption) {
+      var caption = document.createElement("p");
+      caption.className = "caption";
+      caption.textContent = creative.caption;
+      body.appendChild(caption);
+    }
+    card.appendChild(body);
+
+    var actions = document.createElement("div");
+    actions.className = "creative-actions";
+
+    if (creative.status === "published") {
+      var live = document.createElement("div");
+      live.className = "mono";
+      live.style.cssText = "font-size:10px;letter-spacing:.1em;color:#62666d;padding:4px 2px";
+      live.textContent = creative.published_at
+        ? "PUBLISHED " + new Date(creative.published_at)
+            .toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()
+        : "PUBLISHED";
+      actions.appendChild(live);
+    } else if (creative.status === "pending") {
+      var yes = document.createElement("button");
+      yes.className = "act-yes";
+      yes.type = "button";
+      yes.textContent = "Approve";
+      yes.addEventListener("click", function () { setStatus(creative, "approved", card); });
+
+      var no = document.createElement("button");
+      no.className = "act-no";
+      no.type = "button";
+      no.textContent = "Reject";
+      no.addEventListener("click", function () { setStatus(creative, "rejected", card); });
+
+      actions.appendChild(yes);
+      actions.appendChild(no);
+    } else {
+      var undo = document.createElement("button");
+      undo.className = "act-undo";
+      undo.type = "button";
+      undo.textContent = creative.status === "approved"
+        ? "Undo approval"
+        : "Put back in the queue";
+      undo.addEventListener("click", function () { setStatus(creative, "pending", card); });
+      actions.appendChild(undo);
+    }
+
+    card.appendChild(actions);
+    return card;
+  }
+
+  async function setStatus(creative, status, card) {
+    var previous = creative.status;
+    creative.status = status;
+    card.classList.add("is-busy");
+    notice.hidden = true;
+
+    if (!demoMode) {
+      var res = await LBAuth.db
+        .from("creatives")
+        .update({ status: status })
+        .eq("id", creative.id)
+        .select()
+        .maybeSingle();
+
+      if (res.error) {
+        creative.status = previous;
+        card.classList.remove("is-busy");
+        say("Couldn't save that — " + res.error.message);
+        renderAll();
+        return;
+      }
+      await maybeCloseDrop(creative.drop_id);
+    }
+
+    renderAll();
+  }
+
+  // Once a drop has nothing left waiting, mark the drop itself approved.
+  async function maybeCloseDrop(dropId) {
+    var drop = drops.filter(function (d) { return d.id === dropId; })[0];
+    if (!drop || drop.status === "published") return;
+
+    var stillWaiting = creatives.some(function (creative) {
+      return creative.drop_id === dropId && creative.status === "pending";
+    });
+    var nextStatus = stillWaiting ? "awaiting_approval" : "approved";
+    if (drop.status === nextStatus) return;
+
+    var res = await LBAuth.db.from("drops").update({ status: nextStatus }).eq("id", dropId);
+    if (!res.error) drop.status = nextStatus;
+  }
+
+  var EMPTY_COPY = {
+    pending:  ["All caught up.", "Nothing is waiting on you here. Fresh creatives land with next Monday's drop."],
+    approved: ["Nothing approved yet.", "Approve a creative and it moves here, then gets scheduled and published."],
+    rejected: ["Nothing rejected.", "Anything you kill shows up here — you can always put it back in the queue."],
+    all:      ["Nothing in this drop.", "This drop has no creatives attached to it yet."]
+  };
+
+  function renderGrid() {
+    var list = visibleCreatives();
+    grid.innerHTML = "";
+
+    if (!list.length) {
+      emptyView.hidden = false;
+      document.getElementById("empty-filter-title").textContent = EMPTY_COPY[currentFilter][0];
+      document.getElementById("empty-filter-text").textContent = EMPTY_COPY[currentFilter][1];
+      return;
+    }
+    emptyView.hidden = true;
+    list.forEach(function (creative) { grid.appendChild(buildCard(creative)); });
+  }
+
+  function renderAll() {
+    renderDropbar();
+    renderHeader();
+    renderGrid();
+  }
+
+  Array.prototype.forEach.call(filterbar.querySelectorAll("button"), function (button) {
+    button.addEventListener("click", function () {
+      Array.prototype.forEach.call(filterbar.querySelectorAll("button"), function (other) {
+        other.classList.remove("active");
+      });
+      button.classList.add("active");
+      currentFilter = button.dataset.filter;
+      renderGrid();
+    });
+  });
+
+  function openLightbox(url) {
+    var box = document.createElement("div");
+    box.className = "lightbox";
+    var img = new Image();
+    img.src = url;
+    img.alt = "";
+    box.appendChild(img);
+    function close() {
+      box.remove();
+      document.removeEventListener("keydown", onKey);
+    }
+    function onKey(event) {
+      if (event.key === "Escape") close();
+    }
+    box.addEventListener("click", close);
+    document.addEventListener("keydown", onKey);
+    document.body.appendChild(box);
+  }
+
+  // A local, unsaved sample so the page can be seen before the first real drop lands.
+  function sampleImage(label, from, to) {
+    var svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000">' +
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="' + from + '"/><stop offset="1" stop-color="' + to + '"/>' +
+      '</linearGradient></defs>' +
+      '<rect width="800" height="1000" fill="url(#g)"/>' +
+      '<text x="50%" y="52%" text-anchor="middle" fill="rgba(255,255,255,.42)" ' +
+      'font-family="monospace" font-size="30" letter-spacing="6">' + label + '</text></svg>';
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+
+  function loadDemo() {
+    demoMode = true;
+    drops = [{
+      id: "demo",
+      week_starting: new Date().toISOString().slice(0, 10),
+      status: "awaiting_approval",
+      theme: "Sample drop"
+    }];
+    currentDrop = "demo";
+    creatives = [
+      { id: "d1", drop_id: "demo", channel: "Instagram", format: "4:5 post", status: "pending",
+        headline: "Morning rush, sorted.",
+        caption: "Two blocks from the office and open at 6:30. First coffee is on the house this week.",
+        image_url: sampleImage("SAMPLE 01", "#1b2432", "#3a4a63") },
+      { id: "d2", drop_id: "demo", channel: "Facebook", format: "1:1 post", status: "pending",
+        headline: "The corner table is free.",
+        caption: "Quiet hours, fast wifi, no queue. Weekdays between 2 and 5.",
+        image_url: sampleImage("SAMPLE 02", "#2a2233", "#57405f") },
+      { id: "d3", drop_id: "demo", channel: "Instagram", format: "9:16 story", status: "approved",
+        headline: "Baked at 5am. Gone by noon.",
+        caption: "Fresh trays out of the oven every morning — get there early.",
+        image_url: sampleImage("SAMPLE 03", "#20291f", "#3f5a3c") },
+      { id: "d4", drop_id: "demo", channel: "Google", format: "Search ad", status: "rejected",
+        headline: "Same-day repairs, no appointment.",
+        caption: "Walk in before 3pm and it's ready the same day.",
+        image_url: sampleImage("SAMPLE 04", "#33261f", "#63432f") }
+    ];
+    noDrops.hidden = true;
+    board.hidden = false;
+    document.getElementById("page-sub").textContent =
+      "This is a sample drop so you can see how approvals work. Nothing here is saved.";
+    renderAll();
+  }
+  document.getElementById("demo-btn").addEventListener("click", loadDemo);
+
+  LBAuth.ready.then(async function () {
+    if (!LBAuth.isLoggedIn()) {
+      loading.hidden = true;
+      signedOut.hidden = false;
+      return;
+    }
+
+    var user = LBAuth.getUser();
+    var cta = document.getElementById("nav-cta");
+    cta.textContent = "Control room";
+    cta.href = "LocalBoost.dc.html#control";
+
+    var dropRes = await LBAuth.db
+      .from("drops")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("week_starting", { ascending: false });
+
+    var creativeRes = await LBAuth.db
+      .from("creatives")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    loading.hidden = true;
+
+    if (dropRes.error || creativeRes.error) {
+      noDrops.hidden = false;
+      noDrops.querySelector("h3").textContent = "Couldn't load your drop.";
+      noDrops.querySelector("p").textContent = (dropRes.error || creativeRes.error).message;
+      return;
+    }
+
+    drops = dropRes.data || [];
+    creatives = creativeRes.data || [];
+
+    if (!creatives.length) {
+      noDrops.hidden = false;
+      return;
+    }
+
+    currentDrop = drops.length ? drops[0].id : "all";
+    board.hidden = false;
+    renderAll();
+  });
+})();
+</script>
+
+</body>
+</html>
