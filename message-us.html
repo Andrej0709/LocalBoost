@@ -65,10 +65,28 @@
   <div class="foot-bottom"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
 <script>
-document.getElementById("message-form").addEventListener("submit", function(e){
+document.getElementById("message-form").addEventListener("submit", async function(e){
   e.preventDefault();
-  this.hidden = true;
+  var form = this;
+  var button = form.querySelector("button[type=submit]");
+  button.disabled = true;
+
+  var res = await LBAuth.db.from("messages").insert({
+    full_name: document.getElementById("m-name").value,
+    email:     document.getElementById("m-email").value,
+    message:   document.getElementById("m-message").value
+  });
+
+  if (res.error) {
+    button.disabled = false;
+    alert("Could not send: " + res.error.message);
+    return;
+  }
+  form.hidden = true;
   document.getElementById("success-notice").hidden = false;
 });
 </script>

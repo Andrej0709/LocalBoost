@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
 <script src="./auth.js"></script>
 </head>
 <body>
@@ -491,12 +493,16 @@ class Component extends DCLogic {
       }));
     }
 
-    if (window.LBAuth && LBAuth.isLoggedIn()) {
-      const loginLink = r.querySelector('a[href="login.html"]');
-      if (loginLink) {
-        const u = LBAuth.getUser() || {};
-        loginLink.textContent = u.business || u.email || "Account";
-      }
+    if (window.LBAuth) {
+      LBAuth.ready.then(() => {
+        if (!LBAuth.isLoggedIn()) return;
+        const loginLink = r.querySelector('a[href="login.html"]');
+        if (loginLink) {
+          const profile = LBAuth.getProfile() || {};
+          const user = LBAuth.getUser() || {};
+          loginLink.textContent = profile.business_name || user.email || "Account";
+        }
+      });
     }
   }
 

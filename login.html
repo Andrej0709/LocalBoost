@@ -101,6 +101,8 @@
   <div class="foot-bottom"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script>
 (function(){
@@ -126,64 +128,79 @@
   tabLogin.addEventListener("click", showLogin);
   tabSignup.addEventListener("click", showSignup);
 
+  var notice = document.getElementById("redirect-notice");
+
+  function say(message){
+    notice.hidden = false;
+    notice.textContent = message;
+  }
   function redirect(url, message){
-    document.getElementById("redirect-notice").hidden = false;
-    document.getElementById("redirect-notice").textContent = message;
+    say(message);
     setTimeout(function(){ location.href = url; }, 900);
   }
 
-  function ensureTrialStarted(){
-    if (!localStorage.getItem("lb_trial_start")) {
-      localStorage.setItem("lb_trial_start", String(Date.now()));
-    }
-  }
-
-  loginForm.addEventListener("submit", function(e){
+  loginForm.addEventListener("submit", async function(e){
     e.preventDefault();
-    var email = document.getElementById("li-email").value;
-    LBAuth.login({ email: email });
-    ensureTrialStarted();
-    redirect("LocalBoost.dc.html#control", "Logged in — taking you to your control room...");
+    var button = loginForm.querySelector("button[type=submit]");
+    button.disabled = true;
+    try {
+      await LBAuth.logIn(
+        document.getElementById("li-email").value,
+        document.getElementById("li-password").value
+      );
+      redirect("LocalBoost.dc.html#control", "Logged in — taking you to your control room...");
+    } catch (err) {
+      button.disabled = false;
+      say(err.message === "Email not confirmed"
+        ? "Confirm your email first — check your inbox for the link we sent."
+        : err.message);
+    }
   });
 
-  signupForm.addEventListener("submit", function(e){
+  signupForm.addEventListener("submit", async function(e){
     e.preventDefault();
-    var business = document.getElementById("su-business").value;
-    var email = document.getElementById("su-email").value;
-    LBAuth.login({ business: business, email: email });
-    ensureTrialStarted();
-    redirect("LocalBoost.dc.html#pricing", "Account created — pick a plan to start your first drop...");
+    var button = signupForm.querySelector("button[type=submit]");
+    button.disabled = true;
+    try {
+      var result = await LBAuth.signUp(
+        document.getElementById("su-email").value,
+        document.getElementById("su-password").value,
+        { business_name: document.getElementById("su-business").value }
+      );
+      if (result.needsEmailConfirmation) {
+        signupForm.hidden = true;
+        say("Check your inbox — confirm your email, then log in to pick a plan.");
+      } else {
+        redirect("LocalBoost.dc.html#pricing", "Account created — pick a plan to start your first drop...");
+      }
+    } catch (err) {
+      button.disabled = false;
+      say(err.message);
+    }
   });
 
-  var TRIAL_DAYS = 7;
-  function fmt(date){
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  function fmt(value){
+    return new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   }
 
-  if (LBAuth.isLoggedIn()) {
-    var user = LBAuth.getUser() || {};
+  LBAuth.ready.then(function(){
+    if (!LBAuth.isLoggedIn()) return;
 
-    var trialStartMs = parseInt(localStorage.getItem("lb_trial_start") || "", 10);
-    if (!trialStartMs) {
-      trialStartMs = Date.now();
-      localStorage.setItem("lb_trial_start", String(trialStartMs));
-    }
-    var start = new Date(trialStartMs);
-    var end = new Date(trialStartMs + TRIAL_DAYS * 24 * 60 * 60 * 1000);
+    var user = LBAuth.getUser();
+    var profile = LBAuth.getProfile() || {};
 
     document.getElementById("already-in").hidden = false;
     document.getElementById("auth-forms").hidden = true;
-    document.getElementById("already-in-name").textContent = user.business || user.email || "your account";
+    document.getElementById("already-in-name").textContent = profile.business_name || user.email || "your account";
     document.getElementById("trial-email").textContent = user.email || "—";
-    document.getElementById("trial-start").textContent = fmt(start);
-    document.getElementById("trial-end").textContent = fmt(end);
-    document.getElementById("page-title").textContent = "Welcome back.";
-    document.getElementById("page-sub").textContent = "You're already signed in.";
-  }
+    document.getElementById("trial-start").textContent = profile.trial_started_at ? fmt(profile.trial_started_at) : "—";
+    document.getElementById("trial-end").textContent = profile.trial_ends_at ? fmt(profile.trial_ends_at) : "—";
+    title.textContent = "Welcome back.";
+    sub.textContent = "You're already signed in.";
+  });
 
-  document.getElementById("logout-btn").addEventListener("click", function(){
-    LBAuth.logout();
-    localStorage.removeItem("lb_trial_start");
+  document.getElementById("logout-btn").addEventListener("click", async function(){
+    await LBAuth.logOut();
     location.reload();
   });
 })();

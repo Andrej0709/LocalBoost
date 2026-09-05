@@ -126,6 +126,7 @@
       </div>
 
       <button type="submit" class="btn" style="width:100%;justify-content:center;border:none;margin-top:32px">Claim your first drop<span class="mono" style="font-size:13px">→</span></button>
+      <div id="signup-notice" class="notice" style="margin-top:18px" hidden></div>
     </form>
 
     <aside class="card" id="plan-summary" style="position:sticky;top:96px">
@@ -156,6 +157,8 @@
   <div class="foot-bottom"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script>
 (function(){
@@ -166,8 +169,8 @@
       features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", "Performance feedback into next drop", "Caption variants and A/B slotting"] }
   };
   var params = new URLSearchParams(location.search);
-  var key = params.get("plan");
-  var plan = plans[key] || plans.storefront;
+  var planKey = plans[params.get("plan")] ? params.get("plan") : "storefront";
+  var plan = plans[planKey];
 
   document.getElementById("plan-headline").innerHTML = 'Set up your <em>' + plan.name + '</em> drop.';
   document.getElementById("plan-name").textContent = plan.name;
@@ -194,19 +197,61 @@
     document.getElementById("activated-text").textContent = "The " + plan.name + " plan is live on your account.";
   }
 
-  if (LBAuth.isLoggedIn()) {
-    showActivated();
-  } else {
-    document.getElementById("signup-form").addEventListener("submit", function(e){
-      e.preventDefault();
-      LBAuth.login({
-        business: document.getElementById("business").value,
-        email: document.getElementById("email").value,
-        plan: plan.name
-      });
-      showActivated();
-    });
+  var form = document.getElementById("signup-form");
+  var notice = document.getElementById("signup-notice");
+
+  function say(message){
+    notice.hidden = false;
+    notice.textContent = message;
   }
+
+  function checkedChannels(){
+    return Array.prototype.map.call(
+      form.querySelectorAll('input[name="channels"]:checked'),
+      function(box){ return box.value; }
+    );
+  }
+
+  form.addEventListener("submit", async function(e){
+    e.preventDefault();
+    var button = form.querySelector("button[type=submit]");
+    button.disabled = true;
+    try {
+      var result = await LBAuth.signUp(
+        document.getElementById("email").value,
+        document.getElementById("password").value,
+        {
+          business_name:    document.getElementById("business").value,
+          city:             document.getElementById("city").value,
+          vertical:         document.getElementById("vertical").value,
+          website:          document.getElementById("website").value,
+          what_you_sell:    document.getElementById("what").value,
+          typical_customer: document.getElementById("customer").value,
+          differentiator:   document.getElementById("different").value,
+          brand_vibe:       document.getElementById("vibe").value,
+          brand_colors:     document.getElementById("colors").value,
+          avoid_notes:      document.getElementById("avoid").value,
+          channels:         checkedChannels(),
+          plan:             planKey
+        }
+      );
+      if (result.needsEmailConfirmation) {
+        showActivated();
+        document.getElementById("page-eyebrow").textContent = "ONE LAST STEP";
+        document.getElementById("activated-text").textContent =
+          "Check your inbox — confirm your email to finish setting up the " + plan.name + " plan.";
+      } else {
+        showActivated();
+      }
+    } catch (err) {
+      button.disabled = false;
+      say(err.message);
+    }
+  });
+
+  LBAuth.ready.then(function(){
+    if (LBAuth.isLoggedIn()) showActivated();
+  });
 })();
 </script>
 
