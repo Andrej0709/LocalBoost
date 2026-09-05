@@ -1,12 +1,12 @@
--- ============================================================
--- LocalBoost - Supabase schema
--- Run this whole file once in: Supabase Dashboard -> SQL Editor.
--- Safe to re-run (idempotent).
--- ============================================================
+/* ============================================================ */
+/* LocalBoost - Supabase schema */
+/* Run this whole file once in: Supabase Dashboard -> SQL Editor. */
+/* Safe to re-run (idempotent). */
+/* ============================================================ */
 
--- ------------------------------------------------------------
--- 1. Enums
--- ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* 1. Enums */
+/* ------------------------------------------------------------ */
 do $$ begin
   create type public.plan_tier as enum ('counter', 'storefront', 'franchise');
 exception when duplicate_object then null; end $$;
@@ -27,16 +27,16 @@ do $$ begin
   create type public.lead_status as enum ('new', 'contacted', 'closed');
 exception when duplicate_object then null; end $$;
 
--- ------------------------------------------------------------
--- 2. profiles - one row per auth user.
---    Everything the client types about their account + business brief.
--- ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* 2. profiles - one row per auth user. */
+/*    Everything the client types about their account + business brief. */
+/* ------------------------------------------------------------ */
 create table if not exists public.profiles (
   id                  uuid primary key references auth.users (id) on delete cascade,
   email               text not null,
   business_name       text,
 
-  -- About the business
+  /* About the business */
   city                text,
   vertical            text,
   website             text,
@@ -44,15 +44,15 @@ create table if not exists public.profiles (
   typical_customer    text,
   differentiator      text,
 
-  -- Brand and voice
+  /* Brand and voice */
   brand_vibe          text,
   brand_colors        text,
   avoid_notes         text,
 
-  -- Publishing
+  /* Publishing */
   channels            text[] not null default '{}',
 
-  -- Billing / trial
+  /* Billing / trial */
   plan                public.plan_tier,
   subscription_status public.subscription_status not null default 'trialing',
   trial_started_at    timestamptz not null default now(),
@@ -65,9 +65,9 @@ create table if not exists public.profiles (
 
 create index if not exists profiles_email_idx on public.profiles (email);
 
--- ------------------------------------------------------------
--- 3. drops - one weekly batch of creatives per account
--- ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* 3. drops - one weekly batch of creatives per account */
+/* ------------------------------------------------------------ */
 create table if not exists public.drops (
   id            uuid primary key default gen_random_uuid(),
   user_id       uuid not null references public.profiles (id) on delete cascade,
@@ -82,9 +82,9 @@ create table if not exists public.drops (
 
 create index if not exists drops_user_idx on public.drops (user_id, week_starting desc);
 
--- ------------------------------------------------------------
--- 4. creatives - individual ads inside a drop (swipe approval)
--- ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* 4. creatives - individual ads inside a drop (swipe approval) */
+/* ------------------------------------------------------------ */
 create table if not exists public.creatives (
   id           uuid primary key default gen_random_uuid(),
   drop_id      uuid not null references public.drops (id) on delete cascade,
@@ -104,10 +104,10 @@ create table if not exists public.creatives (
 create index if not exists creatives_drop_idx on public.creatives (drop_id);
 create index if not exists creatives_user_idx on public.creatives (user_id, created_at desc);
 
--- ------------------------------------------------------------
--- 5. contact_requests - the "Contact" / talk-to-sales form.
---    Public form: anyone may insert, nobody may read from the browser.
--- ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* 5. contact_requests - the "Contact" / talk-to-sales form. */
+/*    Public form: anyone may insert, nobody may read from the browser. */
+/* ------------------------------------------------------------ */
 create table if not exists public.contact_requests (
   id            uuid primary key default gen_random_uuid(),
   business_name text,
@@ -119,9 +119,9 @@ create table if not exists public.contact_requests (
   created_at    timestamptz not null default now()
 );
 
--- ------------------------------------------------------------
--- 6. messages - the "Message us" form
--- ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* 6. messages - the "Message us" form */
+/* ------------------------------------------------------------ */
 create table if not exists public.messages (
   id         uuid primary key default gen_random_uuid(),
   full_name  text,
@@ -131,9 +131,9 @@ create table if not exists public.messages (
   created_at timestamptz not null default now()
 );
 
--- ------------------------------------------------------------
--- 7. updated_at trigger
--- ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* 7. updated_at trigger */
+/* ------------------------------------------------------------ */
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -159,10 +159,10 @@ create trigger creatives_set_updated_at
   before update on public.creatives
   for each row execute function public.set_updated_at();
 
--- ------------------------------------------------------------
--- 8. Auto-create a profile whenever a user signs up.
---    Reads the metadata passed in supabase.auth.signUp({ options: { data: ... } }).
--- ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* 8. Auto-create a profile whenever a user signs up. */
+/*    Reads the metadata passed in supabase.auth.signUp({ options: { data: ... } }). */
+/* ------------------------------------------------------------ */
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -210,17 +210,17 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- ------------------------------------------------------------
--- 9. Row Level Security
---    RLS is NOT enabled by default on new tables - turn it on explicitly.
--- ------------------------------------------------------------
+/* ------------------------------------------------------------ */
+/* 9. Row Level Security */
+/*    RLS is NOT enabled by default on new tables - turn it on explicitly. */
+/* ------------------------------------------------------------ */
 alter table public.profiles         enable row level security;
 alter table public.drops            enable row level security;
 alter table public.creatives        enable row level security;
 alter table public.contact_requests enable row level security;
 alter table public.messages         enable row level security;
 
--- profiles: a user reads and edits only their own row
+/* profiles: a user reads and edits only their own row */
 drop policy if exists "profiles select own" on public.profiles;
 create policy "profiles select own" on public.profiles
   for select to authenticated using (auth.uid() = id);
@@ -233,7 +233,7 @@ drop policy if exists "profiles update own" on public.profiles;
 create policy "profiles update own" on public.profiles
   for update to authenticated using (auth.uid() = id) with check (auth.uid() = id);
 
--- drops: read own, approve or skip own
+/* drops: read own, approve or skip own */
 drop policy if exists "drops select own" on public.drops;
 create policy "drops select own" on public.drops
   for select to authenticated using (auth.uid() = user_id);
@@ -242,7 +242,7 @@ drop policy if exists "drops update own" on public.drops;
 create policy "drops update own" on public.drops
   for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
--- creatives: read own, approve or reject own
+/* creatives: read own, approve or reject own */
 drop policy if exists "creatives select own" on public.creatives;
 create policy "creatives select own" on public.creatives
   for select to authenticated using (auth.uid() = user_id);
@@ -251,9 +251,9 @@ drop policy if exists "creatives update own" on public.creatives;
 create policy "creatives update own" on public.creatives
   for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
--- contact_requests / messages: public forms.
--- Anyone may submit. Nobody may read them from the browser - read them in the
--- Supabase dashboard, which bypasses RLS.
+/* contact_requests / messages: public forms. */
+/* Anyone may submit. Nobody may read them from the browser - read them in the */
+/* Supabase dashboard, which bypasses RLS. */
 drop policy if exists "contact insert public" on public.contact_requests;
 create policy "contact insert public" on public.contact_requests
   for insert to anon, authenticated with check (true);
