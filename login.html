@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in — LocalBoost</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="localboost.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="LocalBoost.dc.html#top" class="nav-logo"><span class="nav-dot"></span>LocalBoost</a>
+  <div class="nav-links">
+    <a href="LocalBoost.dc.html#drop">The drop</a>
+    <a href="LocalBoost.dc.html#engine">Engine</a>
+    <a href="LocalBoost.dc.html#control">Control room</a>
+    <a href="LocalBoost.dc.html#pricing">Pricing</a>
+  </div>
+  <a href="signup.html" class="nav-cta">Start free drop</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow">YOUR ACCOUNT</div>
+  <h1 id="page-title">Log in to LocalBoost.</h1>
+  <p id="page-sub">Access your control room, or create a quick account to hold your spot.</p>
+</header>
+
+<section class="section-tight">
+  <div class="wrap form-narrow">
+
+    <div id="already-in" class="card" hidden>
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">SIGNED IN AS</div>
+      <div id="already-in-name" style="margin-top:10px;font-size:19px;color:#fff;letter-spacing:-.015em">—</div>
+      <div style="height:1px;background:#1b1e22;margin:18px 0"></div>
+      <div style="display:grid;gap:10px;font-size:13.5px;color:#8a8f98">
+        <div>Email: <span id="trial-email" style="color:#d0d6e0">—</span></div>
+        <div>Free trial started: <span id="trial-start" style="color:#d0d6e0">—</span></div>
+        <div>Free trial ends: <span id="trial-end" style="color:var(--acc)">—</span></div>
+      </div>
+      <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px">
+        <a href="LocalBoost.dc.html#control" class="btn">Go to control room<span class="mono" style="font-size:13px">→</span></a>
+        <button id="logout-btn" class="btn-ghost" type="button">Log out</button>
+      </div>
+    </div>
+
+    <div id="auth-forms">
+      <div style="display:flex;justify-content:center;margin-bottom:28px">
+        <div class="tabswitch">
+          <button id="tab-login" class="active" type="button">Log in</button>
+          <button id="tab-signup" type="button">Sign up</button>
+        </div>
+      </div>
+
+      <form id="login-form">
+        <div class="field">
+          <label for="li-email">EMAIL</label>
+          <input id="li-email" type="email" required placeholder="you@business.com">
+        </div>
+        <div class="field">
+          <label for="li-password">PASSWORD</label>
+          <input id="li-password" type="password" required placeholder="Your password">
+        </div>
+        <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Log in<span class="mono" style="font-size:13px">→</span></button>
+      </form>
+
+      <form id="signup-form" hidden>
+        <div class="field">
+          <label for="su-business">BUSINESS NAME</label>
+          <input id="su-business" type="text" required placeholder="e.g. Milena's Bakery">
+        </div>
+        <div class="field">
+          <label for="su-email">EMAIL</label>
+          <input id="su-email" type="email" required placeholder="you@business.com">
+        </div>
+        <div class="field">
+          <label for="su-password">PASSWORD</label>
+          <input id="su-password" type="password" required placeholder="Create a password">
+        </div>
+        <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Create account<span class="mono" style="font-size:13px">→</span></button>
+      </form>
+
+      <div id="redirect-notice" class="notice" hidden></div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="LocalBoost.dc.html#control">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+</footer>
+
+<script src="auth.js"></script>
+<script>
+(function(){
+  var tabLogin = document.getElementById("tab-login");
+  var tabSignup = document.getElementById("tab-signup");
+  var loginForm = document.getElementById("login-form");
+  var signupForm = document.getElementById("signup-form");
+  var title = document.getElementById("page-title");
+  var sub = document.getElementById("page-sub");
+
+  function showLogin(){
+    tabLogin.classList.add("active"); tabSignup.classList.remove("active");
+    loginForm.hidden = false; signupForm.hidden = true;
+    title.textContent = "Log in to LocalBoost.";
+    sub.textContent = "Access your control room, or create a quick account to hold your spot.";
+  }
+  function showSignup(){
+    tabSignup.classList.add("active"); tabLogin.classList.remove("active");
+    loginForm.hidden = true; signupForm.hidden = false;
+    title.textContent = "Create your account.";
+    sub.textContent = "Just enough to hold your spot — you'll pick a plan and brief the engine next.";
+  }
+  tabLogin.addEventListener("click", showLogin);
+  tabSignup.addEventListener("click", showSignup);
+
+  function redirect(url, message){
+    document.getElementById("redirect-notice").hidden = false;
+    document.getElementById("redirect-notice").textContent = message;
+    setTimeout(function(){ location.href = url; }, 900);
+  }
+
+  function ensureTrialStarted(){
+    if (!localStorage.getItem("lb_trial_start")) {
+      localStorage.setItem("lb_trial_start", String(Date.now()));
+    }
+  }
+
+  loginForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var email = document.getElementById("li-email").value;
+    LBAuth.login({ email: email });
+    ensureTrialStarted();
+    redirect("LocalBoost.dc.html#control", "Logged in — taking you to your control room...");
+  });
+
+  signupForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var business = document.getElementById("su-business").value;
+    var email = document.getElementById("su-email").value;
+    LBAuth.login({ business: business, email: email });
+    ensureTrialStarted();
+    redirect("LocalBoost.dc.html#pricing", "Account created — pick a plan to start your first drop...");
+  });
+
+  var TRIAL_DAYS = 7;
+  function fmt(date){
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
+
+  if (LBAuth.isLoggedIn()) {
+    var user = LBAuth.getUser() || {};
+
+    var trialStartMs = parseInt(localStorage.getItem("lb_trial_start") || "", 10);
+    if (!trialStartMs) {
+      trialStartMs = Date.now();
+      localStorage.setItem("lb_trial_start", String(trialStartMs));
+    }
+    var start = new Date(trialStartMs);
+    var end = new Date(trialStartMs + TRIAL_DAYS * 24 * 60 * 60 * 1000);
+
+    document.getElementById("already-in").hidden = false;
+    document.getElementById("auth-forms").hidden = true;
+    document.getElementById("already-in-name").textContent = user.business || user.email || "your account";
+    document.getElementById("trial-email").textContent = user.email || "—";
+    document.getElementById("trial-start").textContent = fmt(start);
+    document.getElementById("trial-end").textContent = fmt(end);
+    document.getElementById("page-title").textContent = "Welcome back.";
+    document.getElementById("page-sub").textContent = "You're already signed in.";
+  }
+
+  document.getElementById("logout-btn").addEventListener("click", function(){
+    LBAuth.logout();
+    localStorage.removeItem("lb_trial_start");
+    location.reload();
+  });
+})();
+</script>
+
+</body>
+</html>

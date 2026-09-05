@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start your drop — LocalBoost</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="localboost.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="LocalBoost.dc.html#top" class="nav-logo"><span class="nav-dot"></span>LocalBoost</a>
+  <div class="nav-links">
+    <a href="LocalBoost.dc.html#drop">The drop</a>
+    <a href="LocalBoost.dc.html#engine">Engine</a>
+    <a href="LocalBoost.dc.html#control">Control room</a>
+    <a href="LocalBoost.dc.html#pricing">Pricing</a>
+  </div>
+  <a href="login.html" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px">Log in</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow" id="page-eyebrow">FIRST DROP FREE · CANCEL ANY WEEK</div>
+  <h1 id="plan-headline">Set up your <em>Storefront</em> drop.</h1>
+  <p id="page-sub">Onboard in ten minutes. Your first batch is waiting for approval before the week is out.</p>
+</header>
+
+<section class="section-tight">
+
+  <div id="activated-view" class="wrap form-narrow" hidden>
+    <div class="card" style="text-align:center">
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:var(--acc)">PLAN ACTIVE</div>
+      <div id="activated-text" style="margin-top:14px;font-size:19px;color:#fff;letter-spacing:-.015em">The Storefront plan is live on your account.</div>
+      <div style="margin-top:8px;font-size:14px;color:#8a8f98">Your next drop renders Monday at 09:00. Nothing else to do here.</div>
+      <a href="LocalBoost.dc.html#top" class="btn" style="margin-top:24px;justify-content:center">Back to home<span class="mono" style="font-size:13px">→</span></a>
+    </div>
+  </div>
+
+  <div id="form-view" class="wrap-wide" style="max-width:960px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:40px;align-items:start">
+
+    <form id="signup-form">
+
+      <div class="section-label">ACCOUNT</div>
+      <div class="field">
+        <label for="business">BUSINESS NAME</label>
+        <input id="business" name="business" type="text" required placeholder="e.g. Milena's Bakery">
+      </div>
+      <div class="field">
+        <label for="email">EMAIL</label>
+        <input id="email" name="email" type="email" required placeholder="you@business.com">
+      </div>
+      <div class="field">
+        <label for="password">PASSWORD</label>
+        <input id="password" name="password" type="password" required placeholder="Create a password">
+      </div>
+
+      <div class="section-label">ABOUT YOUR BUSINESS</div>
+      <div class="field">
+        <label for="city">CITY</label>
+        <input id="city" name="city" type="text" required placeholder="Where's the shop?">
+      </div>
+      <div class="field">
+        <label for="vertical">VERTICAL</label>
+        <select id="vertical" name="vertical">
+          <option>Bakery</option>
+          <option>Barbershop</option>
+          <option>Dental clinic</option>
+          <option>Gym / studio</option>
+          <option>Wine bar</option>
+          <option>Florist</option>
+          <option>Auto detailer</option>
+          <option>Physiotherapy</option>
+          <option>Nail studio</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="website">WEBSITE OR INSTAGRAM HANDLE (OPTIONAL)</label>
+        <input id="website" name="website" type="text" placeholder="@yourbusiness or yourbusiness.com">
+      </div>
+      <div class="field">
+        <label for="what">WHAT DO YOU SELL OR DO, IN ONE LINE?</label>
+        <input id="what" name="what" type="text" required placeholder="e.g. Sourdough and pastries, baked fresh every morning">
+      </div>
+      <div class="field">
+        <label for="customer">WHO'S YOUR TYPICAL CUSTOMER?</label>
+        <input id="customer" name="customer" type="text" required placeholder="e.g. Neighborhood regulars, 30-55, coffee-first crowd">
+      </div>
+      <div class="field">
+        <label for="different">WHAT MAKES YOU DIFFERENT FROM THE PLACE DOWN THE STREET?</label>
+        <textarea id="different" name="different" placeholder="e.g. Everything's made from scratch, we source local, third generation family recipe..."></textarea>
+      </div>
+
+      <div class="section-label">BRAND &amp; VOICE</div>
+      <div class="field">
+        <label for="vibe">BRAND VIBE</label>
+        <select id="vibe" name="vibe">
+          <option>Warm & cozy</option>
+          <option>Bold & energetic</option>
+          <option>Minimal & modern</option>
+          <option>Playful & fun</option>
+          <option>Premium & elegant</option>
+          <option>Local & authentic</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="colors">BRAND COLORS OR PALETTE (OPTIONAL)</label>
+        <input id="colors" name="colors" type="text" placeholder="e.g. Warm oak, matte black, morning light">
+      </div>
+      <div class="field">
+        <label for="avoid">ANYTHING THE ENGINE SHOULD AVOID? (OPTIONAL)</label>
+        <textarea id="avoid" name="avoid" placeholder="e.g. No humor about pricing, never show the back kitchen..."></textarea>
+      </div>
+
+      <div class="section-label">WHERE SHOULD WE PUBLISH?</div>
+      <div class="checkbox-group">
+        <label class="checkbox-row"><input type="checkbox" name="channels" value="Instagram" checked>Instagram</label>
+        <label class="checkbox-row"><input type="checkbox" name="channels" value="Facebook" checked>Facebook</label>
+        <label class="checkbox-row"><input type="checkbox" name="channels" value="TikTok">TikTok</label>
+        <label class="checkbox-row"><input type="checkbox" name="channels" value="Google Business">Google Business</label>
+        <label class="checkbox-row"><input type="checkbox" name="channels" value="LinkedIn">LinkedIn</label>
+        <label class="checkbox-row"><input type="checkbox" name="channels" value="Pinterest">Pinterest</label>
+      </div>
+
+      <button type="submit" class="btn" style="width:100%;justify-content:center;border:none;margin-top:32px">Claim your first drop<span class="mono" style="font-size:13px">→</span></button>
+    </form>
+
+    <aside class="card" id="plan-summary" style="position:sticky;top:96px">
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">YOUR PLAN</div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:14px">
+        <div id="plan-name" style="font-size:20px;color:#fff;letter-spacing:-.015em">Storefront</div>
+        <div><span id="plan-price" style="font-size:28px;color:var(--acc);letter-spacing:-.03em">€249</span><span class="mono" style="font-size:10px;color:#62666d"> / MONTH</span></div>
+      </div>
+      <div id="plan-rate" style="margin-top:6px;font-size:13px;color:#62666d">12 ads / week · 4 channels</div>
+      <div style="height:1px;background:#1b1e22;margin:18px 0"></div>
+      <ul class="plain" id="plan-features" style="padding-left:0;list-style:none;display:grid;gap:10px;font-size:13.5px"></ul>
+      <div style="margin-top:18px"><a href="LocalBoost.dc.html#pricing" style="font-size:13px;color:#62666d">Not the right plan? Compare plans →</a></div>
+    </aside>
+
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="LocalBoost.dc.html#control">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+</footer>
+
+<script src="auth.js"></script>
+<script>
+(function(){
+  var plans = {
+    counter: { name: "Counter", price: "€89", rate: "4 ads / week · 1 channel",
+      features: ["4 photoreal creatives every Monday", "One connected channel", "Best-time auto-publishing", "Swipe approval in the app"] },
+    storefront: { name: "Storefront", price: "€249", rate: "12 ads / week · 4 channels",
+      features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", "Performance feedback into next drop", "Caption variants and A/B slotting"] }
+  };
+  var params = new URLSearchParams(location.search);
+  var key = params.get("plan");
+  var plan = plans[key] || plans.storefront;
+
+  document.getElementById("plan-headline").innerHTML = 'Set up your <em>' + plan.name + '</em> drop.';
+  document.getElementById("plan-name").textContent = plan.name;
+  document.getElementById("plan-price").textContent = plan.price;
+  document.getElementById("plan-rate").textContent = plan.rate;
+
+  var list = document.getElementById("plan-features");
+  plan.features.forEach(function(f){
+    var li = document.createElement("li");
+    li.style.display = "grid";
+    li.style.gridTemplateColumns = "auto minmax(0,1fr)";
+    li.style.gap = "10px";
+    li.style.color = "#8a8f98";
+    li.innerHTML = '<span style="color:var(--acc);font-family:\'Geist Mono\',monospace;font-size:11px">▪</span>' + f;
+    list.appendChild(li);
+  });
+
+  function showActivated(){
+    document.getElementById("form-view").hidden = true;
+    document.getElementById("activated-view").hidden = false;
+    document.getElementById("page-eyebrow").textContent = "YOU'RE ALL SET";
+    document.getElementById("plan-headline").innerHTML = 'Your <em>' + plan.name + '</em> drop is active.';
+    document.getElementById("page-sub").textContent = "No need to sign up again — your account already has this covered.";
+    document.getElementById("activated-text").textContent = "The " + plan.name + " plan is live on your account.";
+  }
+
+  if (LBAuth.isLoggedIn()) {
+    showActivated();
+  } else {
+    document.getElementById("signup-form").addEventListener("submit", function(e){
+      e.preventDefault();
+      LBAuth.login({
+        business: document.getElementById("business").value,
+        email: document.getElementById("email").value,
+        plan: plan.name
+      });
+      showActivated();
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./auth.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
+<style>
+:root{--acc:#a8c6f0;--acc-soft:rgba(168,198,240,.14);}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#07080a;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;font-feature-settings:"zero" on}
+a{color:var(--acc);text-decoration:none}
+a:hover{color:#cbdff9}
+::selection{background:var(--acc);color:#07080a}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--acc) var(--fill,50%),#23252a var(--fill,50%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-7px;border-radius:9999px;background:var(--acc);box-shadow:0 0 0 6px var(--acc-soft)}
+input[type=range]::-moz-range-track{height:2px;background:linear-gradient(90deg,var(--acc) var(--fill,50%),#23252a var(--fill,50%))}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:9999px;background:var(--acc)}
+@keyframes lbMarquee{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+@keyframes lbPulse{0%{opacity:0;transform:scale(.5)}35%{opacity:.55}100%{opacity:0;transform:scale(2.1)}}
+@keyframes lbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes lbBlink{0%,100%{opacity:.25}50%{opacity:1}}
+@media (max-width:1080px){
+[data-scene]{position:relative !important;inset:auto !important;width:100% !important;height:400px;margin-top:40px}
+[data-grid2]{grid-template-columns:1fr !important}
+[data-offset]{margin:0 !important;transform:none !important}
+[data-pinvis]{display:none !important}
+[data-railhide]{display:none !important}
+}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="position:relative;width:100%;background:#07080a">
+
+<div data-railhide="1" style="position:fixed;top:0;right:0;bottom:0;width:1px;background:#15171b;z-index:40"><div data-progress="1" style="position:absolute;top:0;left:0;width:100%;height:0%;background:linear-gradient(180deg,rgba(168,198,240,0),var(--acc))"></div></div>
+
+<nav style="position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:8px;padding:8px 10px 8px 16px;width:min(1160px,calc(100% - 32px));border-radius:9999px;border:1px solid rgba(255,255,255,.07);background:rgba(10,11,13,.72);backdrop-filter:blur(18px);box-shadow:0 12px 40px rgba(0,0,0,.5)">
+  <a href="#top" style="display:flex;align-items:center;gap:9px;color:#fff;font-size:15px;font-weight:500;letter-spacing:-.02em;margin-right:auto">
+    <span style="display:block;width:16px;height:16px;border-radius:5px;background:var(--acc);box-shadow:0 0 18px rgba(168,198,240,.45)"></span>LocalBoost
+  </a>
+  <div style="display:flex;align-items:center;gap:2px;font-size:13px">
+    <a href="#drop" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">The drop</a>
+    <a href="#engine" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Engine</a>
+    <a href="#control" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Control room</a>
+    <a href="#pricing" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Pricing</a>
+  </div>
+  <a href="login.html" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px" style-hover="background:rgba(255,255,255,.05)">Log in</a>
+  <a href="signup.html" style="margin-left:6px;padding:9px 16px;border-radius:9999px;background:var(--acc);color:#07080a;font-size:13px;font-weight:600;letter-spacing:-.01em" style-hover="background:#cbdff9">Start free drop</a>
+</nav>
+
+<section id="top" style="position:relative;min-height:100svh;padding:172px 24px 80px;display:flex;justify-content:center;overflow:hidden">
+  <div style="position:absolute;top:-10%;left:50%;transform:translateX(-50%);width:min(1400px,140%);height:80vh;background:radial-gradient(60% 50% at 50% 0%,rgba(168,198,240,.10),rgba(7,8,10,0) 70%);pointer-events:none"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:52vh;background:linear-gradient(180deg,rgba(7,8,10,0) 0%,rgba(150,170,200,.09) 58%,rgba(7,8,10,0) 100%);pointer-events:none"></div>
+
+  <div data-grid2="1" style="position:relative;width:100%;max-width:1200px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:center;gap:32px">
+    <div style="position:relative;z-index:3">
+      <div style="display:inline-flex;align-items:center;gap:10px;padding:5px 12px 5px 8px;border:1px solid rgba(255,255,255,.09);border-radius:9999px;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.1em;color:#8a8f98;background:rgba(255,255,255,.02)">
+        <span style="width:6px;height:6px;border-radius:9999px;background:var(--acc);animation:lbBlink 2.2s ease-in-out infinite"></span>DROP 34 RENDERING — MON 09:00
+      </div>
+      <h1 style="margin:26px 0 0;font-size:clamp(42px,6.4vw,78px);line-height:.96;letter-spacing:-.035em;font-weight:500;color:#fff;text-wrap:balance">Your next forty ads are <span style="font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--acc)">already</span> in production.</h1>
+      <p style="margin:26px 0 0;max-width:47ch;font-size:clamp(16px,1.25vw,18px);line-height:1.55;color:#8a8f98">LocalBoost renders a fresh batch of photoreal ads for your business every week — shot in your voice, set in your city — then publishes them to your channels while you run the shop.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:34px">
+        <a href="signup.html" style="display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:9999px;background:var(--acc);color:#07080a;font-size:15px;font-weight:600;letter-spacing:-.01em;box-shadow:0 10px 40px rgba(168,198,240,.22)" style-hover="background:#cbdff9;box-shadow:0 14px 50px rgba(168,198,240,.34)">Claim your first drop<span style="font-family:'Geist Mono',monospace;font-size:13px">→</span></a>
+        <a href="#engine" style="display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:9999px;border:1px solid #23252a;color:#d0d6e0;font-size:15px;background:rgba(255,255,255,.02)" style-hover="border-color:#4a4d54;color:#fff">Open the engine</a>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:28px;margin-top:52px;padding-top:26px;border-top:1px solid #15171b;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:#62666d">
+        <div><div data-count="1" data-target="1240" style="font-family:'Geist',sans-serif;font-size:26px;letter-spacing:-.03em;color:#fff;margin-bottom:5px">0</div>LOCAL BUSINESSES</div>
+        <div><div data-count="1" data-target="186000" data-suffix="+" style="font-family:'Geist',sans-serif;font-size:26px;letter-spacing:-.03em;color:#fff;margin-bottom:5px">0</div>ADS SHIPPED</div>
+        <div><div style="font-family:'Geist',sans-serif;font-size:26px;letter-spacing:-.03em;color:#fff;margin-bottom:5px">0</div>BRIEFS YOU WRITE</div>
+      </div>
+    </div>
+
+    <div data-scene="1" style="position:absolute;top:50%;right:-6%;width:60%;height:112%;transform:translateY(-50%);perspective:1500px;pointer-events:none;z-index:2">
+      <div data-tilt="1" style="position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .12s linear">
+        <div data-depth=".2" style="position:absolute;left:50%;top:64%;width:150%;height:70%;transform:translate(-50%,0) rotateX(74deg) translateY(var(--py,0px));background-image:linear-gradient(rgba(168,198,240,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(168,198,240,.16) 1px,transparent 1px);background-size:46px 46px;-webkit-mask-image:radial-gradient(50% 50% at 50% 40%,#000,transparent 72%);mask-image:radial-gradient(50% 50% at 50% 40%,#000,transparent 72%)"></div>
+        <div style="position:absolute;left:14%;top:26%;width:56%;height:44%;border-radius:50%;background:radial-gradient(closest-side,rgba(168,198,240,.22),transparent);filter:blur(28px)"></div>
+
+        <div data-depth="1" style="position:absolute;left:6%;top:8%;width:60%;transform:translateZ(120px) translateY(var(--py,0px)) rotateY(-13deg) rotateX(6deg);border-radius:14px;border:1px solid rgba(255,255,255,.09);background:#0e0f12;box-shadow:0 40px 90px rgba(0,0,0,.6);overflow:hidden">
+          <div style="height:210px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 11px);background-color:#15171b;display:flex;align-items:flex-end;padding:14px"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#62666d">CREATIVE 34-01 · REEL 9:16</span></div>
+          <div style="padding:14px 16px 16px"><div style="font-size:15px;color:#fff;letter-spacing:-.015em">Saturday tasting, 4pm.</div><div style="margin-top:5px;font-size:13px;color:#62666d">Autoposted · Instagram, TikTok</div></div>
+        </div>
+
+        <div data-depth="1.7" style="position:absolute;right:0%;top:36%;width:52%;transform:translateZ(230px) translateY(var(--py,0px)) rotateY(11deg) rotateX(-4deg);border-radius:14px;border:1px solid rgba(255,255,255,.11);background:#0e0f12;box-shadow:0 50px 100px rgba(0,0,0,.7);overflow:hidden;animation:lbFloat 7s ease-in-out infinite">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid #15171b"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#8a8f98">QUEUE</span><span style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--acc)">12 / 12</span></div>
+          <div style="padding:11px 13px;display:grid;gap:8px">
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:26px;height:26px;border-radius:6px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 2px,transparent 2px 9px);background-color:#1b1e22"></span><span style="font-size:12px;color:#d0d6e0">Mon 18:30 · Story</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:26px;height:26px;border-radius:6px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 2px,transparent 2px 9px);background-color:#1b1e22"></span><span style="font-size:12px;color:#d0d6e0">Wed 12:00 · Feed</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:26px;height:26px;border-radius:6px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 2px,transparent 2px 9px);background-color:#1b1e22"></span><span style="font-size:12px;color:#d0d6e0">Fri 17:15 · Reel</span></div>
+          </div>
+        </div>
+
+      </div>
+      <div style="position:absolute;left:50%;bottom:8%;transform:translateX(-50%);padding:11px 15px;border-radius:9999px;border:1px solid rgba(168,198,240,.3);background:rgba(168,198,240,.08);backdrop-filter:blur(8px);font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--acc);box-shadow:0 20px 50px rgba(0,0,0,.5);white-space:nowrap">+9 CREATIVES APPROVED</div>
+    </div>
+  </div>
+</section>
+
+<section style="position:relative;padding:clamp(60px,7vw,96px) 24px clamp(56px,6vw,84px);background:transparent">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px">
+      <h2 style="margin:0;max-width:24ch;font-size:clamp(24px,2.6vw,34px);line-height:1.15;letter-spacing:-.028em;font-weight:500;color:#fff">Built for operators with no marketing department.</h2>
+      <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;text-align:right;line-height:1.8">NINE VERTICALS<br>ONE ENGINE</div>
+    </div>
+    <div style="margin-top:clamp(28px,4vw,44px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:1px;background:#15171b;border:1px solid #15171b;border-radius:12px;overflow:hidden">
+      <div style="display:flex;align-items:baseline;gap:11px;padding:20px 18px;background:#0a0b0d;transition:background .25s ease" style-hover="background:#101215"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#3d4046">01</span><span style="font-size:15px;letter-spacing:-.01em;color:#d0d6e0">Bakeries</span></div>
+      <div style="display:flex;align-items:baseline;gap:11px;padding:20px 18px;background:#0a0b0d;transition:background .25s ease" style-hover="background:#101215"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#3d4046">02</span><span style="font-size:15px;letter-spacing:-.01em;color:#d0d6e0">Barbershops</span></div>
+      <div style="display:flex;align-items:baseline;gap:11px;padding:20px 18px;background:#0a0b0d;transition:background .25s ease" style-hover="background:#101215"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#3d4046">03</span><span style="font-size:15px;letter-spacing:-.01em;color:#d0d6e0">Dental clinics</span></div>
+      <div style="display:flex;align-items:baseline;gap:11px;padding:20px 18px;background:#0a0b0d;transition:background .25s ease" style-hover="background:#101215"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#3d4046">04</span><span style="font-size:15px;letter-spacing:-.01em;color:#d0d6e0">Gyms &amp; studios</span></div>
+      <div style="display:flex;align-items:baseline;gap:11px;padding:20px 18px;background:#0a0b0d;transition:background .25s ease" style-hover="background:#101215"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#3d4046">05</span><span style="font-size:15px;letter-spacing:-.01em;color:#d0d6e0">Wine bars</span></div>
+      <div style="display:flex;align-items:baseline;gap:11px;padding:20px 18px;background:#0a0b0d;transition:background .25s ease" style-hover="background:#101215"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#3d4046">06</span><span style="font-size:15px;letter-spacing:-.01em;color:#d0d6e0">Florists</span></div>
+      <div style="display:flex;align-items:baseline;gap:11px;padding:20px 18px;background:#0a0b0d;transition:background .25s ease" style-hover="background:#101215"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#3d4046">07</span><span style="font-size:15px;letter-spacing:-.01em;color:#d0d6e0">Auto detailers</span></div>
+      <div style="display:flex;align-items:baseline;gap:11px;padding:20px 18px;background:#0a0b0d;transition:background .25s ease" style-hover="background:#101215"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#3d4046">08</span><span style="font-size:15px;letter-spacing:-.01em;color:#d0d6e0">Physiotherapy</span></div>
+      <div style="display:flex;align-items:baseline;gap:11px;padding:20px 18px;background:#0a0b0d;transition:background .25s ease" style-hover="background:#101215"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#3d4046">09</span><span style="font-size:15px;letter-spacing:-.01em;color:#d0d6e0">Nail studios</span></div>
+    </div>
+  </div>
+</section>
+
+<section style="position:relative;padding:clamp(90px,11vw,150px) 24px;display:flex;justify-content:center">
+  <div data-grid2="1" style="width:100%;max-width:1200px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:clamp(32px,5vw,80px);align-items:start">
+    <div>
+      <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:22px">01 — THE COST OF GOING QUIET</div>
+      <h2 style="margin:0;font-size:clamp(32px,4.2vw,54px);line-height:1.04;letter-spacing:-.032em;font-weight:500;color:#fff;text-wrap:balance">A great local business dies of <span style="font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;color:var(--acc)">silence</span>, not of bad coffee.</h2>
+      <p style="margin:24px 0 0;max-width:46ch;font-size:17px;line-height:1.6;color:#8a8f98">You are the product, the staff, the bookkeeper and the marketing department. The marketing department is the one that gets cut. Two weeks of no posts becomes two months, and the feed forgets you exist.</p>
+      <p style="margin:18px 0 0;max-width:46ch;font-size:17px;line-height:1.6;color:#8a8f98">LocalBoost is built on one assumption: you will never have time to make the ads. So the ads arrive made.</p>
+    </div>
+    <div style="display:grid;gap:16px;padding-top:18px">
+      <div data-reveal="1" style="padding:22px;border-radius:12px;border:1px solid #1b1e22;background:#0e0f12;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)">
+        <div data-count="1" data-target="11" data-suffix=" hrs" style="font-size:44px;letter-spacing:-.035em;color:#fff;font-weight:400">0</div>
+        <div style="margin-top:8px;font-size:14px;color:#8a8f98">Median owner time returned per month, measured across 400 accounts.</div>
+      </div>
+      <div data-reveal="1" data-offset="1" style="margin-left:clamp(0px,4vw,56px);padding:22px;border-radius:12px;border:1px solid #23252a;background:#15171b;box-shadow:0 30px 60px rgba(0,0,0,.45)">
+        <div data-count="1" data-target="3" data-suffix=".1×" style="font-size:44px;letter-spacing:-.035em;color:var(--acc);font-weight:400">0</div>
+        <div style="margin-top:8px;font-size:14px;color:#8a8f98">Posting frequency after 60 days on autopilot, versus the 60 days before.</div>
+      </div>
+      <div data-reveal="1" data-offset="1" style="margin-left:clamp(0px,8vw,104px);padding:22px;border-radius:12px;border:1px solid #1b1e22;background:#0e0f12">
+        <div data-count="1" data-target="0" data-prefix="€" style="font-size:44px;letter-spacing:-.035em;color:#fff;font-weight:400">€0</div>
+        <div style="margin-top:8px;font-size:14px;color:#8a8f98">Spent on an agency retainer, a photographer, or a Monday-morning idea.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="drop" data-story="1" style="position:relative;height:300vh;padding:0 24px">
+  <div style="position:sticky;top:0;height:100svh;display:flex;align-items:center;justify-content:center">
+    <div data-grid2="1" style="width:100%;max-width:1200px;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:clamp(28px,4vw,64px);align-items:center">
+      <div>
+        <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">02 — THE WEEKLY DROP</div>
+        <h2 style="margin:0 0 32px;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Four moves. You are involved in one of them.</h2>
+        <div style="display:grid;gap:2px">
+          <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+            <div onClick="{{ s.go }}" style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;padding:16px 18px;border-radius:10px;border-left:2px solid {{ s.bar }};background:{{ s.bg }};transition:background .5s ease,border-color .5s ease;cursor:pointer" style-hover="background:rgba(255,255,255,.05)">
+              <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.1em;color:{{ s.numColor }};border:1px solid {{ s.chip }};border-radius:9999px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;transition:color .5s ease,border-color .5s ease">{{ s.n }}</div>
+              <div>
+                <div style="font-size:19px;letter-spacing:-.02em;color:{{ s.titleColor }};transition:color .5s ease">{{ s.t }}</div>
+                <div style="margin-top:7px;font-size:14px;line-height:1.55;color:#62666d;opacity:{{ s.op }};max-height:{{ s.mh }};overflow:hidden;transition:opacity .5s ease,max-height .5s ease">{{ s.d }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div data-pinvis="1" style="position:relative;height:min(560px,68vh);perspective:1400px">
+        <div style="position:absolute;left:50%;top:48%;width:min(560px,92%);height:min(420px,60vh);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(168,198,240,.20),rgba(168,198,240,.05) 55%,transparent 78%);filter:blur(34px);pointer-events:none"></div>
+        <div data-tilt="1" data-tilt-strength=".7" style="position:absolute;inset:0;transform-style:preserve-3d">
+          <sc-for list="{{ panels }}" as="p" hint-placeholder-count="4">
+            <div style="position:absolute;left:50%;top:50%;width:min(420px,86%);margin-left:min(-210px,-43%);margin-top:-170px;height:340px;border-radius:14px;border:1px solid {{ p.border }};background:#0e0f12;box-shadow:0 40px 90px rgba(0,0,0,.6);overflow:hidden;transform:{{ p.tf }};opacity:{{ p.op }};transition:transform .7s cubic-bezier(.22,1,.36,1),opacity .7s ease,border-color .7s ease">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #17191d"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8a8f98">{{ p.tag }}</span><span style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--acc)">{{ p.meta }}</span></div>
+              <div style="padding:18px 16px;display:grid;gap:10px">
+                <div style="height:112px;border-radius:8px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 11px);background-color:#15171b;display:flex;align-items:flex-end;padding:11px"><span style="font-family:'Geist Mono',monospace;font-size:10px;color:#62666d">{{ p.slot }}</span></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+                  <div style="height:56px;border-radius:6px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 10px);background-color:#131519"></div>
+                  <div style="height:56px;border-radius:6px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 10px);background-color:#131519"></div>
+                  <div style="height:56px;border-radius:6px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 10px);background-color:#131519"></div>
+                </div>
+                <div style="font-size:13px;color:#8a8f98;line-height:1.5">{{ p.line }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="engine" style="position:relative;padding:clamp(28px,3.4vw,56px) 0 clamp(90px,10vw,130px);background:radial-gradient(75% 55% at 50% 22%,rgba(168,198,240,.055),rgba(7,8,10,0) 72%)">
+  <div style="position:absolute;left:0;right:0;top:0;height:clamp(120px,20vh,240px);background:linear-gradient(180deg,#07080a 0%,rgba(7,8,10,.6) 45%,rgba(7,8,10,0) 100%);pointer-events:none;z-index:1"></div>
+  <div style="position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px">
+    <div>
+      <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">03 — THE ENGINE</div>
+      <h2 style="margin:0;max-width:22ch;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">One drop, rendered every way your channels want it.</h2>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button onClick="{{ spinPrev }}" style="width:44px;height:44px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02);color:#d0d6e0;font-size:16px;cursor:pointer" style-hover="border-color:#4a4d54;color:#fff">←</button>
+      <button onClick="{{ spinNext }}" style="width:44px;height:44px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02);color:#d0d6e0;font-size:16px;cursor:pointer" style-hover="border-color:#4a4d54;color:#fff">→</button>
+    </div>
+  </div>
+
+  <div onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerLeave="{{ dragEnd }}" style="position:relative;height:min(520px,62vh);margin-top:clamp(32px,5vw,64px);perspective:1300px;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none">
+    <div style="position:absolute;left:50%;top:52%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-7deg) rotateY({{ angle }}deg);transition:transform .5s cubic-bezier(.22,1,.36,1)">
+      <sc-for list="{{ deck }}" as="c" hint-placeholder-count="7">
+        <div style="position:absolute;width:232px;height:352px;margin-left:-116px;margin-top:-176px;border-radius:14px;border:1px solid {{ c.border }};background:#0e0f12;box-shadow:0 40px 80px rgba(0,0,0,.6);overflow:hidden;transform:{{ c.tf }};opacity:{{ c.op }}">
+          <div style="height:242px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 11px);background-color:#161a1e;display:flex;flex-direction:column;justify-content:space-between;padding:12px">
+            <span style="align-self:flex-start;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.06);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#d0d6e0">{{ c.ratio }}</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#62666d">{{ c.id }}</span>
+          </div>
+          <div style="padding:13px 14px">
+            <div style="font-size:14px;color:#fff;letter-spacing:-.01em;line-height:1.35">{{ c.hook }}</div>
+            <div style="margin-top:8px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#62666d">{{ c.channel }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    
+  </div>
+
+  <div style="max-width:1200px;margin:clamp(40px,5vw,64px) auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:1px;background:#15171b;border:1px solid #15171b;border-radius:12px;overflow:hidden">
+    <div style="padding:24px;background:#0a0b0d"><div style="font-size:16px;color:#fff;letter-spacing:-.015em">Brand fingerprint</div><div style="margin-top:8px;font-size:14px;line-height:1.55;color:#62666d">Palette, tone, props, the way your shop actually looks. Locked once, reused forever.</div></div>
+    <div style="padding:24px;background:#0a0b0d"><div style="font-size:16px;color:#fff;letter-spacing:-.015em">Seasonal hooks</div><div style="margin-top:8px;font-size:14px;line-height:1.55;color:#62666d">Local holidays, weather, school terms, match days. The engine knows what week it is.</div></div>
+    <div style="padding:24px;background:#0a0b0d"><div style="font-size:16px;color:#fff;letter-spacing:-.015em">Native formats</div><div style="margin-top:8px;font-size:14px;line-height:1.55;color:#62666d">9:16, 4:5, 1:1 and 16:9 rendered from the same scene — never a cropped afterthought.</div></div>
+    <div style="padding:24px;background:#0a0b0d"><div style="font-size:16px;color:#fff;letter-spacing:-.015em">Realism guardrails</div><div style="margin-top:8px;font-size:14px;line-height:1.55;color:#62666d">No six-fingered baristas, no invented prices. Anything uncertain never reaches your queue.</div></div>
+  </div>
+<div style="position: absolute; left: 902px; text-align: center; font-family: 'Geist Mono',monospace; font-size: 10px; letter-spacing: .12em; color: #3d4046; top: 818px">DRAG TO ROTATE THE DRUM</div></section>
+
+<section id="control" data-dash="1" style="position:relative;padding:clamp(90px,10vw,140px) 24px clamp(100px,12vw,160px);border-top:1px solid #15171b;overflow:hidden">
+  <div style="position:absolute;left:50%;top:8%;transform:translateX(-50%);font-size:clamp(90px,18vw,260px);font-weight:600;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px #101215;white-space:nowrap;pointer-events:none;user-select:none">CONTROL ROOM</div>
+  <div style="position:relative;max-width:1200px;margin:0 auto">
+    <div style="max-width:640px">
+      <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">04 — YOUR SIDE OF THE GLASS</div>
+      <h2 style="margin:0;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Two minutes on Monday. Everything else is already handled.</h2>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:34px 0 22px">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+        <button onClick="{{ t.onClick }}" style="padding:9px 16px;border-radius:9999px;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.color }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">{{ t.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="perspective:1800px">
+      <div data-dashcard="1" style="transform:rotateX(var(--dashrx,0deg)) rotateZ(var(--dashrz,0deg));transform-origin:50% 100%;border-radius:14px;border:1px solid #23252a;background:#0b0c0e;box-shadow:0 60px 120px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.02);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid #15171b;background:#0e0f12">
+          <span style="width:9px;height:9px;border-radius:9999px;background:#23252a"></span><span style="width:9px;height:9px;border-radius:9999px;background:#23252a"></span><span style="width:9px;height:9px;border-radius:9999px;background:#23252a"></span>
+          <span style="margin-left:8px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#62666d">localboost.app / {{ tabSlug }}</span>
+          <span style="margin-left:auto;padding:3px 9px;border-radius:4px;background:rgba(168,198,240,.12);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--acc)">DROP 34 READY</span>
+        </div>
+
+        <sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:clamp(16px,2.4vw,26px)">
+            <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px">
+              <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+                <div style="min-height:clamp(120px,15vw,190px);border-radius:10px;border:1px solid {{ d.border }};background:{{ d.bg }};padding:10px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:{{ d.labelColor }}">{{ d.label }}</div>
+                  <sc-for list="{{ d.slots }}" as="sl" hint-placeholder-count="2">
+                    <div style="border-radius:6px;padding:7px;background:{{ sl.bg }};border:1px solid {{ sl.border }};cursor:pointer;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease" style-hover="transform:translateY(-3px);border-color:rgba(168,198,240,.55);box-shadow:0 10px 24px rgba(0,0,0,.5),0 0 22px rgba(168,198,240,.16)">
+                      <div style="height:22px;border-radius:3px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 2px,transparent 2px 9px);background-color:#1b1e22"></div>
+                      <div style="margin-top:6px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.06em;color:{{ sl.color }}">{{ sl.time }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isCreatives }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:clamp(16px,2.4vw,26px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:14px">
+            <sc-for list="{{ grid }}" as="g" hint-placeholder-count="8">
+              <div onClick="{{ g.toggle }}" style="border-radius:10px;border:1px solid {{ g.border }};background:#0e0f12;overflow:hidden;cursor:pointer;transition:transform .25s cubic-bezier(.22,1,.36,1),border-color .25s ease,box-shadow .25s ease" style-hover="transform:translateY(-5px);border-color:rgba(168,198,240,.5);box-shadow:0 22px 44px rgba(0,0,0,.55),0 0 30px rgba(168,198,240,.14)">
+                <div style="height:clamp(130px,14vw,170px);background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 11px);background-color:#161a1e;display:flex;align-items:flex-start;justify-content:space-between;padding:9px">
+                  <span style="padding:2px 7px;border-radius:4px;background:{{ g.badgeBg }};font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:{{ g.badgeColor }}">{{ g.state }}</span>
+                  <span style="font-family:'Geist Mono',monospace;font-size:9px;color:#62666d">{{ g.ratio }}</span>
+                </div>
+                <div style="padding:11px 12px"><div style="font-size:13px;color:#d0d6e0;line-height:1.4">{{ g.hook }}</div><div style="margin-top:7px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">{{ g.id }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isPerf }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:clamp(16px,2.4vw,26px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px">
+            <div style="border-radius:10px;border:1px solid #1b1e22;background:#0e0f12;padding:20px">
+              <div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#62666d">REACH · LAST 8 WEEKS</div>
+              <div style="display:flex;align-items:flex-end;gap:7px;height:150px;margin-top:20px">
+                <sc-for list="{{ bars }}" as="b" hint-placeholder-count="8">
+                  <div style="flex:1;height:{{ b.h }};border-radius:4px 4px 2px 2px;background:{{ b.bg }};cursor:pointer;transition:background .2s ease,box-shadow .2s ease" style-hover="background:var(--acc);box-shadow:0 0 20px rgba(168,198,240,.35)"></div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:grid;gap:16px">
+              <div style="border-radius:10px;border:1px solid #1b1e22;background:#0e0f12;padding:20px"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#62666d">BEST PERFORMER</div><div style="margin-top:12px;font-size:20px;color:#fff;letter-spacing:-.02em">"Saturday tasting, 4pm."</div><div style="margin-top:8px;font-size:13px;color:#8a8f98">14.2k reach · 61 saves · 9 DMs</div></div>
+              <div style="border-radius:10px;border:1px solid #1b1e22;background:#0e0f12;padding:20px"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#62666d">ENGINE LEARNED</div><div style="margin-top:12px;font-size:14px;line-height:1.55;color:#8a8f98">Evening slots outperform mornings by 38% for your audience. Next drop shifts accordingly.</div></div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="position:relative;padding:clamp(90px,10vw,140px) 24px;border-top:1px solid #15171b;background:#08090b">
+  <div data-grid2="1" style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(32px,5vw,72px);align-items:center">
+    <div>
+      <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">05 — DISTRIBUTION</div>
+      <h2 style="margin:0;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Approved at 09:02. <span style="font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;color:var(--acc)">Live</span> at 09:03.</h2>
+      <p style="margin:24px 0 0;max-width:44ch;font-size:17px;line-height:1.6;color:#8a8f98">Connect a channel once. Every approved creative is resized, captioned, hashtagged and slotted into the window where your audience is actually awake.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:30px">
+        <sc-for list="{{ channels }}" as="ch" hint-placeholder-count="6">
+          <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02);font-size:13px;color:#d0d6e0"><span style="width:6px;height:6px;border-radius:9999px;background:var(--acc)"></span>{{ ch }}</span>
+        </sc-for>
+      </div>
+    </div>
+    <div style="position:relative;height:min(440px,58vh);border-radius:14px;border:1px solid #15171b;background:#0a0b0d;overflow:hidden">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:34px 34px"></div>
+      <div style="position:absolute;left:8%;top:50%;transform:translateY(-50%);padding:14px 18px;border-radius:10px;border:1px solid rgba(168,198,240,.32);background:rgba(168,198,240,.07);font-size:14px;color:var(--acc);z-index:2">Your drop</div>
+      <div style="position:absolute;left:8%;top:50%;width:20px;height:20px;margin:-10px 0 0 40px;border-radius:9999px;border:1px solid rgba(168,198,240,.5);animation:lbPulse 3.4s ease-out infinite"></div>
+      <div style="position:absolute;right:6%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:10px;width:min(58%,300px)">
+        <sc-for list="{{ pipes }}" as="p" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(168,198,240,.05),rgba(168,198,240,.45))"></div>
+            <div style="flex:none;padding:9px 13px;border-radius:8px;border:1px solid #23252a;background:#0e0f12;font-size:13px;color:#d0d6e0;min-width:132px">{{ p.name }}<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">{{ p.meta }}</div></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" style="position:relative;padding:clamp(90px,10vw,140px) 24px;border-top:1px solid #15171b">
+  <div style="max-width:1200px;margin:0 auto;text-align:center">
+    <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">06 — PRICING</div>
+    <h2 style="margin:0 auto;max-width:20ch;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Priced per drop, not per meeting.</h2>
+    <div style="display:inline-flex;align-items:center;gap:4px;margin-top:30px;padding:4px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02)">
+      <button onClick="{{ setMonthly }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ mBg }};color:{{ mColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Monthly</button>
+      <button onClick="{{ setAnnual }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ aBg }};color:{{ aColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Annual · −20%</button>
+    </div>
+  </div>
+
+  <div style="max-width:1200px;margin:clamp(36px,4.5vw,56px) auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(290px,100%),1fr));gap:16px;align-items:start">
+    <sc-for list="{{ plans }}" as="pl" hint-placeholder-count="3">
+      <div style="position:relative;padding:clamp(22px,2.4vw,30px);border-radius:14px;border:1px solid {{ pl.border }};background:{{ pl.bg }};box-shadow:{{ pl.shadow }};transform:translateY({{ pl.lift }});transition:transform .3s ease">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="font-size:15px;color:#fff;letter-spacing:-.015em">{{ pl.name }}</div>
+          <sc-if value="{{ pl.featured }}" hint-placeholder-val="{{ false }}"><span style="padding:3px 9px;border-radius:4px;background:rgba(168,198,240,.14);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--acc)">MOST TAKEN</span></sc-if>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:7px;margin-top:20px">
+          <span style="font-size:clamp(38px,4vw,50px);letter-spacing:-.04em;color:#fff;font-weight:400">{{ pl.price }}</span>
+          <span style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#62666d">/ MONTH</span>
+        </div>
+        <div style="margin-top:8px;font-size:14px;color:#8a8f98">{{ pl.rate }}</div>
+        <div style="height:1px;background:#1b1e22;margin:22px 0"></div>
+        <div style="display:grid;gap:11px">
+          <sc-for list="{{ pl.features }}" as="f" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;font-size:14px;line-height:1.5;color:#8a8f98"><span style="color:var(--acc);font-family:'Geist Mono',monospace;font-size:11px;padding-top:3px">▪</span>{{ f }}</div>
+          </sc-for>
+        </div>
+        <a href="{{ pl.href }}" style="display:block;margin-top:26px;padding:13px;border-radius:9999px;text-align:center;font-size:14px;font-weight:500;background:{{ pl.ctaBg }};color:{{ pl.ctaColor }};border:1px solid {{ pl.ctaBorder }}">{{ pl.cta }}</a>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="max-width:1200px;margin:16px auto 0;padding:clamp(22px,2.4vw,30px);border-radius:14px;border:1px solid #1b1e22;background:#0a0b0d;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:clamp(20px,3vw,48px);align-items:center">
+    <div>
+      <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;color:#62666d">SIZE YOUR DROP</div>
+      <div style="margin-top:12px;font-size:19px;color:#fff;letter-spacing:-.02em">{{ adsLabel }} ads per week</div>
+      <div style="margin-top:7px;font-size:14px;color:#62666d">{{ adsHint }}</div>
+      <input type="range" min="2" max="30" step="1" value="{{ ads }}" onChange="{{ onAds }}" onInput="{{ onAds }}" style="width:100%;margin-top:22px;height:16px;--fill:{{ fillPct }}">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="padding:18px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#62666d">EST. MONTHLY</div><div style="margin-top:10px;font-size:30px;letter-spacing:-.035em;color:var(--acc)">{{ estPrice }}</div></div>
+      <div style="padding:18px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#62666d">ADS / YEAR</div><div style="margin-top:10px;font-size:30px;letter-spacing:-.035em;color:#fff">{{ perYear }}</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="position:relative;padding:clamp(80px,9vw,120px) 24px;border-top:1px solid #15171b;background:#08090b;overflow:hidden">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:34px">07 — FROM THE COUNTER</div>
+    <div data-grid2="1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px">
+      <sc-for list="{{ quotes }}" as="q" hint-placeholder-count="3">
+        <div data-offset="1" style="margin-top:{{ q.offset }};padding:26px;border-radius:14px;border:1px solid #1b1e22;background:#0e0f12;box-shadow:0 30px 60px rgba(0,0,0,.4);cursor:default;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-8px) scale(1.025);border-color:rgba(168,198,240,.4);box-shadow:0 40px 80px rgba(0,0,0,.55),0 0 60px rgba(168,198,240,.18)">
+          <div style="font-family:'Instrument Serif',Georgia,serif;font-size:22px;line-height:1.35;color:#fff;letter-spacing:-.01em">{{ q.text }}</div>
+          <div style="height:1px;background:#1b1e22;margin:22px 0 16px"></div>
+          <div style="font-size:14px;color:#d0d6e0">{{ q.name }}</div>
+          <div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#4c5056">{{ q.role }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section style="position:relative;padding:clamp(100px,12vw,170px) 24px clamp(70px,8vw,110px);border-top:1px solid #15171b;text-align:center;overflow:visible">
+  <div style="position:absolute;left:50%;bottom:-70%;transform:translateX(-50%);width:min(1200px,140%);height:110vh;background:radial-gradient(closest-side,rgba(168,198,240,.11),transparent 70%);pointer-events:none;z-index:0"></div>
+  <div style="position:relative;max-width:800px;margin:0 auto">
+    <h2 style="margin:0;font-size:clamp(34px,5vw,66px);line-height:1.02;letter-spacing:-.035em;font-weight:500;color:#fff;text-wrap:balance">The next drop leaves Monday at 09:00.</h2>
+    <p style="margin:22px auto 0;max-width:46ch;font-size:17px;line-height:1.6;color:#8a8f98">Onboard in ten minutes and your first twelve ads are waiting for approval before the week is out. No contract, no retainer, no meeting.</p>
+    <a href="signup.html" style="display:inline-flex;align-items:center;gap:10px;margin-top:34px;padding:16px 28px;border-radius:9999px;background:var(--acc);color:#07080a;font-size:16px;font-weight:600;letter-spacing:-.01em;box-shadow:0 14px 50px rgba(168,198,240,.26)" style-hover="background:#cbdff9">Claim your first drop<span style="font-family:'Geist Mono',monospace;font-size:13px">→</span></a>
+    <div style="margin-top:20px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.1em;color:#4c5056">FIRST DROP FREE · CANCEL ANY WEEK</div>
+  </div>
+</section>
+
+<footer style="position:relative;margin-top:-1px;padding:0 24px 44px;background:transparent">
+  <div style="position:relative;z-index:1;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:32px">
+    <div>
+      <div style="display:flex;align-items:center;gap:9px;color:#fff;font-size:15px;font-weight:500;letter-spacing:-.02em"><span style="display:block;width:16px;height:16px;border-radius:5px;background:var(--acc)"></span>LocalBoost</div>
+      <div style="margin-top:12px;font-size:13px;line-height:1.6;color:#4c5056;max-width:26ch">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">PRODUCT</div><a href="#drop" style="color:#8a8f98">The weekly drop</a><a href="#engine" style="color:#8a8f98">Engine</a><a href="#control" style="color:#8a8f98">Control room</a></div>
+    <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">COMPANY</div><a href="about.html" style="color:#8a8f98">About</a><a href="#pricing" style="color:#8a8f98">Pricing</a><a href="contact.html" style="color:#8a8f98">Contact</a><a href="message-us.html" style="color:#8a8f98">Message us</a></div>
+    <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">LEGAL</div><a href="terms.html" style="color:#8a8f98">Terms</a><a href="privacy.html" style="color:#8a8f98">Privacy</a><a href="ai-disclosure.html" style="color:#8a8f98">AI disclosure</a></div>
+  </div>
+  <div style="position:relative;z-index:1;max-width:1200px;margin:44px auto 0;padding-top:22px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#3d4046"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#a8c6f0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#a8c6f0&quot;,&quot;#d8dbe0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;drumCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:5,&quot;max&quot;:9,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Engine&quot;}}">
+class Component extends DCLogic {
+  state = { step: 0, tab: 0, billing: "monthly", ads: 12, angle: 0, creatives: {} };
+  root = React.createRef();
+
+  componentDidMount() {
+    const acc = this.props.accent;
+    if (acc) {
+      document.documentElement.style.setProperty("--acc", acc);
+      document.documentElement.style.setProperty("--acc-soft", "rgba(168,198,240,.14)");
+    }
+    this.m = { x: 0, y: 0 };
+    this.cur = { rx: 0, ry: 0 };
+    this.onMove = (e) => {
+      this.m.x = (e.clientX / window.innerWidth - 0.5) * 2;
+      this.m.y = (e.clientY / window.innerHeight - 0.5) * 2;
+    };
+    window.addEventListener("mousemove", this.onMove, { passive: true });
+
+    const r = this.root.current;
+    this.tilts = Array.from(r.querySelectorAll("[data-tilt]"));
+    this.layers = Array.from(r.querySelectorAll("[data-depth]"));
+    this.story = r.querySelector("[data-story]");
+    this.dash = r.querySelector("[data-dash]");
+    this.dashCard = r.querySelector("[data-dashcard]");
+    this.bar = r.querySelector("[data-progress]");
+
+    // reveal
+    const rev = Array.from(r.querySelectorAll("[data-reveal]"));
+    const vh = window.innerHeight;
+    rev.forEach((el) => {
+      if (el.getBoundingClientRect().top > vh * 0.9) {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(26px)";
+        el.style.transition = "opacity .8s ease, transform .8s cubic-bezier(.22,1,.36,1)";
+      }
+    });
+    this.io = new IntersectionObserver(
+      (ents) => ents.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.style.opacity = "1";
+        e.target.style.transform = "none";
+        this.io.unobserve(e.target);
+      }),
+      { threshold: 0.2 }
+    );
+    rev.forEach((el) => this.io.observe(el));
+
+    // counters
+    this.cio = new IntersectionObserver(
+      (ents) => ents.forEach((e) => {
+        if (!e.isIntersecting) return;
+        this.cio.unobserve(e.target);
+        this.runCount(e.target);
+      }),
+      { threshold: 0.6 }
+    );
+    Array.from(r.querySelectorAll("[data-count]")).forEach((el) => this.cio.observe(el));
+
+    this.loop = this.loop.bind(this);
+    this.rafId = requestAnimationFrame(this.loop);
+
+    if (location.hash) {
+      const hash = location.hash;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
+      }));
+    }
+
+    if (window.LBAuth && LBAuth.isLoggedIn()) {
+      const loginLink = r.querySelector('a[href="login.html"]');
+      if (loginLink) {
+        const u = LBAuth.getUser() || {};
+        loginLink.textContent = u.business || u.email || "Account";
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("mousemove", this.onMove);
+    cancelAnimationFrame(this.rafId);
+    if (this.io) this.io.disconnect();
+    if (this.cio) this.cio.disconnect();
+  }
+
+  goStep(i) {
+    if (!this.story) return;
+    const vh = window.innerHeight;
+    const doc = document.documentElement;
+    const top = this.story.getBoundingClientRect().top + doc.scrollTop;
+    const span = this.story.offsetHeight - vh;
+    window.scrollTo({ top: top + span * ((i + 0.5) / 4), behavior: "smooth" });
+  }
+
+  runCount(el) {
+    const target = parseFloat(el.getAttribute("data-target") || "0");
+    const pre = el.getAttribute("data-prefix") || "";
+    const suf = el.getAttribute("data-suffix") || "";
+    const t0 = performance.now();
+    const dur = 1300;
+    const tick = (t) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      const v = Math.round(target * e);
+      el.textContent = pre + v.toLocaleString("en-US") + suf;
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  loop() {
+    const vh = window.innerHeight;
+    const doc = document.documentElement;
+
+    if (this.bar) {
+      const p = doc.scrollTop / Math.max(1, doc.scrollHeight - vh);
+      this.bar.style.height = (p * 100).toFixed(2) + "%";
+    }
+
+    this.cur.ry += (this.m.x * 9 - this.cur.ry) * 0.06;
+    this.cur.rx += (this.m.y * -6 - this.cur.rx) * 0.06;
+    this.tilts.forEach((el) => {
+      const k = parseFloat(el.getAttribute("data-tilt-strength")) || 1;
+      el.style.transform =
+        "rotateX(" + (this.cur.rx * k).toFixed(2) + "deg) rotateY(" + (this.cur.ry * k).toFixed(2) + "deg)";
+    });
+    const sy = doc.scrollTop;
+    this.layers.forEach((el) => {
+      const d = parseFloat(el.getAttribute("data-depth")) || 0;
+      el.style.setProperty("--py", (-sy * 0.05 * d).toFixed(1) + "px");
+    });
+
+    if (this.story) {
+      const b = this.story.getBoundingClientRect();
+      const p = Math.max(0, Math.min(0.999, -b.top / Math.max(1, b.height - vh)));
+      const step = Math.floor(p * 4);
+      if (step !== this.state.step) this.setState({ step });
+    }
+
+    if (this.dash && this.dashCard) {
+      const b = this.dash.getBoundingClientRect();
+      const p = Math.max(0, Math.min(1, (vh - b.top) / (vh * 0.85)));
+      this.dashCard.style.setProperty("--dashrx", ((1 - p) * 22).toFixed(2) + "deg");
+      this.dashCard.style.setProperty("--dashrz", ((1 - p) * -3).toFixed(2) + "deg");
+    }
+
+    this.rafId = requestAnimationFrame(this.loop);
+  }
+
+  renderVals() {
+    const st = this.state.step;
+    const steps = [
+      { n: "01", t: "Brief once", d: "Ten minutes. Your offer, your voice, your street. We build a brand fingerprint and never ask you again." },
+      { n: "02", t: "The studio runs", d: "Every Monday at 09:00 the engine renders a fresh batch — photoreal scenes, seasonal hooks, local references, one per channel format." },
+      { n: "03", t: "You approve, or you don't", d: "Swipe the drop in under two minutes. Kill anything off-brand. What survives enters the queue." },
+      { n: "04", t: "It publishes itself", d: "Best-time slotting, caption variants, hashtags, cross-posting. You find out it happened from the customers." }
+    ].map((s, i) => {
+      const on = i === st;
+      return Object.assign({}, s, {
+        go: () => this.goStep(i),
+        chip: on ? "rgba(168,198,240,.45)" : "#1b1e22",
+        bar: on ? "var(--acc)" : "#1b1e22",
+        bg: on ? "rgba(255,255,255,.035)" : "transparent",
+        numColor: on ? "var(--acc)" : "#3d4046",
+        titleColor: on ? "#ffffff" : "#62666d",
+        op: on ? 1 : 0,
+        mh: on ? "120px" : "0px"
+      });
+    });
+
+    const pdata = [
+      { tag: "BRAND FINGERPRINT", meta: "LOCKED", slot: "REFERENCE SET · 24 IMAGES", line: "Warm oak, matte black, morning light. Never neon, never stock-smiling." },
+      { tag: "RENDER QUEUE", meta: "12 / 12", slot: "SCENE 34-07 · REEL 9:16", line: "Twelve creatives rendered in 41 minutes, formatted per channel." },
+      { tag: "APPROVAL", meta: "9 KEPT", slot: "SWIPE TO KEEP OR KILL", line: "Three killed. The engine notes why and adjusts next Monday." },
+      { tag: "PUBLISHED", meta: "LIVE", slot: "MON 18:30 · INSTAGRAM STORY", line: "Nine creatives slotted across four channels for the next seven days." }
+    ];
+    const panels = pdata.map((p, i) => {
+      const d = i - st;
+      const on = d === 0;
+      return Object.assign({}, p, {
+        border: on ? "#33363c" : "#17191d",
+        op: d < 0 ? 0 : d > 2 ? 0 : on ? 1 : 0.42,
+        tf: "translate3d(" + d * 26 + "px," + d * -16 + "px," + d * -140 + "px) rotateY(" + (on ? -8 : -14) + "deg) rotateX(" + (on ? 3 : 6) + "deg) scale(" + (1 - d * 0.03) + ")"
+      });
+    });
+
+    const cards = [
+      { id: "34-01", ratio: "9:16", hook: "Saturday tasting, 4pm.", channel: "INSTAGRAM · TIKTOK" },
+      { id: "34-02", ratio: "4:5", hook: "Two chairs free today.", channel: "INSTAGRAM · FACEBOOK" },
+      { id: "34-03", ratio: "1:1", hook: "Rain outside. Soup inside.", channel: "GOOGLE · FACEBOOK" },
+      { id: "34-04", ratio: "9:16", hook: "The 6am crowd knows.", channel: "TIKTOK · REELS" },
+      { id: "34-05", ratio: "4:5", hook: "New in: local pears.", channel: "INSTAGRAM" },
+      { id: "34-06", ratio: "16:9", hook: "Parking, finally, out back.", channel: "GOOGLE BUSINESS" },
+      { id: "34-07", ratio: "1:1", hook: "Booked out by Thursday.", channel: "FACEBOOK" },
+      { id: "34-08", ratio: "9:16", hook: "Ten minutes, no appointment.", channel: "TIKTOK" },
+      { id: "34-09", ratio: "4:5", hook: "Same recipe since 1998.", channel: "INSTAGRAM" }
+    ];
+    const count = Math.max(5, Math.min(9, this.props.drumCount ?? 7));
+    const stepDeg = 360 / count;
+    const deck = cards.slice(0, count).map((c, i) => {
+      const a = i * stepDeg + this.state.angle;
+      const rad = (a * Math.PI) / 180;
+      const facing = Math.cos(rad);
+      return Object.assign({}, c, {
+        tf: "rotateY(" + a.toFixed(2) + "deg) translateZ(" + (count > 6 ? 330 : 280) + "px)",
+        op: (0.34 + 0.66 * Math.max(0, facing)).toFixed(2),
+        border: facing > 0.85 ? "#3a3d43" : "#1b1e22"
+      });
+    });
+
+    const tabLabels = ["Content calendar", "Creatives", "Performance"];
+    const tabs = tabLabels.map((label, i) => {
+      const on = i === this.state.tab;
+      return {
+        label,
+        onClick: () => this.setState({ tab: i }),
+        border: on ? "rgba(168,198,240,.4)" : "#23252a",
+        bg: on ? "rgba(168,198,240,.1)" : "rgba(255,255,255,.02)",
+        color: on ? "var(--acc)" : "#8a8f98"
+      };
+    });
+
+    const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+    const plan = [[1], [], [1], [0], [1, 0], [1], []];
+    const days = dayNames.map((label, i) => ({
+      label,
+      border: i === 0 ? "rgba(168,198,240,.28)" : "#17191d",
+      bg: i === 0 ? "rgba(168,198,240,.05)" : "#0d0e11",
+      labelColor: i === 0 ? "var(--acc)" : "#4c5056",
+      slots: plan[i].map((kind, j) => ({
+        time: kind ? "18:30 STORY" : "12:00 FEED",
+        bg: kind ? "rgba(168,198,240,.07)" : "rgba(255,255,255,.03)",
+        border: kind ? "rgba(168,198,240,.22)" : "#1b1e22",
+        color: kind ? "var(--acc)" : "#8a8f98"
+      }))
+    }));
+
+    const cycle = ["APPROVED", "PENDING", "KILLED"];
+    const overrides = this.state.creatives || {};
+    const grid = cards.slice(0, 8).map((c, i) => {
+      const base = i < 5 ? "APPROVED" : i < 7 ? "PENDING" : "KILLED";
+      const s = overrides[i] || base;
+      const ok = s === "APPROVED";
+      const dead = s === "KILLED";
+      return {
+        id: "CREATIVE " + c.id,
+        ratio: c.ratio,
+        hook: c.hook,
+        state: s,
+        border: ok ? "rgba(168,198,240,.24)" : "#1b1e22",
+        badgeBg: ok ? "rgba(168,198,240,.14)" : dead ? "rgba(235,87,87,.12)" : "rgba(255,255,255,.07)",
+        badgeColor: ok ? "var(--acc)" : dead ? "#eb5757" : "#8a8f98",
+        toggle: () => this.setState((prev) => {
+          const next = Object.assign({}, prev.creatives || {});
+          next[i] = cycle[(cycle.indexOf(s) + 1) % 3];
+          return { creatives: next };
+        })
+      };
+    });
+
+    const heights = [38, 46, 41, 58, 66, 72, 84, 100];
+    const bars = heights.map((h, i) => ({
+      h: h + "%",
+      bg: i > 5 ? "var(--acc)" : "#23252a"
+    }));
+
+    const annual = this.state.billing === "annual";
+    const mk = (n) => "€" + Math.round(annual ? n * 0.8 : n);
+    const plans = [
+      {
+        name: "Counter", base: 89, rate: "4 ads / week · 1 channel", featured: false,
+        features: ["4 photoreal creatives every Monday", "One connected channel", "Best-time auto-publishing", "Swipe approval in the app"],
+        cta: "Start with Counter", href: "signup.html?plan=counter"
+      },
+      {
+        name: "Storefront", base: 249, rate: "12 ads / week · 4 channels", featured: true,
+        features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", "Performance feedback into next drop", "Caption variants and A/B slotting"],
+        cta: "Start with Storefront", href: "signup.html?plan=storefront"
+      },
+      {
+        name: "Franchise", base: 690, rate: "30 ads / week · unlimited", featured: false,
+        features: ["30 creatives, multi-location aware", "Unlimited channels and locations", "Human creative director review", "Brand-safety approvals workflow", "Dedicated drop slot and support"],
+        cta: "Talk to us", href: "contact.html?plan=franchise"
+      }
+    ].map((p) => ({
+      name: p.name,
+      rate: p.rate,
+      featured: p.featured,
+      features: p.features,
+      cta: p.cta,
+      href: p.href,
+      price: mk(p.base),
+      border: p.featured ? "#33363c" : "#1b1e22",
+      bg: p.featured ? "#101215" : "#0a0b0d",
+      shadow: p.featured ? "0 50px 100px rgba(0,0,0,.6)" : "none",
+      lift: p.featured ? "-16px" : "0px",
+      ctaBg: p.featured ? "var(--acc)" : "transparent",
+      ctaColor: p.featured ? "#07080a" : "#d0d6e0",
+      ctaBorder: p.featured ? "var(--acc)" : "#23252a"
+    }));
+
+    const ads = this.state.ads;
+    const est = Math.round((45 + ads * 17) * (annual ? 0.8 : 1));
+
+    return {
+      steps, panels, deck, tabs, days, grid, bars, plans,
+      angle: this.state.angle,
+      spinPrev: () => this.setState((s) => ({ angle: s.angle + stepDeg })),
+      spinNext: () => this.setState((s) => ({ angle: s.angle - stepDeg })),
+      dragStart: (e) => { this.drag = { x: e.clientX, a: this.state.angle }; },
+      dragMove: (e) => {
+        if (!this.drag) return;
+        this.setState({ angle: this.drag.a + (e.clientX - this.drag.x) * 0.35 });
+      },
+      dragEnd: () => { this.drag = null; },
+      isCalendar: this.state.tab === 0,
+      isCreatives: this.state.tab === 1,
+      isPerf: this.state.tab === 2,
+      tabSlug: ["calendar", "creatives", "performance"][this.state.tab],
+      channels: ["Instagram", "Facebook", "TikTok", "Google Business", "LinkedIn", "Pinterest"],
+      pipes: [
+        { name: "Instagram", meta: "STORY + REEL + FEED" },
+        { name: "Facebook", meta: "FEED + LOCAL GROUPS" },
+        { name: "TikTok", meta: "9:16 NATIVE" },
+        { name: "Google Business", meta: "OFFER POSTS" },
+        { name: "Pinterest", meta: "SEASONAL PINS" }
+      ],
+      quotes: [
+        { text: "I stopped thinking about posting. Twelve ads land Monday, I kill two, and the week markets itself.", name: "Milena R.", role: "BAKERY · 2 LOCATIONS", offset: "0px" },
+        { text: "The first drop looked more expensive than anything my old agency shot in a year.", name: "Andrej P.", role: "BARBERSHOP", offset: "clamp(0px,3vw,42px)" },
+        { text: "Saturdays are full now. That is the entire review.", name: "Tanja K.", role: "WINE BAR", offset: "clamp(0px,6vw,84px)" }
+      ],
+      setMonthly: () => this.setState({ billing: "monthly" }),
+      setAnnual: () => this.setState({ billing: "annual" }),
+      mBg: annual ? "transparent" : "rgba(255,255,255,.07)",
+      mColor: annual ? "#8a8f98" : "#ffffff",
+      aBg: annual ? "rgba(168,198,240,.12)" : "transparent",
+      aColor: annual ? "var(--acc)" : "#8a8f98",
+      ads,
+      adsLabel: ads,
+      fillPct: (((ads - 2) / 28) * 100).toFixed(1) + "%",
+      adsHint: ads < 6 ? "Enough to stay visible." : ads < 16 ? "The sweet spot for a single location." : "Multi-location or multi-offer volume.",
+      onAds: (e) => this.setState({ ads: parseInt(e.target.value, 10) }),
+      estPrice: "€" + est,
+      perYear: (ads * 52).toLocaleString("en-US"),
+      rootRef: this.root
+    };
+  }
+}
+</script>
+</body>
+</html>

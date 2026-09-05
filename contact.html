@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — LocalBoost</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="localboost.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="LocalBoost.dc.html#top" class="nav-logo"><span class="nav-dot"></span>LocalBoost</a>
+  <div class="nav-links">
+    <a href="LocalBoost.dc.html#drop">The drop</a>
+    <a href="LocalBoost.dc.html#engine">Engine</a>
+    <a href="LocalBoost.dc.html#control">Control room</a>
+    <a href="LocalBoost.dc.html#pricing">Pricing</a>
+  </div>
+  <a href="login.html" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px">Log in</a>
+  <a href="signup.html" class="nav-cta">Start free drop</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow">TALK TO US</div>
+  <h1>Tell us about the shop. We'll tell you what the first drop looks like.</h1>
+  <p>Franchise and multi-location accounts get a human on the other end before the engine ever renders a frame.</p>
+</header>
+
+<section class="section-tight">
+  <div class="wrap" style="max-width:640px">
+    <div id="plan-notice" class="notice" hidden></div>
+
+    <form id="contact-form">
+      <div class="field">
+        <label for="business">BUSINESS NAME</label>
+        <input id="business" name="business" type="text" required placeholder="e.g. Milena's Bakery">
+      </div>
+      <div class="field">
+        <label for="name">YOUR NAME</label>
+        <input id="name" name="name" type="text" required placeholder="Full name">
+      </div>
+      <div class="field">
+        <label for="email">EMAIL</label>
+        <input id="email" name="email" type="email" required placeholder="you@business.com">
+      </div>
+      <div class="field">
+        <label for="plan">PLAN INTEREST</label>
+        <select id="plan" name="plan">
+          <option value="counter">Counter</option>
+          <option value="storefront">Storefront</option>
+          <option value="franchise">Franchise</option>
+          <option value="unsure">Not sure yet</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="message">MESSAGE</label>
+        <textarea id="message" name="message" placeholder="Number of locations, verticals, channels you're on today..."></textarea>
+      </div>
+      <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Send message<span class="mono" style="font-size:13px">→</span></button>
+    </form>
+
+    <div id="success-notice" class="notice" hidden>Thanks — a real person reads every message here and replies within one business day.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="LocalBoost.dc.html#control">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+</footer>
+
+<script>
+(function(){
+  var params = new URLSearchParams(location.search);
+  var plan = params.get("plan");
+  var planSelect = document.getElementById("plan");
+  var notice = document.getElementById("plan-notice");
+  var names = { counter: "Counter", storefront: "Storefront", franchise: "Franchise" };
+  if (plan && names[plan]) {
+    planSelect.value = plan;
+    notice.hidden = false;
+    notice.textContent = "You're reaching out about the " + names[plan] + " plan.";
+  }
+
+  document.getElementById("contact-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    this.hidden = true;
+    document.getElementById("success-notice").hidden = false;
+  });
+})();
+</script>
+
+</body>
+</html>

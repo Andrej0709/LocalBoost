@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Message us — LocalBoost</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="localboost.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="LocalBoost.dc.html#top" class="nav-logo"><span class="nav-dot"></span>LocalBoost</a>
+  <div class="nav-links">
+    <a href="LocalBoost.dc.html#drop">The drop</a>
+    <a href="LocalBoost.dc.html#engine">Engine</a>
+    <a href="LocalBoost.dc.html#control">Control room</a>
+    <a href="LocalBoost.dc.html#pricing">Pricing</a>
+  </div>
+  <a href="signup.html" class="nav-cta">Start free drop</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow">SAY HELLO</div>
+  <h1>Got something on your mind? Send it over.</h1>
+  <p>No plan question, no sales pitch needed — feedback, a bug, a random idea, or just a hello all land in the same inbox.</p>
+</header>
+
+<section class="section-tight">
+  <div class="wrap form-narrow">
+    <form id="message-form">
+      <div class="field">
+        <label for="m-name">NAME</label>
+        <input id="m-name" type="text" required placeholder="Your name">
+      </div>
+      <div class="field">
+        <label for="m-email">EMAIL</label>
+        <input id="m-email" type="email" required placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="m-message">MESSAGE</label>
+        <textarea id="m-message" required placeholder="Whatever you'd like to tell us..."></textarea>
+      </div>
+      <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Send message<span class="mono" style="font-size:13px">→</span></button>
+    </form>
+    <div id="success-notice" class="notice" hidden>Sent — thanks for reaching out. We read every message here, no auto-replies.</div>
+
+    <div class="divider"></div>
+    <p style="text-align:center;font-size:13.5px">Looking to talk about a plan or a franchise rollout instead? <a href="contact.html">Talk to us here</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="LocalBoost.dc.html#control">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+</footer>
+
+<script>
+document.getElementById("message-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  this.hidden = true;
+  document.getElementById("success-notice").hidden = false;
+});
+</script>
+
+</body>
+</html>
