@@ -31,6 +31,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 @keyframes lbPulse{0%{opacity:0;transform:scale(.5)}35%{opacity:.55}100%{opacity:0;transform:scale(2.1)}}
 @keyframes lbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 @keyframes lbBlink{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes lbShip{0%{left:0%;opacity:0;transform:translate(-50%,-50%) scale(.55) rotate(-6deg)}7%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}64%{left:100%;opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}74%{left:100%;opacity:0;transform:translate(-50%,-50%) scale(.62) rotate(4deg)}100%{left:100%;opacity:0}}
+@keyframes lbLane{0%,55%{opacity:.3}64%{opacity:1}100%{opacity:.3}}
+@keyframes lbLand{0%,58%{border-color:#23252a;background:#0e0f12;box-shadow:none}68%{border-color:rgba(168,198,240,.55);background:rgba(168,198,240,.07);box-shadow:0 0 26px rgba(168,198,240,.16)}100%{border-color:#23252a;background:#0e0f12;box-shadow:none}}
+@keyframes lbPosted{0%,60%{opacity:0;transform:translateY(3px)}70%{opacity:1;transform:translateY(0)}92%{opacity:1}100%{opacity:0}}
+@keyframes lbQueue{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @media (max-width:1080px){
 [data-scene]{position:relative !important;inset:auto !important;width:100% !important;height:400px;margin-top:40px}
 [data-grid2]{grid-template-columns:1fr !important}
@@ -325,12 +330,41 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
       <div style="position:absolute;left:8%;top:50%;transform:translateY(-50%);padding:14px 18px;border-radius:10px;border:1px solid rgba(168,198,240,.32);background:rgba(168,198,240,.07);font-size:14px;color:var(--acc);z-index:2">Your drop</div>
       <div style="position:absolute;left:8%;top:50%;width:20px;height:20px;margin:-10px 0 0 40px;border-radius:9999px;border:1px solid rgba(168,198,240,.5);animation:lbPulse 3.4s ease-out infinite"></div>
       <div style="position:absolute;right:6%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:10px;width:min(58%,300px)">
-        <sc-for list="{{ pipes }}" as="p" hint-placeholder-count="5">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(168,198,240,.05),rgba(168,198,240,.45))"></div>
-            <div style="flex:none;padding:9px 13px;border-radius:8px;border:1px solid #23252a;background:#0e0f12;font-size:13px;color:#d0d6e0;min-width:132px">{{ p.name }}<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">{{ p.meta }}</div></div>
+            <div style="position:relative;flex:1;height:1px">
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(168,198,240,.05),rgba(168,198,240,.45));animation:lbLane 5s linear infinite"></div>
+              <div style="position:absolute;top:50%;left:0%;width:26px;height:26px;border-radius:6px;border:1px solid rgba(168,198,240,.5);background:linear-gradient(160deg,rgba(168,198,240,.3),rgba(168,198,240,.05));box-shadow:0 0 16px rgba(168,198,240,.25);overflow:hidden;transform:translate(-50%,-50%);animation:lbShip 5s ease-in-out infinite"><div style="position:absolute;left:5px;top:5px;width:5px;height:5px;border-radius:9999px;background:rgba(255,255,255,.8)"></div><div style="position:absolute;left:3px;bottom:-9px;width:17px;height:17px;border-radius:3px;background:rgba(255,255,255,.28);transform:rotate(45deg)"></div><div style="position:absolute;right:-5px;bottom:-7px;width:14px;height:14px;border-radius:3px;background:rgba(255,255,255,.16);transform:rotate(45deg)"></div></div>
+            </div>
+            <div style="flex:none;padding:9px 13px;border-radius:8px;border:1px solid #23252a;background:#0e0f12;font-size:13px;color:#d0d6e0;min-width:132px;animation:lbLand 5s ease-in-out infinite">Instagram<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">STORY + REEL + FEED</div></div>
           </div>
-        </sc-for>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="position:relative;flex:1;height:1px">
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(168,198,240,.05),rgba(168,198,240,.45));animation:lbLane 5s linear .6s infinite"></div>
+              <div style="position:absolute;top:50%;left:0%;width:26px;height:26px;border-radius:6px;border:1px solid rgba(168,198,240,.5);background:linear-gradient(160deg,rgba(168,198,240,.3),rgba(168,198,240,.05));box-shadow:0 0 16px rgba(168,198,240,.25);overflow:hidden;transform:translate(-50%,-50%);animation:lbShip 5s ease-in-out .6s infinite"><div style="position:absolute;left:5px;top:5px;width:5px;height:5px;border-radius:9999px;background:rgba(255,255,255,.8)"></div><div style="position:absolute;left:3px;bottom:-9px;width:17px;height:17px;border-radius:3px;background:rgba(255,255,255,.28);transform:rotate(45deg)"></div><div style="position:absolute;right:-5px;bottom:-7px;width:14px;height:14px;border-radius:3px;background:rgba(255,255,255,.16);transform:rotate(45deg)"></div></div>
+            </div>
+            <div style="flex:none;padding:9px 13px;border-radius:8px;border:1px solid #23252a;background:#0e0f12;font-size:13px;color:#d0d6e0;min-width:132px;animation:lbLand 5s ease-in-out .6s infinite">Facebook<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">FEED + LOCAL GROUPS</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="position:relative;flex:1;height:1px">
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(168,198,240,.05),rgba(168,198,240,.45));animation:lbLane 5s linear 1.2s infinite"></div>
+              <div style="position:absolute;top:50%;left:0%;width:26px;height:26px;border-radius:6px;border:1px solid rgba(168,198,240,.5);background:linear-gradient(160deg,rgba(168,198,240,.3),rgba(168,198,240,.05));box-shadow:0 0 16px rgba(168,198,240,.25);overflow:hidden;transform:translate(-50%,-50%);animation:lbShip 5s ease-in-out 1.2s infinite"><div style="position:absolute;left:5px;top:5px;width:5px;height:5px;border-radius:9999px;background:rgba(255,255,255,.8)"></div><div style="position:absolute;left:3px;bottom:-9px;width:17px;height:17px;border-radius:3px;background:rgba(255,255,255,.28);transform:rotate(45deg)"></div><div style="position:absolute;right:-5px;bottom:-7px;width:14px;height:14px;border-radius:3px;background:rgba(255,255,255,.16);transform:rotate(45deg)"></div></div>
+            </div>
+            <div style="flex:none;padding:9px 13px;border-radius:8px;border:1px solid #23252a;background:#0e0f12;font-size:13px;color:#d0d6e0;min-width:132px;animation:lbLand 5s ease-in-out 1.2s infinite">TikTok<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">9:16 NATIVE</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="position:relative;flex:1;height:1px">
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(168,198,240,.05),rgba(168,198,240,.45));animation:lbLane 5s linear 1.8s infinite"></div>
+              <div style="position:absolute;top:50%;left:0%;width:26px;height:26px;border-radius:6px;border:1px solid rgba(168,198,240,.5);background:linear-gradient(160deg,rgba(168,198,240,.3),rgba(168,198,240,.05));box-shadow:0 0 16px rgba(168,198,240,.25);overflow:hidden;transform:translate(-50%,-50%);animation:lbShip 5s ease-in-out 1.8s infinite"><div style="position:absolute;left:5px;top:5px;width:5px;height:5px;border-radius:9999px;background:rgba(255,255,255,.8)"></div><div style="position:absolute;left:3px;bottom:-9px;width:17px;height:17px;border-radius:3px;background:rgba(255,255,255,.28);transform:rotate(45deg)"></div><div style="position:absolute;right:-5px;bottom:-7px;width:14px;height:14px;border-radius:3px;background:rgba(255,255,255,.16);transform:rotate(45deg)"></div></div>
+            </div>
+            <div style="flex:none;padding:9px 13px;border-radius:8px;border:1px solid #23252a;background:#0e0f12;font-size:13px;color:#d0d6e0;min-width:132px;animation:lbLand 5s ease-in-out 1.8s infinite">Google Business<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">OFFER POSTS</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="position:relative;flex:1;height:1px">
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(168,198,240,.05),rgba(168,198,240,.45));animation:lbLane 5s linear 2.4s infinite"></div>
+              <div style="position:absolute;top:50%;left:0%;width:26px;height:26px;border-radius:6px;border:1px solid rgba(168,198,240,.5);background:linear-gradient(160deg,rgba(168,198,240,.3),rgba(168,198,240,.05));box-shadow:0 0 16px rgba(168,198,240,.25);overflow:hidden;transform:translate(-50%,-50%);animation:lbShip 5s ease-in-out 2.4s infinite"><div style="position:absolute;left:5px;top:5px;width:5px;height:5px;border-radius:9999px;background:rgba(255,255,255,.8)"></div><div style="position:absolute;left:3px;bottom:-9px;width:17px;height:17px;border-radius:3px;background:rgba(255,255,255,.28);transform:rotate(45deg)"></div><div style="position:absolute;right:-5px;bottom:-7px;width:14px;height:14px;border-radius:3px;background:rgba(255,255,255,.16);transform:rotate(45deg)"></div></div>
+            </div>
+            <div style="flex:none;padding:9px 13px;border-radius:8px;border:1px solid #23252a;background:#0e0f12;font-size:13px;color:#d0d6e0;min-width:132px;animation:lbLand 5s ease-in-out 2.4s infinite">Pinterest<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">SEASONAL PINS</div></div>
+          </div>
       </div>
     </div>
   </div>
