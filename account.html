@@ -107,7 +107,13 @@
           <button type="submit" class="btn-ghost">Update email</button>
         </form>
 
-        <form id="password-form">
+        <button type="button" id="password-toggle" class="btn-ghost">Change password</button>
+
+        <form id="password-form" hidden style="margin-top:18px">
+          <div class="field">
+            <label for="acc-current-password">CURRENT PASSWORD</label>
+            <input id="acc-current-password" type="password" required placeholder="Your current password" autocomplete="current-password">
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px" class="field-pair">
             <div class="field" style="margin-bottom:0">
               <label for="acc-new-password">NEW PASSWORD</label>
@@ -118,7 +124,10 @@
               <input id="acc-confirm-password" type="password" required minlength="8" placeholder="Type it again" autocomplete="new-password">
             </div>
           </div>
-          <button type="submit" class="btn-ghost" style="margin-top:16px">Update password</button>
+          <div style="display:flex;gap:10px;margin-top:16px">
+            <button type="submit" class="btn-ghost">Update password</button>
+            <button type="button" id="password-cancel" style="background:none;border:none;color:#62666d;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Cancel</button>
+          </div>
         </form>
 
         <div id="security-notice" class="notice" hidden></div>

@@ -204,8 +204,22 @@
       return res.data.user;
     },
 
-    // Changes the password directly — no re-entry of the old one, matching
-    // Supabase's updateUser behavior for an already-authenticated session.
+    // Confirms the current password is correct before a password change is
+    // allowed. Supabase's updateUser has no built-in re-auth check, so this
+    // re-runs signInWithPassword against the current email as that check.
+    verifyPassword: async function (currentPassword) {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.auth.signInWithPassword({
+        email: session.user.email,
+        password: currentPassword
+      });
+      if (res.error) throw new Error("Current password is incorrect.");
+      session = res.data.session;
+      return true;
+    },
+
+    // Changes the password directly — call verifyPassword first if the old
+    // one needs confirming; Supabase's updateUser itself doesn't ask for it.
     updatePassword: async function (newPassword) {
       if (!session) throw new Error("Not signed in.");
       var res = await db.auth.updateUser({ password: newPassword });

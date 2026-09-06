@@ -63,20 +63,42 @@
       }
     });
 
-    $("password-form").addEventListener("submit", async function (e) {
+    var passwordForm = $("password-form");
+    var passwordToggle = $("password-toggle");
+    var passwordCancel = $("password-cancel");
+
+    function closePasswordForm() {
+      passwordForm.reset();
+      passwordForm.hidden = true;
+      passwordToggle.hidden = false;
+    }
+
+    passwordToggle.addEventListener("click", function () {
+      passwordForm.hidden = false;
+      passwordToggle.hidden = true;
+      $("acc-current-password").focus();
+    });
+    passwordCancel.addEventListener("click", function () {
+      notice.hidden = true;
+      closePasswordForm();
+    });
+
+    passwordForm.addEventListener("submit", async function (e) {
       e.preventDefault();
       var button = e.target.querySelector("button[type=submit]");
+      var current = $("acc-current-password").value;
       var pass = $("acc-new-password").value;
       var confirm = $("acc-confirm-password").value;
       if (pass !== confirm) {
-        say(notice, "Those two passwords don't match.", true);
+        say(notice, "Those two new passwords don't match.", true);
         return;
       }
       button.disabled = true;
       try {
+        await LBAuth.verifyPassword(current);
         await LBAuth.updatePassword(pass);
         say(notice, "Password updated.");
-        e.target.reset();
+        closePasswordForm();
       } catch (err) {
         say(notice, err.message, true);
       } finally {
