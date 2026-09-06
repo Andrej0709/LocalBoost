@@ -172,50 +172,53 @@
         <div id="channels-notice" class="notice" hidden></div>
       </div>
 
-      <!-- Plan & billing -->
-      <div class="card">
-        <div class="acc-head">
-          <h3 class="acc-card-title" style="margin-bottom:0">Plan &amp; billing</h3>
-          <a href="LocalBoost.dc.html#pricing" id="bill-plan-link" style="font-size:12.5px;color:#62666d">Change plan →</a>
-        </div>
-        <p class="acc-card-sub">What you're on and how it's billed.</p>
+      <!-- Plan & billing group: plan details + payment history, visually grouped but not merged -->
+      <div class="acc-group">
+        <div class="acc-group-label mono">PLAN &amp; BILLING</div>
 
-        <div id="billing-empty" class="empty" hidden>
-          <div class="mono">NO PLAN YET</div>
-          <h3>You haven't picked a plan.</h3>
-          <p>Choose a plan to start your first drop — billing details show up here once you do.</p>
-          <a href="LocalBoost.dc.html#pricing" class="btn-ghost" style="margin-top:20px;display:inline-flex">See plans<span class="mono" style="font-size:13px">→</span></a>
-        </div>
+        <div class="card">
+          <div class="acc-head">
+            <h3 class="acc-card-title" style="margin-bottom:0">Plan</h3>
+            <a href="LocalBoost.dc.html#pricing" id="bill-plan-link" style="font-size:12.5px;color:#62666d">Change plan →</a>
+          </div>
+          <p class="acc-card-sub">What you're on and how it's billed.</p>
 
-        <div id="billing-rows" hidden>
-          <div class="acc-row"><div class="acc-row-label">Plan</div><div class="acc-row-value" id="bill-plan">—</div></div>
-          <div class="acc-row"><div class="acc-row-label">Rate</div><div class="acc-row-value" id="bill-rate">—</div></div>
-          <div class="acc-row"><div class="acc-row-label">Billing cycle</div><div class="acc-row-value" id="bill-cycle">—</div></div>
-          <div class="acc-row"><div class="acc-row-label">Status</div><div class="acc-row-value" id="bill-status">—</div></div>
-          <div class="acc-row"><div class="acc-row-label" id="bill-date-label">Trial ends</div><div class="acc-row-value" id="bill-date">—</div></div>
-        </div>
-      </div>
+          <div id="billing-empty" class="empty" hidden>
+            <div class="mono">NO PLAN YET</div>
+            <h3>You haven't picked a plan.</h3>
+            <p>Choose a plan to start your first drop — billing details show up here once you do.</p>
+            <a href="LocalBoost.dc.html#pricing" class="btn-ghost" style="margin-top:20px;display:inline-flex">See plans<span class="mono" style="font-size:13px">→</span></a>
+          </div>
 
-      <!-- Payment insight -->
-      <div class="card">
-        <h3 class="acc-card-title">Payment insight</h3>
-        <p class="acc-card-sub" id="payments-sub">Every charge on your account, past and upcoming.</p>
-
-        <div id="payments-empty" class="empty" hidden>
-          <div class="mono">NO BILLING YET</div>
-          <h3>Nothing charged so far.</h3>
-          <p>Once your trial converts to a paid plan, every charge will show up here.</p>
+          <div id="billing-rows" hidden>
+            <div class="acc-row"><div class="acc-row-label">Plan</div><div class="acc-row-value" id="bill-plan">—</div></div>
+            <div class="acc-row"><div class="acc-row-label">Rate</div><div class="acc-row-value" id="bill-rate">—</div></div>
+            <div class="acc-row"><div class="acc-row-label">Billing cycle</div><div class="acc-row-value" id="bill-cycle">—</div></div>
+            <div class="acc-row"><div class="acc-row-label">Status</div><div class="acc-row-value" id="bill-status">—</div></div>
+            <div class="acc-row"><div class="acc-row-label" id="bill-date-label">Trial ends</div><div class="acc-row-value" id="bill-date">—</div></div>
+          </div>
         </div>
 
-        <div id="payments-table-wrap" class="acc-table-wrap" hidden>
-          <table class="acc-table">
-            <thead><tr><th>Date</th><th>Description</th><th>Status</th><th>Amount</th></tr></thead>
-            <tbody id="payments-rows"></tbody>
-          </table>
-        </div>
+        <div class="card">
+          <h3 class="acc-card-title">Payments</h3>
+          <p class="acc-card-sub" id="payments-sub">Every charge on your account, past and upcoming.</p>
 
-        <div style="margin-top:18px;font-size:12.5px;line-height:1.6;color:#4c5056">
-          Amounts are calculated from your plan and billing date, not pulled from a payment processor yet — connect Stripe to replace this with real invoice receipts.
+          <div id="payments-empty" class="empty" hidden>
+            <div class="mono">NO BILLING YET</div>
+            <h3>Nothing charged so far.</h3>
+            <p>Once your trial converts to a paid plan, every charge will show up here.</p>
+          </div>
+
+          <div id="payments-table-wrap" class="acc-table-wrap" hidden>
+            <table class="acc-table">
+              <thead><tr><th>Date</th><th>Description</th><th>Status</th><th>Amount</th></tr></thead>
+              <tbody id="payments-rows"></tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:18px;font-size:12.5px;line-height:1.6;color:#4c5056">
+            Amounts are calculated from your plan and billing date, not pulled from a payment processor yet — connect Stripe to replace this with real invoice receipts.
+          </div>
         </div>
       </div>
 
