@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account — LocalBoost</title>
+<meta name="description" content="Manage your login, connected channels and billing for your LocalBoost account.">
+<link rel="canonical" href="https://localboost.app/account.html">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#07080a">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="localboost.css">
+<style>
+.acc-grid{display:grid;gap:20px}
+.acc-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:6px}
+.acc-card-title{font-size:15.5px;color:#fff;letter-spacing:-.015em;margin:0}
+.acc-card-sub{margin:6px 0 20px;font-size:13px;color:#62666d}
+.acc-row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid #1b1e22}
+.acc-row:first-of-type{border-top:none;padding-top:0}
+.acc-row-label{font-size:13.5px;color:#8a8f98}
+.acc-row-value{font-size:14px;color:#d0d6e0;text-align:right}
+.acc-chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:9999px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;border:1px solid}
+.acc-chip.ok{border-color:rgba(159,215,176,.4);background:rgba(159,215,176,.14);color:#9fd7b0}
+.acc-chip.warn{border-color:rgba(240,168,168,.35);background:rgba(240,168,168,.12);color:#f0a8a8}
+.acc-chip.muted{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#8a8f98}
+.acc-chip.acc{border-color:rgba(168,198,240,.4);background:var(--acc-soft);color:var(--acc)}
+.acc-channels{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.acc-form-inline{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.acc-form-inline .field{flex:1;min-width:220px;margin-bottom:0}
+.acc-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.acc-table th{text-align:left;padding:0 0 10px;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#62666d;font-weight:400;border-bottom:1px solid #1b1e22}
+.acc-table td{padding:12px 0;border-top:1px solid #1b1e22;color:#d0d6e0;vertical-align:middle}
+.acc-table td:last-child,.acc-table th:last-child{text-align:right}
+.acc-table-wrap{overflow-x:auto}
+@media (max-width:640px){
+  .acc-row{flex-direction:column;align-items:flex-start;gap:4px}
+  .acc-row-value{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="LocalBoost.dc.html#top" class="nav-logo"><span class="nav-dot"></span>LocalBoost</a>
+  <div class="nav-links">
+    <a href="LocalBoost.dc.html#drop">The drop</a>
+    <a href="LocalBoost.dc.html#control">Control room</a>
+    <a href="approvals.html">Approvals</a>
+    <a href="LocalBoost.dc.html#pricing">Pricing</a>
+  </div>
+  <button id="nav-logout" type="button" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px;background:none;border:none;cursor:pointer;font-family:'Geist',sans-serif" hidden>Log out</button>
+  <a href="login.html" class="nav-cta" id="nav-cta">Log in</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow">YOUR ACCOUNT</div>
+  <h1 id="page-title">Account settings.</h1>
+  <p id="page-sub">Your login, your connected channels, and every drop you've been billed for — all in one place.</p>
+</header>
+
+<section class="section-tight">
+  <div class="wrap">
+
+    <!-- Signed out -->
+    <div id="signed-out" class="card" hidden style="max-width:440px;margin:0 auto;text-align:center">
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">NOT SIGNED IN</div>
+      <h3 style="margin:14px 0 8px">Log in to manage your account.</h3>
+      <p style="margin:0">Password, connected channels and billing all live behind your login.</p>
+      <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <a href="login.html" class="btn">Log in<span class="mono" style="font-size:13px">&rarr;</span></a>
+        <a href="signup.html" class="btn-ghost">Create account</a>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="empty">
+      <div class="mono">LOADING YOUR ACCOUNT</div>
+    </div>
+
+    <!-- Main content -->
+    <div id="account-content" class="acc-grid" hidden>
+
+      <div class="card">
+        <div class="acc-head">
+          <div>
+            <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">SIGNED IN AS</div>
+            <div id="acc-name" style="margin-top:8px;font-size:19px;color:#fff;letter-spacing:-.015em">—</div>
+          </div>
+          <div id="acc-status-chip" class="acc-chip muted">NO PLAN</div>
+        </div>
+        <div class="acc-row-value" style="text-align:left;color:#8a8f98;font-size:13.5px" id="acc-email-display">—</div>
+      </div>
+
+      <!-- Security -->
+      <div class="card">
+        <h3 class="acc-card-title">Login &amp; security</h3>
+        <p class="acc-card-sub">Change the email you log in with or set a new password. Both take effect immediately after confirmation.</p>
+
+        <form id="email-form" class="acc-form-inline" style="margin-bottom:26px">
+          <div class="field">
+            <label for="acc-new-email">EMAIL ADDRESS</label>
+            <input id="acc-new-email" type="email" required placeholder="you@business.com" autocomplete="email">
+          </div>
+          <button type="submit" class="btn-ghost">Update email</button>
+        </form>
+
+        <form id="password-form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px" class="field-pair">
+            <div class="field" style="margin-bottom:0">
+              <label for="acc-new-password">NEW PASSWORD</label>
+              <input id="acc-new-password" type="password" required minlength="8" placeholder="At least 8 characters" autocomplete="new-password">
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label for="acc-confirm-password">CONFIRM PASSWORD</label>
+              <input id="acc-confirm-password" type="password" required minlength="8" placeholder="Type it again" autocomplete="new-password">
+            </div>
+          </div>
+          <button type="submit" class="btn-ghost" style="margin-top:16px">Update password</button>
+        </form>
+
+        <div id="security-notice" class="notice" hidden></div>
+      </div>
+
+      <!-- Connected channels -->
+      <div class="card">
+        <h3 class="acc-card-title">Connected channels</h3>
+        <p class="acc-card-sub">The channels your weekly drop publishes to. Untick anything you don't want creatives rendered for.</p>
+
+        <form id="channels-form">
+          <div class="acc-channels">
+            <label class="checkbox-row"><input type="checkbox" name="channels" value="Instagram">Instagram</label>
+            <label class="checkbox-row"><input type="checkbox" name="channels" value="Facebook">Facebook</label>
+            <label class="checkbox-row"><input type="checkbox" name="channels" value="TikTok">TikTok</label>
+            <label class="checkbox-row"><input type="checkbox" name="channels" value="Google Business">Google Business</label>
+            <label class="checkbox-row"><input type="checkbox" name="channels" value="LinkedIn">LinkedIn</label>
+            <label class="checkbox-row"><input type="checkbox" name="channels" value="Pinterest">Pinterest</label>
+          </div>
+          <button type="submit" class="btn-ghost">Save channels</button>
+        </form>
+
+        <div id="channels-notice" class="notice" hidden></div>
+      </div>
+
+      <!-- Plan & billing -->
+      <div class="card">
+        <div class="acc-head">
+          <h3 class="acc-card-title" style="margin-bottom:0">Plan &amp; billing</h3>
+          <a href="LocalBoost.dc.html#pricing" style="font-size:12.5px;color:#62666d">Change plan →</a>
+        </div>
+        <p class="acc-card-sub">What you're on and how it's billed.</p>
+
+        <div class="acc-row"><div class="acc-row-label">Plan</div><div class="acc-row-value" id="bill-plan">—</div></div>
+        <div class="acc-row"><div class="acc-row-label">Rate</div><div class="acc-row-value" id="bill-rate">—</div></div>
+        <div class="acc-row"><div class="acc-row-label">Billing cycle</div><div class="acc-row-value" id="bill-cycle">—</div></div>
+        <div class="acc-row"><div class="acc-row-label">Status</div><div class="acc-row-value" id="bill-status">—</div></div>
+        <div class="acc-row"><div class="acc-row-label" id="bill-date-label">Trial ends</div><div class="acc-row-value" id="bill-date">—</div></div>
+      </div>
+
+      <!-- Payment insight -->
+      <div class="card">
+        <h3 class="acc-card-title">Payment insight</h3>
+        <p class="acc-card-sub" id="payments-sub">Every charge on your account, past and upcoming.</p>
+
+        <div id="payments-empty" class="empty" hidden>
+          <div class="mono">NO BILLING YET</div>
+          <h3>Nothing charged so far.</h3>
+          <p>Once your trial converts to a paid plan, every charge will show up here.</p>
+        </div>
+
+        <div id="payments-table-wrap" class="acc-table-wrap" hidden>
+          <table class="acc-table">
+            <thead><tr><th>Date</th><th>Description</th><th>Status</th><th>Amount</th></tr></thead>
+            <tbody id="payments-rows"></tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:18px;font-size:12.5px;line-height:1.6;color:#4c5056">
+          Amounts are calculated from your plan and billing date, not pulled from a payment processor yet — connect Stripe to replace this with real invoice receipts.
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="approvals.html">Approvals</a><a href="LocalBoost.dc.html#control">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="account.js"></script>
+<script src="nav.js"></script>
+</body>
+</html>

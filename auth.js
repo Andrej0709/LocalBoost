@@ -193,6 +193,24 @@
         redirectTo: siteOrigin() + "login.html"
       });
       if (res.error) throw res.error;
+    },
+
+    // Changes the login email. Supabase sends a confirmation link before the
+    // change takes effect — session.user.email stays the old address until then.
+    updateEmail: async function (newEmail) {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.auth.updateUser({ email: newEmail });
+      if (res.error) throw res.error;
+      return res.data.user;
+    },
+
+    // Changes the password directly — no re-entry of the old one, matching
+    // Supabase's updateUser behavior for an already-authenticated session.
+    updatePassword: async function (newPassword) {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.auth.updateUser({ password: newPassword });
+      if (res.error) throw res.error;
+      return res.data.user;
     }
   };
 })();
