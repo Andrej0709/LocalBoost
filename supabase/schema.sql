@@ -52,11 +52,17 @@ create table if not exists public.profiles (
   /* Publishing */
   channels            text[] not null default '{}',
 
-  /* Billing / trial */
+  /* Billing / trial.
+     A fresh account has subscription_status null - the trial does NOT start at
+     signup. It starts only once the business brief is filled in (onboarded_at)
+     and a card has been captured at checkout (payment_method_at); at that point
+     start_trial() sets the status to 'trialing' and stamps the trial dates. */
   plan                public.plan_tier,
-  subscription_status public.subscription_status not null default 'trialing',
-  trial_started_at    timestamptz not null default now(),
-  trial_ends_at       timestamptz not null default (now() + interval '7 days'),
+  billing_cycle       text,
+  subscription_status public.subscription_status,
+  trial_started_at    timestamptz,
+  trial_ends_at       timestamptz,
+  payment_method_at   timestamptz,
 
   onboarded_at        timestamptz,
   created_at          timestamptz not null default now(),
@@ -64,6 +70,19 @@ create table if not exists public.profiles (
 );
 
 create index if not exists profiles_email_idx on public.profiles (email);
+
+/* --- Migration for databases created before the checkout gate --------------- */
+/* Removes the automatic trial defaults and adds the columns the gate needs.     */
+/* Existing rows keep whatever trial they already have. Safe to re-run.          */
+alter table public.profiles add column if not exists billing_cycle     text;
+alter table public.profiles add column if not exists payment_method_at timestamptz;
+
+alter table public.profiles alter column trial_started_at    drop not null;
+alter table public.profiles alter column trial_ends_at       drop not null;
+alter table public.profiles alter column subscription_status drop not null;
+alter table public.profiles alter column trial_started_at    drop default;
+alter table public.profiles alter column trial_ends_at       drop default;
+alter table public.profiles alter column subscription_status drop default;
 
 /* ------------------------------------------------------------ */
 /* 3. drops - one weekly batch of creatives per account */
@@ -209,6 +228,55 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+/* ------------------------------------------------------------ */
+/* 8b. start_trial - the only way a trial ever begins. */
+/*     Called from checkout.js once the card has been captured. Refuses to run  */
+/*     while the business brief is missing, so the trial can never start        */
+/*     straight off a plan click. */
+/* ------------------------------------------------------------ */
+create or replace function public.start_trial(
+  p_plan  public.plan_tier,
+  p_cycle text default 'monthly'
+)
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  row_out public.profiles;
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in.';
+  end if;
+
+  select * into row_out from public.profiles where id = auth.uid();
+
+  if row_out.onboarded_at is null then
+    raise exception 'Finish the business brief before starting a trial.';
+  end if;
+
+  /* Already on a trial or paying: don't restart the clock. */
+  if row_out.subscription_status in ('trialing', 'active') then
+    return row_out;
+  end if;
+
+  update public.profiles
+     set plan                = coalesce(p_plan, plan),
+         billing_cycle       = coalesce(p_cycle, 'monthly'),
+         payment_method_at   = now(),
+         subscription_status = 'trialing',
+         trial_started_at    = now(),
+         trial_ends_at       = now() + interval '7 days'
+   where id = auth.uid()
+   returning * into row_out;
+
+  return row_out;
+end;
+$$;
+
+grant execute on function public.start_trial(public.plan_tier, text) to authenticated;
 
 /* ------------------------------------------------------------ */
 /* 9. Row Level Security */

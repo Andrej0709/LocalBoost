@@ -231,7 +231,35 @@
     renderSummary();
   });
 
-  $("co-submit").addEventListener("click", function () {
+  // ------------------------------------------------------- access gate
+  // Checkout is step 2. You may only be here signed in and with the business
+  // brief already saved — otherwise back to signup.html for the brief.
+  function signupUrl() {
+    return "signup.html?plan=" + state.plan;
+  }
+
+  function showActive() {
+    $("co-view").hidden = true;
+    $("co-success").hidden = false;
+    var plan = PLANS[state.plan];
+    $("co-eyebrow").textContent = "ALREADY RUNNING";
+    $("co-headline").innerHTML = 'Your <em>' + plan.name + '</em> drop is live.';
+    $("co-sub").textContent = "Nothing to pay here — your plan is already on the account.";
+    $("co-success-text").textContent = "The " + plan.name + " plan is live on your account.";
+  }
+
+  if (window.LBAuth && !params.get("state")) {
+    LBAuth.ready.then(function () {
+      if (!LBAuth.isLoggedIn()) { location.href = signupUrl(); return; }
+      if (!LBAuth.hasBrief()) { location.href = signupUrl(); return; }
+      if (LBAuth.hasActivePlan()) { showActive(); return; }
+
+      var user = LBAuth.getUser();
+      if (user && user.email && !$("co-email").value) $("co-email").value = user.email;
+    });
+  }
+
+  $("co-submit").addEventListener("click", async function () {
     var email = $("co-email").value.trim();
     var notice = $("co-notice");
     var button = $("co-submit");
@@ -264,6 +292,8 @@
     button.innerHTML = 'Opening secure payment<span class="mono" style="font-size:13px">…</span>';
 
     // ---- BACKEND GOES HERE -------------------------------------------------
+    // Stripe collects the card in setup mode — no money moves today, the card
+    // is only stored so the first invoice can be charged when the trial ends.
     // const res = await fetch("/functions/v1/create-checkout-session", {
     //   method: "POST",
     //   headers: { "Content-Type": "application/json" },
@@ -271,20 +301,28 @@
     // });
     // const { url } = await res.json();
     // location.href = url;   // Stripe hosted Checkout
+    // The webhook then calls start_trial() — drop the client-side call below.
     // ------------------------------------------------------------------------
 
     console.log("[checkout] payload for create-checkout-session:", payload);
 
-    setTimeout(function () {
+    // Until Stripe is wired, treat reaching this point as "card captured" and
+    // start the trial here. This is the ONLY place a trial ever begins.
+    try {
+      await LBAuth.startTrial(state.plan, state.cycle);
+    } catch (err) {
       button.disabled = false;
       button.style.opacity = "";
       button.innerHTML = 'Continue to secure payment<span class="mono" style="font-size:13px">→</span>';
       notice.hidden = false;
-      notice.style.borderColor = "rgba(168,198,240,.28)";
-      notice.style.background = "rgba(168,198,240,.08)";
-      notice.style.color = "var(--acc)";
-      notice.textContent = "Front end only for now — payment isn't connected yet. The order payload is in the console.";
-    }, 900);
+      notice.style.borderColor = "rgba(240,168,168,.3)";
+      notice.style.background = "rgba(240,168,168,.08)";
+      notice.style.color = "#f0a8a8";
+      notice.textContent = err.message;
+      return;
+    }
+
+    location.href = "checkout.html?state=success&plan=" + state.plan + "&cycle=" + state.cycle;
   });
 
   // --------------------------------------------------------- returning views
@@ -297,7 +335,9 @@
       $("co-success").hidden = false;
       $("co-eyebrow").textContent = "YOU'RE ALL SET";
       $("co-headline").innerHTML = 'Your <em>' + plan.name + '</em> drop is booked.';
-      $("co-sub").textContent = "Payment went through. Nothing else needed from you until Monday.";
+      $("co-sub").textContent =
+        "Your card is on file and the free trial has started — nothing was charged today. " +
+        "First invoice on " + trialEndsOn() + ", and you can cancel before then.";
       $("co-success-text").textContent = "Your " + plan.name + " drop is live.";
     } else {
       $("co-cancelled").hidden = false;

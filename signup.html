@@ -63,16 +63,16 @@
 
     <form id="signup-form">
 
-      <div class="section-label">ACCOUNT</div>
+      <div class="section-label" id="account-label">ACCOUNT</div>
       <div class="field">
         <label for="business">BUSINESS NAME</label>
         <input id="business" name="business" type="text" required placeholder="e.g. Milena's Bakery">
       </div>
-      <div class="field">
+      <div class="field" id="field-email">
         <label for="email">EMAIL</label>
         <input id="email" name="email" type="email" required placeholder="you@business.com">
       </div>
-      <div class="field">
+      <div class="field" id="field-password">
         <label for="password">PASSWORD</label>
         <input id="password" name="password" type="password" required placeholder="Create a password">
       </div>
@@ -219,6 +219,50 @@
 
   var form = document.getElementById("signup-form");
   var notice = document.getElementById("signup-notice");
+  var submitButton = form.querySelector("button[type=submit]");
+
+  // Signed in with no plan running: this page is the business brief, nothing
+  // more. Account fields come off, and the button leads to checkout.
+  var briefOnly = false;
+
+  function checkoutUrl(){
+    return "checkout.html?plan=" + planKey;
+  }
+
+  function showBriefMode(profile){
+    briefOnly = true;
+
+    ["field-email", "field-password"].forEach(function(id){
+      var node = document.getElementById(id);
+      node.hidden = true;
+      node.querySelector("input").required = false;
+    });
+    document.getElementById("account-label").textContent = "YOUR BUSINESS";
+
+    document.getElementById("page-eyebrow").textContent = "STEP 1 OF 2 · FIRST DROP FREE";
+    document.getElementById("plan-headline").innerHTML = 'Brief the engine for your <em>' + plan.name + '</em> drop.';
+    document.getElementById("page-sub").textContent =
+      "Tell us about the business first. Card details come on the next step — nothing is charged until the free trial ends.";
+    submitButton.innerHTML = 'Continue to checkout<span class="mono" style="font-size:13px">→</span>';
+
+    // Prefill anything the account already knows.
+    var map = {
+      business: "business_name", city: "city", vertical: "vertical",
+      website: "website", what: "what_you_sell", customer: "typical_customer",
+      different: "differentiator", vibe: "brand_vibe", colors: "brand_colors",
+      avoid: "avoid_notes"
+    };
+    Object.keys(map).forEach(function(id){
+      var value = profile[map[id]];
+      if (value) document.getElementById(id).value = value;
+    });
+    if (Array.isArray(profile.channels) && profile.channels.length) {
+      Array.prototype.forEach.call(
+        form.querySelectorAll('input[name="channels"]'),
+        function(box){ box.checked = profile.channels.indexOf(box.value) > -1; }
+      );
+    }
+  }
 
   function say(message){
     notice.hidden = false;
@@ -232,45 +276,74 @@
     );
   }
 
+  function brief(){
+    return {
+      business_name:    document.getElementById("business").value,
+      city:             document.getElementById("city").value,
+      vertical:         document.getElementById("vertical").value,
+      website:          document.getElementById("website").value,
+      what_you_sell:    document.getElementById("what").value,
+      typical_customer: document.getElementById("customer").value,
+      differentiator:   document.getElementById("different").value,
+      brand_vibe:       document.getElementById("vibe").value,
+      brand_colors:     document.getElementById("colors").value,
+      avoid_notes:      document.getElementById("avoid").value,
+      channels:         checkedChannels(),
+      plan:             planKey
+    };
+  }
+
   form.addEventListener("submit", async function(e){
     e.preventDefault();
-    var button = form.querySelector("button[type=submit]");
-    button.disabled = true;
+    submitButton.disabled = true;
     try {
+      if (briefOnly) {
+        // Save the brief only. The trial starts at checkout, not here.
+        await LBAuth.saveBrief(brief());
+        say("Brief saved — taking you to checkout...");
+        location.href = checkoutUrl();
+        return;
+      }
+
       var result = await LBAuth.signUp(
         document.getElementById("email").value,
         document.getElementById("password").value,
-        {
-          business_name:    document.getElementById("business").value,
-          city:             document.getElementById("city").value,
-          vertical:         document.getElementById("vertical").value,
-          website:          document.getElementById("website").value,
-          what_you_sell:    document.getElementById("what").value,
-          typical_customer: document.getElementById("customer").value,
-          differentiator:   document.getElementById("different").value,
-          brand_vibe:       document.getElementById("vibe").value,
-          brand_colors:     document.getElementById("colors").value,
-          avoid_notes:      document.getElementById("avoid").value,
-          channels:         checkedChannels(),
-          plan:             planKey
-        }
+        brief()
       );
       if (result.needsEmailConfirmation) {
-        showActivated();
+        document.getElementById("form-view").hidden = true;
+        document.getElementById("activated-view").hidden = false;
         document.getElementById("page-eyebrow").textContent = "ONE LAST STEP";
+        document.getElementById("plan-headline").innerHTML = 'Confirm your email.';
+        document.getElementById("page-sub").textContent =
+          "Your brief is saved. Confirm your email, log back in, and we'll take you straight to checkout.";
+        document.querySelector("#activated-view .mono").textContent = "ALMOST THERE";
         document.getElementById("activated-text").textContent =
-          "Check your inbox — confirm your email to finish setting up the " + plan.name + " plan.";
+          "Check your inbox — confirm your email to carry on with the " + plan.name + " plan.";
       } else {
-        showActivated();
+        // Session already live: mark the brief done and move to checkout.
+        await LBAuth.saveBrief(brief());
+        location.href = checkoutUrl();
       }
     } catch (err) {
-      button.disabled = false;
+      submitButton.disabled = false;
       say(err.message);
     }
   });
 
   LBAuth.ready.then(function(){
-    if (LBAuth.isLoggedIn()) showActivated();
+    if (!LBAuth.isLoggedIn()) return;
+
+    // A plan is only "active" once checkout has run.
+    if (LBAuth.hasActivePlan()) { showActivated(); return; }
+
+    var profile = LBAuth.getProfile() || {};
+    if (LBAuth.hasBrief()) {
+      // Brief already done, payment isn't — skip straight to checkout.
+      location.href = checkoutUrl();
+      return;
+    }
+    showBriefMode(profile);
   });
 })();
 </script>

@@ -169,7 +169,15 @@
         document.getElementById("li-email").value,
         document.getElementById("li-password").value
       );
-      redirect("LocalBoost.dc.html#control", "Logged in — taking you to your control room...");
+      var profile = LBAuth.getProfile() || {};
+      var next = LBAuth.nextStep(profile.plan || null);
+      if (next) {
+        redirect(next, LBAuth.hasBrief()
+          ? "Logged in — one step left, taking you to checkout..."
+          : "Logged in — let's finish your business brief...");
+      } else {
+        redirect("LocalBoost.dc.html#control", "Logged in — taking you to your control room...");
+      }
     } catch (err) {
       button.disabled = false;
       say(err.message === "Email not confirmed"
@@ -214,10 +222,28 @@
     document.getElementById("auth-forms").hidden = true;
     document.getElementById("already-in-name").textContent = profile.business_name || user.email || "your account";
     document.getElementById("trial-email").textContent = user.email || "—";
-    document.getElementById("trial-start").textContent = profile.trial_started_at ? fmt(profile.trial_started_at) : "—";
-    document.getElementById("trial-end").textContent = profile.trial_ends_at ? fmt(profile.trial_ends_at) : "—";
     title.textContent = "Welcome back.";
     sub.textContent = "You're already signed in.";
+
+    if (LBAuth.hasActivePlan()) {
+      document.getElementById("trial-start").textContent = profile.trial_started_at ? fmt(profile.trial_started_at) : "—";
+      document.getElementById("trial-end").textContent = profile.trial_ends_at ? fmt(profile.trial_ends_at) : "—";
+      return;
+    }
+
+    // No plan running yet — the trial only starts after the brief and checkout.
+    var next = LBAuth.nextStep(profile.plan || null);
+    document.getElementById("trial-start").textContent = "Not started";
+    document.getElementById("trial-end").textContent =
+      LBAuth.hasBrief() ? "Add a card at checkout to start it" : "Finish your business brief to start it";
+
+    var finish = document.createElement("a");
+    finish.className = "btn";
+    finish.href = next;
+    finish.innerHTML = (LBAuth.hasBrief() ? "Continue to checkout" : "Finish setting up") +
+      '<span class="mono" style="font-size:13px">→</span>';
+    var actions = document.querySelector("#already-in div[style*='margin-top:22px']");
+    actions.insertBefore(finish, actions.firstChild);
   });
 
   document.getElementById("logout-btn").addEventListener("click", async function(){

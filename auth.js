@@ -65,6 +65,51 @@
 
     refreshProfile: loadProfile,
 
+    // The business brief is filled in — signup.html stamps onboarded_at.
+    hasBrief: function () {
+      return !!(profile && profile.onboarded_at);
+    },
+
+    // A trial or a paid subscription is actually running. Nothing on the site
+    // may claim a plan is live unless this is true.
+    hasActivePlan: function () {
+      return !!(
+        profile &&
+        (profile.subscription_status === "trialing" ||
+          profile.subscription_status === "active")
+      );
+    },
+
+    // Where a logged-in user should go after clicking a plan:
+    // brief first, then checkout, and only then is the plan live.
+    nextStep: function (planKey) {
+      var q = planKey ? "?plan=" + planKey : "";
+      if (!this.hasBrief()) return "signup.html" + q;
+      if (!this.hasActivePlan()) return "checkout.html" + q;
+      return null; // nothing owed — the plan is already running
+    },
+
+    // Marks the brief as done. Does NOT start the trial.
+    saveBrief: async function (brief) {
+      var patch = {};
+      Object.keys(brief).forEach(function (k) { patch[k] = brief[k]; });
+      patch.onboarded_at = new Date().toISOString();
+      return await window.LBAuth.updateProfile(patch);
+    },
+
+    // Starts the trial. Called by checkout.js once a card is on file — never
+    // anywhere else. The DB function refuses if the brief is missing.
+    startTrial: async function (planKey, cycle) {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.rpc("start_trial", {
+        p_plan: planKey || null,
+        p_cycle: cycle || "monthly"
+      });
+      if (res.error) throw res.error;
+      await loadProfile();
+      return profile;
+    },
+
     // meta: business_name, city, vertical, website, what_you_sell,
     // typical_customer, differentiator, brand_vibe, brand_colors,
     // avoid_notes, channels (array), plan ('counter'|'storefront'|'franchise').
