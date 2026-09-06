@@ -127,7 +127,11 @@
   function renderBilling(profile) {
     var plan = PLANS[profile.plan];
 
-    if (!plan) {
+    // profile.plan is set the moment the business brief is saved — before
+    // checkout ever runs. subscription_status only becomes non-null once
+    // start_trial() fires (checkout.js, after a card is on file), so that's
+    // the real signal for "has a plan running", not the plan column alone.
+    if (!plan || !profile.subscription_status) {
       $("billing-rows").hidden = true;
       $("billing-empty").hidden = false;
       $("bill-plan-link").hidden = true;
