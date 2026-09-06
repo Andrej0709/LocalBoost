@@ -93,7 +93,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
         <div style="position:absolute;left:14%;top:26%;width:56%;height:44%;border-radius:50%;background:radial-gradient(closest-side,rgba(168,198,240,.22),transparent);filter:blur(28px)"></div>
 
         <div data-depth="1" style="position:absolute;left:6%;top:8%;width:60%;transform:translateZ(120px) translateY(var(--py,0px)) rotateY(-13deg) rotateX(6deg);border-radius:14px;border:1px solid rgba(255,255,255,.09);background:#0e0f12;box-shadow:0 40px 90px rgba(0,0,0,.6);overflow:hidden">
-          <div style="height:210px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 11px);background-color:#15171b;display:flex;align-items:flex-end;padding:14px"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#62666d">CREATIVE 34-01 · REEL 9:16</span></div>
+          <div style="height:210px;background-image:radial-gradient(130% 110% at 78% 82%, rgba(214,168,110,.30), transparent 62%), linear-gradient(165deg, rgba(58,44,28,.9) 0%, rgba(14,15,18,.98) 68%), repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 11px);background-size:cover;background-position:center;background-color:#15171b;display:flex;align-items:flex-end;padding:14px"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#62666d">CREATIVE 34-01 · REEL 9:16</span></div>
           <div style="padding:14px 16px 16px"><div style="font-size:15px;color:#fff;letter-spacing:-.015em">Saturday tasting, 4pm.</div><div style="margin-top:5px;font-size:13px;color:#62666d">Autoposted · Instagram, TikTok</div></div>
         </div>
 
@@ -183,7 +183,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
             <div style="position:absolute;left:50%;top:50%;width:min(420px,86%);margin-left:min(-210px,-43%);margin-top:-170px;height:340px;border-radius:14px;border:1px solid {{ p.border }};background:#0e0f12;box-shadow:0 40px 90px rgba(0,0,0,.6);overflow:hidden;transform:{{ p.tf }};opacity:{{ p.op }};transition:transform .7s cubic-bezier(.22,1,.36,1),opacity .7s ease,border-color .7s ease">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #17191d"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8a8f98">{{ p.tag }}</span><span style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--acc)">{{ p.meta }}</span></div>
               <div style="padding:18px 16px;display:grid;gap:10px">
-                <div style="height:112px;border-radius:8px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 11px);background-color:#15171b;display:flex;align-items:flex-end;padding:11px"><span style="font-family:'Geist Mono',monospace;font-size:10px;color:#62666d">{{ p.slot }}</span></div>
+                <div style="height:112px;border-radius:8px;background-image:{{ p.art }};background-size:cover;background-position:center;background-color:#15171b;display:flex;align-items:flex-end;padding:11px"><span style="font-family:'Geist Mono',monospace;font-size:10px;color:#62666d">{{ p.slot }}</span></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
                   <div style="height:56px;border-radius:6px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 10px);background-color:#131519"></div>
                   <div style="height:56px;border-radius:6px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 10px);background-color:#131519"></div>
@@ -216,7 +216,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
     <div style="position:absolute;left:50%;top:52%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-7deg) rotateY({{ angle }}deg);transition:transform .5s cubic-bezier(.22,1,.36,1)">
       <sc-for list="{{ deck }}" as="c" hint-placeholder-count="7">
         <div style="position:absolute;width:232px;height:352px;margin-left:-116px;margin-top:-176px;border-radius:14px;border:1px solid {{ c.border }};background:#0e0f12;box-shadow:0 40px 80px rgba(0,0,0,.6);overflow:hidden;transform:{{ c.tf }};opacity:{{ c.op }}">
-          <div style="height:242px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 11px);background-color:#161a1e;display:flex;flex-direction:column;justify-content:space-between;padding:12px">
+          <div style="height:242px;background-image:{{ c.art }};background-size:cover;background-position:center;background-color:#161a1e;display:flex;flex-direction:column;justify-content:space-between;padding:12px">
             <span style="align-self:flex-start;padding:3px 8px;border-radius:4px;background:rgba(255,255,255,.06);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#d0d6e0">{{ c.ratio }}</span>
             <span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#62666d">{{ c.id }}</span>
           </div>
@@ -236,7 +236,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
     <div style="padding:24px;background:#0a0b0d"><div style="font-size:16px;color:#fff;letter-spacing:-.015em">Native formats</div><div style="margin-top:8px;font-size:14px;line-height:1.55;color:#62666d">9:16, 4:5, 1:1 and 16:9 rendered from the same scene — never a cropped afterthought.</div></div>
     <div style="padding:24px;background:#0a0b0d"><div style="font-size:16px;color:#fff;letter-spacing:-.015em">Realism guardrails</div><div style="margin-top:8px;font-size:14px;line-height:1.55;color:#62666d">No six-fingered baristas, no invented prices. Anything uncertain never reaches your queue.</div></div>
   </div>
-<div style="position: absolute; left: 902px; text-align: center; font-family: 'Geist Mono',monospace; font-size: 10px; letter-spacing: .12em; color: #3d4046; top: 818px">DRAG TO ROTATE THE DRUM</div></section>
+<div style="position: absolute; left: 50%; transform: translateX(-50%); text-align: center; font-family: 'Geist Mono',monospace; font-size: 10px; letter-spacing: .12em; color: #3d4046; top: 818px">DRAG TO ROTATE THE DRUM</div></section>
 
 <section id="control" data-dash="1" style="position:relative;padding:clamp(90px,10vw,140px) 24px clamp(100px,12vw,160px);border-top:1px solid #15171b;overflow:hidden">
   <div style="position:absolute;left:50%;top:8%;transform:translateX(-50%);font-size:clamp(90px,18vw,260px);font-weight:600;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px #101215;white-space:nowrap;pointer-events:none;user-select:none">CONTROL ROOM</div>
@@ -268,7 +268,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
                   <div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:{{ d.labelColor }}">{{ d.label }}</div>
                   <sc-for list="{{ d.slots }}" as="sl" hint-placeholder-count="2">
                     <div style="border-radius:6px;padding:7px;background:{{ sl.bg }};border:1px solid {{ sl.border }};cursor:pointer;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease" style-hover="transform:translateY(-3px);border-color:rgba(168,198,240,.55);box-shadow:0 10px 24px rgba(0,0,0,.5),0 0 22px rgba(168,198,240,.16)">
-                      <div style="height:22px;border-radius:3px;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 2px,transparent 2px 9px);background-color:#1b1e22"></div>
+                      <div style="height:22px;border-radius:3px;background-image:{{ sl.art }};background-size:cover;background-position:center;background-color:#1b1e22"></div>
                       <div style="margin-top:6px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.06em;color:{{ sl.color }}">{{ sl.time }}</div>
                     </div>
                   </sc-for>
@@ -282,7 +282,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
           <div style="padding:clamp(16px,2.4vw,26px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:14px">
             <sc-for list="{{ grid }}" as="g" hint-placeholder-count="8">
               <div onClick="{{ g.toggle }}" style="border-radius:10px;border:1px solid {{ g.border }};background:#0e0f12;overflow:hidden;cursor:pointer;transition:transform .25s cubic-bezier(.22,1,.36,1),border-color .25s ease,box-shadow .25s ease" style-hover="transform:translateY(-5px);border-color:rgba(168,198,240,.5);box-shadow:0 22px 44px rgba(0,0,0,.55),0 0 30px rgba(168,198,240,.14)">
-                <div style="height:clamp(130px,14vw,170px);background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 11px);background-color:#161a1e;display:flex;align-items:flex-start;justify-content:space-between;padding:9px">
+                <div style="height:clamp(130px,14vw,170px);background-image:{{ g.art }};background-size:cover;background-position:center;background-color:#161a1e;display:flex;align-items:flex-start;justify-content:space-between;padding:9px">
                   <span style="padding:2px 7px;border-radius:4px;background:{{ g.badgeBg }};font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:{{ g.badgeColor }}">{{ g.state }}</span>
                   <span style="font-family:'Geist Mono',monospace;font-size:9px;color:#62666d">{{ g.ratio }}</span>
                 </div>
@@ -445,12 +445,12 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 
 <footer style="position:relative;margin-top:-1px;padding:0 24px 44px;background:transparent">
   <div style="position:relative;z-index:1;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:32px">
-    <div>
+    <a href="#top" style="text-decoration:none;display:block">
       <div style="display:flex;align-items:center;gap:9px;color:#fff;font-size:15px;font-weight:500;letter-spacing:-.02em"><span style="display:block;width:16px;height:16px;border-radius:5px;background:var(--acc)"></span>LocalBoost</div>
       <div style="margin-top:12px;font-size:13px;line-height:1.6;color:#4c5056;max-width:26ch">Weekly ad drops for businesses with no marketing department.</div>
-    </div>
+    </a>
     <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">PRODUCT</div><a href="#drop" style="color:#8a8f98">The weekly drop</a><a href="#engine" style="color:#8a8f98">Engine</a><a href="approvals.html" style="color:#8a8f98">Approvals</a><a href="#control" style="color:#8a8f98">Control room</a></div>
-    <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">COMPANY</div><a href="about.html" style="color:#8a8f98">About</a><a href="#pricing" style="color:#8a8f98">Pricing</a><a href="contact.html" style="color:#8a8f98">Contact</a><a href="message-us.html" style="color:#8a8f98">Message us</a></div>
+    <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">COMPANY</div><a href="about.html" style="color:#8a8f98">About</a><a href="#pricing" style="color:#8a8f98">Pricing</a><a href="message-us.html" style="color:#8a8f98">Contact us</a></div>
     <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">LEGAL</div><a href="terms.html" style="color:#8a8f98">Terms</a><a href="privacy.html" style="color:#8a8f98">Privacy</a><a href="ai-disclosure.html" style="color:#8a8f98">AI disclosure</a></div>
   </div>
   <div style="position:relative;z-index:1;max-width:1200px;margin:44px auto 0;padding-top:22px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#3d4046"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
@@ -613,6 +613,7 @@ class Component extends DCLogic {
   }
 
   renderVals() {
+    const GRAIN = "repeating-linear-gradient(115deg,rgba(255,255,255,.06) 0 2px,transparent 2px 11px)";
     const st = this.state.step;
     const steps = [
       { n: "01", t: "Brief once", d: "Ten minutes. Your offer, your voice, your street. We build a brand fingerprint and never ask you again." },
@@ -634,10 +635,10 @@ class Component extends DCLogic {
     });
 
     const pdata = [
-      { tag: "BRAND FINGERPRINT", meta: "LOCKED", slot: "REFERENCE SET · 24 IMAGES", line: "Warm oak, matte black, morning light. Never neon, never stock-smiling." },
-      { tag: "RENDER QUEUE", meta: "12 / 12", slot: "SCENE 34-07 · REEL 9:16", line: "Twelve creatives rendered in 41 minutes, formatted per channel." },
-      { tag: "APPROVAL", meta: "9 KEPT", slot: "SWIPE TO KEEP OR KILL", line: "Three killed. The engine notes why and adjusts next Monday." },
-      { tag: "PUBLISHED", meta: "LIVE", slot: "MON 18:30 · INSTAGRAM STORY", line: "Nine creatives slotted across four channels for the next seven days." }
+      { tag: "BRAND FINGERPRINT", meta: "LOCKED", slot: "REFERENCE SET · 24 IMAGES", line: "Warm oak, matte black, morning light. Never neon, never stock-smiling.", art: `linear-gradient(100deg, rgba(202,160,108,.28) 0%, rgba(202,160,108,.28) 32%, rgba(20,20,22,.95) 32%, rgba(20,20,22,.95) 64%, rgba(168,198,240,.14) 64%, rgba(168,198,240,.14) 100%), ${GRAIN}` },
+      { tag: "RENDER QUEUE", meta: "12 / 12", slot: "SCENE 34-07 · REEL 9:16", line: "Twelve creatives rendered in 41 minutes, formatted per channel.", art: `radial-gradient(130% 110% at 70% 30%, rgba(206,150,140,.24), transparent 60%), linear-gradient(160deg, rgba(46,34,30,.9) 0%, rgba(13,14,16,.98) 68%), ${GRAIN}` },
+      { tag: "APPROVAL", meta: "9 KEPT", slot: "SWIPE TO KEEP OR KILL", line: "Three killed. The engine notes why and adjusts next Monday.", art: `radial-gradient(110% 100% at 50% 50%, rgba(168,198,240,.18), transparent 60%), linear-gradient(165deg, rgba(28,30,34,.9) 0%, rgba(12,13,15,.98) 70%), ${GRAIN}` },
+      { tag: "PUBLISHED", meta: "LIVE", slot: "MON 18:30 · INSTAGRAM STORY", line: "Nine creatives slotted across four channels for the next seven days.", art: `radial-gradient(130% 110% at 50% 85%, rgba(224,180,120,.26), transparent 60%), linear-gradient(170deg, rgba(40,32,22,.9) 0%, rgba(12,13,15,.98) 70%), ${GRAIN}` }
     ];
     const panels = pdata.map((p, i) => {
       const d = i - st;
@@ -650,15 +651,15 @@ class Component extends DCLogic {
     });
 
     const cards = [
-      { id: "34-01", ratio: "9:16", hook: "Saturday tasting, 4pm.", channel: "INSTAGRAM · TIKTOK" },
-      { id: "34-02", ratio: "4:5", hook: "Two chairs free today.", channel: "INSTAGRAM · FACEBOOK" },
-      { id: "34-03", ratio: "1:1", hook: "Rain outside. Soup inside.", channel: "GOOGLE · FACEBOOK" },
-      { id: "34-04", ratio: "9:16", hook: "The 6am crowd knows.", channel: "TIKTOK · REELS" },
-      { id: "34-05", ratio: "4:5", hook: "New in: local pears.", channel: "INSTAGRAM" },
-      { id: "34-06", ratio: "16:9", hook: "Parking, finally, out back.", channel: "GOOGLE BUSINESS" },
-      { id: "34-07", ratio: "1:1", hook: "Booked out by Thursday.", channel: "FACEBOOK" },
-      { id: "34-08", ratio: "9:16", hook: "Ten minutes, no appointment.", channel: "TIKTOK" },
-      { id: "34-09", ratio: "4:5", hook: "Same recipe since 1998.", channel: "INSTAGRAM" }
+      { id: "34-01", ratio: "9:16", hook: "Saturday tasting, 4pm.", channel: "INSTAGRAM · TIKTOK", art: `radial-gradient(130% 110% at 78% 82%, rgba(214,168,110,.30), transparent 62%), linear-gradient(165deg, rgba(58,44,28,.9) 0%, rgba(14,15,18,.98) 68%), ${GRAIN}` },
+      { id: "34-02", ratio: "4:5", hook: "Two chairs free today.", channel: "INSTAGRAM · FACEBOOK", art: `radial-gradient(120% 100% at 18% 18%, rgba(196,156,102,.26), transparent 60%), linear-gradient(155deg, rgba(46,38,30,.9) 0%, rgba(13,14,16,.98) 65%), ${GRAIN}` },
+      { id: "34-03", ratio: "1:1", hook: "Rain outside. Soup inside.", channel: "GOOGLE · FACEBOOK", art: `radial-gradient(140% 120% at 50% 45%, rgba(150,164,178,.20), transparent 65%), linear-gradient(170deg, rgba(30,34,40,.9) 0%, rgba(13,14,17,.98) 70%), ${GRAIN}` },
+      { id: "34-04", ratio: "9:16", hook: "The 6am crowd knows.", channel: "TIKTOK · REELS", art: `radial-gradient(120% 100% at 50% 10%, rgba(224,180,120,.26), transparent 58%), linear-gradient(180deg, rgba(24,28,38,.9) 0%, rgba(12,13,16,.98) 70%), ${GRAIN}` },
+      { id: "34-05", ratio: "4:5", hook: "New in: local pears.", channel: "INSTAGRAM", art: `radial-gradient(120% 110% at 55% 50%, rgba(178,176,110,.22), transparent 62%), linear-gradient(160deg, rgba(40,40,26,.9) 0%, rgba(14,15,18,.98) 68%), ${GRAIN}` },
+      { id: "34-06", ratio: "16:9", hook: "Parking, finally, out back.", channel: "GOOGLE BUSINESS", art: `radial-gradient(130% 110% at 30% 70%, rgba(140,152,168,.20), transparent 62%), linear-gradient(160deg, rgba(34,36,42,.9) 0%, rgba(13,14,17,.98) 68%), ${GRAIN}` },
+      { id: "34-07", ratio: "1:1", hook: "Booked out by Thursday.", channel: "FACEBOOK", art: `radial-gradient(140% 120% at 60% 40%, rgba(206,150,140,.22), transparent 64%), linear-gradient(160deg, rgba(48,34,32,.9) 0%, rgba(14,15,18,.98) 68%), ${GRAIN}` },
+      { id: "34-08", ratio: "9:16", hook: "Ten minutes, no appointment.", channel: "TIKTOK", art: `radial-gradient(100% 90% at 50% 50%, rgba(180,168,150,.20), transparent 58%), linear-gradient(160deg, rgba(38,36,32,.9) 0%, rgba(14,15,18,.98) 68%), ${GRAIN}` },
+      { id: "34-09", ratio: "4:5", hook: "Same recipe since 1998.", channel: "INSTAGRAM", art: `radial-gradient(110% 100% at 50% 30%, rgba(198,158,104,.24), transparent 55%), linear-gradient(170deg, rgba(52,40,26,.92) 0%, rgba(12,13,15,.98) 72%), ${GRAIN}` }
     ];
     const count = Math.max(5, Math.min(9, this.props.drumCount ?? 7));
     const stepDeg = 360 / count;
@@ -696,7 +697,8 @@ class Component extends DCLogic {
         time: kind ? "18:30 STORY" : "12:00 FEED",
         bg: kind ? "rgba(168,198,240,.07)" : "rgba(255,255,255,.03)",
         border: kind ? "rgba(168,198,240,.22)" : "#1b1e22",
-        color: kind ? "var(--acc)" : "#8a8f98"
+        color: kind ? "var(--acc)" : "#8a8f98",
+        art: kind ? pdata[3].art : cards[4].art
       }))
     }));
 
@@ -711,6 +713,7 @@ class Component extends DCLogic {
         id: "CREATIVE " + c.id,
         ratio: c.ratio,
         hook: c.hook,
+        art: c.art,
         state: s,
         border: ok ? "rgba(168,198,240,.24)" : "#1b1e22",
         badgeBg: ok ? "rgba(168,198,240,.14)" : dead ? "rgba(235,87,87,.12)" : "rgba(255,255,255,.07)",
