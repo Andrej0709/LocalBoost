@@ -62,7 +62,6 @@
       </div>
       <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px">
         <a href="approvals.html" class="btn">Review this week's drop<span class="mono" style="font-size:13px">→</span></a>
-        <a href="LocalBoost.dc.html#control" class="btn-ghost">Control room</a>
         <a href="account.html" class="btn-ghost">Account settings</a>
         <button id="logout-btn" class="btn-ghost" type="button">Log out</button>
       </div>
@@ -233,18 +232,9 @@
     }
 
     // No plan running yet — the trial only starts after the brief and checkout.
-    var next = LBAuth.nextStep(profile.plan || null);
     document.getElementById("trial-start").textContent = "Not started";
     document.getElementById("trial-end").textContent =
       LBAuth.hasBrief() ? "Add a card at checkout to start it" : "Finish your business brief to start it";
-
-    var finish = document.createElement("a");
-    finish.className = "btn";
-    finish.href = next;
-    finish.innerHTML = (LBAuth.hasBrief() ? "Continue to checkout" : "Finish setting up") +
-      '<span class="mono" style="font-size:13px">→</span>';
-    var actions = document.querySelector("#already-in div[style*='margin-top:22px']");
-    actions.insertBefore(finish, actions.firstChild);
   });
 
   document.getElementById("logout-btn").addEventListener("click", async function(){
