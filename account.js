@@ -126,11 +126,21 @@
 
   function renderBilling(profile) {
     var plan = PLANS[profile.plan];
-    var cycle = profile.billing_cycle || "monthly";
 
-    $("bill-plan").textContent = plan ? plan.name : "No plan yet";
-    $("bill-rate").textContent = plan ? plan.rate : "—";
-    $("bill-cycle").textContent = plan ? (cycle === "annual" ? "Annual" : "Monthly") : "—";
+    if (!plan) {
+      $("billing-rows").hidden = true;
+      $("billing-empty").hidden = false;
+      $("bill-plan-link").hidden = true;
+      return;
+    }
+    $("billing-rows").hidden = false;
+    $("billing-empty").hidden = true;
+    $("bill-plan-link").hidden = false;
+
+    var cycle = profile.billing_cycle || "monthly";
+    $("bill-plan").textContent = plan.name;
+    $("bill-rate").textContent = plan.rate;
+    $("bill-cycle").textContent = cycle === "annual" ? "Annual" : "Monthly";
 
     var statusText = {
       trialing: "Free trial",
