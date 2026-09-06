@@ -30,6 +30,12 @@
 .acc-channels{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
 .acc-form-inline{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
 .acc-form-inline .field{flex:1;min-width:220px;margin-bottom:0}
+.acc-card-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0;border:none;background:none;cursor:pointer;font-family:'Geist',sans-serif;text-align:left}
+.acc-card-toggle-title{font-size:15.5px;color:#fff;letter-spacing:-.015em}
+.acc-card-arrow{font-size:13px;color:#62666d;transition:transform .2s ease,color .2s ease}
+.acc-card-toggle:hover .acc-card-arrow{color:var(--acc);transform:translateX(3px)}
+.acc-card-toggle[aria-expanded="true"] .acc-card-arrow{transform:rotate(90deg)}
+.acc-card-toggle[aria-expanded="true"]:hover .acc-card-arrow{transform:rotate(90deg) translateX(3px)}
 .acc-table{width:100%;border-collapse:collapse;font-size:13.5px}
 .acc-table th{text-align:left;padding:0 0 10px;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#62666d;font-weight:400;border-bottom:1px solid #1b1e22}
 .acc-table td{padding:12px 0;border-top:1px solid #1b1e22;color:#d0d6e0;vertical-align:middle}
@@ -97,9 +103,9 @@
       <!-- Security -->
       <div class="card">
         <h3 class="acc-card-title">Login &amp; security</h3>
-        <p class="acc-card-sub">Change the email you log in with or set a new password. Both take effect immediately after confirmation.</p>
+        <p class="acc-card-sub">Change the email you log in with. Takes effect after you confirm it.</p>
 
-        <form id="email-form" class="acc-form-inline" style="margin-bottom:26px">
+        <form id="email-form" class="acc-form-inline">
           <div class="field">
             <label for="acc-new-email">EMAIL ADDRESS</label>
             <input id="acc-new-email" type="email" required placeholder="you@business.com" autocomplete="email">
@@ -107,9 +113,17 @@
           <button type="submit" class="btn-ghost">Update email</button>
         </form>
 
-        <button type="button" id="password-toggle" class="btn-ghost">Change password</button>
+        <div id="email-notice" class="notice" hidden></div>
+      </div>
 
-        <form id="password-form" hidden style="margin-top:18px">
+      <!-- Password -->
+      <div class="card">
+        <button type="button" id="password-toggle" class="acc-card-toggle" aria-expanded="false">
+          <span class="acc-card-toggle-title">Password</span>
+          <span class="mono acc-card-arrow">→</span>
+        </button>
+
+        <form id="password-form" hidden style="margin-top:20px">
           <div class="field">
             <label for="acc-current-password">CURRENT PASSWORD</label>
             <input id="acc-current-password" type="password" required placeholder="Your current password" autocomplete="current-password">
@@ -130,7 +144,7 @@
           </div>
         </form>
 
-        <div id="security-notice" class="notice" hidden></div>
+        <div id="password-notice" class="notice" hidden></div>
       </div>
 
       <!-- Connected channels -->

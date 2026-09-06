@@ -45,7 +45,8 @@
 
   // -------------------------------------------------------------- security
   function wireSecurity() {
-    var notice = $("security-notice");
+    var emailNotice = $("email-notice");
+    var passwordNotice = $("password-notice");
 
     $("email-form").addEventListener("submit", async function (e) {
       e.preventDefault();
@@ -54,10 +55,10 @@
       button.disabled = true;
       try {
         await LBAuth.updateEmail(newEmail);
-        say(notice, "Check both your old and new inbox — confirm the change to finish.");
+        say(emailNotice, "Check both your old and new inbox — confirm the change to finish.");
         e.target.reset();
       } catch (err) {
-        say(notice, err.message, true);
+        say(emailNotice, err.message, true);
       } finally {
         button.disabled = false;
       }
@@ -67,20 +68,20 @@
     var passwordToggle = $("password-toggle");
     var passwordCancel = $("password-cancel");
 
-    function closePasswordForm() {
-      passwordForm.reset();
-      passwordForm.hidden = true;
-      passwordToggle.hidden = false;
+    function setPasswordOpen(open) {
+      passwordForm.hidden = !open;
+      passwordToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      if (!open) passwordForm.reset();
     }
 
     passwordToggle.addEventListener("click", function () {
-      passwordForm.hidden = false;
-      passwordToggle.hidden = true;
-      $("acc-current-password").focus();
+      var isOpen = passwordToggle.getAttribute("aria-expanded") === "true";
+      setPasswordOpen(!isOpen);
+      if (!isOpen) $("acc-current-password").focus();
     });
     passwordCancel.addEventListener("click", function () {
-      notice.hidden = true;
-      closePasswordForm();
+      passwordNotice.hidden = true;
+      setPasswordOpen(false);
     });
 
     passwordForm.addEventListener("submit", async function (e) {
@@ -90,17 +91,17 @@
       var pass = $("acc-new-password").value;
       var confirm = $("acc-confirm-password").value;
       if (pass !== confirm) {
-        say(notice, "Those two new passwords don't match.", true);
+        say(passwordNotice, "Those two new passwords don't match.", true);
         return;
       }
       button.disabled = true;
       try {
         await LBAuth.verifyPassword(current);
         await LBAuth.updatePassword(pass);
-        say(notice, "Password updated.");
-        closePasswordForm();
+        say(passwordNotice, "Password updated.");
+        setPasswordOpen(false);
       } catch (err) {
-        say(notice, err.message, true);
+        say(passwordNotice, err.message, true);
       } finally {
         button.disabled = false;
       }
