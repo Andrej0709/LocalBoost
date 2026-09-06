@@ -36,6 +36,9 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 @keyframes lbLand{0%,58%{border-color:#23252a;background:#0e0f12;box-shadow:none}68%{border-color:rgba(168,198,240,.55);background:rgba(168,198,240,.07);box-shadow:0 0 26px rgba(168,198,240,.16)}100%{border-color:#23252a;background:#0e0f12;box-shadow:none}}
 @keyframes lbPosted{0%,60%{opacity:0;transform:translateY(3px)}70%{opacity:1;transform:translateY(0)}92%{opacity:1}100%{opacity:0}}
 @keyframes lbQueue{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes lbDrop{0%{top:-3%;opacity:0}5%{opacity:1}94%{opacity:1}100%{top:100%;opacity:0}}
+@keyframes lbLandM{0%{border-color:rgba(168,198,240,.55);background:rgba(168,198,240,.07);box-shadow:0 0 26px rgba(168,198,240,.16)}16%{border-color:#23252a;background:#0e0f12;box-shadow:none}100%{border-color:#23252a;background:#0e0f12;box-shadow:none}}
+@keyframes lbSpoke{0%{background:rgba(168,198,240,.5)}18%{background:#1b1e22}100%{background:#1b1e22}}
 @media (max-width:1080px){
 [data-scene]{position:relative !important;inset:auto !important;width:100% !important;height:430px !important;transform:none !important;margin-top:40px}
 [data-grid2]{grid-template-columns:1fr !important}
@@ -60,10 +63,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 [data-drum]{height:390px !important}
 [data-calwrap]{overflow-x:auto;-webkit-overflow-scrolling:touch}
 [data-cal]{min-width:600px}
-[data-pipeviz]{height:auto !important;padding:20px !important}
-[data-pipechip]{position:static !important;transform:none !important;display:inline-block;margin-bottom:18px}
-[data-pipepulse]{display:none !important}
-[data-pipelanes]{position:static !important;width:auto !important;display:grid !important;gap:12px}
+[data-pipeviz]{display:none !important}
+[data-pipemobile]{display:block !important}
 [data-planlift]{transform:none !important}
 [data-tabbar] button{padding:13px 18px !important;font-size:14px !important}
 [data-billing] button{padding:13px 18px !important;font-size:14px !important}
@@ -367,6 +368,39 @@ input[type=range]{height:30px !important}
         </sc-for>
       </div>
     </div>
+    <div data-pipemobile="1" style="display:none;position:relative;padding:20px 18px 22px;border-radius:14px;border:1px solid #15171b;background:#0a0b0d;overflow:hidden">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:34px 34px;pointer-events:none"></div>
+      <div style="position:relative;display:inline-flex;align-items:center;gap:9px;padding:11px 15px;border-radius:10px;border:1px solid rgba(168,198,240,.32);background:rgba(168,198,240,.07);font-size:14px;color:var(--acc)"><span style="width:7px;height:7px;border-radius:9999px;background:var(--acc);animation:lbBlink 2.2s ease-in-out infinite"></span>Your drop</div>
+      <div style="position:relative;margin-top:14px;padding-left:34px">
+        <div style="position:absolute;left:11px;top:-8px;bottom:14px;width:1px;background:linear-gradient(180deg,rgba(168,198,240,.45),rgba(168,198,240,.08))">
+          <div style="position:absolute;left:50%;top:0;width:22px;height:22px;margin-left:-11px;margin-top:-11px;border-radius:6px;border:1px solid rgba(168,198,240,.5);background:linear-gradient(160deg,rgba(168,198,240,.32),rgba(168,198,240,.05));box-shadow:0 0 16px rgba(168,198,240,.28);animation:lbDrop 5s linear infinite"><div style="position:absolute;left:4px;top:4px;width:4px;height:4px;border-radius:9999px;background:rgba(255,255,255,.8)"></div></div>
+        </div>
+        <div style="display:grid;gap:10px">
+          <div style="position:relative">
+            <div style="position:absolute;left:-23px;top:50%;width:16px;height:1px;background:#1b1e22;animation:lbSpoke 5s linear .5s infinite"></div>
+            <div style="padding:12px 14px;border-radius:10px;border:1px solid #23252a;background:#0e0f12;font-size:14px;color:#d0d6e0;animation:lbLandM 5s linear .5s infinite">Instagram<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">STORY + REEL + FEED</div></div>
+          </div>
+          <div style="position:relative">
+            <div style="position:absolute;left:-23px;top:50%;width:16px;height:1px;background:#1b1e22;animation:lbSpoke 5s linear 1.5s infinite"></div>
+            <div style="padding:12px 14px;border-radius:10px;border:1px solid #23252a;background:#0e0f12;font-size:14px;color:#d0d6e0;animation:lbLandM 5s linear 1.5s infinite">Facebook<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">FEED + LOCAL GROUPS</div></div>
+          </div>
+          <div style="position:relative">
+            <div style="position:absolute;left:-23px;top:50%;width:16px;height:1px;background:#1b1e22;animation:lbSpoke 5s linear 2.5s infinite"></div>
+            <div style="padding:12px 14px;border-radius:10px;border:1px solid #23252a;background:#0e0f12;font-size:14px;color:#d0d6e0;animation:lbLandM 5s linear 2.5s infinite">TikTok<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">9:16 NATIVE</div></div>
+          </div>
+          <div style="position:relative">
+            <div style="position:absolute;left:-23px;top:50%;width:16px;height:1px;background:#1b1e22;animation:lbSpoke 5s linear 3.5s infinite"></div>
+            <div style="padding:12px 14px;border-radius:10px;border:1px solid #23252a;background:#0e0f12;font-size:14px;color:#d0d6e0;animation:lbLandM 5s linear 3.5s infinite">Google Business<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">OFFER POSTS</div></div>
+          </div>
+          <div style="position:relative">
+            <div style="position:absolute;left:-23px;top:50%;width:16px;height:1px;background:#1b1e22;animation:lbSpoke 5s linear 4.5s infinite"></div>
+            <div style="padding:12px 14px;border-radius:10px;border:1px solid #23252a;background:#0e0f12;font-size:14px;color:#d0d6e0;animation:lbLandM 5s linear 4.5s infinite">Pinterest<div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:9px;letter-spacing:.08em;color:#4c5056">SEASONAL PINS</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="position:relative;margin-top:16px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#3d4046">APPROVED 09:02 · LIVE 09:03</div>
+    </div>
+
     <div data-pipeviz="1" style="position:relative;height:min(440px,58vh);border-radius:14px;border:1px solid #15171b;background:#0a0b0d;overflow:hidden">
       <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:34px 34px"></div>
       <div data-pipechip="1" style="position:absolute;left:8%;top:50%;transform:translateY(-50%);padding:14px 18px;border-radius:10px;border:1px solid rgba(168,198,240,.32);background:rgba(168,198,240,.07);font-size:14px;color:var(--acc);z-index:2">Your drop</div>
