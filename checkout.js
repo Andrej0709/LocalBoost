@@ -248,14 +248,37 @@
     $("co-success-text").textContent = "The " + plan.name + " plan is live on your account.";
   }
 
+  // A blocked visitor gets told why, with a link. Never a silent bounce back to
+  // signup — that reads as "the checkout button does nothing".
+  function block(message, linkText) {
+    var notice = $("co-notice");
+    var button = $("co-submit");
+    button.disabled = true;
+    button.style.opacity = ".6";
+    notice.hidden = false;
+    notice.style.borderColor = "rgba(240,168,168,.3)";
+    notice.style.background = "rgba(240,168,168,.08)";
+    notice.style.color = "#f0a8a8";
+    notice.innerHTML = message +
+      ' <a href="' + signupUrl() + '" style="color:var(--acc)">' + linkText + ' →</a>';
+  }
+
   if (window.LBAuth && !params.get("state")) {
     LBAuth.ready.then(function () {
-      if (!LBAuth.isLoggedIn()) { location.href = signupUrl(); return; }
-      if (!LBAuth.hasBrief()) { location.href = signupUrl(); return; }
+      if (!LBAuth.isLoggedIn()) {
+        block("You need to be signed in to check out.", "Sign up or log in");
+        return;
+      }
+      if (!LBAuth.hasBrief()) {
+        block("Fill in your business brief first — it takes a minute.", "Go to the brief");
+        return;
+      }
       if (LBAuth.hasActivePlan()) { showActive(); return; }
 
       var user = LBAuth.getUser();
       if (user && user.email && !$("co-email").value) $("co-email").value = user.email;
+    }).catch(function (err) {
+      block("Couldn't load your account: " + err.message, "Start over");
     });
   }
 

@@ -94,7 +94,18 @@
       var patch = {};
       Object.keys(brief).forEach(function (k) { patch[k] = brief[k]; });
       patch.onboarded_at = new Date().toISOString();
-      return await window.LBAuth.updateProfile(patch);
+
+      var saved = await window.LBAuth.updateProfile(patch);
+
+      // Checkout refuses to open without this, so fail loudly here rather than
+      // sending the user into a redirect loop.
+      if (!saved || !saved.onboarded_at) {
+        throw new Error(
+          "Your brief didn't save — the database is missing the onboarding " +
+          "columns. Run supabase/schema.sql in the SQL editor and try again."
+        );
+      }
+      return saved;
     },
 
     // Starts the trial. Called by checkout.js once a card is on file — never
@@ -152,6 +163,7 @@
 
     updateProfile: async function (patch) {
       if (!session) throw new Error("Not signed in.");
+
       var res = await db
         .from("profiles")
         .update(patch)
@@ -159,6 +171,19 @@
         .select()
         .maybeSingle();
       if (res.error) throw res.error;
+
+      // An UPDATE that matches no row is not an error in PostgREST, it just
+      // writes nothing. That happens when the on_auth_user_created trigger
+      // never made the row (accounts created before it existed, or a failed
+      // confirmation). Insert it instead of silently losing the data.
+      if (!res.data) {
+        var row = { id: session.user.id, email: session.user.email };
+        Object.keys(patch).forEach(function (k) { row[k] = patch[k]; });
+        res = await db.from("profiles").upsert(row).select().maybeSingle();
+        if (res.error) throw res.error;
+        if (!res.data) throw new Error("Could not save your profile — please try again.");
+      }
+
       profile = res.data;
       return profile;
     },
