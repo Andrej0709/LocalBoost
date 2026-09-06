@@ -1,7 +1,13 @@
 :root{--acc:#a8c6f0;--acc-soft:rgba(168,198,240,.14);}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;overflow-x:clip}
-body{margin:0;background:#07080a;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip}
+body{margin:0;background:#07080a;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip;position:relative}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(46% 38% at 10% -4%,rgba(168,198,240,.11),rgba(7,8,10,0) 65%),
+  radial-gradient(42% 34% at 100% 6%,rgba(168,198,240,.08),rgba(7,8,10,0) 68%),
+  radial-gradient(55% 42% at 50% 105%,rgba(168,198,240,.07),rgba(7,8,10,0) 72%)}
+section:nth-of-type(odd){background:radial-gradient(65% 55% at 18% 0%,rgba(168,198,240,.05),rgba(7,8,10,0) 68%)}
+section:nth-of-type(even){background:radial-gradient(65% 55% at 84% 100%,rgba(168,198,240,.045),rgba(7,8,10,0) 68%)}
 a{color:var(--acc);text-decoration:none}
 a:hover{color:#cbdff9}
 ::selection{background:var(--acc);color:#07080a}
