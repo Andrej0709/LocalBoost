@@ -27,6 +27,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
 <link rel="stylesheet" href="localboost.css">
+<style>
+.creative-card.kb-focus{outline:2px solid var(--acc);outline-offset:2px}
+.bulk-actions{display:flex;gap:8px}
+.bulk-actions button{padding:9px 14px;border-radius:9999px;font-size:13px;white-space:nowrap}
+#kb-hint{margin:-10px 0 20px}
+.approve-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(14,15,18,.95);backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(0,0,0,.5);font-size:13.5px;color:#d0d6e0;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.approve-toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);pointer-events:auto}
+.approve-toast button{padding:6px 14px;border-radius:9999px;border:1px solid rgba(168,198,240,.4);background:var(--acc-soft);color:var(--acc);font-size:12.5px;font-family:'Geist',sans-serif;cursor:pointer;white-space:nowrap}
+@media (max-width:860px){#kb-hint{display:none}}
+@media (max-width:640px){.approve-toast{left:16px;right:16px;transform:translateY(0)}.approve-toast.show{transform:translateY(-6px)}}
+</style>
 </head>
 <body>
 
@@ -73,7 +84,13 @@
           <h2 id="drop-title">Your creatives</h2>
           <div id="drop-meta" class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d;margin-top:8px">&mdash;</div>
         </div>
-        <div class="counts" id="counts"></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+          <div class="counts" id="counts"></div>
+          <div id="bulk-actions" class="bulk-actions" hidden>
+            <button type="button" id="bulk-approve" class="btn-ghost">Approve all waiting</button>
+            <button type="button" id="bulk-reject" class="btn-ghost">Reject all waiting</button>
+          </div>
+        </div>
       </div>
 
       <div class="dropbar" id="dropbar"></div>
@@ -83,6 +100,7 @@
         <button data-filter="rejected">Rejected</button>
         <button data-filter="all">Everything</button>
       </div>
+      <div id="kb-hint" class="mono" style="font-size:11px;letter-spacing:.08em;color:#4c5056">Y approve &middot; N reject &middot; &larr;&rarr; navigate</div>
 
       <div id="board-notice" class="notice" hidden style="margin-bottom:20px"></div>
 
@@ -108,6 +126,11 @@
 
   </div>
 </section>
+
+<div id="approve-toast" class="approve-toast">
+  <span id="approve-toast-msg"></span>
+  <button type="button" id="approve-toast-undo">Undo</button>
+</div>
 
 <section class="section-tight">
   <div class="wrap">
@@ -149,6 +172,7 @@
   var currentDrop = null; // a drop id, or "all"
   var currentFilter = "pending";
   var demoMode = false;
+  var focusIndex = -1;    // keyboard-navigated card, index into the visible list
 
   function say(message) {
     notice.hidden = false;
@@ -182,6 +206,7 @@
       if (drop.id === currentDrop) button.classList.add("active");
       button.addEventListener("click", function () {
         currentDrop = drop.id;
+        focusIndex = -1;
         renderAll();
       });
       dropbar.appendChild(button);
@@ -192,6 +217,7 @@
     if (currentDrop === "all") all.classList.add("active");
     all.addEventListener("click", function () {
       currentDrop = "all";
+      focusIndex = -1;
       renderAll();
     });
     dropbar.appendChild(all);
@@ -223,6 +249,16 @@
       "<span>WAITING <b>" + count("pending") + "</b></span>" +
       "<span>APPROVED <b>" + (count("approved") + count("published")) + "</b></span>" +
       "<span>REJECTED <b>" + count("rejected") + "</b></span>";
+
+    var waiting = count("pending");
+    var bulkActions = document.getElementById("bulk-actions");
+    if (waiting > 0) {
+      bulkActions.hidden = false;
+      document.getElementById("bulk-approve").textContent = "Approve all waiting (" + waiting + ")";
+      document.getElementById("bulk-reject").textContent = "Reject all waiting (" + waiting + ")";
+    } else {
+      bulkActions.hidden = true;
+    }
   }
 
   var STATUS_LABEL = {
@@ -384,7 +420,110 @@
     }
     emptyView.hidden = true;
     list.forEach(function (creative) { grid.appendChild(buildCard(creative)); });
+
+    if (focusIndex >= list.length) focusIndex = list.length - 1;
+    applyFocusRing();
   }
+
+  // --- Keyboard triage: arrow keys move a focus ring, Y/N act on it ---
+  function applyFocusRing() {
+    var cards = grid.querySelectorAll(".creative-card");
+    Array.prototype.forEach.call(cards, function (card, i) {
+      card.classList.toggle("kb-focus", i === focusIndex);
+    });
+  }
+
+  function moveFocus(delta) {
+    var list = visibleCreatives();
+    if (!list.length) { focusIndex = -1; return; }
+    focusIndex = focusIndex < 0 ? 0 : Math.max(0, Math.min(list.length - 1, focusIndex + delta));
+    applyFocusRing();
+    var cards = grid.querySelectorAll(".creative-card");
+    if (cards[focusIndex]) cards[focusIndex].scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
+  function actOnFocused(status) {
+    var list = visibleCreatives();
+    if (!list.length) return;
+    if (focusIndex < 0) focusIndex = 0;
+    var creative = list[focusIndex];
+    if (creative.status !== "pending") return;
+    var card = grid.querySelectorAll(".creative-card")[focusIndex];
+    setStatus(creative, status, card);
+  }
+
+  document.addEventListener("keydown", function (event) {
+    var tag = document.activeElement && document.activeElement.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || board.hidden || document.querySelector(".lightbox")) return;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") { event.preventDefault(); moveFocus(1); }
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") { event.preventDefault(); moveFocus(-1); }
+    else if (event.key === "y" || event.key === "Y") { actOnFocused("approved"); }
+    else if (event.key === "n" || event.key === "N") { actOnFocused("rejected"); }
+  });
+
+  // --- Bulk approve/reject, with an undo window ---
+  var toastTimer = null;
+
+  function showUndoToast(ids, appliedStatus) {
+    var toast = document.getElementById("approve-toast");
+    document.getElementById("approve-toast-msg").textContent =
+      ids.length + (ids.length === 1 ? " creative " : " creatives ") +
+      (appliedStatus === "approved" ? "approved." : "rejected.");
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 5000);
+
+    document.getElementById("approve-toast-undo").onclick = function () {
+      clearTimeout(toastTimer);
+      toast.classList.remove("show");
+      undoBulk(ids);
+    };
+  }
+
+  async function bulkSetStatus(status) {
+    var scope = creatives.filter(function (creative) {
+      return creative.status === "pending" && (currentDrop === "all" || creative.drop_id === currentDrop);
+    });
+    if (!scope.length) return;
+
+    var ids = scope.map(function (creative) { return creative.id; });
+    scope.forEach(function (creative) { creative.status = status; });
+    notice.hidden = true;
+    renderAll();
+
+    if (!demoMode) {
+      var res = await LBAuth.db.from("creatives").update({ status: status }).in("id", ids).select();
+      if (res.error) {
+        scope.forEach(function (creative) { creative.status = "pending"; });
+        renderAll();
+        say("Couldn't save that — " + res.error.message);
+        return;
+      }
+      var dropIds = {};
+      scope.forEach(function (creative) { dropIds[creative.drop_id] = true; });
+      for (var dropId in dropIds) await maybeCloseDrop(dropId);
+    }
+
+    showUndoToast(ids, status);
+  }
+
+  async function undoBulk(ids) {
+    var scope = creatives.filter(function (creative) { return ids.indexOf(creative.id) !== -1; });
+    scope.forEach(function (creative) { creative.status = "pending"; });
+    renderAll();
+
+    if (!demoMode) {
+      var res = await LBAuth.db.from("creatives").update({ status: "pending" }).in("id", ids).select();
+      if (res.error) { say("Couldn't undo — " + res.error.message); return; }
+      var dropIds = {};
+      scope.forEach(function (creative) { dropIds[creative.drop_id] = true; });
+      for (var dropId in dropIds) await maybeCloseDrop(dropId);
+    }
+  }
+
+  document.getElementById("bulk-approve").addEventListener("click", function () { bulkSetStatus("approved"); });
+  document.getElementById("bulk-reject").addEventListener("click", function () { bulkSetStatus("rejected"); });
 
   function renderAll() {
     renderDropbar();
@@ -399,6 +538,7 @@
       });
       button.classList.add("active");
       currentFilter = button.dataset.filter;
+      focusIndex = -1;
       renderGrid();
     });
   });
