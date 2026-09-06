@@ -275,17 +275,16 @@
 
   // ---------------------------------------------------------------- nav
   function wireNav(loggedIn) {
-    var cta = $("nav-cta");
-    var logout = $("nav-logout");
-    if (loggedIn) {
-      cta.textContent = "Control room";
-      cta.href = "LocalBoost.dc.html#control";
-      logout.hidden = false;
-      logout.addEventListener("click", async function () {
-        await LBAuth.logOut();
-        location.href = "login.html";
-      });
-    }
+    // "Control room" already lives in nav-links once logged in — the nav-cta
+    // pill would just repeat it, so it's hidden rather than relabeled.
+    if (loggedIn) $("nav-cta").hidden = true;
+  }
+
+  function wireLogout() {
+    $("logout-btn").addEventListener("click", async function () {
+      await LBAuth.logOut();
+      location.href = "login.html";
+    });
   }
 
   // ---------------------------------------------------------------- boot
@@ -304,6 +303,7 @@
     var profile = LBAuth.getProfile() || {};
 
     wireNav(true);
+    wireLogout();
     renderHeader(user, profile);
     renderChannels(profile);
     renderBilling(profile);

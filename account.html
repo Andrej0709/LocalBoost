@@ -17,6 +17,8 @@
 .acc-grid{display:grid;gap:20px}
 .acc-group{display:grid;gap:10px}
 .acc-group-label{font-size:11px;letter-spacing:.1em;color:#62666d;padding-left:2px}
+.acc-logout{flex:none;padding:0;background:none;border:none;color:#62666d;font-size:13px;cursor:pointer;font-family:'Geist',sans-serif;transition:color .2s ease}
+.acc-logout:hover{color:#fff}
 .acc-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:6px}
 .acc-card-title{font-size:15.5px;color:#fff;letter-spacing:-.015em;margin:0}
 .acc-card-sub{margin:6px 0 20px;font-size:13px;color:#62666d}
@@ -59,7 +61,6 @@
     <a href="approvals.html">Approvals</a>
     <a href="LocalBoost.dc.html#pricing">Pricing</a>
   </div>
-  <button id="nav-logout" type="button" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px;background:none;border:none;cursor:pointer;font-family:'Geist',sans-serif" hidden>Log out</button>
   <a href="login.html" class="nav-cta" id="nav-cta">Log in</a>
 </nav>
 
@@ -99,7 +100,10 @@
           </div>
           <div id="acc-status-chip" class="acc-chip muted">NO PLAN</div>
         </div>
-        <div class="acc-row-value" style="text-align:left;color:#8a8f98;font-size:13.5px" id="acc-email-display">—</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div class="acc-row-value" style="text-align:left;color:#8a8f98;font-size:13.5px" id="acc-email-display">—</div>
+          <button type="button" id="logout-btn" class="acc-logout">Log out</button>
+        </div>
       </div>
 
       <!-- Login & security group: email + password, visually grouped but not merged -->
