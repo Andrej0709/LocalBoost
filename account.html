@@ -15,6 +15,8 @@
 <link rel="stylesheet" href="localboost.css">
 <style>
 .acc-grid{display:grid;gap:20px}
+.acc-group{display:grid;gap:10px}
+.acc-group-label{font-size:11px;letter-spacing:.1em;color:#62666d;padding-left:2px}
 .acc-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:6px}
 .acc-card-title{font-size:15.5px;color:#fff;letter-spacing:-.015em;margin:0}
 .acc-card-sub{margin:6px 0 20px;font-size:13px;color:#62666d}
@@ -100,51 +102,54 @@
         <div class="acc-row-value" style="text-align:left;color:#8a8f98;font-size:13.5px" id="acc-email-display">—</div>
       </div>
 
-      <!-- Security -->
-      <div class="card">
-        <h3 class="acc-card-title">Login &amp; security</h3>
-        <p class="acc-card-sub">Change the email you log in with. Takes effect after you confirm it.</p>
+      <!-- Login & security group: email + password, visually grouped but not merged -->
+      <div class="acc-group">
+        <div class="acc-group-label mono">LOGIN &amp; SECURITY</div>
 
-        <form id="email-form" class="acc-form-inline">
-          <div class="field">
-            <label for="acc-new-email">EMAIL ADDRESS</label>
-            <input id="acc-new-email" type="email" required placeholder="you@business.com" autocomplete="email">
-          </div>
-          <button type="submit" class="btn-ghost">Update email</button>
-        </form>
+        <div class="card">
+          <h3 class="acc-card-title">Email address</h3>
+          <p class="acc-card-sub">Change the email you log in with. Takes effect after you confirm it.</p>
 
-        <div id="email-notice" class="notice" hidden></div>
-      </div>
-
-      <!-- Password -->
-      <div class="card">
-        <button type="button" id="password-toggle" class="acc-card-toggle" aria-expanded="false">
-          <span class="acc-card-toggle-title">Password</span>
-          <span class="mono acc-card-arrow">→</span>
-        </button>
-
-        <form id="password-form" hidden style="margin-top:20px">
-          <div class="field">
-            <label for="acc-current-password">CURRENT PASSWORD</label>
-            <input id="acc-current-password" type="password" required placeholder="Your current password" autocomplete="current-password">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px" class="field-pair">
-            <div class="field" style="margin-bottom:0">
-              <label for="acc-new-password">NEW PASSWORD</label>
-              <input id="acc-new-password" type="password" required minlength="8" placeholder="At least 8 characters" autocomplete="new-password">
+          <form id="email-form" class="acc-form-inline">
+            <div class="field">
+              <label for="acc-new-email">EMAIL ADDRESS</label>
+              <input id="acc-new-email" type="email" required placeholder="you@business.com" autocomplete="email">
             </div>
-            <div class="field" style="margin-bottom:0">
-              <label for="acc-confirm-password">CONFIRM PASSWORD</label>
-              <input id="acc-confirm-password" type="password" required minlength="8" placeholder="Type it again" autocomplete="new-password">
-            </div>
-          </div>
-          <div style="display:flex;gap:10px;margin-top:16px">
-            <button type="submit" class="btn-ghost">Update password</button>
-            <button type="button" id="password-cancel" style="background:none;border:none;color:#62666d;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Cancel</button>
-          </div>
-        </form>
+            <button type="submit" class="btn-ghost">Update email</button>
+          </form>
 
-        <div id="password-notice" class="notice" hidden></div>
+          <div id="email-notice" class="notice" hidden></div>
+        </div>
+
+        <div class="card">
+          <button type="button" id="password-toggle" class="acc-card-toggle" aria-expanded="false">
+            <span class="acc-card-toggle-title">Password</span>
+            <span class="mono acc-card-arrow">→</span>
+          </button>
+
+          <form id="password-form" hidden style="margin-top:20px">
+            <div class="field">
+              <label for="acc-current-password">CURRENT PASSWORD</label>
+              <input id="acc-current-password" type="password" required placeholder="Your current password" autocomplete="current-password">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px" class="field-pair">
+              <div class="field" style="margin-bottom:0">
+                <label for="acc-new-password">NEW PASSWORD</label>
+                <input id="acc-new-password" type="password" required minlength="8" placeholder="At least 8 characters" autocomplete="new-password">
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label for="acc-confirm-password">CONFIRM PASSWORD</label>
+                <input id="acc-confirm-password" type="password" required minlength="8" placeholder="Type it again" autocomplete="new-password">
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px">
+              <button type="submit" class="btn-ghost">Update password</button>
+              <button type="button" id="password-cancel" style="background:none;border:none;color:#62666d;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Cancel</button>
+            </div>
+          </form>
+
+          <div id="password-notice" class="notice" hidden></div>
+        </div>
       </div>
 
       <!-- Connected channels -->
