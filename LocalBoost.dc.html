@@ -468,6 +468,7 @@ input[type=range]{height:30px !important}
           <span style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#62666d">/ MONTH</span>
         </div>
         <div style="margin-top:8px;font-size:14px;color:#8a8f98">{{ pl.rate }}</div>
+        <div style="margin-top:6px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#4c5056">{{ pl.yearly }} billed yearly</div>
         <div style="height:1px;background:#1b1e22;margin:22px 0"></div>
         <div style="display:grid;gap:11px">
           <sc-for list="{{ pl.features }}" as="f" hint-placeholder-count="4">
@@ -847,6 +848,7 @@ class Component extends DCLogic {
       cta: p.cta,
       href: p.href,
       price: mk(p.base),
+      yearly: "€" + Math.round((annual ? p.base * 0.8 : p.base) * 12).toLocaleString("en-US"),
       border: p.featured ? "#33363c" : "#1b1e22",
       bg: p.featured ? "#101215" : "#0a0b0d",
       shadow: p.featured ? "0 50px 100px rgba(0,0,0,.6)" : "none",
