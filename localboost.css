@@ -1,7 +1,7 @@
 :root{--acc:#a8c6f0;--acc-soft:rgba(168,198,240,.14);}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:#07080a;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{margin:0;background:#07080a;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip}
 a{color:var(--acc);text-decoration:none}
 a:hover{color:#cbdff9}
 ::selection{background:var(--acc);color:#07080a}

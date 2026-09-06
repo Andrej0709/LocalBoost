@@ -3,10 +3,117 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LocalBoost — weekly ad drops for local business</title>
+<meta name="description" content="Weekly drops of photoreal ads for local business. The engine renders, you approve in two minutes, LocalBoost publishes to every channel. First drop free, cancel any week.">
+<link rel="canonical" href="https://localboost.app/LocalBoost.dc.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#07080a">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LocalBoost">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="LocalBoost — your next forty ads are already in production">
+<meta property="og:description" content="Weekly drops of photoreal ads for local business. The engine renders, you approve in two minutes, LocalBoost publishes to every channel. First drop free, cancel any week.">
+<meta property="og:url" content="https://localboost.app/LocalBoost.dc.html">
+<meta property="og:image" content="https://localboost.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LocalBoost — weekly ad drops for local business">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LocalBoost — your next forty ads are already in production">
+<meta name="twitter:description" content="Weekly drops of photoreal ads for local business. The engine renders, you approve in two minutes, LocalBoost publishes to every channel. First drop free, cancel any week.">
+<meta name="twitter:image" content="https://localboost.app/og-image.png">
 <script src="./support.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./supabase-config.js"></script>
 <script src="./auth.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://localboost.app/#org",
+      "name": "LocalBoost",
+      "url": "https://localboost.app/",
+      "logo": "https://localboost.app/og-image.png",
+      "description": "Weekly drops of photoreal ads for local business. The engine renders, you approve in two minutes, LocalBoost publishes to every channel.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "url": "https://localboost.app/contact.html"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://localboost.app/#website",
+      "url": "https://localboost.app/",
+      "name": "LocalBoost",
+      "publisher": { "@id": "https://localboost.app/#org" },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "Service",
+      "@id": "https://localboost.app/#service",
+      "name": "LocalBoost weekly ad drops",
+      "serviceType": "Advertising creative production and publishing",
+      "provider": { "@id": "https://localboost.app/#org" },
+      "areaServed": "Worldwide",
+      "url": "https://localboost.app/LocalBoost.dc.html#pricing",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Counter",
+          "description": "4 ads per week, one connected channel.",
+          "price": "89",
+          "priceCurrency": "EUR",
+          "url": "https://localboost.app/signup.html?plan=counter",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "89",
+            "priceCurrency": "EUR",
+            "billingDuration": 1,
+            "billingIncrement": 1,
+            "unitCode": "MON"
+          }
+        },
+        {
+          "@type": "Offer",
+          "name": "Storefront",
+          "description": "12 ads per week across four connected channels.",
+          "price": "249",
+          "priceCurrency": "EUR",
+          "url": "https://localboost.app/signup.html?plan=storefront",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "249",
+            "priceCurrency": "EUR",
+            "billingDuration": 1,
+            "billingIncrement": 1,
+            "unitCode": "MON"
+          }
+        },
+        {
+          "@type": "Offer",
+          "name": "Franchise",
+          "description": "30 ads per week, unlimited channels and locations.",
+          "price": "690",
+          "priceCurrency": "EUR",
+          "url": "https://localboost.app/contact.html?plan=franchise",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "690",
+            "priceCurrency": "EUR",
+            "billingDuration": 1,
+            "billingIncrement": 1,
+            "unitCode": "MON"
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <x-dc>
@@ -17,8 +124,8 @@
 <style>
 :root{--acc:#a8c6f0;--acc-soft:rgba(168,198,240,.14);}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:#07080a;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;font-feature-settings:"zero" on}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{margin:0;background:#07080a;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip;font-feature-settings:"zero" on}
 a{color:var(--acc);text-decoration:none}
 a:hover{color:#cbdff9}
 ::selection{background:var(--acc);color:#07080a}

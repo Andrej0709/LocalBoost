@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout — LocalBoost</title>
+<meta name="description" content="Confirm your plan and start your first drop. First drop free, cancel any week.">
+<link rel="canonical" href="https://localboost.app/checkout.html">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#07080a">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="localboost.css">
+<style>
+.co-grid{max-width:1040px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:40px;align-items:start}
+
+.co-step{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.co-step-num{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;background:var(--acc-soft);border:1px solid rgba(168,198,240,.3);font-family:'Geist Mono',monospace;font-size:11px;color:var(--acc);flex:none}
+.co-step-title{font-size:16px;letter-spacing:-.015em;color:#fff}
+
+.co-plan{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px;padding:16px;border-radius:12px;border:1px solid #23252a;background:#0e0f12;cursor:pointer;transition:border-color .2s ease,background .2s ease}
+.co-plan:hover{border-color:#4a4d54}
+.co-plan.selected{border-color:rgba(168,198,240,.55);background:rgba(168,198,240,.05)}
+.co-radio{position:relative;width:16px;height:16px;border-radius:9999px;border:1px solid #4a4d54;flex:none}
+.co-plan.selected .co-radio{border-color:var(--acc)}
+.co-plan.selected .co-radio::after{content:"";position:absolute;inset:3px;border-radius:9999px;background:var(--acc)}
+.co-plan-name{font-size:15.5px;color:#fff;letter-spacing:-.015em}
+.co-plan-rate{margin-top:3px;font-size:12.5px;color:#62666d}
+.co-plan-price{text-align:right;font-size:19px;color:#d0d6e0;letter-spacing:-.02em;white-space:nowrap}
+.co-plan-per{display:block;margin-top:2px;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#4c5056}
+
+.co-save{display:inline-block;margin-left:8px;padding:3px 8px;border-radius:9999px;background:rgba(159,215,176,.14);border:1px solid rgba(159,215,176,.3);font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#9fd7b0;vertical-align:middle}
+
+.co-promo{display:flex;gap:8px}
+.co-promo input{flex:1}
+.co-promo button{flex:none;padding:0 18px;border-radius:10px;border:1px solid #23252a;background:rgba(255,255,255,.02);color:#d0d6e0;font-size:13.5px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .2s ease}
+.co-promo button:hover{border-color:#4a4d54;color:#fff}
+
+.co-line{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:11px;font-size:14px;color:#8a8f98}
+.co-line span:last-child{color:#d0d6e0;white-space:nowrap}
+.co-line.is-credit span:last-child{color:#9fd7b0}
+.co-total{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid #1b1e22}
+.co-total-label{font-size:15px;color:#fff}
+.co-total-value{font-size:28px;color:var(--acc);letter-spacing:-.03em}
+
+.co-secure{display:flex;align-items:center;gap:9px;margin-top:16px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#4c5056}
+.co-secure-dot{width:6px;height:6px;border-radius:9999px;background:#9fd7b0;box-shadow:0 0 10px rgba(159,215,176,.6);flex:none}
+
+.co-terms{margin-top:14px;font-size:12.5px;line-height:1.6;color:#4c5056;text-align:center}
+.co-terms a{color:#62666d;text-decoration:underline;text-underline-offset:2px}
+
+.co-summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.co-swap{font-size:12.5px;color:#62666d}
+
+.co-result{max-width:520px;margin:0 auto;text-align:center}
+.co-result-mark{display:flex;align-items:center;justify-content:center;width:52px;height:52px;margin:0 auto 20px;border-radius:16px;font-size:22px}
+.co-result-mark.ok{background:rgba(159,215,176,.12);border:1px solid rgba(159,215,176,.34);color:#9fd7b0}
+.co-result-mark.stop{background:rgba(240,168,168,.1);border:1px solid rgba(240,168,168,.3);color:#f0a8a8}
+
+@media (max-width:860px){
+  .co-grid{grid-template-columns:minmax(0,1fr);gap:26px}
+  #co-summary{position:static !important}
+}
+@media (max-width:640px){
+  .co-plan{grid-template-columns:auto minmax(0,1fr);gap:12px;padding:14px}
+  .co-plan-price{grid-column:2;text-align:left}
+  .co-plan-per{display:inline;margin-left:6px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="LocalBoost.dc.html#top" class="nav-logo"><span class="nav-dot"></span>LocalBoost</a>
+  <div class="nav-links">
+    <a href="LocalBoost.dc.html#drop">The drop</a>
+    <a href="LocalBoost.dc.html#engine">Engine</a>
+    <a href="LocalBoost.dc.html#control">Control room</a>
+    <a href="approvals.html">Approvals</a>
+    <a href="LocalBoost.dc.html#pricing">Pricing</a>
+  </div>
+  <a href="login.html" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px">Log in</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow" id="co-eyebrow">STEP 2 OF 2 · FIRST DROP FREE</div>
+  <h1 id="co-headline">Confirm your <em>Storefront</em> drop.</h1>
+  <p id="co-sub">Nothing is charged today. Your first drop lands Monday — billing starts a week later, and you can cancel before it does.</p>
+</header>
+
+<section class="section-tight">
+
+  <!-- ==================== CHECKOUT ==================== -->
+  <div id="co-view" class="wrap-wide co-grid">
+
+    <div>
+      <div class="co-step">
+        <div class="co-step-num">1</div>
+        <div class="co-step-title">Your plan</div>
+      </div>
+
+      <div id="co-plans" style="display:grid;gap:10px"></div>
+
+      <div class="co-step" style="margin-top:34px">
+        <div class="co-step-num">2</div>
+        <div class="co-step-title">Billing cycle</div>
+      </div>
+
+      <div class="tabswitch" id="co-cycle" style="display:flex">
+        <button type="button" data-cycle="monthly" class="active">Monthly</button>
+        <button type="button" data-cycle="annual">Annual<span class="co-save">SAVE 20%</span></button>
+      </div>
+      <p id="co-cycle-note" style="margin:12px 0 0;font-size:13px;color:#4c5056">Billed every month. Cancel any week, no notice period.</p>
+
+      <div class="co-step" style="margin-top:34px">
+        <div class="co-step-num">3</div>
+        <div class="co-step-title">Billing details</div>
+      </div>
+
+      <div class="field">
+        <label for="co-email">BILLING EMAIL</label>
+        <input id="co-email" type="email" placeholder="you@business.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="co-country">COUNTRY</label>
+        <select id="co-country">
+          <option value="RS" data-vat="20">Serbia</option>
+          <option value="DE" data-vat="19">Germany</option>
+          <option value="AT" data-vat="20">Austria</option>
+          <option value="NL" data-vat="21">Netherlands</option>
+          <option value="FR" data-vat="20">France</option>
+          <option value="IT" data-vat="22">Italy</option>
+          <option value="ES" data-vat="21">Spain</option>
+          <option value="IE" data-vat="23">Ireland</option>
+          <option value="US" data-vat="0">United States</option>
+          <option value="GB" data-vat="0">United Kingdom</option>
+          <option value="OTHER" data-vat="0">Somewhere else</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="co-vatid">VAT ID (OPTIONAL)</label>
+        <input id="co-vatid" type="text" placeholder="For reverse charge, if your business has one" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="co-promo">PROMO CODE</label>
+        <div class="co-promo">
+          <input id="co-promo" type="text" placeholder="Have a code?" autocomplete="off">
+          <button type="button" id="co-promo-apply">Apply</button>
+        </div>
+      </div>
+      <div id="co-promo-note" class="notice" style="margin-top:12px" hidden></div>
+
+      <button type="button" class="btn" id="co-submit" style="width:100%;justify-content:center;margin-top:30px">Continue to secure payment<span class="mono" style="font-size:13px">→</span></button>
+
+      <div class="co-secure">
+        <span class="co-secure-dot"></span>
+        <span>PAYMENT HANDLED BY STRIPE · CARD DETAILS NEVER TOUCH OUR SERVERS</span>
+      </div>
+
+      <div class="co-terms">
+        By continuing you agree to the <a href="terms.html">Terms</a> and the <a href="privacy.html">Privacy notice</a>.
+        Creatives are AI-generated and human-approved — see the <a href="ai-disclosure.html">AI disclosure</a>.
+      </div>
+
+      <div id="co-notice" class="notice" hidden></div>
+    </div>
+
+    <aside class="card" id="co-summary" style="position:sticky;top:96px">
+      <div class="co-summary-head">
+        <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">ORDER SUMMARY</div>
+        <a href="LocalBoost.dc.html#pricing" class="co-swap">Compare plans →</a>
+      </div>
+
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:16px">
+        <div id="co-sum-name" style="font-size:20px;color:#fff;letter-spacing:-.015em">Storefront</div>
+        <div><span id="co-sum-price" style="font-size:28px;color:var(--acc);letter-spacing:-.03em">€249</span><span id="co-sum-per" class="mono" style="font-size:10px;color:#62666d"> / MONTH</span></div>
+      </div>
+      <div id="co-sum-rate" style="margin-top:6px;font-size:13px;color:#62666d">12 ads / week · 4 channels</div>
+
+      <div style="height:1px;background:#1b1e22;margin:18px 0"></div>
+
+      <div id="co-lines"></div>
+
+      <div class="co-total">
+        <div class="co-total-label">Due today</div>
+        <div class="co-total-value" id="co-due">€0</div>
+      </div>
+      <div id="co-then" style="margin-top:8px;font-size:12.5px;line-height:1.6;color:#4c5056"></div>
+
+      <div style="height:1px;background:#1b1e22;margin:18px 0"></div>
+
+      <ul class="plain" id="co-features" style="padding-left:0;list-style:none;display:grid;gap:10px;font-size:13.5px"></ul>
+    </aside>
+
+  </div>
+
+  <!-- ==================== SUCCESS ==================== -->
+  <div id="co-success" class="wrap co-result" hidden>
+    <div class="card">
+      <div class="co-result-mark ok">✓</div>
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#9fd7b0">SUBSCRIPTION ACTIVE</div>
+      <div id="co-success-text" style="margin-top:14px;font-size:19px;color:#fff;letter-spacing:-.015em">Your Storefront drop is live.</div>
+      <p style="margin-top:10px">The engine is already rendering. Your first batch hits the approvals queue Monday at 09:00 — you'll get an email the moment it's ready.</p>
+      <a href="approvals.html" class="btn" style="width:100%;justify-content:center;margin-top:24px">Go to approvals<span class="mono" style="font-size:13px">→</span></a>
+      <div style="margin-top:16px;font-size:12.5px;color:#4c5056">A receipt is on its way to your billing email.</div>
+    </div>
+  </div>
+
+  <!-- ==================== CANCELLED ==================== -->
+  <div id="co-cancelled" class="wrap co-result" hidden>
+    <div class="card">
+      <div class="co-result-mark stop">✕</div>
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#f0a8a8">PAYMENT NOT COMPLETED</div>
+      <div style="margin-top:14px;font-size:19px;color:#fff;letter-spacing:-.015em">Nothing was charged.</div>
+      <p style="margin-top:10px">You stepped out before the payment went through. Your account and onboarding answers are saved exactly as you left them.</p>
+      <a id="co-retry" href="checkout.html" class="btn" style="width:100%;justify-content:center;margin-top:24px">Pick up where you left off<span class="mono" style="font-size:13px">→</span></a>
+      <div style="margin-top:14px"><a href="contact.html" style="font-size:13px;color:#62666d">Something went wrong? Talk to us →</a></div>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="approvals.html">Approvals</a><a href="LocalBoost.dc.html#control">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+</footer>
+
+<script src="checkout.js"></script>
+<script src="nav.js"></script>
+</body>
+</html>
