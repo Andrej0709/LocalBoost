@@ -37,11 +37,43 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 @keyframes lbPosted{0%,60%{opacity:0;transform:translateY(3px)}70%{opacity:1;transform:translateY(0)}92%{opacity:1}100%{opacity:0}}
 @keyframes lbQueue{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @media (max-width:1080px){
-[data-scene]{position:relative !important;inset:auto !important;width:100% !important;height:400px;margin-top:40px}
+[data-scene]{position:relative !important;inset:auto !important;width:100% !important;height:430px !important;transform:none !important;margin-top:40px}
 [data-grid2]{grid-template-columns:1fr !important}
 [data-offset]{margin:0 !important;transform:none !important}
 [data-pinvis]{display:none !important}
 [data-railhide]{display:none !important}
+}
+@media (max-width:900px){
+[data-navlinks]{display:none !important}
+[data-navburger]{display:inline-flex !important}
+[data-navsheet]{display:grid !important}
+[data-loginlink]{display:none !important}
+}
+@media (max-width:820px){
+[data-hero]{min-height:auto !important;padding:126px 20px 56px !important}
+[data-scene]{height:430px !important;margin-top:24px}
+[data-story]{height:auto !important}
+[data-storysticky]{position:static !important;height:auto !important;padding:clamp(64px,11vw,96px) 0 !important}
+[data-stepdesc]{opacity:1 !important;max-height:none !important}
+[data-steptitle]{color:#fff !important}
+[data-steprow]{background:rgba(255,255,255,.025) !important;border-left-color:#23252a !important}
+[data-drum]{height:390px !important}
+[data-calwrap]{overflow-x:auto;-webkit-overflow-scrolling:touch}
+[data-cal]{min-width:600px}
+[data-pipeviz]{height:auto !important;padding:20px !important}
+[data-pipechip]{position:static !important;transform:none !important;display:inline-block;margin-bottom:18px}
+[data-pipepulse]{display:none !important}
+[data-pipelanes]{position:static !important;width:auto !important;display:grid !important;gap:12px}
+[data-planlift]{transform:none !important}
+[data-tabbar] button{padding:13px 18px !important;font-size:14px !important}
+[data-billing] button{padding:13px 18px !important;font-size:14px !important}
+[data-footcol]{gap:4px !important}
+[data-footcol] a{padding:8px 0}
+input[type=range]{height:30px !important}
+}
+@media (max-width:520px){
+[data-stat]{min-width:calc(50% - 14px)}
+[data-calcstats]{grid-template-columns:1fr !important}
 }
 </style>
 </helmet>
@@ -54,18 +86,28 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
   <a href="#top" style="display:flex;align-items:center;gap:9px;color:#fff;font-size:15px;font-weight:500;letter-spacing:-.02em;margin-right:auto">
     <span style="display:block;width:16px;height:16px;border-radius:5px;background:var(--acc);box-shadow:0 0 18px rgba(168,198,240,.45)"></span>LocalBoost
   </a>
-  <div style="display:flex;align-items:center;gap:2px;font-size:13px">
+  <div data-navlinks="1" style="display:flex;align-items:center;gap:2px;font-size:13px">
     <a href="#drop" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">The drop</a>
     <a href="#engine" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Engine</a>
     <a href="#control" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Control room</a>
     <a href="approvals.html" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Approvals</a>
     <a href="#pricing" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Pricing</a>
   </div>
-  <a href="login.html" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px" style-hover="background:rgba(255,255,255,.05)">Log in</a>
-  <a href="signup.html" style="margin-left:6px;padding:9px 16px;border-radius:9999px;background:var(--acc);color:#07080a;font-size:13px;font-weight:600;letter-spacing:-.01em" style-hover="background:#cbdff9">Start free drop</a>
+  <a data-loginlink="1" href="login.html" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px" style-hover="background:rgba(255,255,255,.05)">Log in</a>
+  <a href="signup.html" style="margin-left:6px;padding:11px 16px;border-radius:9999px;background:var(--acc);color:#07080a;font-size:13px;font-weight:600;letter-spacing:-.01em;white-space:nowrap" style-hover="background:#cbdff9">Start free drop</a>
+  <button data-navburger="1" onClick="{{ toggleNav }}" aria-label="Menu" style="display:none;align-items:center;justify-content:center;flex:none;width:44px;height:44px;margin-left:2px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#d0d6e0;font-size:16px;line-height:1;cursor:pointer;font-family:'Geist Mono',monospace">{{ navIcon }}</button>
 </nav>
 
-<section id="top" style="position:relative;min-height:100svh;padding:172px 24px 80px;display:flex;justify-content:center;overflow:hidden">
+<div data-navsheet="1" style="display:none;position:fixed;top:86px;left:16px;right:16px;z-index:49;gap:2px;padding:10px;border-radius:22px;border:1px solid rgba(255,255,255,.08);background:rgba(10,11,13,.95);backdrop-filter:blur(18px);box-shadow:0 24px 60px rgba(0,0,0,.6);opacity:{{ navOp }};transform:{{ navTf }};pointer-events:{{ navPe }};transition:opacity .22s ease,transform .28s cubic-bezier(.22,1,.36,1)">
+  <a href="#drop" onClick="{{ closeNav }}" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">The drop</a>
+  <a href="#engine" onClick="{{ closeNav }}" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">Engine</a>
+  <a href="#control" onClick="{{ closeNav }}" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">Control room</a>
+  <a href="approvals.html" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">Approvals</a>
+  <a href="#pricing" onClick="{{ closeNav }}" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">Pricing</a>
+  <a href="login.html" style="margin-top:4px;padding:14px;border-radius:14px;border:1px solid #23252a;color:#d0d6e0;font-size:15px" style-hover="border-color:#4a4d54">Log in</a>
+</div>
+
+<section id="top" data-hero="1" style="position:relative;min-height:100svh;padding:172px 24px 80px;display:flex;justify-content:center;overflow:hidden">
   <div style="position:absolute;top:-10%;left:50%;transform:translateX(-50%);width:min(1400px,140%);height:80vh;background:radial-gradient(60% 50% at 50% 0%,rgba(168,198,240,.10),rgba(7,8,10,0) 70%);pointer-events:none"></div>
   <div style="position:absolute;left:0;right:0;bottom:0;height:52vh;background:linear-gradient(180deg,rgba(7,8,10,0) 0%,rgba(150,170,200,.09) 58%,rgba(7,8,10,0) 100%);pointer-events:none"></div>
 
@@ -81,9 +123,9 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
         <a href="#engine" style="display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:9999px;border:1px solid #23252a;color:#d0d6e0;font-size:15px;background:rgba(255,255,255,.02)" style-hover="border-color:#4a4d54;color:#fff">Open the engine</a>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:28px;margin-top:52px;padding-top:26px;border-top:1px solid #15171b;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:#62666d">
-        <div><div data-count="1" data-target="1240" style="font-family:'Geist',sans-serif;font-size:26px;letter-spacing:-.03em;color:#fff;margin-bottom:5px">0</div>LOCAL BUSINESSES</div>
-        <div><div data-count="1" data-target="186000" data-suffix="+" style="font-family:'Geist',sans-serif;font-size:26px;letter-spacing:-.03em;color:#fff;margin-bottom:5px">0</div>ADS SHIPPED</div>
-        <div><div style="font-family:'Geist',sans-serif;font-size:26px;letter-spacing:-.03em;color:#fff;margin-bottom:5px">0</div>BRIEFS YOU WRITE</div>
+        <div data-stat="1"><div data-count="1" data-target="1240" style="font-family:'Geist',sans-serif;font-size:26px;letter-spacing:-.03em;color:#fff;margin-bottom:5px">0</div>LOCAL BUSINESSES</div>
+        <div data-stat="1"><div data-count="1" data-target="186000" data-suffix="+" style="font-family:'Geist',sans-serif;font-size:26px;letter-spacing:-.03em;color:#fff;margin-bottom:5px">0</div>ADS SHIPPED</div>
+        <div data-stat="1"><div style="font-family:'Geist',sans-serif;font-size:26px;letter-spacing:-.03em;color:#fff;margin-bottom:5px">0</div>BRIEFS YOU WRITE</div>
       </div>
     </div>
 
@@ -158,18 +200,18 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 </section>
 
 <section id="drop" data-story="1" style="position:relative;height:300vh;padding:0 24px">
-  <div style="position:sticky;top:0;height:100svh;display:flex;align-items:center;justify-content:center">
+  <div data-storysticky="1" style="position:sticky;top:0;height:100svh;display:flex;align-items:center;justify-content:center">
     <div data-grid2="1" style="width:100%;max-width:1200px;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:clamp(28px,4vw,64px);align-items:center">
       <div>
         <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">02 — THE WEEKLY DROP</div>
         <h2 style="margin:0 0 32px;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Four moves. You are involved in one of them.</h2>
         <div style="display:grid;gap:2px">
           <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
-            <div onClick="{{ s.go }}" style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;padding:16px 18px;border-radius:10px;border-left:2px solid {{ s.bar }};background:{{ s.bg }};transition:background .5s ease,border-color .5s ease;cursor:pointer" style-hover="background:rgba(255,255,255,.05)">
+            <div onClick="{{ s.go }}" data-steprow="1" style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;padding:16px 18px;border-radius:10px;border-left:2px solid {{ s.bar }};background:{{ s.bg }};transition:background .5s ease,border-color .5s ease;cursor:pointer" style-hover="background:rgba(255,255,255,.05)">
               <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.1em;color:{{ s.numColor }};border:1px solid {{ s.chip }};border-radius:9999px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;transition:color .5s ease,border-color .5s ease">{{ s.n }}</div>
               <div>
-                <div style="font-size:19px;letter-spacing:-.02em;color:{{ s.titleColor }};transition:color .5s ease">{{ s.t }}</div>
-                <div style="margin-top:7px;font-size:14px;line-height:1.55;color:#62666d;opacity:{{ s.op }};max-height:{{ s.mh }};overflow:hidden;transition:opacity .5s ease,max-height .5s ease">{{ s.d }}</div>
+                <div data-steptitle="1" style="font-size:19px;letter-spacing:-.02em;color:{{ s.titleColor }};transition:color .5s ease">{{ s.t }}</div>
+                <div data-stepdesc="1" style="margin-top:7px;font-size:14px;line-height:1.55;color:#62666d;opacity:{{ s.op }};max-height:{{ s.mh }};overflow:hidden;transition:opacity .5s ease,max-height .5s ease">{{ s.d }}</div>
               </div>
             </div>
           </sc-for>
@@ -212,7 +254,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
     </div>
   </div>
 
-  <div onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerLeave="{{ dragEnd }}" style="position:relative;height:min(520px,62vh);margin-top:clamp(32px,5vw,64px);perspective:1300px;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none">
+  <div data-drum="1" onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerLeave="{{ dragEnd }}" style="position:relative;height:min(520px,62vh);margin-top:clamp(32px,5vw,64px);perspective:1300px;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none">
     <div style="position:absolute;left:50%;top:52%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-7deg) rotateY({{ angle }}deg);transition:transform .5s cubic-bezier(.22,1,.36,1)">
       <sc-for list="{{ deck }}" as="c" hint-placeholder-count="7">
         <div style="position:absolute;width:232px;height:352px;margin-left:-116px;margin-top:-176px;border-radius:14px;border:1px solid {{ c.border }};background:#0e0f12;box-shadow:0 40px 80px rgba(0,0,0,.6);overflow:hidden;transform:{{ c.tf }};opacity:{{ c.op }}">
@@ -227,7 +269,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
         </div>
       </sc-for>
     </div>
-    
+    <div style="position:absolute;left:50%;bottom:2px;transform:translateX(-50%);text-align:center;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#3d4046;pointer-events:none">DRAG TO ROTATE THE DRUM</div>
   </div>
 
   <div style="max-width:1200px;margin:clamp(40px,5vw,64px) auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:1px;background:#15171b;border:1px solid #15171b;border-radius:12px;overflow:hidden">
@@ -236,7 +278,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
     <div style="padding:24px;background:#0a0b0d"><div style="font-size:16px;color:#fff;letter-spacing:-.015em">Native formats</div><div style="margin-top:8px;font-size:14px;line-height:1.55;color:#62666d">9:16, 4:5, 1:1 and 16:9 rendered from the same scene — never a cropped afterthought.</div></div>
     <div style="padding:24px;background:#0a0b0d"><div style="font-size:16px;color:#fff;letter-spacing:-.015em">Realism guardrails</div><div style="margin-top:8px;font-size:14px;line-height:1.55;color:#62666d">No six-fingered baristas, no invented prices. Anything uncertain never reaches your queue.</div></div>
   </div>
-<div style="position: absolute; left: 50%; transform: translateX(-50%); text-align: center; font-family: 'Geist Mono',monospace; font-size: 10px; letter-spacing: .12em; color: #3d4046; top: 818px">DRAG TO ROTATE THE DRUM</div></section>
+</section>
 
 <section id="control" data-dash="1" style="position:relative;padding:clamp(90px,10vw,140px) 24px clamp(100px,12vw,160px);border-top:1px solid #15171b;overflow:hidden">
   <div style="position:absolute;left:50%;top:8%;transform:translateX(-50%);font-size:clamp(90px,18vw,260px);font-weight:600;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px #101215;white-space:nowrap;pointer-events:none;user-select:none">CONTROL ROOM</div>
@@ -246,7 +288,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
       <h2 style="margin:0;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Two minutes on Monday. Everything else is already handled.</h2>
     </div>
 
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:34px 0 22px">
+    <div data-tabbar="1" style="display:flex;flex-wrap:wrap;gap:6px;margin:34px 0 22px">
       <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
         <button onClick="{{ t.onClick }}" style="padding:9px 16px;border-radius:9999px;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.color }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">{{ t.label }}</button>
       </sc-for>
@@ -261,8 +303,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
         </div>
 
         <sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ true }}">
-          <div style="padding:clamp(16px,2.4vw,26px)">
-            <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px">
+          <div data-calwrap="1" style="padding:clamp(16px,2.4vw,26px)">
+            <div data-cal="1" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px">
               <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
                 <div style="min-height:clamp(120px,15vw,190px);border-radius:10px;border:1px solid {{ d.border }};background:{{ d.bg }};padding:10px;display:flex;flex-direction:column;gap:7px">
                   <div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:{{ d.labelColor }}">{{ d.label }}</div>
@@ -325,11 +367,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
         </sc-for>
       </div>
     </div>
-    <div style="position:relative;height:min(440px,58vh);border-radius:14px;border:1px solid #15171b;background:#0a0b0d;overflow:hidden">
+    <div data-pipeviz="1" style="position:relative;height:min(440px,58vh);border-radius:14px;border:1px solid #15171b;background:#0a0b0d;overflow:hidden">
       <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:34px 34px"></div>
-      <div style="position:absolute;left:8%;top:50%;transform:translateY(-50%);padding:14px 18px;border-radius:10px;border:1px solid rgba(168,198,240,.32);background:rgba(168,198,240,.07);font-size:14px;color:var(--acc);z-index:2">Your drop</div>
-      <div style="position:absolute;left:8%;top:50%;width:20px;height:20px;margin:-10px 0 0 40px;border-radius:9999px;border:1px solid rgba(168,198,240,.5);animation:lbPulse 3.4s ease-out infinite"></div>
-      <div style="position:absolute;right:6%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:10px;width:min(58%,300px)">
+      <div data-pipechip="1" style="position:absolute;left:8%;top:50%;transform:translateY(-50%);padding:14px 18px;border-radius:10px;border:1px solid rgba(168,198,240,.32);background:rgba(168,198,240,.07);font-size:14px;color:var(--acc);z-index:2">Your drop</div>
+      <div data-pipepulse="1" style="position:absolute;left:8%;top:50%;width:20px;height:20px;margin:-10px 0 0 40px;border-radius:9999px;border:1px solid rgba(168,198,240,.5);animation:lbPulse 3.4s ease-out infinite"></div>
+      <div data-pipelanes="1" style="position:absolute;right:6%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:10px;width:min(58%,300px)">
           <div style="display:flex;align-items:center;gap:10px">
             <div style="position:relative;flex:1;height:1px">
               <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(168,198,240,.05),rgba(168,198,240,.45));animation:lbLane 5s linear infinite"></div>
@@ -374,7 +416,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
   <div style="max-width:1200px;margin:0 auto;text-align:center">
     <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">06 — PRICING</div>
     <h2 style="margin:0 auto;max-width:20ch;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Priced per drop, not per meeting.</h2>
-    <div style="display:inline-flex;align-items:center;gap:4px;margin-top:30px;padding:4px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02)">
+    <div data-billing="1" style="display:inline-flex;align-items:center;gap:4px;margin-top:30px;padding:4px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02)">
       <button onClick="{{ setMonthly }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ mBg }};color:{{ mColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Monthly</button>
       <button onClick="{{ setAnnual }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ aBg }};color:{{ aColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Annual · −20%</button>
     </div>
@@ -382,7 +424,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 
   <div style="max-width:1200px;margin:clamp(36px,4.5vw,56px) auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(290px,100%),1fr));gap:16px;align-items:start">
     <sc-for list="{{ plans }}" as="pl" hint-placeholder-count="3">
-      <div style="position:relative;padding:clamp(22px,2.4vw,30px);border-radius:14px;border:1px solid {{ pl.border }};background:{{ pl.bg }};box-shadow:{{ pl.shadow }};transform:translateY({{ pl.lift }});transition:transform .3s ease">
+      <div style="position:relative;padding:clamp(22px,2.4vw,30px);border-radius:14px;border:1px solid {{ pl.border }};background:{{ pl.bg }};box-shadow:{{ pl.shadow }};transform:translateY({{ pl.lift }});transition:transform .3s ease" data-planlift="1">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
           <div style="font-size:15px;color:#fff;letter-spacing:-.015em">{{ pl.name }}</div>
           <sc-if value="{{ pl.featured }}" hint-placeholder-val="{{ false }}"><span style="padding:3px 9px;border-radius:4px;background:rgba(168,198,240,.14);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--acc)">MOST TAKEN</span></sc-if>
@@ -410,7 +452,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
       <div style="margin-top:7px;font-size:14px;color:#62666d">{{ adsHint }}</div>
       <input type="range" min="2" max="30" step="1" value="{{ ads }}" onChange="{{ onAds }}" onInput="{{ onAds }}" style="width:100%;margin-top:22px;height:16px;--fill:{{ fillPct }}">
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div data-calcstats="1" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div style="padding:18px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#62666d">EST. MONTHLY</div><div style="margin-top:10px;font-size:30px;letter-spacing:-.035em;color:var(--acc)">{{ estPrice }}</div></div>
       <div style="padding:18px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#62666d">ADS / YEAR</div><div style="margin-top:10px;font-size:30px;letter-spacing:-.035em;color:#fff">{{ perYear }}</div></div>
     </div>
@@ -449,9 +491,9 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
       <div style="display:flex;align-items:center;gap:9px;color:#fff;font-size:15px;font-weight:500;letter-spacing:-.02em"><span style="display:block;width:16px;height:16px;border-radius:5px;background:var(--acc)"></span>LocalBoost</div>
       <div style="margin-top:12px;font-size:13px;line-height:1.6;color:#4c5056;max-width:26ch">Weekly ad drops for businesses with no marketing department.</div>
     </a>
-    <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">PRODUCT</div><a href="#drop" style="color:#8a8f98">The weekly drop</a><a href="#engine" style="color:#8a8f98">Engine</a><a href="approvals.html" style="color:#8a8f98">Approvals</a><a href="#control" style="color:#8a8f98">Control room</a></div>
-    <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">COMPANY</div><a href="about.html" style="color:#8a8f98">About</a><a href="#pricing" style="color:#8a8f98">Pricing</a><a href="message-us.html" style="color:#8a8f98">Contact us</a></div>
-    <div style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">LEGAL</div><a href="terms.html" style="color:#8a8f98">Terms</a><a href="privacy.html" style="color:#8a8f98">Privacy</a><a href="ai-disclosure.html" style="color:#8a8f98">AI disclosure</a></div>
+    <div data-footcol="1" style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">PRODUCT</div><a href="#drop" style="color:#8a8f98">The weekly drop</a><a href="#engine" style="color:#8a8f98">Engine</a><a href="approvals.html" style="color:#8a8f98">Approvals</a><a href="#control" style="color:#8a8f98">Control room</a></div>
+    <div data-footcol="1" style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">COMPANY</div><a href="about.html" style="color:#8a8f98">About</a><a href="#pricing" style="color:#8a8f98">Pricing</a><a href="message-us.html" style="color:#8a8f98">Contact us</a></div>
+    <div data-footcol="1" style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#4c5056;margin-bottom:4px">LEGAL</div><a href="terms.html" style="color:#8a8f98">Terms</a><a href="privacy.html" style="color:#8a8f98">Privacy</a><a href="ai-disclosure.html" style="color:#8a8f98">AI disclosure</a></div>
   </div>
   <div style="position:relative;z-index:1;max-width:1200px;margin:44px auto 0;padding-top:22px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#3d4046"><span>© 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
@@ -460,7 +502,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#a8c6f0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#a8c6f0&quot;,&quot;#d8dbe0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;drumCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:5,&quot;max&quot;:9,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Engine&quot;}}">
 class Component extends DCLogic {
-  state = { step: 0, tab: 0, billing: "monthly", ads: 12, angle: 0, creatives: {} };
+  state = { step: 0, tab: 0, billing: "monthly", ads: 12, angle: 0, creatives: {}, isMobile: false, navOpen: false };
   root = React.createRef();
 
   componentDidMount() {
@@ -469,6 +511,11 @@ class Component extends DCLogic {
       document.documentElement.style.setProperty("--acc", acc);
       document.documentElement.style.setProperty("--acc-soft", "rgba(168,198,240,.14)");
     }
+    this.mq = window.matchMedia("(max-width:820px)");
+    this.onMq = (e) => this.setState({ isMobile: e.matches, navOpen: false });
+    if (this.mq.addEventListener) this.mq.addEventListener("change", this.onMq);
+    if (this.mq.matches) this.setState({ isMobile: true });
+
     this.m = { x: 0, y: 0 };
     this.cur = { rx: 0, ry: 0 };
     this.onMove = (e) => {
@@ -543,13 +590,14 @@ class Component extends DCLogic {
 
   componentWillUnmount() {
     window.removeEventListener("mousemove", this.onMove);
+    if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener("change", this.onMq);
     cancelAnimationFrame(this.rafId);
     if (this.io) this.io.disconnect();
     if (this.cio) this.cio.disconnect();
   }
 
   goStep(i) {
-    if (!this.story) return;
+    if (!this.story || this.state.isMobile) return;
     const vh = window.innerHeight;
     const doc = document.documentElement;
     const top = this.story.getBoundingClientRect().top + doc.scrollTop;
@@ -595,7 +643,7 @@ class Component extends DCLogic {
       el.style.setProperty("--py", (-sy * 0.05 * d).toFixed(1) + "px");
     });
 
-    if (this.story) {
+    if (this.story && !this.state.isMobile) {
       const b = this.story.getBoundingClientRect();
       const p = Math.max(0, Math.min(0.999, -b.top / Math.max(1, b.height - vh)));
       const step = Math.floor(p * 4);
@@ -603,10 +651,15 @@ class Component extends DCLogic {
     }
 
     if (this.dash && this.dashCard) {
-      const b = this.dash.getBoundingClientRect();
-      const p = Math.max(0, Math.min(1, (vh - b.top) / (vh * 0.85)));
-      this.dashCard.style.setProperty("--dashrx", ((1 - p) * 22).toFixed(2) + "deg");
-      this.dashCard.style.setProperty("--dashrz", ((1 - p) * -3).toFixed(2) + "deg");
+      if (this.state.isMobile) {
+        this.dashCard.style.setProperty("--dashrx", "0deg");
+        this.dashCard.style.setProperty("--dashrz", "0deg");
+      } else {
+        const b = this.dash.getBoundingClientRect();
+        const p = Math.max(0, Math.min(1, (vh - b.top) / (vh * 0.85)));
+        this.dashCard.style.setProperty("--dashrx", ((1 - p) * 22).toFixed(2) + "deg");
+        this.dashCard.style.setProperty("--dashrz", ((1 - p) * -3).toFixed(2) + "deg");
+      }
     }
 
     this.rafId = requestAnimationFrame(this.loop);
@@ -661,14 +714,16 @@ class Component extends DCLogic {
       { id: "34-08", ratio: "9:16", hook: "Ten minutes, no appointment.", channel: "TIKTOK", art: `radial-gradient(100% 90% at 50% 50%, rgba(180,168,150,.20), transparent 58%), linear-gradient(160deg, rgba(38,36,32,.9) 0%, rgba(14,15,18,.98) 68%), ${GRAIN}` },
       { id: "34-09", ratio: "4:5", hook: "Same recipe since 1998.", channel: "INSTAGRAM", art: `radial-gradient(110% 100% at 50% 30%, rgba(198,158,104,.24), transparent 55%), linear-gradient(170deg, rgba(52,40,26,.92) 0%, rgba(12,13,15,.98) 72%), ${GRAIN}` }
     ];
-    const count = Math.max(5, Math.min(9, this.props.drumCount ?? 7));
+    const mob = this.state.isMobile;
+    const count = mob ? 5 : Math.max(5, Math.min(9, this.props.drumCount ?? 7));
     const stepDeg = 360 / count;
+    const radius = mob ? 200 : count > 6 ? 330 : 280;
     const deck = cards.slice(0, count).map((c, i) => {
       const a = i * stepDeg + this.state.angle;
       const rad = (a * Math.PI) / 180;
       const facing = Math.cos(rad);
       return Object.assign({}, c, {
-        tf: "rotateY(" + a.toFixed(2) + "deg) translateZ(" + (count > 6 ? 330 : 280) + "px)",
+        tf: "rotateY(" + a.toFixed(2) + "deg) translateZ(" + radius + "px)" + (mob ? " scale(.82)" : ""),
         op: (0.34 + 0.66 * Math.max(0, facing)).toFixed(2),
         border: facing > 0.85 ? "#3a3d43" : "#1b1e22"
       });
@@ -781,6 +836,12 @@ class Component extends DCLogic {
         this.setState({ angle: this.drag.a + (e.clientX - this.drag.x) * 0.35 });
       },
       dragEnd: () => { this.drag = null; },
+      navIcon: this.state.navOpen ? "✕" : "≡",
+      navOp: this.state.navOpen ? "1" : "0",
+      navPe: this.state.navOpen ? "auto" : "none",
+      navTf: this.state.navOpen ? "translateY(0)" : "translateY(-10px)",
+      toggleNav: () => this.setState((s) => ({ navOpen: !s.navOpen })),
+      closeNav: () => this.setState({ navOpen: false }),
       isCalendar: this.state.tab === 0,
       isCreatives: this.state.tab === 1,
       isPerf: this.state.tab === 2,
