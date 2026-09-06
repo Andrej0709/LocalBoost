@@ -119,6 +119,7 @@
 <body>
 <x-dc>
 <helmet>
+<script src="./lb-planet.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
@@ -191,6 +192,12 @@ input[type=range]{height:30px !important}
 </helmet>
 
 <div ref="{{ rootRef }}" style="position:relative;width:100%;background:#07080a">
+
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden">
+  <lb-planet accent="{{ planetAccent }}" base="{{ planetAccent }}" glow="{{ planetGlow }}" count="{{ planetCount }}" style="position:absolute;inset:0;width:100%;height:100%"></lb-planet>
+  <div style="position:absolute;inset:0;background:radial-gradient(125% 88% at 50% 50%,rgba(7,8,10,0) 40%,rgba(7,8,10,.55) 100%)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,rgba(7,8,10,0),rgba(7,8,10,.55))"></div>
+</div>
 
 <div data-railhide="1" style="position:fixed;top:0;right:0;bottom:0;width:1px;background:#15171b;z-index:40"><div data-progress="1" style="position:absolute;top:0;left:0;width:100%;height:0%;background:linear-gradient(180deg,rgba(168,198,240,0),var(--acc))"></div></div>
 
@@ -467,7 +474,7 @@ input[type=range]{height:30px !important}
   </div>
 </section>
 
-<section id="live" style="position:relative;padding:clamp(90px,10vw,140px) 24px;border-top:1px solid #15171b;background:#08090b">
+<section id="live" style="position:relative;z-index:1;padding:clamp(90px,10vw,140px) 24px;border-top:1px solid #15171b;background:transparent">
   <div data-grid2="1" style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(32px,5vw,72px);align-items:center">
     <div>
       <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">05 — DISTRIBUTION</div>
@@ -605,7 +612,7 @@ input[type=range]{height:30px !important}
   </div>
 </section>
 
-<section id="testimonials" style="position:relative;padding:clamp(80px,9vw,120px) 24px;border-top:1px solid #15171b;background:#08090b;overflow:hidden">
+<section id="testimonials" style="position:relative;z-index:1;padding:clamp(80px,9vw,120px) 24px;border-top:1px solid #15171b;background:transparent;overflow:hidden">
   <div style="max-width:1200px;margin:0 auto">
     <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:34px">07 — FROM THE COUNTER</div>
     <div data-grid2="1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px">
@@ -646,7 +653,7 @@ input[type=range]{height:30px !important}
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#a8c6f0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#a8c6f0&quot;,&quot;#d8dbe0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;drumCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:5,&quot;max&quot;:9,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Engine&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#a8c6f0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#a8c6f0&quot;,&quot;#d8dbe0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;planetGlow&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:2,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;planetDensity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:5000,&quot;step&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;drumCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:5,&quot;max&quot;:9,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Engine&quot;}}">
 class Component extends DCLogic {
   state = { step: 0, tab: 0, billing: "monthly", ads: 12, angle: 0, creatives: {}, isMobile: false, navOpen: false };
   root = React.createRef();
