@@ -72,6 +72,7 @@
       this.base = hexToRgb(this.getAttribute("base") || this.getAttribute("accent") || "#a8c6f0");
       this.glowK = parseFloat(this.getAttribute("glow") || "1") || 1;
       this.reduced = matchMedia("(prefers-reduced-motion:reduce)").matches;
+      this.mobile = matchMedia("(pointer:coarse)").matches || Math.min(innerWidth, innerHeight) < 700;
 
       this.buildPoints(parseInt(this.getAttribute("count") || "0", 10));
       this.buildGlow();
@@ -102,8 +103,7 @@
     }
 
     buildPoints(count) {
-      const small = Math.min(innerWidth, innerHeight) < 700;
-      const n = count > 0 ? count : small ? 1500 : 2800;
+      const n = count > 0 ? count : this.mobile ? 1100 : 2800;
       const pts = (this.pts = new Array(n));
       const gold = Math.PI * (3 - Math.sqrt(5));
 
@@ -150,7 +150,7 @@
     }
 
     resize() {
-      const dpr = Math.min(2, devicePixelRatio || 1);
+      const dpr = Math.min(this.mobile ? 1.5 : 2, devicePixelRatio || 1);
       const r = this.getBoundingClientRect();
       this.w = Math.max(1, r.width);
       this.h = Math.max(1, r.height);
@@ -174,7 +174,8 @@
         this._acc = (this._acc || 0) + dt;
         if (this._fr === 90) {
           this._checked = true;
-          if (this._acc / 90 > 0.026 && this.pts.length > 900) this.buildPoints(Math.round(this.pts.length * 0.55));
+          const budget = this.mobile ? 0.019 : 0.026;
+          if (this._acc / 90 > budget && this.pts.length > 700) this.buildPoints(Math.round(this.pts.length * 0.55));
         }
       }
 
@@ -232,9 +233,10 @@
         }
       }
 
-      // glow halos
+      // glow halos (skip every other on mobile — drawImage+composite is the priciest part per frame)
       ctx.globalCompositeOperation = "lighter";
-      for (let i = 0; i < lit.length; i += 5) {
+      const glowStep = this.mobile ? 10 : 5;
+      for (let i = 0; i < lit.length; i += glowStep) {
         const a = lit[i + 4] * (0.13 + lit[i + 3] * 0.26) * this.glowK;
         if (a < 0.015) continue;
         const g = (3.6 + lit[i + 3] * 6.4) * dpr * litScale;
