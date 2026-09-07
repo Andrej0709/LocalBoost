@@ -145,7 +145,7 @@
       <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
       <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
     </div>
-    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="approvals.html">Approvals</a><a href="LocalBoost.dc.html#control">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
     <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
     <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
   </div>
@@ -620,7 +620,7 @@
     var user = LBAuth.getUser();
     var cta = document.getElementById("nav-cta");
     cta.textContent = "Control room";
-    cta.href = "LocalBoost.dc.html#control";
+    cta.href = "control-room.html";
 
     var dropRes = await LBAuth.db
       .from("drops")

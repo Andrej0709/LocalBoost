@@ -35,7 +35,7 @@
   <div class="nav-links">
     <a href="LocalBoost.dc.html#drop">The drop</a>
     <a href="LocalBoost.dc.html#engine">Engine</a>
-    <a href="LocalBoost.dc.html#control">Control room</a>
+    <a href="control-room.html">Control room</a>
     <a href="approvals.html">Approvals</a>
     <a href="LocalBoost.dc.html#pricing">Pricing</a>
   </div>
@@ -62,6 +62,7 @@
       </div>
       <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px">
         <a href="approvals.html" class="btn">Review this week's drop<span class="mono" style="font-size:13px">→</span></a>
+        <a href="control-room.html" class="btn-ghost">Control room</a>
         <a href="account.html" class="btn-ghost">Account settings</a>
         <button id="logout-btn" class="btn-ghost" type="button">Log out</button>
       </div>
@@ -115,7 +116,7 @@
       <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
       <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
     </div>
-    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="approvals.html">Approvals</a><a href="LocalBoost.dc.html#control">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
     <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
     <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
   </div>
@@ -169,7 +170,7 @@
         document.getElementById("li-email").value,
         document.getElementById("li-password").value
       );
-      redirect("LocalBoost.dc.html#control", "Logged in — taking you to your control room...");
+      redirect("control-room.html", "Logged in — taking you to your control room...");
     } catch (err) {
       button.disabled = false;
       say(err.message === "Email not confirmed"

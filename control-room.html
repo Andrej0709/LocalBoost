@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control room — LocalBoost</title>
+<meta name="description" content="What's scheduled and what's already live, pulled straight from your account.">
+<link rel="canonical" href="https://localboost.app/control-room.html">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#07080a">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="localboost.css">
+<style>
+.cr-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:14px;margin-bottom:8px}
+.cr-stat{padding:20px;border-radius:12px;border:1px solid #1b1e22;background:#0e0f12}
+.cr-stat-n{font-size:32px;color:#fff;letter-spacing:-.03em}
+.cr-stat-l{margin-top:6px;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#62666d}
+.cr-stat-cta{display:inline-block;margin-top:10px;font-size:12.5px}
+.cr-section-label{margin:44px 0 14px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;color:#62666d}
+.cr-section-label:first-of-type{margin-top:8px}
+.cr-day{margin:22px 0 10px;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#4c5056}
+.cr-day:first-child{margin-top:0}
+.cr-row{display:flex;gap:14px;align-items:center;padding:12px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12;margin-bottom:8px}
+.cr-thumb{width:46px;height:46px;border-radius:8px;background:#161a1e;object-fit:cover;flex:none;display:block}
+.cr-thumb-ph{width:46px;height:46px;border-radius:8px;background:#161a1e;flex:none}
+.cr-time{width:64px;flex:none;font-family:'Geist Mono',monospace;font-size:12px;color:var(--acc)}
+.cr-time.is-muted{color:#62666d}
+.cr-main{flex:1;min-width:0}
+.cr-headline{font-size:14.5px;color:#fff;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-meta{margin-top:3px;font-size:12.5px;color:#62666d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-chip{flex:none;padding:4px 10px;border-radius:9999px;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.08em;border:1px solid}
+.cr-chip.live{border-color:rgba(159,215,176,.4);background:rgba(159,215,176,.14);color:#9fd7b0}
+.cr-chip.slot{border-color:rgba(168,198,240,.4);background:var(--acc-soft);color:var(--acc)}
+@media (max-width:640px){
+  .cr-row{padding:10px}
+  .cr-time{width:52px;font-size:11px}
+  .cr-headline,.cr-meta{white-space:normal}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="LocalBoost.dc.html#top" class="nav-logo"><span class="nav-dot"></span>LocalBoost</a>
+  <div class="nav-links">
+    <a href="LocalBoost.dc.html#drop">The drop</a>
+    <a href="LocalBoost.dc.html#engine">Engine</a>
+    <a href="approvals.html">Approvals</a>
+    <a href="LocalBoost.dc.html#pricing">Pricing</a>
+  </div>
+  <a href="account.html" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px">Account</a>
+  <a href="login.html" class="nav-cta" id="nav-cta">Log in</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow">CONTROL ROOM</div>
+  <h1 id="page-title">What's scheduled, what's live.</h1>
+  <p id="page-sub">Pulled straight from your account — every approved creative and when it posts, every creative that's already out.</p>
+</header>
+
+<section class="section-tight">
+  <div class="wrap-wide">
+
+    <!-- Signed out -->
+    <div id="signed-out" class="card" hidden style="max-width:440px;margin:0 auto;text-align:center">
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">NOT SIGNED IN</div>
+      <h3 style="margin:14px 0 8px">Log in to see your control room.</h3>
+      <p style="margin:0">Your schedule is tied to your account — sign in and it loads here.</p>
+      <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <a href="login.html" class="btn">Log in<span class="mono" style="font-size:13px">&rarr;</span></a>
+        <a href="signup.html" class="btn-ghost">Create account</a>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="empty">
+      <div class="mono">LOADING YOUR CONTROL ROOM</div>
+    </div>
+
+    <!-- Main board -->
+    <div id="board" hidden>
+
+      <div class="cr-stats">
+        <div class="cr-stat">
+          <div class="cr-stat-n" id="stat-scheduled">0</div>
+          <div class="cr-stat-l">SCHEDULED TO POST</div>
+        </div>
+        <div class="cr-stat">
+          <div class="cr-stat-n" id="stat-live">0</div>
+          <div class="cr-stat-l">LIVE SO FAR</div>
+        </div>
+        <div class="cr-stat">
+          <div class="cr-stat-n" id="stat-waiting">0</div>
+          <div class="cr-stat-l">WAITING ON YOU</div>
+          <a href="approvals.html" class="cr-stat-cta" id="stat-waiting-link" hidden>Review approvals &rarr;</a>
+        </div>
+      </div>
+
+      <div id="scheduled-wrap">
+        <div class="cr-section-label">SCHEDULED TO POST</div>
+        <div id="scheduled-list"></div>
+        <div id="scheduled-empty" class="empty" hidden>
+          <div class="mono">NOTHING SLOTTED YET</div>
+          <h3>Nothing scheduled right now.</h3>
+          <p>Approve a creative and, once the engine slots it into a posting window, it'll show up here with a day and time.</p>
+        </div>
+      </div>
+
+      <div id="live-wrap">
+        <div class="cr-section-label">ALREADY LIVE</div>
+        <div id="live-list"></div>
+        <div id="live-empty" class="empty" hidden>
+          <div class="mono">NOTHING PUBLISHED YET</div>
+          <h3>Nothing has posted yet.</h3>
+          <p>Once a scheduled creative goes out, it lands here with the exact time it posted.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- No creatives at all -->
+    <div id="no-drops" class="empty" hidden>
+      <div class="mono">NO DROP YET</div>
+      <h3>Nothing to show yet.</h3>
+      <p>Once your first drop renders and you approve a few creatives, this is where you'll see exactly what's posting and when.</p>
+      <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <a href="approvals.html" class="btn-ghost">Go to approvals</a>
+        <a href="account.html" class="btn-ghost">Account settings</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><span class="dot"></span>LocalBoost</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="LocalBoost.dc.html#drop">The weekly drop</a><a href="LocalBoost.dc.html#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="LocalBoost.dc.html#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+  </div>
+  <div class="foot-bottom"><span>&copy; 2026 LOCALBOOST</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="control-room.js"></script>
+<script src="nav.js"></script>
+</body>
+</html>
