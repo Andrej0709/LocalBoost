@@ -1,13 +1,12 @@
 :root{--acc:#a8c6f0;--acc-soft:rgba(168,198,240,.14);}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;overflow-x:clip}
-body{margin:0;background:#0a0e18;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip;position:relative}
+body{margin:0;background:#07080a;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip;position:relative}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
-  radial-gradient(70% 55% at 12% 0%,rgba(168,198,240,.26),rgba(10,14,24,0) 68%),
-  radial-gradient(60% 50% at 100% 12%,rgba(168,198,240,.20),rgba(10,14,24,0) 70%),
-  radial-gradient(75% 60% at 50% 108%,rgba(168,198,240,.20),rgba(10,14,24,0) 75%),
-  radial-gradient(90% 70% at 50% 50%,rgba(90,120,180,.14),rgba(10,14,24,0) 80%),
-  #0a0e18}
+  radial-gradient(46% 38% at 10% -4%,rgba(168,198,240,.11),rgba(7,8,10,0) 65%),
+  radial-gradient(42% 34% at 100% 6%,rgba(168,198,240,.08),rgba(7,8,10,0) 68%),
+  radial-gradient(55% 42% at 50% 105%,rgba(168,198,240,.07),rgba(7,8,10,0) 72%),
+  #07080a}
 a{color:var(--acc);text-decoration:none}
 a:hover{color:#cbdff9}
 ::selection{background:var(--acc);color:#07080a}
@@ -32,6 +31,7 @@ em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:40
 
 .page-hero{position:relative;padding:172px 24px 64px;text-align:center;overflow:hidden}
 .page-hero::before{content:"";position:absolute;top:-10%;left:50%;transform:translateX(-50%);width:min(1400px,140%);height:60vh;background:radial-gradient(60% 50% at 50% 0%,rgba(168,198,240,.10),rgba(7,8,10,0) 70%);pointer-events:none;z-index:0}
+.page-hero-watermark{position:absolute;top:6%;left:50%;transform:translateX(-50%);font-size:clamp(64px,15vw,220px);font-weight:600;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px #14161b;white-space:nowrap;pointer-events:none;user-select:none;z-index:0}
 .eyebrow{position:relative;z-index:1;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px}
 .page-hero h1{position:relative;z-index:1;margin:0 auto;max-width:20ch;font-size:clamp(34px,5vw,58px);line-height:1.05;letter-spacing:-.035em;font-weight:500;color:#fff;text-wrap:balance}
 .page-hero p{position:relative;z-index:1;margin:22px auto 0;max-width:52ch;font-size:clamp(15px,1.2vw,17px);line-height:1.6;color:#8a8f98}
