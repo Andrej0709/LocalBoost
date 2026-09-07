@@ -54,7 +54,6 @@
           document.querySelectorAll('a[href="login.html"]'),
           function (a) {
             a.textContent = label;
-            a.href = "control-room.html";
           }
         );
       });

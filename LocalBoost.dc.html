@@ -736,7 +736,6 @@ class Component extends DCLogic {
         const label = profile.business_name || user.email || "Account";
         r.querySelectorAll('a[href="login.html"]').forEach((loginLink) => {
           loginLink.textContent = label;
-          loginLink.href = "control-room.html";
         });
       });
     }
