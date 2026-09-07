@@ -43,6 +43,22 @@
     window.addEventListener("resize", function () {
       if (window.innerWidth > 860) setOpen(false);
     });
+
+    if (window.LBAuth) {
+      LBAuth.ready.then(function () {
+        if (!LBAuth.isLoggedIn()) return;
+        var profile = LBAuth.getProfile() || {};
+        var user = LBAuth.getUser() || {};
+        var label = profile.business_name || user.email || "Account";
+        Array.prototype.forEach.call(
+          document.querySelectorAll('a[href="login.html"]'),
+          function (a) {
+            a.textContent = label;
+            a.href = "account.html";
+          }
+        );
+      });
+    }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();

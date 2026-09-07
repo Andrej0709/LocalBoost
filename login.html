@@ -169,15 +169,7 @@
         document.getElementById("li-email").value,
         document.getElementById("li-password").value
       );
-      var profile = LBAuth.getProfile() || {};
-      var next = LBAuth.nextStep(profile.plan || null);
-      if (next) {
-        redirect(next, LBAuth.hasBrief()
-          ? "Logged in — one step left, taking you to checkout..."
-          : "Logged in — let's finish your business brief...");
-      } else {
-        redirect("LocalBoost.dc.html#control", "Logged in — taking you to your control room...");
-      }
+      redirect("LocalBoost.dc.html#control", "Logged in — taking you to your control room...");
     } catch (err) {
       button.disabled = false;
       say(err.message === "Email not confirmed"

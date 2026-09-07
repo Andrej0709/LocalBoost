@@ -8,8 +8,6 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
   radial-gradient(75% 60% at 50% 108%,rgba(168,198,240,.20),rgba(10,14,24,0) 75%),
   radial-gradient(90% 70% at 50% 50%,rgba(90,120,180,.14),rgba(10,14,24,0) 80%),
   #0a0e18}
-section:nth-of-type(odd){background:radial-gradient(80% 70% at 18% 0%,rgba(168,198,240,.13),rgba(10,14,24,0) 72%)}
-section:nth-of-type(even){background:radial-gradient(80% 70% at 84% 100%,rgba(168,198,240,.11),rgba(10,14,24,0) 72%)}
 a{color:var(--acc);text-decoration:none}
 a:hover{color:#cbdff9}
 ::selection{background:var(--acc);color:#07080a}
