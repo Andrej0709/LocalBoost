@@ -1,9 +1,9 @@
-/* LocalBoost account settings page.
+/* Adronis account settings page.
    Everything here reads/writes through LBAuth (auth.js) — no direct Supabase
    calls except the ones LBAuth already exposes on window.LBAuth.db. */
 (function () {
 
-  // Mirrors the `plans` array in LocalBoost.dc.html and checkout.js — keep in sync.
+  // Mirrors the `plans` array in Adronis.dc.html and checkout.js — keep in sync.
   var PLANS = {
     counter:    { name: "Counter",    base: 89,  rate: "4 ads / week · 1 channel" },
     storefront: { name: "Storefront", base: 249, rate: "12 ads / week · 4 channels" },

@@ -1,5 +1,5 @@
 /* ============================================================ */
-/* LocalBoost - Supabase schema */
+/* Adronis - Supabase schema */
 /* Run this whole file once in: Supabase Dashboard -> SQL Editor. */
 /* Safe to re-run (idempotent). */
 /* ============================================================ */

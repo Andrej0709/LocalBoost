@@ -1,4 +1,4 @@
-// LocalBoost auth, backed by Supabase.
+// Adronis auth, backed by Supabase.
 //
 // Load order on every page that uses it:
 //   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

@@ -3,4 +3,4 @@ Allow: /
 Disallow: /approvals.html
 Disallow: /login.html
 
-Sitemap: https://localboost.app/sitemap.xml
+Sitemap: https://adronis.app/sitemap.xml

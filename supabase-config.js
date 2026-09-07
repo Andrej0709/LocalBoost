@@ -1,4 +1,4 @@
-// LocalBoost - Supabase connection.
+// Adronis - Supabase connection.
 // The anon key is designed to be public; it is safe in client-side code.
 // Row Level Security in supabase/schema.sql is what actually protects the data.
 window.LB_SUPABASE_URL = "https://jctvpizlzznabcjaxlgk.supabase.co";

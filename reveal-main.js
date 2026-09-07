@@ -1,4 +1,4 @@
-/* Scroll-reveal for LocalBoost.dc.html — a generated design-canvas file.
+/* Scroll-reveal for Adronis.dc.html — a generated design-canvas file.
    The canvas runtime re-asserts each element's own class/style attribute
    from its template on reconciliation, silently wiping any class or inline
    style added directly to a section. <html> sits outside that managed tree,

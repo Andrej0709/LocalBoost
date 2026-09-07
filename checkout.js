@@ -1,11 +1,11 @@
-/* LocalBoost checkout — front end only.
+/* Adronis checkout — front end only.
    No payment is taken here. The submit handler builds the exact payload that a
    future `create-checkout-session` endpoint will consume, then stops. Wire the
    backend at the one marked spot below and nothing else on this page changes. */
 (function () {
 
   // ---------------------------------------------------------------- plan data
-  // Mirrors the `plans` array in LocalBoost.dc.html — keep the two in sync.
+  // Mirrors the `plans` array in Adronis.dc.html — keep the two in sync.
   var PLANS = {
     counter: {
       key: "counter", name: "Counter", base: 89,
