@@ -98,6 +98,8 @@ footer{position:relative;margin-top:64px;padding:44px 24px 44px;background:trans
 @media (max-width:860px){
   .nav{padding:8px 8px 8px 14px;gap:6px}
   .nav-links{display:none}
+  #nav-account{display:none}
+  #nav-login{display:none}
   .nav-burger{display:inline-flex}
   .nav-cta{padding:11px 15px;white-space:nowrap}
   .nav-sheet{display:grid;position:fixed;top:86px;left:16px;right:16px;z-index:49;gap:2px;padding:10px;border-radius:22px;border:1px solid rgba(255,255,255,.08);background:rgba(10,11,13,.95);backdrop-filter:blur(18px);box-shadow:0 24px 60px rgba(0,0,0,.6);opacity:0;transform:translateY(-10px);pointer-events:none;transition:opacity .22s ease,transform .28s cubic-bezier(.22,1,.36,1)}

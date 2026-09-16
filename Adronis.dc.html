@@ -177,6 +177,7 @@ html.dcr-operators #operators,html.dcr-silence #silence,html.dcr-engine #engine,
 [data-calwrap]{overflow-x:auto;-webkit-overflow-scrolling:touch}
 [data-cal]{min-width:600px}
 [data-pipeviz]{display:none !important}
+[data-ctrlwm]{display:none !important}
 [data-pipemobile]{display:block !important}
 [data-planlift]{transform:none !important}
 [data-tabbar] button{padding:13px 18px !important;font-size:14px !important}
@@ -400,7 +401,7 @@ input[type=range]{height:30px !important}
 </section>
 
 <section id="control" data-dash="1" style="position:relative;padding:clamp(90px,10vw,140px) 24px clamp(100px,12vw,160px);overflow:hidden">
-  <div style="position:absolute;left:50%;top:8%;transform:translateX(-50%);font-size:clamp(90px,18vw,260px);font-weight:600;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px #101215;white-space:nowrap;pointer-events:none;user-select:none">CONTROL ROOM</div>
+  <div data-ctrlwm="1" style="position:absolute;left:50%;top:8%;transform:translateX(-50%);font-size:clamp(90px,18vw,260px);font-weight:600;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px #101215;white-space:nowrap;pointer-events:none;user-select:none">CONTROL ROOM</div>
   <div style="position:relative;max-width:1200px;margin:0 auto">
     <div style="max-width:640px">
       <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">04 — YOUR SIDE OF THE GLASS</div>
@@ -665,7 +666,10 @@ class Component extends DCLogic {
       document.documentElement.style.setProperty("--acc-soft", "rgba(168,198,240,.14)");
     }
     this.mq = window.matchMedia("(max-width:820px)");
-    this.onMq = (e) => this.setState({ isMobile: e.matches, navOpen: false });
+    this.onMq = (e) => {
+      document.body.style.overflow = "";
+      this.setState({ isMobile: e.matches, navOpen: false });
+    };
     if (this.mq.addEventListener) this.mq.addEventListener("change", this.onMq);
     if (this.mq.matches) this.setState({ isMobile: true });
 
@@ -994,8 +998,14 @@ class Component extends DCLogic {
       navOp: this.state.navOpen ? "1" : "0",
       navPe: this.state.navOpen ? "auto" : "none",
       navTf: this.state.navOpen ? "translateY(0)" : "translateY(-10px)",
-      toggleNav: () => this.setState((s) => ({ navOpen: !s.navOpen })),
-      closeNav: () => this.setState({ navOpen: false }),
+      toggleNav: () => this.setState((s) => {
+        document.body.style.overflow = s.navOpen ? "" : "hidden";
+        return { navOpen: !s.navOpen };
+      }),
+      closeNav: () => {
+        document.body.style.overflow = "";
+        this.setState({ navOpen: false });
+      },
       isCalendar: this.state.tab === 0,
       isCreatives: this.state.tab === 1,
       isPerf: this.state.tab === 2,
