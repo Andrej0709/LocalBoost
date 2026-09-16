@@ -97,10 +97,10 @@
 
       <div class="dropbar" id="dropbar"></div>
       <div class="dropbar" id="filterbar">
-        <button data-filter="pending" class="active">Waiting on you</button>
-        <button data-filter="approved">Approved</button>
-        <button data-filter="rejected">Rejected</button>
-        <button data-filter="all">Everything</button>
+        <button data-filter="pending" data-label="Waiting on you" class="active">Waiting on you</button>
+        <button data-filter="approved" data-label="Approved">Approved</button>
+        <button data-filter="rejected" data-label="Rejected">Rejected</button>
+        <button data-filter="all" data-label="Everything">Everything</button>
       </div>
       <div id="kb-hint" class="mono" style="font-size:11px;letter-spacing:.08em;color:#4c5056">Y approve &middot; N reject &middot; &larr;&rarr; navigate</div>
 
@@ -251,6 +251,17 @@
       "<span>WAITING <b>" + count("pending") + "</b></span>" +
       "<span>APPROVED <b>" + (count("approved") + count("published")) + "</b></span>" +
       "<span>REJECTED <b>" + count("rejected") + "</b></span>";
+
+    var filterCounts = {
+      pending: count("pending"),
+      approved: count("approved") + count("published"),
+      rejected: count("rejected"),
+      all: scoped.length
+    };
+    Array.prototype.forEach.call(filterbar.querySelectorAll("button"), function (button) {
+      var n = filterCounts[button.dataset.filter];
+      button.textContent = button.dataset.label + " (" + n + ")";
+    });
 
     var waiting = count("pending");
     var bulkActions = document.getElementById("bulk-actions");
@@ -604,6 +615,7 @@
         caption: "Walk in before 3pm and it's ready the same day.",
         image_url: sampleImage("SAMPLE 04", "#33261f", "#63432f") }
     ];
+    signedOut.hidden = true;
     noDrops.hidden = true;
     board.hidden = false;
     document.getElementById("page-sub").textContent =
