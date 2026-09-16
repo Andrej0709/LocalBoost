@@ -63,7 +63,7 @@
         <div>Free trial ends: <span id="trial-end" style="color:var(--acc)">—</span></div>
       </div>
       <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px">
-        <a href="approvals.html" class="btn">Review this week's drop<span class="mono" style="font-size:13px">→</span></a>
+        <a href="approvals.html" id="already-in-primary" class="btn">Review this week's drop<span class="mono" style="font-size:13px">→</span></a>
         <a href="control-room.html" class="btn-ghost">Control room</a>
         <a href="account.html" class="btn-ghost">Account settings</a>
         <button id="logout-btn" class="btn-ghost" type="button">Log out</button>
@@ -142,12 +142,14 @@
     loginForm.hidden = false; signupForm.hidden = true;
     title.textContent = "Log in to Adronis.";
     sub.textContent = "Access your control room, or create a quick account to hold your spot.";
+    notice.hidden = true;
   }
   function showSignup(){
     tabSignup.classList.add("active"); tabLogin.classList.remove("active");
     loginForm.hidden = true; signupForm.hidden = false;
     title.textContent = "Create your account.";
     sub.textContent = "Just enough to hold your spot — you'll pick a plan and brief the engine next.";
+    notice.hidden = true;
   }
   tabLogin.addEventListener("click", showLogin);
   tabSignup.addEventListener("click", showSignup);
@@ -193,9 +195,9 @@
       );
       if (result.needsEmailConfirmation) {
         signupForm.hidden = true;
-        say("Check your inbox — confirm your email, then log in to pick a plan.");
+        say("Check your inbox — confirm your email, then log in to brief the engine.");
       } else {
-        redirect("/#pricing", "Account created — pick a plan to start your first drop...");
+        redirect(LBAuth.nextStep(), "Account created — let's brief the engine...");
       }
     } catch (err) {
       button.disabled = false;
@@ -227,9 +229,22 @@
     }
 
     // No plan running yet — the trial only starts after the brief and checkout.
+    // Point the primary button at whichever of those two steps is still missing,
+    // instead of "Review this week's drop" (there's nothing to review yet).
     document.getElementById("trial-start").textContent = "Not started";
     document.getElementById("trial-end").textContent =
       LBAuth.hasBrief() ? "Add a card at checkout to start it" : "Finish your business brief to start it";
+
+    var primary = document.getElementById("already-in-primary");
+    primary.href = LBAuth.nextStep(profile.plan);
+    primary.textContent = LBAuth.hasBrief() ? "Continue to checkout" : "Finish signing up";
+    primary.appendChild((function(){
+      var span = document.createElement("span");
+      span.className = "mono";
+      span.style.fontSize = "13px";
+      span.textContent = "→";
+      return span;
+    })());
   });
 
   document.getElementById("logout-btn").addEventListener("click", async function(){
