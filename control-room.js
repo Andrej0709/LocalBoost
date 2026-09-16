@@ -150,9 +150,8 @@
 
     var user = LBAuth.getUser();
     var cta = document.getElementById("nav-cta");
-    var profile = LBAuth.getProfile() || {};
-    cta.textContent = profile.business_name || user.email || "Account";
-    cta.href = "account.html";
+    cta.textContent = "Approvals";
+    cta.href = "approvals.html";
 
     var res = await LBAuth.db
       .from("creatives")
