@@ -136,7 +136,7 @@
 
     $("co-sum-name").textContent = plan.name;
     $("co-sum-price").textContent = euro(perMonth);
-    $("co-sum-per").textContent = " / MONTH";
+    $("co-sum-per").textContent = " / MONTH" + (vat > 0 ? " + VAT" : "");
     $("co-sum-rate").textContent = plan.rate;
 
     var lines = [];
