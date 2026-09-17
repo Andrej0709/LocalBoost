@@ -950,12 +950,12 @@ class Component extends DCLogic {
       {
         name: "Counter", base: 89, rate: "4 ads / week · 1 channel", featured: false,
         features: ["4 photoreal creatives every Monday", "One connected channel", "Best-time auto-publishing", "Swipe approval in the app"],
-        cta: "Start with Counter", href: "signup.html?plan=counter"
+        cta: "Start with Counter", href: "signup.html?plan=counter" + (annual ? "&cycle=annual" : "")
       },
       {
         name: "Storefront", base: 249, rate: "12 ads / week · 4 channels", featured: true,
         features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", "Performance feedback into next drop", "Caption variants and A/B slotting"],
-        cta: "Start with Storefront", href: "signup.html?plan=storefront"
+        cta: "Start with Storefront", href: "signup.html?plan=storefront" + (annual ? "&cycle=annual" : "")
       },
       {
         name: "Franchise", base: 690, rate: "30 ads / week · unlimited", featured: false,

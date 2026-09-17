@@ -222,7 +222,8 @@
     if (profile.trial_ends_at) {
       var cursor = new Date(profile.trial_ends_at);
       var lastPastIndex = -1;
-      while (cursor <= now && profile.subscription_status !== "canceled") {
+      var MAX_PAST_ROWS = 120; // ~10 years monthly — plenty for real accounts, caps runaway dates
+      while (cursor <= now && profile.subscription_status !== "canceled" && rows.length < MAX_PAST_ROWS) {
         rows.push({
           date: new Date(cursor),
           desc: plan.name + " plan — " + (cycle === "annual" ? "annual" : "monthly") + " billing",

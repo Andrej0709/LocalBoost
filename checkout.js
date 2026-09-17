@@ -263,23 +263,29 @@
       ' <a href="' + signupUrl() + '" style="color:var(--acc)">' + linkText + ' →</a>';
   }
 
-  if (window.LBAuth && !params.get("state")) {
-    LBAuth.ready.then(function () {
-      if (!LBAuth.isLoggedIn()) {
-        block("You need to be signed in to check out.", "Sign up or log in");
-        return;
-      }
-      if (!LBAuth.hasBrief()) {
-        block("Fill in your business brief first — it takes a minute.", "Go to the brief");
-        return;
-      }
-      if (LBAuth.hasActivePlan()) { showActive(); return; }
+  if (!params.get("state")) {
+    if (!window.LBAuth) {
+      // auth.js failed to load (network hiccup, CDN down, ...). Never let a
+      // checkout page with no way to verify identity sit open and usable.
+      block("Couldn't load your account system. Refresh the page and try again.", "Start over");
+    } else {
+      LBAuth.ready.then(function () {
+        if (!LBAuth.isLoggedIn()) {
+          block("You need to be signed in to check out.", "Sign up or log in");
+          return;
+        }
+        if (!LBAuth.hasBrief()) {
+          block("Fill in your business brief first — it takes a minute.", "Go to the brief");
+          return;
+        }
+        if (LBAuth.hasActivePlan()) { showActive(); return; }
 
-      var user = LBAuth.getUser();
-      if (user && user.email && !$("co-email").value) $("co-email").value = user.email;
-    }).catch(function (err) {
-      block("Couldn't load your account: " + err.message, "Start over");
-    });
+        var user = LBAuth.getUser();
+        if (user && user.email && !$("co-email").value) $("co-email").value = user.email;
+      }).catch(function (err) {
+        block("Couldn't load your account: " + err.message, "Start over");
+      });
+    }
   }
 
   $("co-submit").addEventListener("click", async function () {

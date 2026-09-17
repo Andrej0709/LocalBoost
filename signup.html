@@ -193,6 +193,7 @@
   var params = new URLSearchParams(location.search);
   var planKey = plans[params.get("plan")] ? params.get("plan") : "storefront";
   var plan = plans[planKey];
+  var cycle = params.get("cycle") === "annual" ? "annual" : "monthly";
 
   document.getElementById("plan-headline").innerHTML = 'Set up your <em>' + plan.name + '</em> drop.';
   document.getElementById("plan-name").textContent = plan.name;
@@ -228,7 +229,7 @@
   var briefOnly = false;
 
   function checkoutUrl(){
-    return "checkout.html?plan=" + planKey;
+    return "checkout.html?plan=" + planKey + "&cycle=" + cycle;
   }
 
   function showBriefMode(profile){
