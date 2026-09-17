@@ -11,6 +11,12 @@ a{color:var(--acc);text-decoration:none}
 a:hover{color:#cbdff9}
 ::selection{background:var(--acc);color:#07080a}
 [hidden]{display:none !important}
+a:focus-visible,button:focus-visible,[tabindex]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+/* Homepage decorative loops (ships, pulses, blinking dots, etc.) are set via
+   inline style="animation:..." attributes scattered across the page — this
+   attribute selector is the only way to stop all of them for anyone who asked
+   the OS for reduced motion, without hunting down every inline occurrence. */
+@media (prefers-reduced-motion:reduce){[style*="animation"]{animation:none !important}}
 em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;color:var(--acc)}
 
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
@@ -59,9 +65,10 @@ a.card:hover,a.card:focus-visible{transform:translateY(-3px);border-color:#2a2d3
 .mono{font-family:'Geist Mono',ui-monospace,monospace}
 
 .field{display:grid;gap:7px;margin-bottom:16px}
-.field label{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.1em;color:#62666d}
-.field input,.field select,.field textarea{width:100%;padding:13px 14px;border-radius:10px;border:1px solid #23252a;background:#0e0f12;color:#fff;font-size:14px;font-family:'Geist',sans-serif;outline:none;transition:border-color .2s ease}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(168,198,240,.55)}
+.field label{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.1em;color:#9aa0a8}
+.field input,.field select,.field textarea{width:100%;padding:13px 14px;border-radius:10px;border:1px solid #23252a;background:#0e0f12;color:#fff;font-size:14px;font-family:'Geist',sans-serif;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(168,198,240,.55);box-shadow:0 0 0 2px rgba(168,198,240,.35)}
+.field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible{box-shadow:0 0 0 2px rgba(168,198,240,.55)}
 .field textarea{resize:vertical;min-height:110px}
 
 .notice{margin-top:18px;padding:14px 16px;border-radius:10px;border:1px solid rgba(168,198,240,.28);background:rgba(168,198,240,.08);color:var(--acc);font-size:14px;animation:notice-in .25s ease}

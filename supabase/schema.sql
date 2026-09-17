@@ -73,6 +73,12 @@ create table if not exists public.profiles (
   pending_plan          public.plan_tier,
   pending_billing_cycle text,
 
+  /* One entry per completed billing period, appended by finalize_billing_period()
+     at the plan/cycle that was actually charged for that period. Past invoices
+     must never be recomputed from the CURRENT plan - a plan change must not
+     rewrite what earlier periods actually billed. */
+  billing_history     jsonb not null default '[]'::jsonb,
+
   onboarded_at        timestamptz,
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now()
@@ -91,6 +97,7 @@ alter table public.profiles add column if not exists current_period_end    times
 alter table public.profiles add column if not exists cancel_at_period_end  boolean not null default false;
 alter table public.profiles add column if not exists pending_plan          public.plan_tier;
 alter table public.profiles add column if not exists pending_billing_cycle text;
+alter table public.profiles add column if not exists billing_history       jsonb not null default '[]'::jsonb;
 
 /* Existing paying accounts predate current_period_end - seed it from the trial
    date they already have so finalize_billing_period() has an anchor to work from. */
@@ -322,6 +329,8 @@ declare
   row_out     public.profiles;
   plan_months int;
   guard       int := 0;
+  period_start timestamptz;
+  entry        jsonb;
 begin
   if auth.uid() is null then
     raise exception 'Not signed in.';
@@ -355,11 +364,22 @@ begin
        returning * into row_out;
     end if;
 
-    plan_months := case when row_out.billing_cycle = 'annual' then 12 else 1 end;
+    /* The period that just renewed is charged at whatever plan/cycle is now
+       active (after the switch above, if any) - matches "a plan change takes
+       effect at the next renewal". Snapshot it so this period's invoice never
+       changes retroactively if the plan changes again later. */
+    period_start := row_out.current_period_end;
+    plan_months  := case when row_out.billing_cycle = 'annual' then 12 else 1 end;
+    entry := jsonb_build_object(
+      'period_start', period_start,
+      'plan', row_out.plan,
+      'cycle', coalesce(row_out.billing_cycle, 'monthly')
+    );
 
     update public.profiles
        set subscription_status = 'active',
-           current_period_end  = row_out.current_period_end + (plan_months || ' months')::interval
+           current_period_end  = period_start + (plan_months || ' months')::interval,
+           billing_history      = row_out.billing_history || jsonb_build_array(entry)
      where id = auth.uid()
      returning * into row_out;
   end loop;

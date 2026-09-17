@@ -16,6 +16,7 @@
 
   var session = null;
   var profile = null;
+  var ready_ = false;
 
   function siteOrigin() {
     return location.origin + location.pathname.replace(/[^/]*$/, "");
@@ -54,10 +55,18 @@
     var res = await db.auth.getSession();
     session = res.data.session;
     await loadProfile();
+    ready_ = true;
   })();
 
   db.auth.onAuthStateChange(function (_event, newSession) {
+    var hadSession = !!session;
     session = newSession;
+    // Supabase fires this in every open tab, including ones that didn't cause
+    // the change. A tab that goes from signed-in to signed-out (logged out in
+    // another tab, session expired, etc.) reloads so its page re-runs the
+    // normal boot flow instead of sitting there stale with the old profile
+    // still rendered and every action failing with "Not signed in."
+    if (ready_ && hadSession && !session) location.reload();
   });
 
   window.LBAuth = {

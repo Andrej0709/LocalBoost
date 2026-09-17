@@ -209,7 +209,10 @@
 
     $("bill-plan-toggle").hidden = !manageable || !!profile.cancel_at_period_end;
     $("cancel-plan-row").hidden = !manageable || !!profile.cancel_at_period_end;
-    if (!manageable) $("plan-change-panel").hidden = true;
+    // Cancelling while the change-plan panel happens to be open must close it —
+    // otherwise "Confirm change" is still clickable and just fails against the
+    // database instead of the control simply not being there.
+    if (!manageable || profile.cancel_at_period_end) $("plan-change-panel").hidden = true;
 
     var cancelNotice = $("plan-cancel-notice");
     if (profile.cancel_at_period_end) {
@@ -367,11 +370,6 @@
     var plan = PLANS[profile.plan];
     if (!plan || !profile.subscription_status || !profile.trial_started_at) return [];
 
-    var cycle = profile.billing_cycle || "monthly";
-    var amount = invoiceAmount(plan, cycle);
-    var periodMonths = cycle === "annual" ? 12 : 1;
-    var now = new Date();
-
     var rows = [{
       date: new Date(profile.trial_started_at),
       desc: "Free trial started",
@@ -379,31 +377,36 @@
       tag: "trial"
     }];
 
-    if (profile.trial_ends_at) {
-      var cursor = new Date(profile.trial_ends_at);
-      var lastPastIndex = -1;
-      var MAX_PAST_ROWS = 120; // ~10 years monthly — plenty for real accounts, caps runaway dates
-      while (cursor <= now && profile.subscription_status !== "canceled" && rows.length < MAX_PAST_ROWS) {
-        rows.push({
-          date: new Date(cursor),
-          desc: plan.name + " plan — " + (cycle === "annual" ? "annual" : "monthly") + " billing",
-          amount: amount,
-          tag: "paid"
-        });
-        lastPastIndex = rows.length - 1;
-        cursor.setMonth(cursor.getMonth() + periodMonths);
-      }
-      if (lastPastIndex > -1 && profile.subscription_status === "past_due") {
-        rows[lastPastIndex].tag = "past_due";
-      }
-      if (profile.subscription_status === "trialing" || profile.subscription_status === "active") {
-        rows.push({
-          date: new Date(cursor),
-          desc: plan.name + " plan — " + (cycle === "annual" ? "annual" : "monthly") + " billing",
-          amount: amount,
-          tag: "upcoming"
-        });
-      }
+    // Each entry is a snapshot finalize_billing_period() wrote at the plan/cycle
+    // that period was actually charged at — never recomputed from the CURRENT
+    // plan, so an earlier plan/cycle switch can't rewrite past invoices.
+    var history = Array.isArray(profile.billing_history) ? profile.billing_history : [];
+    history.forEach(function (entry, i) {
+      var p = PLANS[entry.plan];
+      if (!p) return;
+      var cyc = entry.cycle || "monthly";
+      var isLast = i === history.length - 1;
+      rows.push({
+        date: new Date(entry.period_start),
+        desc: p.name + " plan — " + (cyc === "annual" ? "annual" : "monthly") + " billing",
+        amount: invoiceAmount(p, cyc),
+        tag: (isLast && profile.subscription_status === "past_due") ? "past_due" : "paid"
+      });
+    });
+
+    if (profile.subscription_status === "trialing" || profile.subscription_status === "active") {
+      // What's actually charged next is the pending plan/cycle if a switch is
+      // scheduled — not the plan running today.
+      var upcomingPlan = PLANS[profile.pending_plan] || plan;
+      var upcomingCycle = profile.pending_plan
+        ? (profile.pending_billing_cycle || profile.billing_cycle || "monthly")
+        : (profile.billing_cycle || "monthly");
+      rows.push({
+        date: new Date(periodEndDate(profile)),
+        desc: upcomingPlan.name + " plan — " + (upcomingCycle === "annual" ? "annual" : "monthly") + " billing",
+        amount: invoiceAmount(upcomingPlan, upcomingCycle),
+        tag: "upcoming"
+      });
     }
 
     rows.reverse();
@@ -442,9 +445,16 @@
   }
 
   function wireLogout() {
-    $("logout-btn").addEventListener("click", async function () {
-      await LBAuth.logOut();
-      location.href = "login.html";
+    var btn = $("logout-btn");
+    btn.addEventListener("click", async function () {
+      btn.disabled = true;
+      try {
+        await LBAuth.logOut();
+        location.href = "login.html";
+      } catch (err) {
+        btn.disabled = false;
+        alert(err.message || "Log out failed — try again.");
+      }
     });
   }
 

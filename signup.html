@@ -17,8 +17,8 @@
 <meta property="og:description" content="Onboard in ten minutes. Your first twelve photoreal ads are waiting for approval before the week is out. No contract, no retainer.">
 <meta property="og:url" content="https://adronis.app/signup.html">
 <meta property="og:image" content="https://adronis.app/logo.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="623">
+<meta property="og:image:height" content="591">
 <meta property="og:image:alt" content="Adronis — weekly ad drops for local business">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Start your first drop free">
@@ -68,21 +68,21 @@
       <div class="section-label" id="account-label">ACCOUNT</div>
       <div class="field">
         <label for="business">BUSINESS NAME</label>
-        <input id="business" name="business" type="text" required placeholder="e.g. Milena's Bakery">
+        <input id="business" name="business" type="text" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
       </div>
       <div class="field" id="field-email">
         <label for="email">EMAIL</label>
-        <input id="email" name="email" type="email" required placeholder="you@business.com">
+        <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@business.com">
       </div>
       <div class="field" id="field-password">
         <label for="password">PASSWORD</label>
-        <input id="password" name="password" type="password" required placeholder="Create a password">
+        <input id="password" name="password" type="password" required autocomplete="new-password" placeholder="Create a password">
       </div>
 
       <div class="section-label">ABOUT YOUR BUSINESS</div>
       <div class="field">
         <label for="city">CITY</label>
-        <input id="city" name="city" type="text" required placeholder="Where's the shop?">
+        <input id="city" name="city" type="text" required autocomplete="address-level2" placeholder="Where's the shop?">
       </div>
       <div class="field">
         <label for="vertical">VERTICAL</label>
@@ -101,7 +101,7 @@
       </div>
       <div class="field">
         <label for="website">WEBSITE OR INSTAGRAM HANDLE (OPTIONAL)</label>
-        <input id="website" name="website" type="text" placeholder="@yourbusiness or yourbusiness.com">
+        <input id="website" name="website" type="text" autocomplete="url" placeholder="@yourbusiness or yourbusiness.com">
       </div>
       <div class="field">
         <label for="what">WHAT DO YOU SELL OR DO, IN ONE LINE?</label>
@@ -148,7 +148,7 @@
       </div>
 
       <button type="submit" class="btn" style="width:100%;justify-content:center;border:none;margin-top:32px">Claim your first drop<span class="mono" style="font-size:13px">→</span></button>
-      <div id="signup-notice" class="notice" style="margin-top:18px" hidden></div>
+      <div id="signup-notice" class="notice" role="status" style="margin-top:18px" hidden></div>
     </form>
 
     <aside class="card" id="plan-summary" style="position:sticky;top:96px">

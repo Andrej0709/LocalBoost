@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <link rel="icon" type="image/png" href="logo.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contact — Adronis</title>
+<title>Contact Adronis — Talk to Sales</title>
 <meta name="description" content="Multi-location, unlimited channels or a custom drop slot? Tell us about the business and we will come back with a plan.">
 <link rel="canonical" href="https://adronis.app/contact.html">
 <meta name="robots" content="index,follow,max-image-preview:large">
@@ -17,8 +17,8 @@
 <meta property="og:description" content="Multi-location, unlimited channels or a custom drop slot? Tell us about the business and we will come back with a plan.">
 <meta property="og:url" content="https://adronis.app/contact.html">
 <meta property="og:image" content="https://adronis.app/logo.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="623">
+<meta property="og:image:height" content="591">
 <meta property="og:image:alt" content="Adronis — weekly ad drops for local business">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Talk to Adronis">
@@ -53,20 +53,20 @@
 
 <section class="section-tight">
   <div class="wrap" style="max-width:640px">
-    <div id="plan-notice" class="notice" hidden></div>
+    <div id="plan-notice" class="notice" role="status" hidden></div>
 
     <form id="contact-form">
       <div class="field">
         <label for="business">BUSINESS NAME</label>
-        <input id="business" name="business" type="text" required placeholder="e.g. Milena's Bakery">
+        <input id="business" name="business" type="text" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
       </div>
       <div class="field">
         <label for="name">YOUR NAME</label>
-        <input id="name" name="name" type="text" required placeholder="Full name">
+        <input id="name" name="name" type="text" required autocomplete="name" placeholder="Full name">
       </div>
       <div class="field">
         <label for="email">EMAIL</label>
-        <input id="email" name="email" type="email" required placeholder="you@business.com">
+        <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@business.com">
       </div>
       <div class="field">
         <label for="plan">PLAN INTEREST</label>
@@ -84,7 +84,7 @@
       <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Send message<span class="mono" style="font-size:13px">→</span></button>
     </form>
 
-    <div id="success-notice" class="notice" hidden>Thanks — a real person reads every message here and replies within one business day.</div>
+    <div id="success-notice" class="notice" role="status" hidden>Thanks — a real person reads every message here and replies within one business day.</div>
   </div>
 </section>
 
