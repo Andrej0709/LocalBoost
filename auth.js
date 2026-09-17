@@ -32,6 +32,21 @@
       .eq("id", session.user.id)
       .maybeSingle();
     profile = res.data || null;
+
+    // A renewal date may have passed since the last time this account was
+    // loaded (a cancellation taking effect, a scheduled plan switch kicking
+    // in). Catch it up here so every page sees the current state, not a
+    // stale one from before the renewal.
+    if (
+      profile &&
+      profile.current_period_end &&
+      (profile.subscription_status === "trialing" || profile.subscription_status === "active") &&
+      new Date(profile.current_period_end) <= new Date()
+    ) {
+      var fin = await db.rpc("finalize_billing_period");
+      if (!fin.error && fin.data) profile = fin.data;
+    }
+
     return profile;
   }
 
@@ -225,6 +240,44 @@
       var res = await db.auth.updateUser({ password: newPassword });
       if (res.error) throw res.error;
       return res.data.user;
+    },
+
+    // Cancels at the end of the current paid period — access continues until
+    // current_period_end, finalize_billing_period() ends it when that arrives.
+    cancelAtPeriodEnd: async function () {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.rpc("cancel_at_period_end");
+      if (res.error) throw res.error;
+      profile = res.data;
+      return profile;
+    },
+
+    // Undoes a pending cancellation before the period runs out.
+    resumeSubscription: async function () {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.rpc("resume_subscription");
+      if (res.error) throw res.error;
+      profile = res.data;
+      return profile;
+    },
+
+    // Schedules a plan/cycle switch for the next renewal — never applied on
+    // the spot, since this period is already paid for at the old plan.
+    schedulePlanChange: async function (planKey, cycle) {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.rpc("schedule_plan_change", { p_plan: planKey, p_cycle: cycle || null });
+      if (res.error) throw res.error;
+      profile = res.data;
+      return profile;
+    },
+
+    // Undoes a scheduled plan switch before it takes effect.
+    cancelPlanChange: async function () {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.rpc("cancel_plan_change");
+      if (res.error) throw res.error;
+      profile = res.data;
+      return profile;
     }
   };
 })();

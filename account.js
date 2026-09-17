@@ -11,6 +11,10 @@
   };
   var ANNUAL_DISCOUNT = 0.2;
 
+  // Kept in sync on every renderBilling() call so the plan-change and
+  // cancel panels always read the latest profile, not the one from boot.
+  var currentProfile = null;
+
   var $ = function (id) { return document.getElementById(id); };
 
   function euro(n) {
@@ -147,7 +151,12 @@
     return cycle === "annual" ? monthlyRate(plan, cycle) * 12 : monthlyRate(plan, cycle);
   }
 
+  function periodEndDate(profile) {
+    return profile.current_period_end || profile.trial_ends_at;
+  }
+
   function renderBilling(profile) {
+    currentProfile = profile;
     var plan = PLANS[profile.plan];
 
     // profile.plan is set the moment the business brief is saved — before
@@ -157,12 +166,15 @@
     if (!plan || !profile.subscription_status) {
       $("billing-rows").hidden = true;
       $("billing-empty").hidden = false;
-      $("bill-plan-link").hidden = true;
+      $("bill-plan-toggle").hidden = true;
+      $("plan-change-panel").hidden = true;
+      $("plan-pending-notice").hidden = true;
+      $("plan-cancel-notice").hidden = true;
+      $("cancel-plan-row").hidden = true;
       return;
     }
     $("billing-rows").hidden = false;
     $("billing-empty").hidden = true;
-    $("bill-plan-link").hidden = false;
 
     var cycle = profile.billing_cycle || "monthly";
     $("bill-plan").textContent = plan.name;
@@ -189,6 +201,154 @@
       dateLabel.textContent = "Trial ends";
       dateValue.textContent = "—";
     }
+
+    // Managing a plan (switching or cancelling) only makes sense while it's
+    // actually running — a trial that already lapsed into "canceled" has
+    // nothing left to change.
+    var manageable = profile.subscription_status === "trialing" || profile.subscription_status === "active";
+
+    $("bill-plan-toggle").hidden = !manageable || !!profile.cancel_at_period_end;
+    $("cancel-plan-row").hidden = !manageable || !!profile.cancel_at_period_end;
+    if (!manageable) $("plan-change-panel").hidden = true;
+
+    var cancelNotice = $("plan-cancel-notice");
+    if (profile.cancel_at_period_end) {
+      cancelNotice.hidden = false;
+      cancelNotice.innerHTML = "Your plan cancels on " + fmtDate(periodEndDate(profile)) +
+        ". You'll keep full access until then. " +
+        '<button type="button" id="resume-sub-btn" style="margin-left:2px;background:none;border:none;padding:0;color:var(--acc);text-decoration:underline;cursor:pointer;font-family:\'Geist\',sans-serif;font-size:14px">Keep my subscription</button>';
+      $("resume-sub-btn").addEventListener("click", async function () {
+        var button = this;
+        button.disabled = true;
+        try {
+          var updated = await LBAuth.resumeSubscription();
+          renderBilling(updated);
+          renderPayments(updated);
+        } catch (err) {
+          say($("plan-notice"), err.message, true);
+          button.disabled = false;
+        }
+      });
+    } else {
+      cancelNotice.hidden = true;
+    }
+
+    var pendingNotice = $("plan-pending-notice");
+    if (manageable && profile.pending_plan && !profile.cancel_at_period_end) {
+      var pendingPlan = PLANS[profile.pending_plan];
+      var pendingCycle = profile.pending_billing_cycle || cycle;
+      pendingNotice.hidden = false;
+      pendingNotice.innerHTML = "Switching to " + pendingPlan.name + " (" +
+        (pendingCycle === "annual" ? "annual" : "monthly") + ") on " + fmtDate(periodEndDate(profile)) +
+        '. <button type="button" id="undo-plan-change-btn" style="margin-left:2px;background:none;border:none;padding:0;color:var(--acc);text-decoration:underline;cursor:pointer;font-family:\'Geist\',sans-serif;font-size:14px">Undo</button>';
+      $("undo-plan-change-btn").addEventListener("click", async function () {
+        var button = this;
+        button.disabled = true;
+        try {
+          var updated = await LBAuth.cancelPlanChange();
+          renderBilling(updated);
+        } catch (err) {
+          say($("plan-notice"), err.message, true);
+          button.disabled = false;
+        }
+      });
+    } else {
+      pendingNotice.hidden = true;
+    }
+  }
+
+  // ----------------------------------------------------- plan change / cancel
+  function wirePlanChange(getProfile) {
+    var toggle = $("bill-plan-toggle");
+    var panel = $("plan-change-panel");
+    var planGroup = $("pc-plan");
+    var cycleGroup = $("pc-cycle");
+    var note = $("pc-note");
+    var notice = $("plan-notice");
+    var picked = { plan: null, cycle: "monthly" };
+
+    function sync() {
+      Array.prototype.forEach.call(planGroup.children, function (b) {
+        b.classList.toggle("active", b.getAttribute("data-plan") === picked.plan);
+      });
+      Array.prototype.forEach.call(cycleGroup.children, function (b) {
+        b.classList.toggle("active", b.getAttribute("data-cycle") === picked.cycle);
+      });
+      var p = PLANS[picked.plan];
+      note.textContent = p
+        ? p.name + " — " + p.rate + " — " + euro(monthlyRate(p, picked.cycle)) + " / month, billed " +
+          (picked.cycle === "annual" ? "yearly" : "monthly") + ". Takes effect on your next billing date, " +
+          fmtDate(periodEndDate(getProfile())) + " — this period is already paid for."
+        : "";
+    }
+
+    toggle.addEventListener("click", function () {
+      var profile = getProfile();
+      picked.plan = profile.pending_plan || profile.plan;
+      picked.cycle = profile.pending_billing_cycle || profile.billing_cycle || "monthly";
+      sync();
+      notice.hidden = true;
+      panel.hidden = false;
+    });
+
+    planGroup.addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-plan]");
+      if (!btn) return;
+      picked.plan = btn.getAttribute("data-plan");
+      sync();
+    });
+    cycleGroup.addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-cycle]");
+      if (!btn) return;
+      picked.cycle = btn.getAttribute("data-cycle");
+      sync();
+    });
+
+    $("pc-cancel").addEventListener("click", function () { panel.hidden = true; });
+
+    $("pc-confirm").addEventListener("click", async function () {
+      var button = this;
+      button.disabled = true;
+      try {
+        var updated = await LBAuth.schedulePlanChange(picked.plan, picked.cycle);
+        panel.hidden = true;
+        renderBilling(updated);
+        renderPayments(updated);
+      } catch (err) {
+        say(notice, err.message, true);
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+
+  function wireCancelSubscription(getProfile) {
+    var toggle = $("cancel-sub-toggle");
+    var panel = $("cancel-sub-panel");
+    var until = $("cancel-sub-until");
+    var confirmBtn = $("cancel-sub-confirm");
+    var notice = $("plan-notice");
+
+    toggle.addEventListener("click", function () {
+      until.textContent = fmtDate(periodEndDate(getProfile()));
+      notice.hidden = true;
+      panel.hidden = false;
+    });
+    $("cancel-sub-back").addEventListener("click", function () { panel.hidden = true; });
+
+    confirmBtn.addEventListener("click", async function () {
+      confirmBtn.disabled = true;
+      try {
+        var updated = await LBAuth.cancelAtPeriodEnd();
+        panel.hidden = true;
+        renderBilling(updated);
+        renderPayments(updated);
+      } catch (err) {
+        say(notice, err.message, true);
+      } finally {
+        confirmBtn.disabled = false;
+      }
+    });
   }
 
   // ------------------------------------------------------------- payments
@@ -309,6 +469,8 @@
     renderChannels(profile);
     renderBilling(profile);
     renderPayments(profile);
+    wirePlanChange(function () { return currentProfile; });
+    wireCancelSubscription(function () { return currentProfile; });
 
     loading.hidden = true;
     $("account-content").hidden = false;

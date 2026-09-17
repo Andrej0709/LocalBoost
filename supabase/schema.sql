@@ -64,6 +64,15 @@ create table if not exists public.profiles (
   trial_ends_at       timestamptz,
   payment_method_at   timestamptz,
 
+  /* current_period_end is the next charge date - what a real Stripe subscription
+     calls current_period_end. finalize_billing_period() advances it every time a
+     period rolls over, and applies whatever was scheduled for that renewal:
+     a cancellation (cancel_at_period_end) or a plan/cycle switch (pending_plan). */
+  current_period_end    timestamptz,
+  cancel_at_period_end  boolean not null default false,
+  pending_plan          public.plan_tier,
+  pending_billing_cycle text,
+
   onboarded_at        timestamptz,
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now()
@@ -76,6 +85,19 @@ create index if not exists profiles_email_idx on public.profiles (email);
 /* Existing rows keep whatever trial they already have. Safe to re-run.          */
 alter table public.profiles add column if not exists billing_cycle     text;
 alter table public.profiles add column if not exists payment_method_at timestamptz;
+
+/* --- Migration for self-serve plan changes and cancellation ----------------- */
+alter table public.profiles add column if not exists current_period_end    timestamptz;
+alter table public.profiles add column if not exists cancel_at_period_end  boolean not null default false;
+alter table public.profiles add column if not exists pending_plan          public.plan_tier;
+alter table public.profiles add column if not exists pending_billing_cycle text;
+
+/* Existing paying accounts predate current_period_end - seed it from the trial
+   date they already have so finalize_billing_period() has an anchor to work from. */
+update public.profiles
+   set current_period_end = trial_ends_at
+ where current_period_end is null
+   and trial_ends_at is not null;
 
 alter table public.profiles alter column trial_started_at    drop not null;
 alter table public.profiles alter column trial_ends_at       drop not null;
@@ -263,12 +285,16 @@ begin
   end if;
 
   update public.profiles
-     set plan                = coalesce(p_plan, plan),
-         billing_cycle       = coalesce(p_cycle, 'monthly'),
-         payment_method_at   = now(),
-         subscription_status = 'trialing',
-         trial_started_at    = now(),
-         trial_ends_at       = now() + interval '7 days'
+     set plan                  = coalesce(p_plan, plan),
+         billing_cycle         = coalesce(p_cycle, 'monthly'),
+         payment_method_at     = now(),
+         subscription_status   = 'trialing',
+         trial_started_at      = now(),
+         trial_ends_at         = now() + interval '7 days',
+         current_period_end    = now() + interval '7 days',
+         cancel_at_period_end  = false,
+         pending_plan          = null,
+         pending_billing_cycle = null
    where id = auth.uid()
    returning * into row_out;
 
@@ -277,6 +303,207 @@ end;
 $$;
 
 grant execute on function public.start_trial(public.plan_tier, text) to authenticated;
+
+/* ------------------------------------------------------------ */
+/* 8c. finalize_billing_period - fast-forwards a subscription past any renewal */
+/*     dates that have already come and gone, applying whatever was scheduled  */
+/*     for each one: a cancellation, or a pending plan/cycle switch. Called    */
+/*     from auth.js on every profile load, so the account.html gate reflects   */
+/*     a cancellation or plan switch the moment its date arrives - nothing     */
+/*     needs to run in the background to make that happen. */
+/* ------------------------------------------------------------ */
+create or replace function public.finalize_billing_period()
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  row_out     public.profiles;
+  plan_months int;
+  guard       int := 0;
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in.';
+  end if;
+
+  select * into row_out from public.profiles where id = auth.uid();
+
+  if row_out.current_period_end is null
+     or row_out.subscription_status not in ('trialing', 'active') then
+    return row_out;
+  end if;
+
+  while row_out.current_period_end <= now() and guard < 1000 loop
+    guard := guard + 1;
+
+    if row_out.cancel_at_period_end then
+      update public.profiles
+         set subscription_status = 'canceled'
+       where id = auth.uid()
+       returning * into row_out;
+      exit;
+    end if;
+
+    if row_out.pending_plan is not null then
+      update public.profiles
+         set plan                  = row_out.pending_plan,
+             billing_cycle         = coalesce(row_out.pending_billing_cycle, row_out.billing_cycle),
+             pending_plan          = null,
+             pending_billing_cycle = null
+       where id = auth.uid()
+       returning * into row_out;
+    end if;
+
+    plan_months := case when row_out.billing_cycle = 'annual' then 12 else 1 end;
+
+    update public.profiles
+       set subscription_status = 'active',
+           current_period_end  = row_out.current_period_end + (plan_months || ' months')::interval
+     where id = auth.uid()
+     returning * into row_out;
+  end loop;
+
+  return row_out;
+end;
+$$;
+
+grant execute on function public.finalize_billing_period() to authenticated;
+
+/* ------------------------------------------------------------ */
+/* 8d. cancel_at_period_end / resume_subscription - self-serve cancellation.   */
+/*     Cancelling never revokes access immediately - it flips                  */
+/*     cancel_at_period_end, and finalize_billing_period() is what actually    */
+/*     ends the plan once current_period_end arrives. */
+/* ------------------------------------------------------------ */
+create or replace function public.cancel_at_period_end()
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  row_out public.profiles;
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in.';
+  end if;
+
+  update public.profiles
+     set cancel_at_period_end = true
+   where id = auth.uid()
+     and subscription_status in ('trialing', 'active')
+   returning * into row_out;
+
+  if row_out is null then
+    raise exception 'No active plan to cancel.';
+  end if;
+
+  return row_out;
+end;
+$$;
+
+grant execute on function public.cancel_at_period_end() to authenticated;
+
+create or replace function public.resume_subscription()
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  row_out public.profiles;
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in.';
+  end if;
+
+  update public.profiles
+     set cancel_at_period_end = false
+   where id = auth.uid()
+   returning * into row_out;
+
+  return row_out;
+end;
+$$;
+
+grant execute on function public.resume_subscription() to authenticated;
+
+/* ------------------------------------------------------------ */
+/* 8e. schedule_plan_change / cancel_plan_change - self-serve plan switching.  */
+/*     A switch is only ever scheduled for the next renewal, never applied on  */
+/*     the spot - matches "you paid for this period, the new plan starts next  */
+/*     billing date" rather than prorating a switch mid-period. */
+/* ------------------------------------------------------------ */
+create or replace function public.schedule_plan_change(
+  p_plan  public.plan_tier,
+  p_cycle text default null
+)
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  row_out public.profiles;
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in.';
+  end if;
+
+  select * into row_out from public.profiles where id = auth.uid();
+
+  if row_out.subscription_status not in ('trialing', 'active') then
+    raise exception 'No active plan to change.';
+  end if;
+  if row_out.cancel_at_period_end then
+    raise exception 'Your plan is set to cancel - resume it first.';
+  end if;
+
+  /* Picking what's already running just clears any pending switch. */
+  if p_plan = row_out.plan and coalesce(p_cycle, row_out.billing_cycle) = row_out.billing_cycle then
+    update public.profiles
+       set pending_plan = null, pending_billing_cycle = null
+     where id = auth.uid()
+     returning * into row_out;
+    return row_out;
+  end if;
+
+  update public.profiles
+     set pending_plan          = p_plan,
+         pending_billing_cycle = coalesce(p_cycle, row_out.billing_cycle)
+   where id = auth.uid()
+   returning * into row_out;
+
+  return row_out;
+end;
+$$;
+
+grant execute on function public.schedule_plan_change(public.plan_tier, text) to authenticated;
+
+create or replace function public.cancel_plan_change()
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  row_out public.profiles;
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in.';
+  end if;
+
+  update public.profiles
+     set pending_plan = null, pending_billing_cycle = null
+   where id = auth.uid()
+   returning * into row_out;
+
+  return row_out;
+end;
+$$;
+
+grant execute on function public.cancel_plan_change() to authenticated;
 
 /* ------------------------------------------------------------ */
 /* 9. Row Level Security */
