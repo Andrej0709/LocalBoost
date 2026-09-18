@@ -1,0 +1,12 @@
+{
+  "name": "Adronis",
+  "short_name": "Adronis",
+  "description": "Weekly ad drops for local business.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07080a",
+  "theme_color": "#07080a",
+  "icons": [
+    { "src": "/logo.png", "sizes": "623x591", "type": "image/png" }
+  ]
+}
