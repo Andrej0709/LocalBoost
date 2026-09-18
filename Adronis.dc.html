@@ -56,7 +56,13 @@ function lbAfterMinBoot(fn) {
   setTimeout(fn, Math.max(0, LB_BOOT_MIN_MS - (Date.now() - lbBootStart)));
 }
 var lbStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-if (lbStandalone && window.LBAuth) {
+// Only auto-redirect once per app session — otherwise a signed-in customer
+// who taps back to "Adronis" in the nav from approvals/checkout/signup gets
+// bounced straight back there every time, unable to ever reach the landing
+// page again from inside the installed app.
+var lbAlreadyBooted = lbStandalone && sessionStorage.getItem("lbBooted");
+if (lbStandalone && !lbAlreadyBooted && window.LBAuth) {
+  sessionStorage.setItem("lbBooted", "1");
   // Safety net: never leave a customer stuck behind the boot screen if
   // Supabase is slow or unreachable.
   var lbBootTimer = setTimeout(lbBootDone, 4000);
