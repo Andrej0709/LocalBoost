@@ -622,6 +622,123 @@ create trigger creatives_enforce_free_quota
   for each row execute function public.enforce_free_quota();
 
 /* ------------------------------------------------------------ */
+/* 8g. What a customer may write from the browser. */
+/*     RLS lets a customer update their own profiles/creatives rows, but on   */
+/*     its own it can't limit WHICH columns - so a signed-in customer could   */
+/*     set subscription_status = 'active' from the browser console and get a */
+/*     paid plan (and dodge the free quota) without paying, or backdate their */
+/*     creatives' created_at so this month's free allowance looked unused.   */
+/*     Browser requests run as the 'authenticated' / 'anon' roles. The        */
+/*     billing functions above are security definer and run as their owner,  */
+/*     and the dashboard / service role run as themselves, so none of those  */
+/*     are affected by these checks. Both guards start from the stored row    */
+/*     and copy over only the columns the customer may edit, so a column     */
+/*     added later is locked by default. */
+/* ------------------------------------------------------------ */
+create or replace function public.protect_profile_billing()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+declare
+  editable public.profiles;
+begin
+  if current_user not in ('authenticated', 'anon') then
+    return new;
+  end if;
+
+  /* Only auth.js's fallback insert (for an account whose row the signup
+     trigger never made) gets here - it carries the brief, never billing. */
+  if tg_op = 'INSERT' then
+    if new.subscription_status is not null
+       or new.billing_cycle is not null
+       or new.trial_started_at is not null
+       or new.trial_ends_at is not null
+       or new.payment_method_at is not null
+       or new.current_period_end is not null
+       or new.cancel_at_period_end
+       or new.pending_plan is not null
+       or new.pending_billing_cycle is not null
+       or new.billing_history <> '[]'::jsonb then
+      raise exception 'Billing details can only be set through checkout.';
+    end if;
+    return new;
+  end if;
+
+  editable                  := old;
+  editable.email            := new.email;
+  editable.business_name    := new.business_name;
+  editable.city             := new.city;
+  editable.vertical         := new.vertical;
+  editable.website          := new.website;
+  editable.what_you_sell    := new.what_you_sell;
+  editable.typical_customer := new.typical_customer;
+  editable.differentiator   := new.differentiator;
+  editable.brand_vibe       := new.brand_vibe;
+  editable.brand_colors     := new.brand_colors;
+  editable.avoid_notes      := new.avoid_notes;
+  editable.channels         := new.channels;
+  editable.onboarded_at     := new.onboarded_at;
+  editable.plan             := new.plan;
+  editable.updated_at       := new.updated_at;
+
+  if new is distinct from editable then
+    raise exception 'Billing details can only be changed through checkout or your account page.';
+  end if;
+
+  /* plan is only the customer's pick until a subscription starts. While one
+     is running, the engine renders to it - switching goes through
+     schedule_plan_change(), so what's rendered always matches what's billed. */
+  if new.plan is distinct from old.plan
+     and old.subscription_status in ('trialing', 'active', 'past_due') then
+    raise exception 'Change your plan from the account page - it switches at your next billing date.';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists profiles_protect_billing on public.profiles;
+create trigger profiles_protect_billing
+  before insert or update on public.profiles
+  for each row execute function public.protect_profile_billing();
+
+/* Approving and rejecting is all a customer does to a creative. */
+create or replace function public.protect_creative_fields()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+declare
+  editable public.creatives;
+begin
+  if current_user not in ('authenticated', 'anon') then
+    return new;
+  end if;
+
+  editable            := old;
+  editable.status     := new.status;
+  editable.updated_at := new.updated_at;
+
+  if new is distinct from editable then
+    raise exception 'Only a creative''s approval can be changed.';
+  end if;
+
+  if new.status is distinct from old.status
+     and (old.status = 'published' or new.status = 'published') then
+    raise exception 'Publishing is handled by Adronis.';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists creatives_protect_fields on public.creatives;
+create trigger creatives_protect_fields
+  before update on public.creatives
+  for each row execute function public.protect_creative_fields();
+
+/* ------------------------------------------------------------ */
 /* 9. Row Level Security */
 /*    RLS is NOT enabled by default on new tables - turn it on explicitly. */
 /* ------------------------------------------------------------ */
