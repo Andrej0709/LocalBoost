@@ -34,14 +34,30 @@
 // Installed as a home-screen web app: skip the landing page for a signed-in
 // customer and send them straight to where they act on this week's drop.
 // A normal browser tab still shows the landing page even when logged in.
-if (window.LBAuth) {
-  var lbStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  if (lbStandalone) {
-    LBAuth.ready.then(function () {
-      if (!LBAuth.isLoggedIn()) return;
+// Until that decision is made, #lb-boot (a full-screen logo) covers the page
+// so the landing content never flashes before the redirect fires.
+function lbBootDone() {
+  var el = document.getElementById("lb-boot");
+  if (el) el.style.display = "none";
+}
+var lbStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+if (lbStandalone && window.LBAuth) {
+  // Safety net: never leave a customer stuck behind the boot screen if
+  // Supabase is slow or unreachable.
+  var lbBootTimer = setTimeout(lbBootDone, 4000);
+  LBAuth.ready.then(function () {
+    if (LBAuth.isLoggedIn()) {
       location.replace(LBAuth.nextStep() || "approvals.html");
-    });
-  }
+      return; // overlay stays up — the page is navigating away
+    }
+    clearTimeout(lbBootTimer);
+    lbBootDone();
+  }, function () {
+    clearTimeout(lbBootTimer);
+    lbBootDone();
+  });
+} else {
+  lbBootDone();
 }
 </script>
 <script src="./reveal-main.js"></script>
@@ -206,8 +222,16 @@ input[type=range]{height:30px !important}
 [data-stat]{min-width:calc(50% - 14px)}
 [data-calcstats]{grid-template-columns:1fr !important}
 }
+#lb-boot{display:none}
+@media (display-mode:standalone){
+#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
+}
+#lb-boot img{width:56px;height:56px;animation:lbBootPulse 1.3s ease-in-out infinite}
+@keyframes lbBootPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
 </style>
 </helmet>
+
+<div id="lb-boot"><img src="logo.png" alt=""></div>
 
 <div ref="{{ rootRef }}" style="position:relative;width:100%;background:#07080a">
 
