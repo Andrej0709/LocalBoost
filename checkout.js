@@ -280,6 +280,7 @@
         }
         if (LBAuth.hasActivePlan()) { showActive(); return; }
 
+        $("co-free").hidden = false;
         var user = LBAuth.getUser();
         if (user && user.email && !$("co-email").value) $("co-email").value = user.email;
       }).catch(function (err) {
@@ -352,6 +353,25 @@
     }
 
     location.href = "checkout.html?state=success&plan=" + state.plan + "&cycle=" + state.cycle;
+  });
+
+  // Skip the card entirely: record the free-plan choice (so login/signup stop
+  // steering back to checkout) and go straight into the app.
+  $("co-free-btn").addEventListener("click", async function () {
+    var button = this;
+    button.disabled = true;
+    try {
+      await LBAuth.updateProfile({ plan: "free" });
+      location.href = "approvals.html";
+    } catch (err) {
+      button.disabled = false;
+      var notice = $("co-notice");
+      notice.hidden = false;
+      notice.style.borderColor = "rgba(240,168,168,.3)";
+      notice.style.background = "rgba(240,168,168,.08)";
+      notice.style.color = "#f0a8a8";
+      notice.textContent = err.message;
+    }
   });
 
   // --------------------------------------------------------- returning views

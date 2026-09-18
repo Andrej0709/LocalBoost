@@ -230,16 +230,20 @@
       return;
     }
 
-    // No plan running yet — the trial only starts after the brief and checkout.
-    // Point the primary button at whichever of those two steps is still missing,
-    // instead of "Review this week's drop" (there's nothing to review yet).
+    // No plan running — the trial only starts after the brief and checkout.
+    // With the brief done they're on the free plan, and Approvals is where
+    // their free ads land. Without it, the brief is the one step missing.
     document.getElementById("trial-start").textContent = "Not started";
     document.getElementById("trial-end").textContent =
-      LBAuth.hasBrief() ? "Add a card at checkout to start it" : "Finish your business brief to start it";
+      LBAuth.hasBrief() ? "You're on the Free plan — pick a paid plan to start one" : "Finish your business brief to start it";
 
     var primary = document.getElementById("already-in-primary");
-    primary.href = LBAuth.nextStep(profile.plan);
-    primary.textContent = LBAuth.hasBrief() ? "Continue to checkout" : "Finish signing up";
+    if (LBAuth.hasBrief()) {
+      primary.textContent = "Open approvals";
+    } else {
+      primary.href = LBAuth.nextStep(profile.plan);
+      primary.textContent = "Finish signing up";
+    }
     primary.appendChild((function(){
       var span = document.createElement("span");
       span.className = "mono";

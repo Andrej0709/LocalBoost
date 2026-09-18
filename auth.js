@@ -104,13 +104,51 @@
       );
     },
 
+    // No trial or subscription running — never paid, or canceled. These
+    // accounts get the free monthly allowance (see freeQuota).
+    isOnFreePlan: function () {
+      return !!session && !this.hasActivePlan();
+    },
+
     // Where a logged-in user should go after clicking a plan:
     // brief first, then checkout, and only then is the plan live.
+    // The free plan skips checkout — there's no card to take.
     nextStep: function (planKey) {
-      var q = planKey ? "?plan=" + planKey : "";
+      var key = planKey || (profile && profile.plan) || "";
+      var q = key ? "?plan=" + key : "";
       if (!this.hasBrief()) return "signup.html" + q;
-      if (!this.hasActivePlan()) return "checkout.html" + q;
-      return null; // nothing owed — the plan is already running
+      if (this.hasActivePlan() || key === "free") return null; // nothing owed
+      return "checkout.html" + q;
+    },
+
+    // How many creatives are waiting on this account's approval.
+    pendingCount: async function () {
+      if (!session) return 0;
+      var res = await db
+        .from("creatives")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", session.user.id)
+        .eq("status", "pending");
+      return res.error ? 0 : res.count || 0;
+    },
+
+    // This calendar month's free allowance: { used, limit, resets_at }.
+    // null if it can't be read (signed out, or schema.sql not run yet).
+    freeQuota: async function () {
+      if (!session) return null;
+      var res = await db.rpc("free_quota");
+      return res.error ? null : res.data;
+    },
+
+    // Where a signed-in customer belongs when they open the site:
+    //   "approvals" — a paid plan is running, or they're on the free plan
+    //                 with a creative waiting on their approval
+    //   "pricing"   — free plan with nothing waiting
+    // null when signed out (they stay on the landing page).
+    homeRoute: async function () {
+      if (!session) return null;
+      if (this.hasActivePlan()) return "approvals";
+      return (await this.pendingCount()) > 0 ? "approvals" : "pricing";
     },
 
     // Marks the brief as done. Does NOT start the trial.
@@ -147,7 +185,7 @@
 
     // meta: business_name, city, vertical, website, what_you_sell,
     // typical_customer, differentiator, brand_vibe, brand_colors,
-    // avoid_notes, channels (array), plan ('counter'|'storefront'|'franchise').
+    // avoid_notes, channels (array), plan ('counter'|'storefront'|'franchise'|'free').
     // The on_auth_user_created trigger copies these into public.profiles.
     signUp: async function (email, password, meta) {
       var res = await db.auth.signUp({

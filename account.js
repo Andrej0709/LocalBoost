@@ -44,6 +44,7 @@
     else if (status === "active") { chip.className = "acc-chip ok"; chip.textContent = "ACTIVE"; }
     else if (status === "past_due") { chip.className = "acc-chip warn"; chip.textContent = "PAST DUE"; }
     else if (status === "canceled") { chip.className = "acc-chip muted"; chip.textContent = "CANCELED"; }
+    else if (profile.onboarded_at) { chip.className = "acc-chip muted"; chip.textContent = "FREE"; }
     else { chip.className = "acc-chip muted"; chip.textContent = "NO PLAN"; }
   }
 
@@ -171,6 +172,7 @@
       $("plan-pending-notice").hidden = true;
       $("plan-cancel-notice").hidden = true;
       $("cancel-plan-row").hidden = true;
+      if (profile.onboarded_at) renderFreePlan();
       return;
     }
     $("billing-rows").hidden = false;
@@ -185,7 +187,7 @@
       trialing: "Free trial",
       active: "Active",
       past_due: "Past due — update your card",
-      canceled: "Canceled"
+      canceled: "Canceled — you're on the Free plan"
     }[profile.subscription_status] || "No active plan";
     $("bill-status").textContent = statusText;
 
@@ -258,6 +260,20 @@
     } else {
       pendingNotice.hidden = true;
     }
+  }
+
+  // Brief done, no plan running: the account is on the free monthly allowance.
+  async function renderFreePlan() {
+    $("billing-empty-tag").textContent = "FREE PLAN";
+    $("billing-empty-title").textContent = "You're on the Free plan.";
+    $("billing-empty-text").textContent = "A few free ads every month, no card on file. Pick a plan for a full drop every week.";
+
+    var q = await LBAuth.freeQuota();
+    if (!q) return;
+    var reset = new Date(q.resets_at).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+    $("billing-empty-text").textContent =
+      q.used + " of " + q.limit + " free ads used this month, resets " + reset +
+      ". No card on file. Pick a plan for a full drop every week.";
   }
 
   // ----------------------------------------------------- plan change / cancel

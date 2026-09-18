@@ -8,8 +8,14 @@
 /* 1. Enums */
 /* ------------------------------------------------------------ */
 do $$ begin
-  create type public.plan_tier as enum ('counter', 'storefront', 'franchise');
+  create type public.plan_tier as enum ('counter', 'storefront', 'franchise', 'free');
 exception when duplicate_object then null; end $$;
+
+/* Databases created before the free plan existed. 'free' only records that
+   the customer chose the free plan at signup (so they skip checkout) - what
+   actually decides free vs paid everywhere is subscription_status: anyone
+   without a running trial or subscription is on the free allowance. */
+alter type public.plan_tier add value if not exists 'free';
 
 do $$ begin
   create type public.subscription_status as enum ('trialing', 'active', 'past_due', 'canceled');
@@ -286,6 +292,10 @@ begin
     raise exception 'Finish the business brief before starting a trial.';
   end if;
 
+  if coalesce(p_plan, row_out.plan) is null or coalesce(p_plan, row_out.plan) = 'free' then
+    raise exception 'Pick a paid plan to start a trial.';
+  end if;
+
   /* Already on a trial or paying: don't restart the clock. */
   if row_out.subscription_status in ('trialing', 'active') then
     return row_out;
@@ -479,6 +489,9 @@ begin
   if row_out.cancel_at_period_end then
     raise exception 'Your plan is set to cancel - resume it first.';
   end if;
+  if p_plan = 'free' then
+    raise exception 'To move to Free, cancel your plan - it drops to Free when this period ends.';
+  end if;
 
   /* Picking what's already running just clears any pending switch. */
   if p_plan = row_out.plan and coalesce(p_cycle, row_out.billing_cycle) = row_out.billing_cycle then
@@ -524,6 +537,89 @@ end;
 $$;
 
 grant execute on function public.cancel_plan_change() to authenticated;
+
+/* ------------------------------------------------------------ */
+/* 8f. Free plan - a monthly allowance of creatives for every account without  */
+/*     a running trial or subscription (never paid, or canceled). Months are   */
+/*     calendar months in UTC. The limit lives only here - the site reads it  */
+/*     through free_quota(), and the trigger below refuses to insert past it,  */
+/*     so the engine can't over-deliver to a free account by mistake. */
+/* ------------------------------------------------------------ */
+create or replace function public.free_images_per_month()
+returns int
+language sql
+immutable
+as $$ select 3 $$;
+
+create or replace function public.free_quota()
+returns json
+language plpgsql
+stable
+set search_path = public
+as $$
+declare
+  month_start timestamptz := date_trunc('month', now() at time zone 'utc') at time zone 'utc';
+  used        int;
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in.';
+  end if;
+
+  select count(*) into used
+    from public.creatives
+   where user_id = auth.uid()
+     and created_at >= month_start;
+
+  return json_build_object(
+    'used', used,
+    'limit', public.free_images_per_month(),
+    'resets_at', month_start + interval '1 month'
+  );
+end;
+$$;
+
+grant execute on function public.free_quota() to authenticated;
+
+create or replace function public.enforce_free_quota()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  owner_status public.subscription_status;
+  month_start  timestamptz := date_trunc('month', now() at time zone 'utc') at time zone 'utc';
+  used         int;
+begin
+  select subscription_status into owner_status
+    from public.profiles
+   where id = new.user_id;
+
+  if owner_status in ('trialing', 'active') then
+    return new;
+  end if;
+
+  /* Rows inserted earlier in the same statement are visible here, so a bulk
+     insert of five into a free account fails as a whole instead of slipping
+     all five through. */
+  select count(*) into used
+    from public.creatives
+   where user_id = new.user_id
+     and created_at >= month_start;
+
+  if used >= public.free_images_per_month() then
+    raise exception 'Free plan limit reached: this account already has % creatives this month.',
+      public.free_images_per_month();
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists creatives_enforce_free_quota on public.creatives;
+create trigger creatives_enforce_free_quota
+  before insert on public.creatives
+  for each row execute function public.enforce_free_quota();
 
 /* ------------------------------------------------------------ */
 /* 9. Row Level Security */

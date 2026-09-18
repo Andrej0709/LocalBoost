@@ -7,6 +7,7 @@
 @media (display-mode:standalone){
 #lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
 }
+html.lb-boot-on #lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
 html.lb-booted #lb-boot{display:none}
 #lb-boot img{width:56px;height:auto;animation:lbBootPulse 1.3s ease-in-out infinite}
 @keyframes lbBootPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
@@ -40,51 +41,105 @@ html.lb-booted #lb-boot{display:none}
 <script src="./supabase-config.js"></script>
 <script src="./auth.js"></script>
 <script>
-// Installed as a home-screen web app: skip the landing page for a signed-in
-// customer and send them straight to where they act on this week's drop.
-// A normal browser tab still shows the landing page even when logged in.
-// Until that decision is made, #lb-boot (a full-screen logo) covers the page
-// so the landing content never flashes before the redirect fires.
-// This script runs in <head>, before #lb-boot exists, so hide it with a
+// Opening the site (installed home-screen app or a normal browser tab) sends
+// a signed-in customer where they belong — see LBAuth.homeRoute():
+//   - paid plan (trial or active)             -> approvals.html
+//   - free plan, a creative waiting on them   -> approvals.html
+//   - free plan, nothing waiting              -> this page, at #pricing
+//   - signed out                              -> this page, as is
+// Until that's decided, #lb-boot (a full-screen logo) covers the page so the
+// landing content never flashes before a redirect fires. In a browser tab it
+// only goes up when a stored session exists, so signed-out visitors never
+// wait on it.
+// This script runs in <head>, before #lb-boot exists, so show/hide it with a
 // class on <html> rather than looking the element up — otherwise a call made
 // right away (e.g. on a repeat visit) finds nothing and the boot screen stays
 // up forever.
 function lbBootDone() {
   document.documentElement.classList.add("lb-booted");
 }
-// The boot screen stays up at least this long even if auth resolves
-// instantly, so it reads as a real loading moment instead of a flicker.
-var LB_BOOT_MIN_MS = 2000;
+var lbStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+// In the installed app the boot screen stays up at least this long even if
+// auth resolves instantly, so it reads as a real loading moment instead of a
+// flicker. A browser tab gets out of the way as fast as it can.
+var LB_BOOT_MIN_MS = lbStandalone ? 2000 : 0;
 var lbBootStart = Date.now();
 function lbAfterMinBoot(fn) {
   setTimeout(fn, Math.max(0, LB_BOOT_MIN_MS - (Date.now() - lbBootStart)));
 }
-var lbStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-// Only auto-redirect once per app session — otherwise a signed-in customer
-// who taps "Adronis" in the nav from approvals/checkout/signup gets bounced
-// straight back there every time, unable to ever reach the landing page
-// again from inside the installed app. (document.referrer is not a reliable
-// signal here — standalone iOS web apps often omit it even for in-app link
-// clicks, not just real launches, so it can't tell the two apart.)
+function lbHasStoredSession() {
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      if (/^sb-.+-auth-token$/.test(localStorage.key(i))) return true;
+    }
+  } catch (e) {}
+  return false;
+}
+// Jumps (no smooth scroll) to the rendered pricing section, then calls done.
+// The section only exists once the page's React runtime has mounted — the
+// hidden copy inside the x-dc element is just the raw template, so it's
+// skipped. (Don't write that tag name with angle brackets anywhere above the
+// real one: the runtime finds its template by searching the page source for
+// the first such tag, and would start reading from here instead.)
+function lbShowPricing(done) {
+  try { history.replaceState(null, "", "#pricing"); } catch (e) {}
+  var tries = 0;
+  function attempt() {
+    var all = document.querySelectorAll("#pricing");
+    var target = null;
+    for (var i = 0; i < all.length; i++) if (!all[i].closest("x-dc")) target = all[i];
+    if (target) {
+      var root = document.documentElement;
+      var prev = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
+      target.scrollIntoView({ block: "start" });
+      root.style.scrollBehavior = prev;
+      done();
+    } else if (++tries < 240) {
+      requestAnimationFrame(attempt);
+    } else {
+      done();
+    }
+  }
+  // Web fonts change the height of everything above #pricing — wait for them
+  // so the jump doesn't land short.
+  var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+  fontsReady.then(attempt, attempt);
+}
+// Only route once per tab/app session — otherwise a signed-in customer who
+// comes back to "/" from approvals/checkout/signup gets bounced away again
+// every time, unable to ever reach the landing page. (document.referrer is not
+// a reliable signal here — standalone iOS web apps often omit it even for
+// in-app link clicks, not just real launches, so it can't tell the two apart.)
+// A link to a specific section ("/#drop", "/#top" from the nav logo) is also
+// left alone: the visitor asked for this page.
 var lbAlreadyBooted = false;
-try { lbAlreadyBooted = lbStandalone && sessionStorage.getItem("lbBooted") === "1"; } catch (e) {}
-if (lbStandalone && !lbAlreadyBooted && window.LBAuth) {
-  try { sessionStorage.setItem("lbBooted", "1"); } catch (e) {}
+try { lbAlreadyBooted = sessionStorage.getItem("lbBooted") === "1"; } catch (e) {}
+if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHasStoredSession())) {
+  document.documentElement.classList.add("lb-boot-on");
   // Safety net: never leave a customer stuck behind the boot screen if
   // Supabase is slow or unreachable.
   var lbBootTimer = setTimeout(lbBootDone, 4000);
+  var lbReveal = function () {
+    clearTimeout(lbBootTimer);
+    lbAfterMinBoot(lbBootDone);
+  };
   LBAuth.ready.then(function () {
-    if (LBAuth.isLoggedIn()) {
-      var lbDest = LBAuth.nextStep() || "approvals.html";
-      lbAfterMinBoot(function () { location.replace(lbDest); });
-      return; // overlay stays up — the page is about to navigate away
-    }
-    clearTimeout(lbBootTimer);
-    lbAfterMinBoot(lbBootDone);
-  }, function () {
-    clearTimeout(lbBootTimer);
-    lbAfterMinBoot(lbBootDone);
-  });
+    if (!LBAuth.isLoggedIn()) { lbReveal(); return; }
+    try { sessionStorage.setItem("lbBooted", "1"); } catch (e) {}
+    return LBAuth.homeRoute().then(function (route) {
+      if (route === "approvals") {
+        lbAfterMinBoot(function () { location.replace("approvals.html"); });
+        return; // overlay stays up — the page is about to navigate away
+      }
+      lbAfterMinBoot(function () {
+        lbShowPricing(function () {
+          clearTimeout(lbBootTimer);
+          lbBootDone();
+        });
+      });
+    });
+  }).catch(lbReveal);
 } else {
   lbBootDone();
 }
@@ -124,6 +179,14 @@ if (lbStandalone && !lbAlreadyBooted && window.LBAuth) {
       "areaServed": "Worldwide",
       "url": "https://adronis.app/#pricing",
       "offers": [
+        {
+          "@type": "Offer",
+          "name": "Free",
+          "description": "3 ads per month, one connected channel. No card needed.",
+          "price": "0",
+          "priceCurrency": "EUR",
+          "url": "https://adronis.app/signup.html?plan=free"
+        },
         {
           "@type": "Offer",
           "name": "Counter",
@@ -635,6 +698,9 @@ input[type=range]{height:30px !important}
       <button onClick="{{ setMonthly }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ mBg }};color:{{ mColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Monthly</button>
       <button onClick="{{ setAnnual }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ aBg }};color:{{ aColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Annual · −20%</button>
     </div>
+    <sc-if value="{{ hasFreeNote }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="max-width:680px;margin:26px auto 0;padding:14px 20px;border-radius:12px;border:1px solid rgba(168,198,240,.25);background:rgba(168,198,240,.06);font-size:14px;line-height:1.6;color:#d0d6e0;text-align:left"><span style="margin-right:10px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--acc)">{{ freeNoteTag }}</span>{{ freeNoteText }}</div>
+    </sc-if>
   </div>
 
   <div style="max-width:1200px;margin:clamp(36px,4.5vw,56px) auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(290px,100%),1fr));gap:16px;align-items:start">
@@ -659,6 +725,15 @@ input[type=range]{height:30px !important}
         <a href="{{ pl.href }}" style="display:block;margin-top:26px;padding:13px;border-radius:9999px;text-align:center;font-size:14px;font-weight:500;background:{{ pl.ctaBg }};color:{{ pl.ctaColor }};border:1px solid {{ pl.ctaBorder }}">{{ pl.cta }}</a>
       </div>
     </sc-for>
+  </div>
+
+  <div style="max-width:1200px;margin:16px auto 0;padding:clamp(18px,2vw,24px) clamp(22px,2.4vw,30px);border-radius:14px;border:1px solid #1b1e22;background:#0a0b0d;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 32px">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 20px">
+      <div style="font-size:15px;color:#fff;letter-spacing:-.015em">Free</div>
+      <div><span style="font-size:30px;letter-spacing:-.04em;color:#fff">€0</span><span style="margin-left:7px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#62666d">/ MONTH</span></div>
+      <div style="font-size:14px;color:#8a8f98">3 ads / month · 1 channel · swipe approval · no card needed</div>
+    </div>
+    <a href="{{ freeHref }}" style="padding:12px 22px;border-radius:9999px;font-size:14px;font-weight:500;color:#d0d6e0;border:1px solid #23252a;white-space:nowrap" style-hover="border-color:#4a4d54">{{ freeCta }}</a>
   </div>
 
   <div style="max-width:1200px;margin:16px auto 0;padding:clamp(22px,2.4vw,30px);border-radius:14px;border:1px solid #1b1e22;background:#0a0b0d;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:clamp(20px,3vw,48px);align-items:center">
@@ -718,7 +793,7 @@ input[type=range]{height:30px !important}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#a8c6f0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#a8c6f0&quot;,&quot;#d8dbe0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;planetGlow&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:2,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;planetDensity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:5000,&quot;step&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;drumCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:5,&quot;max&quot;:9,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Engine&quot;}}">
 class Component extends DCLogic {
-  state = { step: 0, tab: 0, billing: "monthly", ads: 12, angle: 0, creatives: {}, isMobile: false, navOpen: false };
+  state = { step: 0, tab: 0, billing: "monthly", ads: 12, angle: 0, creatives: {}, isMobile: false, navOpen: false, freeNote: null, onFree: false };
   root = React.createRef();
 
   componentDidMount() {
@@ -803,8 +878,32 @@ class Component extends DCLogic {
         r.querySelectorAll('a[href="login.html"]').forEach((loginLink) => {
           loginLink.textContent = label;
         });
+        if (LBAuth.isOnFreePlan()) this.loadFreeNote();
       });
     }
+  }
+
+  // The strip above the plan cards for a signed-in customer on the free plan:
+  // where their allowance stands, so the plans read as "here's how to get
+  // more" rather than a cold paywall.
+  async loadFreeNote() {
+    if (!LBAuth.hasBrief()) {
+      this.setState({ freeNote: { tag: "ALMOST SET UP", text: "Pick a plan below and brief the engine. The Free plan needs no card." } });
+      return;
+    }
+    const q = await LBAuth.freeQuota();
+    let text = "You're on the Free plan. Want a full drop every week? Pick a plan below.";
+    if (q) {
+      const utc = { timeZone: "UTC" };
+      if (q.used >= q.limit) {
+        const month = new Date().toLocaleDateString("en-US", { month: "long", ...utc });
+        const reset = new Date(q.resets_at).toLocaleDateString("en-US", { month: "short", day: "numeric", ...utc });
+        text = `You've used all ${q.limit} free ads for ${month}. The next ${q.limit} arrive from ${reset} — or get a full drop every week.`;
+      } else {
+        text = `${q.limit - q.used} of ${q.limit} free ads left this month — they land in Approvals as soon as they're rendered. Want a full drop every week?`;
+      }
+    }
+    this.setState({ freeNote: { tag: "FREE PLAN", text }, onFree: true });
   }
 
   componentWillUnmount() {
@@ -1111,6 +1210,12 @@ class Component extends DCLogic {
       onAds: (e) => this.setState({ ads: parseInt(e.target.value, 10) }),
       estPrice: "€" + est,
       perYear: (ads * 52).toLocaleString("en-US"),
+      hasFreeNote: !!this.state.freeNote,
+      freeNoteTag: this.state.freeNote ? this.state.freeNote.tag : "",
+      freeNoteText: this.state.freeNote ? this.state.freeNote.text : "",
+      // Keep "3 ads / month" in the Free row in sync with free_images_per_month() in schema.sql.
+      freeHref: this.state.onFree ? "approvals.html" : "signup.html?plan=free",
+      freeCta: this.state.onFree ? "Open approvals" : "Start free",
       rootRef: this.root
     };
   }

@@ -197,6 +197,8 @@
 <script>
 (function(){
   var plans = {
+    free: { name: "Free", price: "€0", rate: "3 ads / month · 1 channel",
+      features: ["3 photoreal creatives every month", "One connected channel", "Swipe approval in the app", "No card needed — upgrade whenever you like"] },
     counter: { name: "Counter", price: "€89", rate: "4 ads / week · 1 channel",
       features: ["4 photoreal creatives every Monday", "One connected channel", "Best-time auto-publishing", "Swipe approval in the app"] },
     storefront: { name: "Storefront", price: "€249", rate: "12 ads / week · 4 channels",
@@ -219,7 +221,16 @@
     if (el) el.style.display = "none";
   }
 
+  // The free plan has no checkout step — the brief is the whole signup.
+  var isFree = planKey === "free";
+  var FREE_EYEBROW = "FREE PLAN · NO CARD NEEDED";
+
   document.getElementById("plan-headline").innerHTML = 'Set up your <em>' + plan.name + '</em> drop.';
+  if (isFree) {
+    document.getElementById("page-eyebrow").textContent = FREE_EYEBROW;
+    document.getElementById("page-sub").textContent =
+      "Onboard in ten minutes. Your free ads land in Approvals as soon as the engine renders them.";
+  }
   document.getElementById("plan-name").textContent = plan.name;
   document.getElementById("plan-price").textContent = plan.price;
   document.getElementById("plan-rate").textContent = plan.rate;
@@ -235,13 +246,18 @@
     list.appendChild(li);
   });
 
-  function showActivated(){
+  // Named after the plan actually running on the account, not the one in the
+  // URL — a paying customer who clicks another plan's button still lands here.
+  var PAID_NAMES = { counter: "Counter", storefront: "Storefront", franchise: "Franchise" };
+
+  function showActivated(profile){
+    var name = PAID_NAMES[profile.plan] || plan.name;
     document.getElementById("form-view").hidden = true;
     document.getElementById("activated-view").hidden = false;
     document.getElementById("page-eyebrow").textContent = "YOU'RE ALL SET";
-    document.getElementById("plan-headline").innerHTML = 'Your <em>' + plan.name + '</em> drop is active.';
+    document.getElementById("plan-headline").innerHTML = 'Your <em>' + name + '</em> drop is active.';
     document.getElementById("page-sub").textContent = "No need to sign up again — your account already has this covered.";
-    document.getElementById("activated-text").textContent = "The " + plan.name + " plan is live on your account.";
+    document.getElementById("activated-text").textContent = "The " + name + " plan is live on your account.";
   }
 
   var form = document.getElementById("signup-form");
@@ -256,6 +272,12 @@
     return "checkout.html?plan=" + planKey + "&cycle=" + cycle;
   }
 
+  // Where the brief leads: checkout for a paid plan, straight into the app
+  // for the free one.
+  function afterBriefUrl(){
+    return isFree ? "approvals.html" : checkoutUrl();
+  }
+
   function showBriefMode(profile){
     briefOnly = true;
 
@@ -266,11 +288,18 @@
     });
     document.getElementById("account-label").textContent = "YOUR BUSINESS";
 
-    document.getElementById("page-eyebrow").textContent = "STEP 1 OF 2 · FIRST DROP FREE";
     document.getElementById("plan-headline").innerHTML = 'Brief the engine for your <em>' + plan.name + '</em> drop.';
-    document.getElementById("page-sub").textContent =
-      "Tell us about the business first. Card details come on the next step — nothing is charged until the free trial ends.";
-    submitButton.innerHTML = 'Continue to checkout<span class="mono" style="font-size:13px">→</span>';
+    if (isFree) {
+      document.getElementById("page-eyebrow").textContent = FREE_EYEBROW;
+      document.getElementById("page-sub").textContent =
+        "Tell us about the business and your free ads start rendering. No card, nothing to pay.";
+      submitButton.innerHTML = 'Start free<span class="mono" style="font-size:13px">→</span>';
+    } else {
+      document.getElementById("page-eyebrow").textContent = "STEP 1 OF 2 · FIRST DROP FREE";
+      document.getElementById("page-sub").textContent =
+        "Tell us about the business first. Card details come on the next step — nothing is charged until the free trial ends.";
+      submitButton.innerHTML = 'Continue to checkout<span class="mono" style="font-size:13px">→</span>';
+    }
 
     // Prefill anything the account already knows.
     var map = {
@@ -327,8 +356,8 @@
       if (briefOnly) {
         // Save the brief only. The trial starts at checkout, not here.
         await LBAuth.saveBrief(brief());
-        say("Brief saved — taking you to checkout...");
-        location.href = checkoutUrl();
+        say(isFree ? "Brief saved — taking you to your approvals..." : "Brief saved — taking you to checkout...");
+        location.href = afterBriefUrl();
         return;
       }
 
@@ -348,9 +377,9 @@
         document.getElementById("activated-text").textContent =
           "Check your inbox — confirm your email to carry on with the " + plan.name + " plan.";
       } else {
-        // Session already live: mark the brief done and move to checkout.
+        // Session already live: mark the brief done and move on.
         await LBAuth.saveBrief(brief());
-        location.href = checkoutUrl();
+        location.href = afterBriefUrl();
       }
     } catch (err) {
       submitButton.disabled = false;
@@ -361,13 +390,22 @@
   LBAuth.ready.then(function(){
     if (!LBAuth.isLoggedIn()) { lbBootDone(); return; }
 
-    // A plan is only "active" once checkout has run.
-    if (LBAuth.hasActivePlan()) { showActivated(); lbBootDone(); return; }
-
     var profile = LBAuth.getProfile() || {};
+
+    // A plan is only "active" once checkout has run.
+    if (LBAuth.hasActivePlan()) { showActivated(profile); lbBootDone(); return; }
+
     if (LBAuth.hasBrief()) {
+      // #lb-boot stays up through either branch — the page is about to navigate away.
+      if (isFree) {
+        // Already free in practice (no plan running) — record the choice so
+        // nothing keeps nudging them to checkout, then into the app.
+        LBAuth.updateProfile({ plan: "free" })
+          .catch(function(){})
+          .then(function(){ location.href = afterBriefUrl(); });
+        return;
+      }
       // Brief already done, payment isn't — skip straight to checkout.
-      // #lb-boot stays up — the page is about to navigate away.
       location.href = checkoutUrl();
       return;
     }

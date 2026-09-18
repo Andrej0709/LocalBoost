@@ -91,6 +91,12 @@
       <div class="mono">LOADING YOUR DROP</div>
     </div>
 
+    <!-- Free plan: where the monthly allowance stands -->
+    <div id="free-strip" class="notice" role="status" hidden style="margin:0 0 28px;color:#d0d6e0">
+      <span class="mono" style="margin-right:10px;font-size:10px;letter-spacing:.12em;color:var(--acc)">FREE PLAN</span><span id="free-strip-text"></span>
+      <a href="/#pricing" style="margin-left:4px;white-space:nowrap">Get a full drop every week →</a>
+    </div>
+
     <!-- Main board -->
     <div id="board" hidden>
       <div class="approve-head">
@@ -647,6 +653,32 @@
   }
   document.getElementById("demo-btn").addEventListener("click", loadDemo);
 
+  // Free plan: no weekly drop, just a monthly allowance — say where it
+  // stands instead of promising a Monday batch that isn't coming.
+  async function showFreeStrip() {
+    EMPTY_COPY.pending[1] = "Nothing is waiting on you here. New free ads show up the moment they're rendered.";
+    if (LBAuth.hasBrief()) {
+      noDrops.querySelector("h3").textContent = "Your free ads are on the way.";
+      noDrops.querySelector("p").textContent =
+        "As soon as the engine renders them, they show up here for approval.";
+    } else {
+      noDrops.querySelector("h3").textContent = "Brief the engine first.";
+      noDrops.querySelector("p").innerHTML =
+        'Tell us about your business and your free ads start rendering. <a href="signup.html?plan=free">Fill in the brief →</a>';
+    }
+
+    var text = "";
+    var q = await LBAuth.freeQuota();
+    if (q) {
+      var reset = new Date(q.resets_at).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+      text = q.used >= q.limit
+        ? "All " + q.limit + " free ads used this month — the next ones arrive from " + reset + "."
+        : q.used + " of " + q.limit + " free ads used this month.";
+    }
+    document.getElementById("free-strip-text").textContent = text;
+    document.getElementById("free-strip").hidden = false;
+  }
+
   LBAuth.ready.then(async function () {
     if (!LBAuth.isLoggedIn()) {
       loading.hidden = true;
@@ -659,6 +691,8 @@
     var cta = document.getElementById("nav-cta");
     cta.textContent = "Control room";
     cta.href = "control-room.html";
+
+    if (LBAuth.isOnFreePlan()) showFreeStrip();
 
     var dropRes = await LBAuth.db
       .from("drops")
