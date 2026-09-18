@@ -30,6 +30,20 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./supabase-config.js"></script>
 <script src="./auth.js"></script>
+<script>
+// Installed as a home-screen web app: skip the landing page for a signed-in
+// customer and send them straight to where they act on this week's drop.
+// A normal browser tab still shows the landing page even when logged in.
+if (window.LBAuth) {
+  var lbStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  if (lbStandalone) {
+    LBAuth.ready.then(function () {
+      if (!LBAuth.isLoggedIn()) return;
+      location.replace(LBAuth.nextStep() || "approvals.html");
+    });
+  }
+}
+</script>
 <script src="./reveal-main.js"></script>
 <script type="application/ld+json">
 {
