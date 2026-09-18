@@ -40,6 +40,13 @@ function lbBootDone() {
   var el = document.getElementById("lb-boot");
   if (el) el.style.display = "none";
 }
+// The boot screen stays up at least this long even if auth resolves
+// instantly, so it reads as a real loading moment instead of a flicker.
+var LB_BOOT_MIN_MS = 2000;
+var lbBootStart = Date.now();
+function lbAfterMinBoot(fn) {
+  setTimeout(fn, Math.max(0, LB_BOOT_MIN_MS - (Date.now() - lbBootStart)));
+}
 var lbStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 if (lbStandalone && window.LBAuth) {
   // Safety net: never leave a customer stuck behind the boot screen if
@@ -47,14 +54,15 @@ if (lbStandalone && window.LBAuth) {
   var lbBootTimer = setTimeout(lbBootDone, 4000);
   LBAuth.ready.then(function () {
     if (LBAuth.isLoggedIn()) {
-      location.replace(LBAuth.nextStep() || "approvals.html");
-      return; // overlay stays up — the page is navigating away
+      var lbDest = LBAuth.nextStep() || "approvals.html";
+      lbAfterMinBoot(function () { location.replace(lbDest); });
+      return; // overlay stays up — the page is about to navigate away
     }
     clearTimeout(lbBootTimer);
-    lbBootDone();
+    lbAfterMinBoot(lbBootDone);
   }, function () {
     clearTimeout(lbBootTimer);
-    lbBootDone();
+    lbAfterMinBoot(lbBootDone);
   });
 } else {
   lbBootDone();
