@@ -2,6 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<style>
+#lb-boot{display:none}
+@media (display-mode:standalone){
+#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
+}
+#lb-boot img{width:56px;height:auto;animation:lbBootPulse 1.3s ease-in-out infinite}
+@keyframes lbBootPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
+</style>
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="manifest" href="site.webmanifest">
@@ -40,12 +48,6 @@
 .approve-toast button{padding:6px 14px;border-radius:9999px;border:1px solid rgba(168,198,240,.4);background:var(--acc-soft);color:var(--acc);font-size:12.5px;font-family:'Geist',sans-serif;cursor:pointer;white-space:nowrap}
 @media (max-width:860px){#kb-hint{display:none}}
 @media (max-width:640px){.approve-toast{left:16px;right:16px;transform:translateY(0)}.approve-toast.show{transform:translateY(-6px)}}
-#lb-boot{display:none}
-@media (display-mode:standalone){
-#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
-}
-#lb-boot img{width:56px;height:auto;animation:lbBootPulse 1.3s ease-in-out infinite}
-@keyframes lbBootPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
 </style>
 </head>
 <body>

@@ -2,6 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<style>
+#lb-boot{display:none}
+@media (display-mode:standalone){
+#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
+}
+#lb-boot img{width:56px;height:auto;animation:lbBootPulse 1.3s ease-in-out infinite}
+@keyframes lbBootPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
+</style>
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="manifest" href="site.webmanifest">
@@ -158,6 +166,7 @@ if (lbStandalone && window.LBAuth) {
 </script>
 </head>
 <body>
+<div id="lb-boot"><img src="logo.png" alt=""></div>
 <x-dc>
 <helmet>
 <script src="./lb-planet.js"></script>
@@ -230,16 +239,8 @@ input[type=range]{height:30px !important}
 [data-stat]{min-width:calc(50% - 14px)}
 [data-calcstats]{grid-template-columns:1fr !important}
 }
-#lb-boot{display:none}
-@media (display-mode:standalone){
-#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
-}
-#lb-boot img{width:56px;height:auto;animation:lbBootPulse 1.3s ease-in-out infinite}
-@keyframes lbBootPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
 </style>
 </helmet>
-
-<div id="lb-boot"><img src="logo.png" alt=""></div>
 
 <div ref="{{ rootRef }}" style="position:relative;width:100%;background:#07080a">
 
