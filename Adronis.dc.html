@@ -56,13 +56,13 @@ function lbAfterMinBoot(fn) {
   setTimeout(fn, Math.max(0, LB_BOOT_MIN_MS - (Date.now() - lbBootStart)));
 }
 var lbStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-// Only auto-redirect once per app session — otherwise a signed-in customer
-// who taps back to "Adronis" in the nav from approvals/checkout/signup gets
-// bounced straight back there every time, unable to ever reach the landing
-// page again from inside the installed app.
-var lbAlreadyBooted = lbStandalone && sessionStorage.getItem("lbBooted");
-if (lbStandalone && !lbAlreadyBooted && window.LBAuth) {
-  sessionStorage.setItem("lbBooted", "1");
+// Only auto-redirect on an actual app launch (tapping the home-screen icon
+// opens the URL with no referrer), never on in-app navigation back to "/" —
+// otherwise a signed-in customer who taps "Adronis" in the nav from
+// approvals/checkout/signup gets bounced straight back there every time,
+// unable to ever reach the landing page again from inside the installed app.
+var lbFreshLaunch = !document.referrer || document.referrer.indexOf(location.origin) !== 0;
+if (lbStandalone && lbFreshLaunch && window.LBAuth) {
   // Safety net: never leave a customer stuck behind the boot screen if
   // Supabase is slow or unreachable.
   var lbBootTimer = setTimeout(lbBootDone, 4000);
