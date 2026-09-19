@@ -43,7 +43,7 @@
 .bulk-actions{display:flex;gap:8px}
 .bulk-actions button{padding:9px 14px;border-radius:9999px;font-size:13px;white-space:nowrap}
 #kb-hint{margin:-10px 0 20px}
-.approve-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(14,15,18,.95);backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(0,0,0,.5);font-size:13.5px;color:#d0d6e0;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.approve-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(14,15,18,.95);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(0,0,0,.5);font-size:13.5px;color:#d0d6e0;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
 .approve-toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);pointer-events:auto}
 .approve-toast button{padding:6px 14px;border-radius:9999px;border:1px solid rgba(168,198,240,.4);background:var(--acc-soft);color:var(--acc);font-size:12.5px;font-family:'Geist',sans-serif;cursor:pointer;white-space:nowrap}
 @media (max-width:860px){#kb-hint{display:none}}
