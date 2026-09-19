@@ -701,9 +701,25 @@ input[type=range]{height:30px !important}
   </div>
 </section>
 
+<section id="testimonials" style="position:relative;z-index:1;padding:clamp(80px,9vw,120px) 24px;background:transparent;overflow:hidden">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:34px">06 — FROM THE COUNTER</div>
+    <div data-grid2="1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px">
+      <sc-for list="{{ quotes }}" as="q" hint-placeholder-count="3">
+        <div data-offset="1" style="margin-top:{{ q.offset }};padding:26px;border-radius:14px;border:1px solid #1b1e22;background:#0e0f12;box-shadow:0 30px 60px rgba(0,0,0,.4);cursor:default;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-8px) scale(1.025);border-color:rgba(168,198,240,.4);box-shadow:0 40px 80px rgba(0,0,0,.55),0 0 60px rgba(168,198,240,.18)">
+          <div style="font-family:'Instrument Serif',Georgia,serif;font-size:22px;line-height:1.35;color:#fff;letter-spacing:-.01em">{{ q.text }}</div>
+          <div style="height:1px;background:#1b1e22;margin:22px 0 16px"></div>
+          <div style="font-size:14px;color:#d0d6e0">{{ q.name }}</div>
+          <div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#4c5056">{{ q.role }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
 <section id="pricing" style="position:relative;padding:clamp(90px,10vw,140px) 24px">
   <div style="max-width:1200px;margin:0 auto;text-align:center">
-    <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">06 — PRICING</div>
+    <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:20px">07 — PRICING</div>
     <h2 style="margin:0 auto;max-width:20ch;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Priced per drop, not per meeting.</h2>
     <div data-billing="1" style="display:inline-flex;align-items:center;gap:4px;margin-top:30px;padding:4px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02)">
       <button onClick="{{ setMonthly }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ mBg }};color:{{ mColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Monthly</button>
@@ -757,22 +773,6 @@ input[type=range]{height:30px !important}
     <div data-calcstats="1" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div style="padding:18px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#62666d">EST. MONTHLY</div><div style="margin-top:10px;font-size:30px;letter-spacing:-.035em;color:var(--acc)">{{ estPrice }}</div></div>
       <div style="padding:18px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#62666d">ADS / YEAR</div><div style="margin-top:10px;font-size:30px;letter-spacing:-.035em;color:#fff">{{ perYear }}</div></div>
-    </div>
-  </div>
-</section>
-
-<section id="testimonials" style="position:relative;z-index:1;padding:clamp(80px,9vw,120px) 24px;background:transparent;overflow:hidden">
-  <div style="max-width:1200px;margin:0 auto">
-    <div style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.14em;color:#62666d;margin-bottom:34px">07 — FROM THE COUNTER</div>
-    <div data-grid2="1" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px">
-      <sc-for list="{{ quotes }}" as="q" hint-placeholder-count="3">
-        <div data-offset="1" style="margin-top:{{ q.offset }};padding:26px;border-radius:14px;border:1px solid #1b1e22;background:#0e0f12;box-shadow:0 30px 60px rgba(0,0,0,.4);cursor:default;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-8px) scale(1.025);border-color:rgba(168,198,240,.4);box-shadow:0 40px 80px rgba(0,0,0,.55),0 0 60px rgba(168,198,240,.18)">
-          <div style="font-family:'Instrument Serif',Georgia,serif;font-size:22px;line-height:1.35;color:#fff;letter-spacing:-.01em">{{ q.text }}</div>
-          <div style="height:1px;background:#1b1e22;margin:22px 0 16px"></div>
-          <div style="font-size:14px;color:#d0d6e0">{{ q.name }}</div>
-          <div style="margin-top:3px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:#4c5056">{{ q.role }}</div>
-        </div>
-      </sc-for>
     </div>
   </div>
 </section>
