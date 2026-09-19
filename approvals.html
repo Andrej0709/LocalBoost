@@ -36,7 +36,8 @@
 <meta name="twitter:image" content="https://adronis.app/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"></noscript>
 <link rel="stylesheet" href="adronis.css">
 <style>
 .creative-card.kb-focus{outline:2px solid var(--acc);outline-offset:2px}
@@ -52,10 +53,10 @@
 </head>
 <body>
 
-<div id="lb-boot"><img src="logo.png" alt=""></div>
+<div id="lb-boot"><img src="logo-128.png" alt=""></div>
 
 <nav class="nav">
-  <a href="/#top" class="nav-logo"><img src="logo.png" alt="" class="nav-logo-img">Adronis</a>
+  <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
   <div class="nav-links">
     <a href="/#drop">The drop</a>
     <a href="/#engine">Engine</a>
@@ -324,6 +325,10 @@
     if (creative.image_url) {
       var img = new Image();
       img.alt = creative.headline || "AI-generated creative";
+      // A drop can hold dozens of creatives but only a few are on screen — let
+      // the browser fetch the rest as they scroll into view.
+      img.loading = "lazy";
+      img.decoding = "async";
       img.addEventListener("load", function () { img.classList.add("loaded"); });
       img.addEventListener("error", function () { placeholder.textContent = "IMAGE UNAVAILABLE"; });
       img.src = creative.image_url;
@@ -694,17 +699,22 @@
 
     if (LBAuth.isOnFreePlan()) showFreeStrip();
 
-    var dropRes = await LBAuth.db
-      .from("drops")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("week_starting", { ascending: false });
-
-    var creativeRes = await LBAuth.db
-      .from("creatives")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    // The two queries don't depend on each other — run them together rather
+    // than paying for two round trips one after the other.
+    var loaded = await Promise.all([
+      LBAuth.db
+        .from("drops")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("week_starting", { ascending: false }),
+      LBAuth.db
+        .from("creatives")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+    ]);
+    var dropRes = loaded[0];
+    var creativeRes = loaded[1];
 
     loading.hidden = true;
     lbBootDone();
