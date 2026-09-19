@@ -98,6 +98,12 @@
         this.resize();
         this.onScroll();
         this._sized = true;
+        // Resizing a canvas clears it, and observers run after the frame's
+        // animation callbacks — so without drawing again right here the empty
+        // canvas gets painted and the planet flashes off for a frame. That
+        // happens whenever the viewport changes size, e.g. the mobile address
+        // bar collapsing while scrolling.
+        this.draw(performance.now());
       });
       this.ro.observe(this);
 
@@ -165,17 +171,24 @@
       this.w = Math.max(1, r.width);
       this.h = Math.max(1, r.height);
       this.dpr = dpr;
-      this.cv.width = Math.round(this.w * dpr);
-      this.cv.height = Math.round(this.h * dpr);
+      // Assigning width/height clears the canvas even when the value is the
+      // same, so only touch them when the size really changed.
+      const cw = Math.round(this.w * dpr), ch = Math.round(this.h * dpr);
+      if (this.cv.width !== cw) this.cv.width = cw;
+      if (this.cv.height !== ch) this.cv.height = ch;
     }
 
     tick(now) {
       this.raf = requestAnimationFrame(this.tick);
       if (document.hidden || !this._sized) return;
+      this.draw(now);
+    }
+
+    draw(now) {
       const ctx = this.ctx;
       if (!ctx) return;
 
-      const dt = Math.min(0.05, (now - (this.last || now)) / 1000);
+      const dt = Math.max(0, Math.min(0.05, (now - (this.last || now)) / 1000));
       this.last = now;
 
       // adaptive degrade: if frames get expensive, thin the point cloud once
