@@ -64,7 +64,9 @@
       this.style.pointerEvents = "none";
 
       const cv = (this.cv = document.createElement("canvas"));
-      cv.style.cssText = "display:block;width:100%;height:100%";
+      // Absolutely filled so the canvas box never depends on its backing-store
+      // size — otherwise it can start at 0x0 and jump to full screen (a huge CLS hit).
+      cv.style.cssText = "position:absolute;inset:0;display:block;width:100%;height:100%";
       this.appendChild(cv);
       this.ctx = cv.getContext("2d", { alpha: true });
 
@@ -81,15 +83,23 @@
       this.spin = 0;
       this.t0 = performance.now();
 
-      this.onResize = () => this.resize();
+      this.w = this.h = 1;
+      this.dpr = 1;
       this.onScroll = () => {
         const d = document.documentElement;
         this.target = clamp(d.scrollTop / Math.max(1, d.scrollHeight - innerHeight), 0, 1);
       };
-      addEventListener("resize", this.onResize, { passive: true });
       addEventListener("scroll", this.onScroll, { passive: true });
-      this.onScroll();
-      this.resize();
+      // Measure from a ResizeObserver, not from here: connectedCallback can run
+      // before the page has any layout (size 0, and reading it forces a full
+      // reflow). The observer fires after layout, when reads are free, and also
+      // covers window resizes and zoom.
+      this.ro = new ResizeObserver(() => {
+        this.resize();
+        this.onScroll();
+        this._sized = true;
+      });
+      this.ro.observe(this);
 
       this.tick = this.tick.bind(this);
       this.raf = requestAnimationFrame(this.tick);
@@ -98,7 +108,7 @@
     disconnectedCallback() {
       this._on = false;
       cancelAnimationFrame(this.raf);
-      removeEventListener("resize", this.onResize);
+      if (this.ro) this.ro.disconnect();
       removeEventListener("scroll", this.onScroll);
     }
 
@@ -161,7 +171,7 @@
 
     tick(now) {
       this.raf = requestAnimationFrame(this.tick);
-      if (document.hidden) return;
+      if (document.hidden || !this._sized) return;
       const ctx = this.ctx;
       if (!ctx) return;
 
