@@ -104,6 +104,12 @@
       );
     },
 
+    // One trial per account: once a trial has ever started, checkout for this
+    // account is paid from day one (start_trial enforces the same rule).
+    hadTrial: function () {
+      return !!(profile && profile.trial_started_at);
+    },
+
     // No trial or subscription running — never paid, or canceled. These
     // accounts get the free monthly allowance (see freeQuota).
     isOnFreePlan: function () {

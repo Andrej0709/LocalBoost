@@ -269,6 +269,9 @@ create trigger on_auth_user_created
 /*     Called from checkout.js once the card has been captured. Refuses to run  */
 /*     while the business brief is missing, so the trial can never start        */
 /*     straight off a plan click. */
+/*     One trial per account: trial_started_at is never cleared, so a customer */
+/*     who already had a trial (then canceled) starts paid from day one - the  */
+/*     first period is charged now instead of handing out another free week.  */
 /* ------------------------------------------------------------ */
 create or replace function public.start_trial(
   p_plan  public.plan_tier,
@@ -298,6 +301,29 @@ begin
 
   /* Already on a trial or paying: don't restart the clock. */
   if row_out.subscription_status in ('trialing', 'active') then
+    return row_out;
+  end if;
+
+  /* Returning customer: no second trial. The first period starts and is
+     billed today, snapshotted into billing_history like any renewal. */
+  if row_out.trial_started_at is not null then
+    update public.profiles
+       set plan                  = coalesce(p_plan, plan),
+           billing_cycle         = coalesce(p_cycle, 'monthly'),
+           payment_method_at     = now(),
+           subscription_status   = 'active',
+           current_period_end    = now() + case when coalesce(p_cycle, 'monthly') = 'annual'
+                                                then interval '12 months' else interval '1 month' end,
+           cancel_at_period_end  = false,
+           pending_plan          = null,
+           pending_billing_cycle = null,
+           billing_history       = billing_history || jsonb_build_array(jsonb_build_object(
+                                     'period_start', now(),
+                                     'plan', coalesce(p_plan, row_out.plan),
+                                     'cycle', coalesce(p_cycle, 'monthly')))
+     where id = auth.uid()
+     returning * into row_out;
+
     return row_out;
   end if;
 

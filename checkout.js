@@ -56,7 +56,10 @@
     plan: PLANS[params.get("plan")] ? params.get("plan") : "storefront",
     cycle: params.get("cycle") === "annual" ? "annual" : "monthly",
     country: "RS",
-    promo: null
+    promo: null,
+    // One trial per account — an account that already had one pays today.
+    // Set once auth loads; the success view reads it back from the URL.
+    paidNow: params.get("paid") === "1"
   };
 
   // ------------------------------------------------------------------- utils
@@ -84,10 +87,21 @@
     return pct / 100;
   }
 
+  function fmtDay(d) {
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  }
+
   function trialEndsOn() {
     var d = new Date();
     d.setDate(d.getDate() + TRIAL_DAYS);
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    return fmtDay(d);
+  }
+
+  // Next invoice for a customer who pays today: one cycle from now.
+  function renewsOn(cycle) {
+    var d = new Date();
+    d.setMonth(d.getMonth() + (cycle === "annual" ? 12 : 1));
+    return fmtDay(d);
   }
 
   // -------------------------------------------------------------- plan cards
@@ -155,17 +169,30 @@
     } else if ($("co-vatid").value.trim().length > 3) {
       lines.push({ label: "VAT — reverse charge", value: "€0" });
     }
-    lines.push({ label: "First drop (" + TRIAL_DAYS + "-day trial)", value: "Free", credit: true });
+    if (!state.paidNow) {
+      lines.push({ label: "First drop (" + TRIAL_DAYS + "-day trial)", value: "Free", credit: true });
+    }
 
     $("co-lines").innerHTML = lines.map(function (l) {
       return '<div class="co-line' + (l.credit ? " is-credit" : "") + '"><span>' +
         l.label + '</span><span>' + l.value + '</span></div>';
     }).join("");
 
-    $("co-due").textContent = "€0";
-    $("co-then").textContent =
-      "Then " + euro(recurring) + " " + (state.cycle === "annual" ? "per year" : "per month") +
-      ", first charged " + trialEndsOn() + ". Cancel before then and you pay nothing.";
+    var per = state.cycle === "annual" ? "per year" : "per month";
+    if (state.paidNow) {
+      $("co-due").textContent = euro(recurring);
+      $("co-then").textContent =
+        "Your free trial was already used on this account, so billing starts today. Then " +
+        euro(recurring) + " " + per + ", next charged " + renewsOn(state.cycle) + ". Cancel any time.";
+      $("co-sub").textContent =
+        "Welcome back. Your free trial was already used, so your first " +
+        (state.cycle === "annual" ? "year" : "month") + " is billed today. Cancel any time before the next renewal.";
+    } else {
+      $("co-due").textContent = "€0";
+      $("co-then").textContent =
+        "Then " + euro(recurring) + " " + per +
+        ", first charged " + trialEndsOn() + ". Cancel before then and you pay nothing.";
+    }
 
     $("co-features").innerHTML = plan.features.map(function (f) {
       return '<li style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;color:#8a8f98">' +
@@ -245,7 +272,9 @@
     $("co-eyebrow").textContent = "ALREADY RUNNING";
     $("co-headline").innerHTML = 'Your <em>' + plan.name + '</em> drop is live.';
     $("co-sub").textContent = "Nothing to pay here — your plan is already on the account.";
+    $("co-success-tag").textContent = "PLAN ACTIVE";
     $("co-success-text").textContent = "The " + plan.name + " plan is live on your account.";
+    $("co-success-foot").hidden = true;
   }
 
   // A blocked visitor gets told why, with a link. Never a silent bounce back to
@@ -280,6 +309,8 @@
         }
         if (LBAuth.hasActivePlan()) { showActive(); return; }
 
+        state.paidNow = LBAuth.hadTrial();
+        renderSummary();
         $("co-free").hidden = false;
         var user = LBAuth.getUser();
         if (user && user.email && !$("co-email").value) $("co-email").value = user.email;
@@ -312,7 +343,7 @@
       country: $("co-country").value,
       vat_id: $("co-vatid").value.trim() || null,
       promo_code: state.promo ? state.promo.label : null,
-      trial_days: TRIAL_DAYS,
+      trial_days: state.paidNow ? 0 : TRIAL_DAYS,
       success_url: location.origin + "/checkout.html?state=success&plan=" + state.plan,
       cancel_url: location.origin + "/checkout.html?state=cancelled&plan=" + state.plan
     };
@@ -324,6 +355,8 @@
     // ---- BACKEND GOES HERE -------------------------------------------------
     // Stripe collects the card in setup mode — no money moves today, the card
     // is only stored so the first invoice can be charged when the trial ends.
+    // With trial_days 0 (returning customer) it's a normal subscription
+    // checkout and the first invoice is charged right away.
     // const res = await fetch("/functions/v1/create-checkout-session", {
     //   method: "POST",
     //   headers: { "Content-Type": "application/json" },
@@ -352,7 +385,8 @@
       return;
     }
 
-    location.href = "checkout.html?state=success&plan=" + state.plan + "&cycle=" + state.cycle;
+    location.href = "checkout.html?state=success&plan=" + state.plan + "&cycle=" + state.cycle +
+      (state.paidNow ? "&paid=1" : "");
   });
 
   // Skip the card entirely: record the free-plan choice (so login/signup stop
@@ -384,9 +418,17 @@
       $("co-success").hidden = false;
       $("co-eyebrow").textContent = "YOU'RE ALL SET";
       $("co-headline").innerHTML = 'Your <em>' + plan.name + '</em> drop is booked.';
-      $("co-sub").textContent =
-        "Your card is on file and the free trial has started — nothing was charged today. " +
-        "First invoice on " + trialEndsOn() + ", and you can cancel before then.";
+      if (state.paidNow) {
+        $("co-sub").textContent =
+          "Payment received — your plan is running again. " +
+          "Next invoice on " + renewsOn(state.cycle) + ", and you can cancel any time before then.";
+        $("co-success-tag").textContent = "PLAN ACTIVE · FIRST " + (state.cycle === "annual" ? "YEAR" : "MONTH") + " PAID";
+        $("co-success-foot").textContent = "Your card was charged today for the first " + (state.cycle === "annual" ? "year" : "month") + ".";
+      } else {
+        $("co-sub").textContent =
+          "Your card is on file and the free trial has started — nothing was charged today. " +
+          "First invoice on " + trialEndsOn() + ", and you can cancel before then.";
+      }
       $("co-success-text").textContent = "Your " + plan.name + " drop is live.";
     } else {
       $("co-cancelled").hidden = false;
