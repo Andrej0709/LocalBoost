@@ -57,7 +57,7 @@
 </nav>
 
 <header class="page-hero">
-  <div class="page-hero-watermark">SIGN UP</div>
+  <div class="page-hero-watermark" aria-hidden="true">SIGN UP</div>
   <div class="eyebrow" id="page-eyebrow">FIRST DROP FREE · CANCEL ANY WEEK</div>
   <h1 id="plan-headline">Set up your <em>Storefront</em> drop.</h1>
   <p id="page-sub">Onboard in ten minutes. Your first batch is waiting for approval before the week is out.</p>
@@ -150,8 +150,8 @@
         <textarea id="avoid" name="avoid" placeholder="e.g. No humor about pricing, never show the back kitchen..."></textarea>
       </div>
 
-      <div class="section-label">WHERE SHOULD WE PUBLISH?</div>
-      <div class="checkbox-group">
+      <div class="section-label" id="channels-label">WHERE SHOULD WE PUBLISH?</div>
+      <div class="checkbox-group" role="group" aria-labelledby="channels-label">
         <label class="checkbox-row"><input type="checkbox" name="channels" value="Instagram" checked>Instagram</label>
         <label class="checkbox-row"><input type="checkbox" name="channels" value="Facebook" checked>Facebook</label>
         <label class="checkbox-row"><input type="checkbox" name="channels" value="TikTok">TikTok</label>

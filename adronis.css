@@ -109,8 +109,8 @@ footer{position:relative;margin-top:64px;padding:44px 24px 44px;background:trans
   #nav-login{display:none}
   .nav-burger{display:inline-flex}
   .nav-cta{padding:11px 15px;white-space:nowrap}
-  .nav-sheet{display:grid;position:fixed;top:86px;left:16px;right:16px;z-index:49;gap:2px;padding:10px;border-radius:22px;border:1px solid rgba(255,255,255,.08);background:rgba(10,11,13,.95);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 24px 60px rgba(0,0,0,.6);opacity:0;transform:translateY(-10px);pointer-events:none;transition:opacity .22s ease,transform .28s cubic-bezier(.22,1,.36,1)}
-  .nav-sheet.open{opacity:1;transform:translateY(0);pointer-events:auto}
+  .nav-sheet{display:grid;position:fixed;top:86px;left:16px;right:16px;z-index:49;gap:2px;padding:10px;border-radius:22px;border:1px solid rgba(255,255,255,.08);background:rgba(10,11,13,.95);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 24px 60px rgba(0,0,0,.6);opacity:0;transform:translateY(-10px);pointer-events:none;visibility:hidden;transition:opacity .22s ease,transform .28s cubic-bezier(.22,1,.36,1),visibility .22s linear}
+  .nav-sheet.open{opacity:1;transform:translateY(0);pointer-events:auto;visibility:visible}
   .nav-sheet a{padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px}
   .nav-sheet a:active{background:rgba(255,255,255,.05)}
   .nav-sheet a.nav-sheet-alt{margin-top:4px;border:1px solid #23252a}

@@ -10,10 +10,12 @@
     burger.className = "nav-burger";
     burger.setAttribute("aria-label", "Menu");
     burger.setAttribute("aria-expanded", "false");
+    burger.setAttribute("aria-controls", "nav-sheet");
     burger.textContent = "≡";
 
     var sheet = document.createElement("div");
     sheet.className = "nav-sheet";
+    sheet.id = "nav-sheet";
     Array.prototype.forEach.call(links.querySelectorAll("a"), function (a) {
       sheet.appendChild(a.cloneNode(true));
     });
