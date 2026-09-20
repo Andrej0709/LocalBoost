@@ -44,8 +44,8 @@
 .bulk-actions{display:flex;gap:8px}
 .bulk-actions button{padding:9px 14px;border-radius:9999px;font-size:13px;white-space:nowrap}
 #kb-hint{margin:-10px 0 20px}
-.approve-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(14,15,18,.95);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(0,0,0,.5);font-size:13.5px;color:#d0d6e0;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
-.approve-toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);pointer-events:auto}
+.approve-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(14,15,18,.95);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(0,0,0,.5);font-size:13.5px;color:#d0d6e0;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .2s ease,transform .2s ease,visibility .2s linear}
+.approve-toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);pointer-events:auto;visibility:visible}
 .approve-toast button{padding:6px 14px;border-radius:9999px;border:1px solid rgba(168,198,240,.4);background:var(--acc-soft);color:var(--acc);font-size:12.5px;font-family:'Geist',sans-serif;cursor:pointer;white-space:nowrap}
 @media (max-width:860px){#kb-hint{display:none}}
 @media (max-width:640px){.approve-toast{left:16px;right:16px;transform:translateY(0)}.approve-toast.show{transform:translateY(-6px)}}
@@ -149,7 +149,7 @@
 </section>
 
 <div id="approve-toast" class="approve-toast">
-  <span id="approve-toast-msg"></span>
+  <span id="approve-toast-msg" role="status"></span>
   <button type="button" id="approve-toast-undo">Undo</button>
 </div>
 
@@ -314,6 +314,10 @@
   function buildCard(creative) {
     var card = document.createElement("article");
     card.className = "creative-card is-" + creative.status;
+    card.tabIndex = -1;
+    card.setAttribute("aria-label",
+      (creative.headline || "Untitled creative") + " — " +
+      (STATUS_LABEL[creative.status] || creative.status).toLowerCase());
 
     var media = document.createElement("div");
     media.className = "creative-media";
@@ -333,7 +337,15 @@
       img.addEventListener("error", function () { placeholder.textContent = "IMAGE UNAVAILABLE"; });
       img.src = creative.image_url;
       media.appendChild(img);
-      media.addEventListener("click", function () { openLightbox(creative.image_url); });
+      media.setAttribute("role", "button");
+      media.tabIndex = 0;
+      media.setAttribute("aria-label", "View full size: " + (creative.headline || "creative"));
+      media.addEventListener("click", function () { openLightbox(creative.image_url, creative.headline); });
+      media.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        openLightbox(creative.image_url, creative.headline);
+      });
     } else {
       media.style.cursor = "default";
     }
@@ -457,6 +469,7 @@
 
   function renderGrid() {
     var list = visibleCreatives();
+    var keptFocus = grid.contains(document.activeElement);
     grid.innerHTML = "";
 
     if (!list.length) {
@@ -469,14 +482,20 @@
     list.forEach(function (creative) { grid.appendChild(buildCard(creative)); });
 
     if (focusIndex >= list.length) focusIndex = list.length - 1;
-    applyFocusRing();
+    applyFocusRing(keptFocus);
   }
 
   // --- Keyboard triage: arrow keys move a focus ring, Y/N act on it ---
-  function applyFocusRing() {
+  // The ring is only half of it: the focused card also takes DOM focus, so a
+  // screen reader reads the card the arrows landed on and Y/N act on the card
+  // its user just heard. Tab reaches the grid at whichever card the ring is on.
+  function applyFocusRing(moveDomFocus) {
     var cards = grid.querySelectorAll(".creative-card");
     Array.prototype.forEach.call(cards, function (card, i) {
-      card.classList.toggle("kb-focus", i === focusIndex);
+      var focused = i === focusIndex;
+      card.classList.toggle("kb-focus", focused);
+      card.tabIndex = focused || (focusIndex < 0 && i === 0) ? 0 : -1;
+      if (focused && moveDomFocus) card.focus({ preventScroll: true });
     });
   }
 
@@ -484,7 +503,7 @@
     var list = visibleCreatives();
     if (!list.length) { focusIndex = -1; return; }
     focusIndex = focusIndex < 0 ? 0 : Math.max(0, Math.min(list.length - 1, focusIndex + delta));
-    applyFocusRing();
+    applyFocusRing(true);
     var cards = grid.querySelectorAll(".creative-card");
     if (cards[focusIndex]) cards[focusIndex].scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
@@ -500,8 +519,12 @@
   }
 
   document.addEventListener("keydown", function (event) {
-    var tag = document.activeElement && document.activeElement.tagName;
-    if (tag === "INPUT" || tag === "TEXTAREA" || board.hidden || document.querySelector(".lightbox")) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    var active = document.activeElement;
+    var tag = active && active.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" ||
+        (active && active.isContentEditable) ||
+        board.hidden || document.querySelector(".lightbox")) return;
 
     if (event.key === "ArrowRight" || event.key === "ArrowDown") { event.preventDefault(); moveFocus(1); }
     else if (event.key === "ArrowLeft" || event.key === "ArrowUp") { event.preventDefault(); moveFocus(-1); }
@@ -511,6 +534,12 @@
 
   // --- Bulk approve/reject, with an undo window ---
   var toastTimer = null;
+
+  // Five seconds is enough to read the toast but not always enough to tab to it,
+  // so reaching Undo with the keyboard stops the clock.
+  document.getElementById("approve-toast").addEventListener("focusin", function () {
+    clearTimeout(toastTimer);
+  });
 
   function showUndoToast(ids, appliedStatus) {
     var toast = document.getElementById("approve-toast");
@@ -590,23 +619,33 @@
     });
   });
 
-  function openLightbox(url) {
+  function openLightbox(url, label) {
+    var opener = document.activeElement;
     var box = document.createElement("div");
     box.className = "lightbox";
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    box.setAttribute("aria-label", label ? label + " — full size" : "Creative, full size");
+    box.tabIndex = -1;
     var img = new Image();
     img.src = url;
-    img.alt = "";
+    img.alt = label || "AI-generated creative";
     box.appendChild(img);
     function close() {
       box.remove();
       document.removeEventListener("keydown", onKey);
+      if (opener && opener.focus) opener.focus();
     }
     function onKey(event) {
-      if (event.key === "Escape") close();
+      if (event.key === "Escape") { close(); return; }
+      // Nothing inside the lightbox is focusable, so Tab would otherwise walk
+      // the page behind it while it covers the screen.
+      if (event.key === "Tab") { event.preventDefault(); box.focus(); }
     }
     box.addEventListener("click", close);
     document.addEventListener("keydown", onKey);
     document.body.appendChild(box);
+    box.focus();
   }
 
   // A local, unsaved sample so the page can be seen before the first real drop lands.
