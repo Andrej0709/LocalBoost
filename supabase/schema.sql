@@ -221,7 +221,7 @@ create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 begin
   insert into public.profiles (
@@ -280,7 +280,7 @@ create or replace function public.start_trial(
 returns public.profiles
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   row_out public.profiles;
@@ -359,7 +359,7 @@ create or replace function public.finalize_billing_period()
 returns public.profiles
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   row_out     public.profiles;
@@ -436,7 +436,7 @@ create or replace function public.cancel_at_period_end()
 returns public.profiles
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   row_out public.profiles;
@@ -465,7 +465,7 @@ create or replace function public.resume_subscription()
 returns public.profiles
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   row_out public.profiles;
@@ -498,7 +498,7 @@ create or replace function public.schedule_plan_change(
 returns public.profiles
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   row_out public.profiles;
@@ -544,7 +544,7 @@ create or replace function public.cancel_plan_change()
 returns public.profiles
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   row_out public.profiles;
@@ -581,7 +581,7 @@ create or replace function public.free_quota()
 returns json
 language plpgsql
 stable
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   month_start timestamptz := date_trunc('month', now() at time zone 'utc') at time zone 'utc';
@@ -610,7 +610,7 @@ create or replace function public.enforce_free_quota()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   owner_status public.subscription_status;
@@ -664,7 +664,7 @@ create trigger creatives_enforce_free_quota
 create or replace function public.protect_profile_billing()
 returns trigger
 language plpgsql
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   editable public.profiles;
@@ -733,7 +733,7 @@ create trigger profiles_protect_billing
 create or replace function public.protect_creative_fields()
 returns trigger
 language plpgsql
-set search_path = public
+set search_path = public, pg_temp
 as $$
 declare
   editable public.creatives;
@@ -763,6 +763,44 @@ drop trigger if exists creatives_protect_fields on public.creatives;
 create trigger creatives_protect_fields
   before update on public.creatives
   for each row execute function public.protect_creative_fields();
+
+/* A drop row moves through the queue on its own; the only thing the customer
+   does to it is close it out once nothing is left waiting. The engine owns
+   'rendering', 'published' and 'skipped'. */
+create or replace function public.protect_drop_fields()
+returns trigger
+language plpgsql
+set search_path = public, pg_temp
+as $$
+declare
+  editable public.drops;
+begin
+  if current_user not in ('authenticated', 'anon') then
+    return new;
+  end if;
+
+  editable            := old;
+  editable.status     := new.status;
+  editable.updated_at := new.updated_at;
+
+  if new is distinct from editable then
+    raise exception 'Only a drop''s status can be changed.';
+  end if;
+
+  if new.status is distinct from old.status
+     and (new.status not in ('awaiting_approval', 'approved')
+          or old.status = 'published') then
+    raise exception 'Adronis moves a drop through the rest of the queue.';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists drops_protect_fields on public.drops;
+create trigger drops_protect_fields
+  before update on public.drops
+  for each row execute function public.protect_drop_fields();
 
 /* ------------------------------------------------------------ */
 /* 9. Row Level Security */
@@ -810,8 +848,8 @@ create policy "creatives update own" on public.creatives
 /* Supabase dashboard, which bypasses RLS. */
 drop policy if exists "contact insert public" on public.contact_requests;
 create policy "contact insert public" on public.contact_requests
-  for insert to anon, authenticated with check (true);
+  for insert to anon, authenticated with check (status = 'new');
 
 drop policy if exists "messages insert public" on public.messages;
 create policy "messages insert public" on public.messages
-  for insert to anon, authenticated with check (true);
+  for insert to anon, authenticated with check (status = 'new');
