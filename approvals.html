@@ -78,7 +78,7 @@
 
     <!-- Signed out -->
     <div id="signed-out" class="card" hidden style="max-width:440px;margin:0 auto;text-align:center">
-      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">NOT SIGNED IN</div>
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089">NOT SIGNED IN</div>
       <h3 style="margin:14px 0 8px">Log in to see your drop.</h3>
       <p style="margin:0">Your creatives are tied to your account — sign in and this week's batch loads here.</p>
       <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
@@ -103,7 +103,7 @@
       <div class="approve-head">
         <div>
           <h2 id="drop-title">Your creatives</h2>
-          <div id="drop-meta" class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d;margin-top:8px">&mdash;</div>
+          <div id="drop-meta" class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089;margin-top:8px">&mdash;</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
           <div class="counts" id="counts"></div>
@@ -121,7 +121,7 @@
         <button data-filter="rejected" data-label="Rejected">Rejected</button>
         <button data-filter="all" data-label="Everything">Everything</button>
       </div>
-      <div id="kb-hint" class="mono" style="font-size:11px;letter-spacing:.08em;color:#4c5056">Y approve &middot; N reject &middot; &larr;&rarr; navigate</div>
+      <div id="kb-hint" class="mono" style="font-size:11px;letter-spacing:.08em;color:#7b8089">Y approve &middot; N reject &middot; &larr;&rarr; navigate</div>
 
       <div id="board-notice" class="notice" role="status" hidden style="margin-bottom:20px"></div>
 
@@ -156,7 +156,7 @@
 <section class="section-tight">
   <div class="wrap">
     <div class="divider" style="margin:16px auto 40px"></div>
-    <p style="font-size:13.5px;color:#4c5056">Every image on this page is AI-generated and published only after you approve it. Read the <a href="ai-disclosure.html">AI disclosure</a>.</p>
+    <p style="font-size:13.5px;color:#7b8089">Every image on this page is AI-generated and published only after you approve it. Read the <a href="ai-disclosure.html">AI disclosure</a>.</p>
   </div>
 </section>
 
@@ -370,7 +370,7 @@
     if (creative.status === "published") {
       var live = document.createElement("div");
       live.className = "mono";
-      live.style.cssText = "font-size:10px;letter-spacing:.1em;color:#62666d;padding:4px 2px";
+      live.style.cssText = "font-size:10px;letter-spacing:.1em;color:#7b8089;padding:4px 2px";
       live.textContent = creative.published_at
         ? "PUBLISHED " + new Date(creative.published_at)
             .toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()

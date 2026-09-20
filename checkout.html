@@ -39,9 +39,9 @@
 .co-plan.selected .co-radio{border-color:var(--acc)}
 .co-plan.selected .co-radio::after{content:"";position:absolute;inset:3px;border-radius:9999px;background:var(--acc)}
 .co-plan-name{font-size:15.5px;color:#fff;letter-spacing:-.015em}
-.co-plan-rate{margin-top:3px;font-size:12.5px;color:#62666d}
+.co-plan-rate{margin-top:3px;font-size:12.5px;color:#7b8089}
 .co-plan-price{text-align:right;font-size:19px;color:#d0d6e0;letter-spacing:-.02em;white-space:nowrap}
-.co-plan-per{display:block;margin-top:2px;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#4c5056}
+.co-plan-per{display:block;margin-top:2px;font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#7b8089}
 
 .co-save{display:inline-block;margin-left:8px;padding:3px 8px;border-radius:9999px;background:rgba(159,215,176,.14);border:1px solid rgba(159,215,176,.3);font-family:'Geist Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#9fd7b0;vertical-align:middle}
 
@@ -57,14 +57,14 @@
 .co-total-label{font-size:15px;color:#fff}
 .co-total-value{font-size:28px;color:var(--acc);letter-spacing:-.03em}
 
-.co-secure{display:flex;align-items:center;gap:9px;margin-top:16px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#4c5056}
+.co-secure{display:flex;align-items:center;gap:9px;margin-top:16px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#7b8089}
 .co-secure-dot{width:6px;height:6px;border-radius:9999px;background:#9fd7b0;box-shadow:0 0 10px rgba(159,215,176,.6);flex:none}
 
 .co-terms{margin-top:14px;font-size:12.5px;line-height:1.6;color:#8a8f98;text-align:center}
 .co-terms a{color:#a8c6f0;text-decoration:underline;text-underline-offset:2px}
 
 .co-summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.co-swap{font-size:12.5px;color:#62666d}
+.co-swap{font-size:12.5px;color:#7b8089}
 
 .co-result{max-width:520px;margin:0 auto;text-align:center}
 .co-result-mark{display:flex;align-items:center;justify-content:center;width:52px;height:52px;margin:0 auto 20px;border-radius:16px;font-size:22px}
@@ -127,7 +127,7 @@
         <button type="button" data-cycle="monthly" class="active">Monthly</button>
         <button type="button" data-cycle="annual">Annual<span class="co-save">SAVE 20%</span></button>
       </div>
-      <p id="co-cycle-note" style="margin:12px 0 0;font-size:13px;color:#4c5056">Billed every month. Cancel any week, no notice period.</p>
+      <p id="co-cycle-note" style="margin:12px 0 0;font-size:13px;color:#7b8089">Billed every month. Cancel any week, no notice period.</p>
 
       <div class="co-step" style="margin-top:34px">
         <div class="co-step-num">3</div>
@@ -174,10 +174,10 @@
         <span>PAYMENT HANDLED BY STRIPE · CARD DETAILS NEVER TOUCH OUR SERVERS</span>
       </div>
 
-      <div id="co-free" style="margin-top:14px;text-align:center;font-size:13px;color:#62666d" hidden>
+      <div id="co-free" style="margin-top:14px;text-align:center;font-size:13px;color:#7b8089" hidden>
         Not ready to add a card?
         <button type="button" id="co-free-btn" style="background:none;border:none;padding:0;color:var(--acc);font-size:13px;font-family:'Geist',sans-serif;cursor:pointer">Start on the Free plan instead →</button>
-        <div style="margin-top:4px;font-size:12px;color:#4c5056">3 ads a month, no card. Upgrade whenever you like.</div>
+        <div style="margin-top:4px;font-size:12px;color:#7b8089">3 ads a month, no card. Upgrade whenever you like.</div>
       </div>
 
       <div class="co-terms">
@@ -190,15 +190,15 @@
 
     <aside class="card" id="co-summary" style="position:sticky;top:96px">
       <div class="co-summary-head">
-        <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">ORDER SUMMARY</div>
+        <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089">ORDER SUMMARY</div>
         <a href="/#pricing" class="co-swap">Compare plans →</a>
       </div>
 
       <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:16px">
         <div id="co-sum-name" style="font-size:20px;color:#fff;letter-spacing:-.015em">Storefront</div>
-        <div><span id="co-sum-price" style="font-size:28px;color:var(--acc);letter-spacing:-.03em">€249</span><span id="co-sum-per" class="mono" style="font-size:10px;color:#62666d"> / MONTH</span></div>
+        <div><span id="co-sum-price" style="font-size:28px;color:var(--acc);letter-spacing:-.03em">€249</span><span id="co-sum-per" class="mono" style="font-size:10px;color:#7b8089"> / MONTH</span></div>
       </div>
-      <div id="co-sum-rate" style="margin-top:6px;font-size:13px;color:#62666d">12 ads / week · 4 channels</div>
+      <div id="co-sum-rate" style="margin-top:6px;font-size:13px;color:#7b8089">12 ads / week · 4 channels</div>
 
       <div style="height:1px;background:#1b1e22;margin:18px 0"></div>
 
@@ -208,7 +208,7 @@
         <div class="co-total-label">Due today</div>
         <div class="co-total-value" id="co-due">€0</div>
       </div>
-      <div id="co-then" style="margin-top:8px;font-size:12.5px;line-height:1.6;color:#4c5056"></div>
+      <div id="co-then" style="margin-top:8px;font-size:12.5px;line-height:1.6;color:#7b8089"></div>
 
       <div style="height:1px;background:#1b1e22;margin:18px 0"></div>
 
@@ -225,7 +225,7 @@
       <div id="co-success-text" style="margin-top:14px;font-size:19px;color:#fff;letter-spacing:-.015em">Your Storefront drop is live.</div>
       <p style="margin-top:10px">The engine is already rendering. Your first batch hits the approvals queue Monday at 09:00 — you'll get an email the moment it's ready.</p>
       <a href="approvals.html" class="btn" style="width:100%;justify-content:center;margin-top:24px">Go to approvals<span class="mono" style="font-size:13px">→</span></a>
-      <div id="co-success-foot" style="margin-top:16px;font-size:12.5px;color:#4c5056">Your card is saved for after the trial. Nothing has been charged.</div>
+      <div id="co-success-foot" style="margin-top:16px;font-size:12.5px;color:#7b8089">Your card is saved for after the trial. Nothing has been charged.</div>
     </div>
   </div>
 
@@ -237,7 +237,7 @@
       <div style="margin-top:14px;font-size:19px;color:#fff;letter-spacing:-.015em">Nothing was charged.</div>
       <p style="margin-top:10px">You stepped out before the payment went through. Your account and onboarding answers are saved exactly as you left them.</p>
       <a id="co-retry" href="checkout.html" class="btn" style="width:100%;justify-content:center;margin-top:24px">Pick up where you left off<span class="mono" style="font-size:13px">→</span></a>
-      <div style="margin-top:14px"><a href="contact.html" style="font-size:13px;color:#62666d">Something went wrong? Talk to us →</a></div>
+      <div style="margin-top:14px"><a href="contact.html" style="font-size:13px;color:#7b8089">Something went wrong? Talk to us →</a></div>
     </div>
   </div>
 

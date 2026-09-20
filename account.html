@@ -20,12 +20,12 @@
 <style>
 .acc-grid{display:grid;gap:20px}
 .acc-group{display:grid;gap:10px}
-.acc-group-label{font-size:11px;letter-spacing:.1em;color:#62666d;padding-left:2px}
+.acc-group-label{font-size:11px;letter-spacing:.1em;color:#7b8089;padding-left:2px}
 .acc-logout{flex:none;padding:10px 8px;margin:-10px -8px;background:none;border:none;color:#9aa0a8;font-size:13px;cursor:pointer;font-family:'Geist',sans-serif;transition:color .2s ease}
 .acc-logout:hover{color:#fff}
 .acc-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:6px}
 .acc-card-title{font-size:15.5px;color:#fff;letter-spacing:-.015em;margin:0}
-.acc-card-sub{margin:6px 0 20px;font-size:13px;color:#62666d}
+.acc-card-sub{margin:6px 0 20px;font-size:13px;color:#7b8089}
 .acc-row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid #1b1e22}
 .acc-row:first-of-type{border-top:none;padding-top:0}
 .acc-row-label{font-size:13.5px;color:#8a8f98}
@@ -40,12 +40,12 @@
 .acc-form-inline .field{flex:1;min-width:220px;margin-bottom:0}
 .acc-card-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0;border:none;background:none;cursor:pointer;font-family:'Geist',sans-serif;text-align:left}
 .acc-card-toggle-title{font-size:15.5px;color:#fff;letter-spacing:-.015em}
-.acc-card-arrow{font-size:13px;color:#62666d;transition:transform .2s ease,color .2s ease}
+.acc-card-arrow{font-size:13px;color:#7b8089;transition:transform .2s ease,color .2s ease}
 .acc-card-toggle:hover .acc-card-arrow{color:var(--acc);transform:translateX(3px)}
 .acc-card-toggle[aria-expanded="true"] .acc-card-arrow{transform:rotate(90deg)}
 .acc-card-toggle[aria-expanded="true"]:hover .acc-card-arrow{transform:rotate(90deg) translateX(3px)}
 .acc-table{width:100%;border-collapse:collapse;font-size:13.5px}
-.acc-table th{text-align:left;padding:0 0 10px;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#62666d;font-weight:400;border-bottom:1px solid #1b1e22}
+.acc-table th{text-align:left;padding:0 0 10px;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#7b8089;font-weight:400;border-bottom:1px solid #1b1e22}
 .acc-table td{padding:12px 0;border-top:1px solid #1b1e22;color:#d0d6e0;vertical-align:middle}
 .acc-table td:last-child,.acc-table th:last-child{text-align:right}
 .acc-table-wrap{overflow-x:auto}
@@ -80,7 +80,7 @@
 
     <!-- Signed out -->
     <div id="signed-out" class="card" hidden style="max-width:440px;margin:0 auto;text-align:center">
-      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">NOT SIGNED IN</div>
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089">NOT SIGNED IN</div>
       <h3 style="margin:14px 0 8px">Log in to manage your account.</h3>
       <p style="margin:0">Password, connected channels and billing all live behind your login.</p>
       <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
@@ -100,7 +100,7 @@
       <div class="card">
         <div class="acc-head">
           <div>
-            <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#62666d">SIGNED IN AS</div>
+            <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089">SIGNED IN AS</div>
             <div id="acc-name" style="margin-top:8px;font-size:19px;color:#fff;letter-spacing:-.015em">—</div>
           </div>
           <div id="acc-status-chip" class="acc-chip muted">NO PLAN</div>
@@ -227,10 +227,10 @@
                 <button type="button" data-cycle="annual">Annual · −20%</button>
               </div>
             </div>
-            <p id="pc-note" style="font-size:12.5px;line-height:1.5;color:#4c5056;margin:0 0 16px">—</p>
+            <p id="pc-note" style="font-size:12.5px;line-height:1.5;color:#7b8089;margin:0 0 16px">—</p>
             <div style="display:flex;gap:10px">
               <button type="button" id="pc-confirm" class="btn-ghost">Confirm change</button>
-              <button type="button" id="pc-cancel" style="background:none;border:none;color:#62666d;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Cancel</button>
+              <button type="button" id="pc-cancel" style="background:none;border:none;color:#7b8089;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Cancel</button>
             </div>
           </div>
 
@@ -263,7 +263,7 @@
             </table>
           </div>
 
-          <div style="margin-top:18px;font-size:12.5px;line-height:1.6;color:#4c5056">
+          <div style="margin-top:18px;font-size:12.5px;line-height:1.6;color:#7b8089">
             Amounts are calculated from your plan and billing date, not pulled from a payment processor yet — connect Stripe to replace this with real invoice receipts.
           </div>
         </div>
