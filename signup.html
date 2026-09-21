@@ -58,7 +58,7 @@
 
 <header class="page-hero">
   <div class="page-hero-watermark" aria-hidden="true">SIGN UP</div>
-  <div class="eyebrow" id="page-eyebrow">FIRST DROP FREE · CANCEL ANY WEEK</div>
+  <div class="eyebrow" id="page-eyebrow">7-DAY FREE TRIAL · CANCEL ANY TIME</div>
   <h1 id="plan-headline">Set up your <em>Storefront</em> drop.</h1>
   <p id="page-sub">Onboard in ten minutes. Your first batch is waiting for approval before the week is out.</p>
 </header>
@@ -160,6 +160,15 @@
         <label class="checkbox-row"><input type="checkbox" name="channels" value="Pinterest">Pinterest</label>
       </div>
 
+      <div class="section-label" id="consent-label">BEFORE YOU START</div>
+      <div class="checkbox-group" role="group" aria-labelledby="consent-label">
+        <label class="checkbox-row"><input type="checkbox" id="consent-terms" name="consent-terms" required>I have read and accept the <a href="terms.html" target="_blank" rel="noopener">Terms of Service</a>, the <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a> and the <a href="ai-disclosure.html" target="_blank" rel="noopener">AI Disclosure</a>, and I am opening this account for a business.</label>
+      </div>
+      <p style="margin:14px 0 0;font-size:12.5px;line-height:1.6;color:#7b8089">
+        We use what you enter here to render your drops, run your account and support you. We do not sell it and we do not use your brand material to train models for other customers.
+        You can request a copy or deletion at any time at <a href="mailto:privacy@adronis.app">privacy@adronis.app</a>.
+        Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.
+      </p>
       <button type="submit" class="btn" style="width:100%;justify-content:center;border:none;margin-top:32px">Claim your first drop<span class="mono" style="font-size:13px">→</span></button>
       <div id="signup-notice" class="notice" role="status" style="margin-top:18px" hidden></div>
     </form>
@@ -171,6 +180,7 @@
         <div><span id="plan-price" style="font-size:28px;color:var(--acc);letter-spacing:-.03em">€249</span><span class="mono" style="font-size:10px;color:#7b8089"> / MONTH</span></div>
       </div>
       <div id="plan-rate" style="margin-top:6px;font-size:13px;color:#7b8089">12 ads / week · 4 channels</div>
+      <div id="plan-vat" style="margin-top:6px;font-size:12px;color:#7b8089">Excl. VAT. Tax is calculated at checkout from your country.</div>
       <div style="height:1px;background:#1b1e22;margin:18px 0"></div>
       <ul class="plain" id="plan-features" style="padding-left:0;list-style:none;display:grid;gap:10px;font-size:13.5px"></ul>
       <div style="margin-top:18px"><a href="/#pricing" style="font-size:13px;color:#7b8089">Not the right plan? Compare plans →</a></div>
@@ -187,7 +197,7 @@
     </div>
     <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="/#drop">The weekly drop</a><a href="/#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
     <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
-    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
   </div>
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
@@ -197,6 +207,9 @@
 <script src="auth.js"></script>
 <script>
 (function(){
+  // Bump this whenever terms.html / privacy.html change materially, so the
+  // stored acceptance points at the wording the customer actually saw.
+  var TERMS_VERSION = "2026-09-21";
   var plans = {
     free: { name: "Free", price: "€0", rate: "3 ads / month · 1 channel",
       features: ["3 photoreal creatives every month", "One connected channel", "Swipe approval in the app", "No card needed — upgrade whenever you like"] },
@@ -231,6 +244,8 @@
     document.getElementById("page-eyebrow").textContent = FREE_EYEBROW;
     document.getElementById("page-sub").textContent =
       "Onboard in ten minutes. Your free ads land in Approvals as soon as the engine renders them.";
+    // Nothing is billed on the free plan, so the VAT line would only confuse.
+    document.getElementById("plan-vat").hidden = true;
   }
   document.getElementById("plan-name").textContent = plan.name;
   document.getElementById("plan-price").textContent = plan.price;
@@ -346,7 +361,12 @@
       brand_colors:     document.getElementById("colors").value,
       avoid_notes:      document.getElementById("avoid").value,
       channels:         checkedChannels(),
-      plan:             planKey
+      plan:             planKey,
+      // Evidence of the contract: stamped from the consent checkbox on this
+      // form. TERMS_VERSION must be bumped whenever the terms change materially,
+      // so an account's row says which wording it actually accepted.
+      terms_accepted_at: new Date().toISOString(),
+      terms_version:     TERMS_VERSION
     };
   }
 

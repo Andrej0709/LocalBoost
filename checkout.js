@@ -183,15 +183,17 @@
       $("co-due").textContent = euro(recurring);
       $("co-then").textContent =
         "Your free trial was already used on this account, so billing starts today. Then " +
-        euro(recurring) + " " + per + ", next charged " + renewsOn(state.cycle) + ". Cancel any time.";
+        euro(recurring) + " " + per + " including tax, renewing automatically, next charged " +
+        renewsOn(state.cycle) + ". Cancel any time from your account — access runs to the end of the period you paid for.";
       $("co-sub").textContent =
         "Welcome back. Your free trial was already used, so your first " +
         (state.cycle === "annual" ? "year" : "month") + " is billed today. Cancel any time before the next renewal.";
     } else {
       $("co-due").textContent = "€0";
       $("co-then").textContent =
-        "Then " + euro(recurring) + " " + per +
-        ", first charged " + trialEndsOn() + ". Cancel before then and you pay nothing.";
+        "After the 7-day free trial this becomes a paid subscription automatically: " +
+        euro(recurring) + " " + per + " including tax, first charged " + trialEndsOn() +
+        " and renewing until you cancel. Cancel before that date from your account and you pay nothing.";
     }
 
     $("co-features").innerHTML = plan.features.map(function (f) {
@@ -206,9 +208,11 @@
     Array.prototype.forEach.call($("co-cycle").children, function (b) {
       b.classList.toggle("active", b.getAttribute("data-cycle") === state.cycle);
     });
+    // Must say exactly what terms.html clause 7 says. A refund promise made here
+    // and denied there is the kind of contradiction a customer wins.
     $("co-cycle-note").textContent = state.cycle === "annual"
-      ? "Billed once a year at 20% off. Cancel any time — unused months are refunded pro rata."
-      : "Billed every month. Cancel any week, no notice period.";
+      ? "Billed once a year at 20% off, then renews every 12 months. Cancel any time — access runs to the end of the paid year, and unused months are not refunded."
+      : "Billed every month and renews automatically. Cancel any time — access runs to the end of the paid month, with no notice period.";
   }
 
   function render() {

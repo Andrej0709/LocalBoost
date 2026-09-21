@@ -84,7 +84,17 @@
         <label for="message">MESSAGE</label>
         <textarea id="message" name="message" placeholder="Number of locations, verticals, channels you're on today..."></textarea>
       </div>
+      <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+        <label for="c-company">Company (leave empty)</label>
+        <input id="c-company" name="c-company" type="text" tabindex="-1" autocomplete="off">
+      </div>
       <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Send message<span class="mono" style="font-size:13px">→</span></button>
+      <p style="margin:16px 0 0;font-size:12.5px;line-height:1.6;color:#7b8089">
+        We use what you send here only to answer you, and we keep it for up to 24 months.
+        We do not sell it and we do not add you to a marketing list without your consent.
+        See the <a href="privacy.html">Privacy Policy</a>, or ask us to delete your message at <a href="mailto:privacy@adronis.app">privacy@adronis.app</a>.
+        Please do not send sensitive personal data through this form.
+      </p>
     </form>
 
     <div id="success-notice" class="notice" role="status" hidden>Thanks — a real person reads every message here and replies within one business day.</div>
@@ -99,7 +109,7 @@
     </div>
     <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="/#drop">The weekly drop</a><a href="/#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
     <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
-    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a></div>
+    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
   </div>
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
@@ -125,6 +135,15 @@
     var form = this;
     var button = form.querySelector("button[type=submit]");
     button.disabled = true;
+
+    // Honeypot: a real person never sees this field, so anything in it is a bot.
+    // Show the same success state and write nothing — every stored row is personal
+    // data we then have to keep, secure and delete on request.
+    if (document.getElementById("c-company").value) {
+      form.hidden = true;
+      document.getElementById("success-notice").hidden = false;
+      return;
+    }
 
     var res = await LBAuth.db.from("contact_requests").insert({
       business_name: document.getElementById("business").value,

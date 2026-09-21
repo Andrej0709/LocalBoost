@@ -85,6 +85,12 @@ create table if not exists public.profiles (
      rewrite what earlier periods actually billed. */
   billing_history     jsonb not null default '[]'::jsonb,
 
+  /* Proof of what the customer accepted and when. Written once at signup from
+     the consent checkbox, and again whenever they accept a newer version. Never
+     cleared - it is the evidence that the contract was formed. */
+  terms_accepted_at   timestamptz,
+  terms_version       text,
+
   onboarded_at        timestamptz,
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now()
@@ -104,6 +110,12 @@ alter table public.profiles add column if not exists cancel_at_period_end  boole
 alter table public.profiles add column if not exists pending_plan          public.plan_tier;
 alter table public.profiles add column if not exists pending_billing_cycle text;
 alter table public.profiles add column if not exists billing_history       jsonb not null default '[]'::jsonb;
+
+/* --- Migration for recorded acceptance of the legal terms ------------------- */
+/* Rows created before the consent checkbox stay null: no record, no claim that  */
+/* they accepted anything. Ask those accounts to re-accept on next login.        */
+alter table public.profiles add column if not exists terms_accepted_at timestamptz;
+alter table public.profiles add column if not exists terms_version     text;
 
 /* Existing paying accounts predate current_period_end - seed it from the trial
    date they already have so finalize_billing_period() has an anchor to work from. */
@@ -227,7 +239,8 @@ begin
   insert into public.profiles (
     id, email, business_name, city, vertical, website,
     what_you_sell, typical_customer, differentiator,
-    brand_vibe, brand_colors, avoid_notes, channels, plan
+    brand_vibe, brand_colors, avoid_notes, channels, plan,
+    terms_accepted_at, terms_version
   )
   values (
     new.id,
@@ -251,7 +264,9 @@ begin
            end)),
       '{}'
     ),
-    (nullif(new.raw_user_meta_data ->> 'plan', ''))::public.plan_tier
+    (nullif(new.raw_user_meta_data ->> 'plan', ''))::public.plan_tier,
+    (nullif(new.raw_user_meta_data ->> 'terms_accepted_at', ''))::timestamptz,
+    nullif(new.raw_user_meta_data ->> 'terms_version', '')
   )
   on conflict (id) do nothing;
 
