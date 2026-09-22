@@ -94,9 +94,10 @@
     </ul>
     <p>We do not sell personal data, and we do not use it for automated decisions that produce legal or similarly significant effects for you.</p>
 
-    <h3>5. Cookies and local storage</h3>
+    <h3 id="cookies">5. Cookies and local storage</h3>
     <p>We use only what is strictly necessary to run the product: a session stored in your browser to keep you signed in, and storage for basic interface preferences. <strong>We do not use analytics, advertising or tracking cookies, and there are no third-party trackers on this site.</strong></p>
-    <p>Because only essential storage is used, no consent banner is required. If we ever introduce analytics or any non-essential cookie, we will ask for your consent first and update this section before it is switched on.</p>
+    <p>On your first visit we ask you to confirm your choice, and we remember it in your browser. If we ever introduce analytics or any non-essential cookie, we will ask for your consent again and update this section before it is switched on.</p>
+    <p><button type="button" class="btn-ghost" onclick="window.LBConsent &amp;&amp; LBConsent.open()">Cookie settings</button></p>
 
     <h3>6. Who else processes your data</h3>
     <p>We share personal data only with providers that help us run the service, under contracts that oblige them to protect it and to process it only on our instructions:</p>
@@ -159,6 +160,7 @@
 </footer>
 
 <script src="nav.js"></script>
+<script src="cookies.js"></script>
 <script src="i18n-sr.js"></script>
 <script src="i18n.js"></script>
 </body>

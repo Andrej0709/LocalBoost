@@ -26,6 +26,14 @@ window.LB_I18N_SR = {
     "Start free drop": "Pokreni besplatan drop",
     "Account": "Nalog",
     "Menu": "Meni",
+
+    /* --- Cookie consent card (cookies.js) -------------------------------- */
+    "Cookies on this site": "Kolačići na ovom sajtu",
+    "We use cookies and local storage to keep you signed in and remember your preferences. No ads, no trackers.":
+      "Koristimo kolačiće i lokalno skladište da ostaneš prijavljen i da zapamtimo tvoja podešavanja. Bez oglasa, bez praćenja.",
+    "Privacy policy": "Politika privatnosti",
+    "Essential only": "Samo neophodni",
+    "Accept all": "Prihvati sve",
     "Weekly ad drops for businesses with no marketing department.":
       "Nedeljni dropovi oglasa za biznise bez marketing odeljenja.",
     "PRODUCT": "PROIZVOD",
@@ -936,8 +944,9 @@ window.LB_I18N_SR = {
       "Koristimo samo ono što je neophodno za rad proizvoda: sesiju sačuvanu u tvom pregledaču da ostaneš prijavljen i skladište za osnovna podešavanja interfejsa.",
     "We do not use analytics, advertising or tracking cookies, and there are no third-party trackers on this site.":
       "Ne koristimo analitičke, oglasne ni prateće kolačiće, i na ovom sajtu nema pratilaca trećih lica.",
-    "Because only essential storage is used, no consent banner is required. If we ever introduce analytics or any non-essential cookie, we will ask for your consent first and update this section before it is switched on.":
-      "Pošto se koristi samo neophodno skladište, baner za saglasnost nije potreban. Ako ikada uvedemo analitiku ili bilo koji kolačić koji nije neophodan, prvo ćemo tražiti tvoju saglasnost i ažurirati ovaj odeljak pre nego što se uključi.",
+    "On your first visit we ask you to confirm your choice, and we remember it in your browser. If we ever introduce analytics or any non-essential cookie, we will ask for your consent again and update this section before it is switched on.":
+      "Pri prvoj poseti tražimo da potvrdiš svoj izbor i pamtimo ga u tvom pregledaču. Ako ikada uvedemo analitiku ili bilo koji kolačić koji nije neophodan, ponovo ćemo tražiti tvoju saglasnost i ažurirati ovaj odeljak pre nego što se uključi.",
+    "Cookie settings": "Podešavanja kolačića",
     "6. Who else processes your data": "6. Ko još obrađuje tvoje podatke",
     "We share personal data only with providers that help us run the service, under contracts that oblige them to protect it and to process it only on our instructions:":
       "Lične podatke delimo samo sa provajderima koji nam pomažu da vodimo uslugu, po ugovorima koji ih obavezuju da ih štite i obrađuju isključivo po našim uputstvima:",
