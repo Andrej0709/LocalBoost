@@ -49,6 +49,7 @@ create table if not exists public.profiles (
   what_you_sell       text,
   typical_customer    text,
   differentiator      text,
+  why_us              text,
 
   /* Brand and voice */
   brand_vibe          text,
@@ -110,6 +111,10 @@ alter table public.profiles add column if not exists cancel_at_period_end  boole
 alter table public.profiles add column if not exists pending_plan          public.plan_tier;
 alter table public.profiles add column if not exists pending_billing_cycle text;
 alter table public.profiles add column if not exists billing_history       jsonb not null default '[]'::jsonb;
+
+/* --- Migration for the "what made you come to us?" answer ------------------- */
+/* Rows created before the question stay null - they were never asked.           */
+alter table public.profiles add column if not exists why_us text;
 
 /* --- Migration for recorded acceptance of the legal terms ------------------- */
 /* Rows created before the consent checkbox stay null: no record, no claim that  */
@@ -238,7 +243,7 @@ as $$
 begin
   insert into public.profiles (
     id, email, business_name, city, vertical, website,
-    what_you_sell, typical_customer, differentiator,
+    what_you_sell, typical_customer, differentiator, why_us,
     brand_vibe, brand_colors, avoid_notes, channels, plan,
     terms_accepted_at, terms_version
   )
@@ -252,6 +257,7 @@ begin
     nullif(new.raw_user_meta_data ->> 'what_you_sell', ''),
     nullif(new.raw_user_meta_data ->> 'typical_customer', ''),
     nullif(new.raw_user_meta_data ->> 'differentiator', ''),
+    nullif(new.raw_user_meta_data ->> 'why_us', ''),
     nullif(new.raw_user_meta_data ->> 'brand_vibe', ''),
     nullif(new.raw_user_meta_data ->> 'brand_colors', ''),
     nullif(new.raw_user_meta_data ->> 'avoid_notes', ''),
@@ -715,6 +721,7 @@ begin
   editable.what_you_sell    := new.what_you_sell;
   editable.typical_customer := new.typical_customer;
   editable.differentiator   := new.differentiator;
+  editable.why_us           := new.why_us;
   editable.brand_vibe       := new.brand_vibe;
   editable.brand_colors     := new.brand_colors;
   editable.avoid_notes      := new.avoid_notes;

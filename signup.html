@@ -98,7 +98,7 @@
         <input id="city" name="city" type="text" required autocomplete="address-level2" placeholder="Where's the shop?">
       </div>
       <div class="field">
-        <label for="vertical">VERTICAL</label>
+        <label for="vertical">BUSINESS TYPE</label>
         <select id="vertical" name="vertical">
           <option>Bakery</option>
           <option>Barbershop</option>
@@ -109,8 +109,12 @@
           <option>Auto detailer</option>
           <option>Physiotherapy</option>
           <option>Nail studio</option>
-          <option>Other</option>
+          <option value="Other">Other</option>
         </select>
+      </div>
+      <div class="field" id="field-vertical-other" hidden>
+        <label for="vertical-other">WHAT KIND OF BUSINESS IS IT?</label>
+        <input id="vertical-other" name="vertical_other" type="text" placeholder="e.g. Record shop, tailor, dog groomer">
       </div>
       <div class="field">
         <label for="website">WEBSITE OR INSTAGRAM HANDLE (OPTIONAL)</label>
@@ -127,6 +131,10 @@
       <div class="field">
         <label for="different">WHAT MAKES YOU DIFFERENT FROM THE PLACE DOWN THE STREET?</label>
         <textarea id="different" name="different" placeholder="e.g. Everything's made from scratch, we source local, third generation family recipe..."></textarea>
+      </div>
+      <div class="field">
+        <label for="why">WHAT MADE YOU COME TO US?</label>
+        <textarea id="why" name="why" required placeholder="e.g. We post once a month and it goes nowhere, nobody here has time for marketing, foot traffic has dropped since spring..."></textarea>
       </div>
 
       <div class="section-label">BRAND &amp; VOICE</div>
@@ -319,15 +327,16 @@
 
     // Prefill anything the account already knows.
     var map = {
-      business: "business_name", city: "city", vertical: "vertical",
+      business: "business_name",
       website: "website", what: "what_you_sell", customer: "typical_customer",
-      different: "differentiator", vibe: "brand_vibe", colors: "brand_colors",
-      avoid: "avoid_notes"
+      different: "differentiator", why: "why_us", vibe: "brand_vibe",
+      colors: "brand_colors", avoid: "avoid_notes", city: "city"
     };
     Object.keys(map).forEach(function(id){
       var value = profile[map[id]];
       if (value) document.getElementById(id).value = value;
     });
+    if (profile.vertical) setVertical(profile.vertical);
     if (Array.isArray(profile.channels) && profile.channels.length) {
       Array.prototype.forEach.call(
         form.querySelectorAll('input[name="channels"]'),
@@ -341,6 +350,41 @@
     notice.textContent = message;
   }
 
+  // BUSINESS TYPE: picking "Other" opens a free-text box, and whatever the
+  // customer types there is the business type we store.
+  var verticalSelect = document.getElementById("vertical");
+  var verticalOtherField = document.getElementById("field-vertical-other");
+  var verticalOther = document.getElementById("vertical-other");
+
+  function syncVerticalOther(){
+    var isOther = verticalSelect.value === "Other";
+    verticalOtherField.hidden = !isOther;
+    verticalOther.required = isOther;
+    if (!isOther) verticalOther.value = "";
+  }
+  verticalSelect.addEventListener("change", syncVerticalOther);
+  syncVerticalOther();
+
+  function verticalValue(){
+    if (verticalSelect.value !== "Other") return verticalSelect.value;
+    return verticalOther.value.trim() || "Other";
+  }
+
+  // A saved business type that isn't one of the listed options came from the
+  // "Other" box, so put it back there.
+  function setVertical(value){
+    var listed = Array.prototype.some.call(verticalSelect.options, function(opt){
+      return opt.value === value && opt.value !== "Other";
+    });
+    if (listed) {
+      verticalSelect.value = value;
+    } else {
+      verticalSelect.value = "Other";
+      verticalOther.value = value === "Other" ? "" : value;
+    }
+    syncVerticalOther();
+  }
+
   function checkedChannels(){
     return Array.prototype.map.call(
       form.querySelectorAll('input[name="channels"]:checked'),
@@ -352,11 +396,12 @@
     return {
       business_name:    document.getElementById("business").value,
       city:             document.getElementById("city").value,
-      vertical:         document.getElementById("vertical").value,
+      vertical:         verticalValue(),
       website:          document.getElementById("website").value,
       what_you_sell:    document.getElementById("what").value,
       typical_customer: document.getElementById("customer").value,
       differentiator:   document.getElementById("different").value,
+      why_us:           document.getElementById("why").value,
       brand_vibe:       document.getElementById("vibe").value,
       brand_colors:     document.getElementById("colors").value,
       avoid_notes:      document.getElementById("avoid").value,

@@ -190,7 +190,7 @@
     },
 
     // meta: business_name, city, vertical, website, what_you_sell,
-    // typical_customer, differentiator, brand_vibe, brand_colors,
+    // typical_customer, differentiator, why_us, brand_vibe, brand_colors,
     // avoid_notes, channels (array), plan ('counter'|'storefront'|'franchise'|'free').
     // The on_auth_user_created trigger copies these into public.profiles.
     signUp: async function (email, password, meta) {
