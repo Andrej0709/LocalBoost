@@ -181,21 +181,26 @@
   }
 
   /* --- The switch ----------------------------------------------------------
-     Two letters in the nav bar: the live one in full colour, the other dimmed
-     until hovered. It is a real button with a label, so it works from the
-     keyboard and announces itself to a screen reader. */
+     A small pill in the bottom-right corner, out of the way of the nav and of
+     the approvals toast, which owns the bottom centre. The live language is in
+     the accent colour, the other one dimmed until hovered. Both are real
+     buttons with labels, so the switch works from the keyboard and announces
+     itself to a screen reader. */
   var STYLE = [
-    ".lb-lang{display:inline-flex;align-items:center;gap:5px;flex:none;",
+    ".lb-lang{position:fixed;right:18px;bottom:18px;z-index:45;",
+    "display:inline-flex;align-items:center;gap:5px;",
+    "padding:7px 12px;border-radius:9999px;border:1px solid rgba(255,255,255,.08);",
+    "background:rgba(10,11,13,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);",
+    "box-shadow:0 8px 28px rgba(0,0,0,.45);",
     "font-family:'Geist Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em}",
-    ".lb-lang-btn{padding:6px 2px;border:none;background:none;cursor:pointer;color:#5d626a;",
+    ".lb-lang-btn{padding:2px;border:none;background:none;cursor:pointer;color:#5d626a;",
     "font:inherit;letter-spacing:inherit;line-height:1;transition:color .18s ease}",
     ".lb-lang-btn:hover{color:#d0d6e0}",
     ".lb-lang-btn.is-on{color:var(--acc,#a8c6f0)}",
     ".lb-lang-btn:focus-visible{outline:2px solid var(--acc,#a8c6f0);outline-offset:3px;border-radius:4px}",
     ".lb-lang-sep{color:#2b2e34}",
-    ".lb-lang[data-lb-lang='sheet']{justify-content:center;margin-top:6px;padding:12px 0;",
-    "border-top:1px solid rgba(255,255,255,.07);font-size:12px}",
-    "@media (max-width:860px){.lb-lang[data-lb-lang='nav']{display:none}}"
+    "@media (max-width:860px){.lb-lang{right:12px;bottom:12px;padding:6px 10px}}",
+    "@media print{.lb-lang{display:none}}"
   ].join("");
 
   function mountStyle() {
@@ -206,10 +211,11 @@
     (document.head || document.documentElement).appendChild(style);
   }
 
-  function buildSwitch(variant) {
+  function buildSwitch() {
     var wrap = document.createElement("div");
     wrap.className = "lb-lang";
-    wrap.setAttribute("data-lb-lang", variant || "nav");
+    wrap.id = "lb-lang-switch";
+    wrap.setAttribute("aria-label", "Language / Jezik");
 
     Object.keys(LANGS).forEach(function (code, i) {
       if (i) {
@@ -242,24 +248,13 @@
     });
   }
 
-  // The nav on the home page is rebuilt by the runtime, so the switch is
-  // re-inserted whenever it goes missing rather than mounted once.
+  // The switch hangs off <body> rather than off any of the page's own markup,
+  // so the home page's runtime can re-render everything underneath it without
+  // taking the switch with it. Re-inserted if it ever goes missing.
   function mountSwitches() {
-    var navs = document.querySelectorAll("nav.nav, nav[data-glass='nav']");
-    Array.prototype.forEach.call(navs, function (nav) {
-      if (nav.querySelector(".lb-lang")) return;
-      var anchor = nav.querySelector("#nav-login, [data-loginlink], a[href='login.html']");
-      var node = buildSwitch("nav");
-      if (anchor) nav.insertBefore(node, anchor);
-      else nav.appendChild(node);
-    });
-
-    // Mobile: the nav collapses into a sheet, so the switch goes in there too.
-    var sheets = document.querySelectorAll(".nav-sheet, [data-navsheet]");
-    Array.prototype.forEach.call(sheets, function (sheet) {
-      if (sheet.querySelector(".lb-lang")) return;
-      sheet.appendChild(buildSwitch("sheet"));
-    });
+    if (!document.body) return;
+    if (document.getElementById("lb-lang-switch")) return;
+    document.body.appendChild(buildSwitch());
   }
 
   var applying = false;
