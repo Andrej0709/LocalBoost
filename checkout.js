@@ -66,7 +66,7 @@
   var $ = function (id) { return document.getElementById(id); };
 
   function euro(n) {
-    return "€" + Math.round(n).toLocaleString("en-US");
+    return "€" + Math.round(n).toLocaleString((window.LBLang ? LBLang.locale() : "en-US"));
   }
 
   // Monthly rate for a plan under the current cycle.
@@ -88,7 +88,7 @@
   }
 
   function fmtDay(d) {
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    return d.toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), { day: "numeric", month: "short", year: "numeric" });
   }
 
   function trialEndsOn() {

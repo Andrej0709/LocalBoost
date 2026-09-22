@@ -212,7 +212,7 @@
   }
 
   function fmtWeek(value) {
-    return new Date(value + "T00:00:00").toLocaleDateString("en-US", {
+    return new Date(value + "T00:00:00").toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), {
       month: "short", day: "numeric", year: "numeric"
     });
   }
@@ -385,7 +385,7 @@
       live.style.cssText = "font-size:10px;letter-spacing:.1em;color:#7b8089;padding:4px 2px";
       live.textContent = creative.published_at
         ? "PUBLISHED " + new Date(creative.published_at)
-            .toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()
+            .toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), { month: "short", day: "numeric" }).toUpperCase()
         : "PUBLISHED";
       actions.appendChild(live);
     } else if (creative.status === "pending") {
@@ -714,7 +714,7 @@
     var text = "";
     var q = await LBAuth.freeQuota();
     if (q) {
-      var reset = new Date(q.resets_at).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+      var reset = new Date(q.resets_at).toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), { month: "short", day: "numeric", timeZone: "UTC" });
       text = q.used >= q.limit
         ? "All " + q.limit + " free ads used this month — the next ones arrive from " + reset + "."
         : q.used + " of " + q.limit + " free ads used this month.";
@@ -781,5 +781,7 @@
 </script>
 
 <script src="nav.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
 </body>
 </html>

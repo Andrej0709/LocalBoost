@@ -18,11 +18,11 @@
   var $ = function (id) { return document.getElementById(id); };
 
   function euro(n) {
-    return "€" + Math.round(n).toLocaleString("en-US");
+    return "€" + Math.round(n).toLocaleString((window.LBLang ? LBLang.locale() : "en-US"));
   }
 
   function fmtDate(value) {
-    return new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return new Date(value).toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), { month: "short", day: "numeric", year: "numeric" });
   }
 
   function say(el, message, isError) {
@@ -270,7 +270,7 @@
 
     var q = await LBAuth.freeQuota();
     if (!q) return;
-    var reset = new Date(q.resets_at).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+    var reset = new Date(q.resets_at).toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), { month: "short", day: "numeric", timeZone: "UTC" });
     $("billing-empty-text").textContent =
       q.used + " of " + q.limit + " free ads used this month, resets " + reset +
       ". No card on file. Pick a plan for a full drop every week.";

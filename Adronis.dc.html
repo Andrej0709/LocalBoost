@@ -911,8 +911,8 @@ class Component extends DCLogic {
     if (q) {
       const utc = { timeZone: "UTC" };
       if (q.used >= q.limit) {
-        const month = new Date().toLocaleDateString("en-US", { month: "long", ...utc });
-        const reset = new Date(q.resets_at).toLocaleDateString("en-US", { month: "short", day: "numeric", ...utc });
+        const month = new Date().toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), { month: "long", ...utc });
+        const reset = new Date(q.resets_at).toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), { month: "short", day: "numeric", ...utc });
         text = `You've used all ${q.limit} free ads for ${month}. The next ${q.limit} arrive from ${reset} — or get a full drop every week.`;
       } else {
         text = `${q.limit - q.used} of ${q.limit} free ads left this month — they land in Approvals as soon as they're rendered. Want a full drop every week?`;
@@ -948,7 +948,7 @@ class Component extends DCLogic {
       const p = Math.min(1, (t - t0) / dur);
       const e = 1 - Math.pow(1 - p, 3);
       const v = Math.round(target * e);
-      el.textContent = pre + v.toLocaleString("en-US") + suf;
+      el.textContent = pre + v.toLocaleString((window.LBLang ? LBLang.locale() : "en-US")) + suf;
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -1158,7 +1158,7 @@ class Component extends DCLogic {
       cta: p.cta,
       href: p.href,
       price: mk(p.base),
-      yearly: "€" + Math.round((annual ? p.base * 0.8 : p.base) * 12).toLocaleString("en-US"),
+      yearly: "€" + Math.round((annual ? p.base * 0.8 : p.base) * 12).toLocaleString((window.LBLang ? LBLang.locale() : "en-US")),
       border: p.featured ? "#33363c" : "#1b1e22",
       bg: p.featured ? "#101215" : "#0a0b0d",
       shadow: p.featured ? "0 50px 100px rgba(0,0,0,.6)" : "none",
@@ -1227,7 +1227,7 @@ class Component extends DCLogic {
       adsHint: ads < 6 ? "Enough to stay visible." : ads < 16 ? "The sweet spot for a single location." : "Multi-location or multi-offer volume.",
       onAds: (e) => this.setState({ ads: parseInt(e.target.value, 10) }),
       estPrice: "€" + est,
-      perYear: (ads * 52).toLocaleString("en-US"),
+      perYear: (ads * 52).toLocaleString((window.LBLang ? LBLang.locale() : "en-US")),
       hasFreeNote: !!this.state.freeNote,
       freeNoteTag: this.state.freeNote ? this.state.freeNote.tag : "",
       freeNoteText: this.state.freeNote ? this.state.freeNote.text : "",
@@ -1239,5 +1239,7 @@ class Component extends DCLogic {
   }
 }
 </script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
 </body>
 </html>

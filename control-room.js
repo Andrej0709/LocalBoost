@@ -7,19 +7,19 @@
   var noDrops    = document.getElementById("no-drops");
 
   function fmtDay(value) {
-    return new Date(value).toLocaleDateString("en-US", {
+    return new Date(value).toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), {
       weekday: "short", month: "short", day: "numeric"
     }).toUpperCase();
   }
 
   function fmtTime(value) {
-    return new Date(value).toLocaleTimeString("en-US", {
+    return new Date(value).toLocaleTimeString((window.LBLang ? LBLang.locale() : "en-US"), {
       hour: "numeric", minute: "2-digit"
     });
   }
 
   function fmtLiveMeta(value) {
-    return new Date(value).toLocaleDateString("en-US", {
+    return new Date(value).toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), {
       month: "short", day: "numeric"
     }) + " · " + fmtTime(value);
   }
