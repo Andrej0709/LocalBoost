@@ -479,7 +479,7 @@
         location.href = "login.html";
       } catch (err) {
         btn.disabled = false;
-        alert(err.message || "Log out failed — try again.");
+        alert(err.message || (window.LBLang ? LBLang.t("Log out failed — try again.") : "Log out failed — try again."));
       }
     });
   }

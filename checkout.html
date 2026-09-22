@@ -261,6 +261,13 @@
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
 
+<!-- The translation loads first so scripts that format a date on load already
+     know the reader's language. nav.js comes before it: its menu copies the nav
+     links, and must copy them before they are translated. -->
+<script src="nav.js"></script>
+<script src="cookies.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
@@ -281,9 +288,5 @@
 })();
 </script>
 <script src="checkout.js"></script>
-<script src="nav.js"></script>
-<script src="cookies.js"></script>
-<script src="i18n-sr.js"></script>
-<script src="i18n.js"></script>
 </body>
 </html>

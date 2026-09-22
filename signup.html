@@ -210,6 +210,13 @@
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
 
+<!-- The translation loads first so scripts that format a date on load already
+     know the reader's language. nav.js comes before it: its menu copies the nav
+     links, and must copy them before they are translated. -->
+<script src="nav.js"></script>
+<script src="cookies.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
@@ -247,7 +254,11 @@
   var isFree = planKey === "free";
   var FREE_EYEBROW = "FREE PLAN · NO CARD NEEDED";
 
-  document.getElementById("plan-headline").innerHTML = 'Set up your <em>' + plan.name + '</em> drop.';
+  // Lower-case on the free plan: it reads as 'your free drop', not a plan name,
+  // and the Serbian copy needs the adjective there rather than the plan label.
+  var headlineName = isFree ? 'free' : plan.name;
+
+  document.getElementById("plan-headline").innerHTML = 'Set up your <em>' + headlineName + '</em> drop.';
   if (isFree) {
     document.getElementById("page-eyebrow").textContent = FREE_EYEBROW;
     document.getElementById("page-sub").textContent =
@@ -312,7 +323,7 @@
     });
     document.getElementById("account-label").textContent = "YOUR BUSINESS";
 
-    document.getElementById("plan-headline").innerHTML = 'Brief the engine for your <em>' + plan.name + '</em> drop.';
+    document.getElementById("plan-headline").innerHTML = 'Brief the engine for your <em>' + headlineName + '</em> drop.';
     if (isFree) {
       document.getElementById("page-eyebrow").textContent = FREE_EYEBROW;
       document.getElementById("page-sub").textContent =
@@ -481,9 +492,5 @@
 })();
 </script>
 
-<script src="nav.js"></script>
-<script src="cookies.js"></script>
-<script src="i18n-sr.js"></script>
-<script src="i18n.js"></script>
 </body>
 </html>

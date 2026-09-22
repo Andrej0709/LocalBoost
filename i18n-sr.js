@@ -1181,7 +1181,123 @@ window.LB_I18N_SR = {
     "ads per week": "oglasa nedeljno",
     "THE DROP": "DROP",
     "YOUR CALL": "TVOJA ODLUKA",
-    "DISTRIBUTION": "DISTRIBUCIJA"
+    "DISTRIBUTION": "DISTRIBUCIJA",
+    "billed yearly": "naplata godišnje",
+    "Pick a plan below and brief the engine. The Free plan needs no card.":
+      "Izaberi plan ispod i napravi brif za mašinu. Za besplatni plan ne treba kartica.",
+    "You're on the Free plan. Want a full drop every week? Pick a plan below.":
+      "Koristiš besplatni plan. Želiš pun drop svake nedelje? Izaberi plan ispod.",
+    "Open approvals": "Otvori odobravanja",
+
+    /* --- Checkout: what the script writes -------------------------------- */
+    "/ MONTH + VAT": "/ MESEČNO + PDV",
+    "VAT — reverse charge": "PDV — obrnuto obračunavanje",
+    "per month": "mesečno",
+    "per year": "godišnje",
+    "yearly": "godišnje",
+    "Welcome back. Your free trial was already used, so your first month is billed today. Cancel any time before the next renewal.":
+      "Dobro došao nazad. Besplatnu probu si već iskoristio, pa se prvi mesec naplaćuje danas. Otkazati možeš bilo kad pre sledeće obnove.",
+    "Welcome back. Your free trial was already used, so your first year is billed today. Cancel any time before the next renewal.":
+      "Dobro došao nazad. Besplatnu probu si već iskoristio, pa se prva godina naplaćuje danas. Otkazati možeš bilo kad pre sledeće obnove.",
+    "Billed once a year at 20% off, then renews every 12 months. Cancel any time — access runs to the end of the paid year, and unused months are not refunded.":
+      "Naplaćuje se jednom godišnje uz 20% popusta, a zatim se obnavlja na svakih 12 meseci. Otkazati možeš bilo kad — pristup traje do kraja plaćene godine, a neiskorišćeni meseci se ne vraćaju.",
+    // Headlines built around an <em> plan name arrive as separate text nodes.
+    "Your": "Tvoj",
+    "drop is live.": "drop je aktivan.",
+    "drop is booked.": "drop je rezervisan.",
+    "drop is active.": "drop je aktivan.",
+    "Set up your": "Podesi svoj",
+    "free": "besplatni",
+    "Brief the engine for your": "Napravi brif za svoj",
+    "PLAN ACTIVE": "PLAN AKTIVAN",
+    "10% off every drop, for as long as you stay.": "10% popusta na svaki drop, dok god si sa nama.",
+    "25% off your first year.": "25% popusta na prvu godinu.",
+    "Couldn't load your account system. Refresh the page and try again.":
+      "Nismo uspeli da učitamo sistem naloga. Osveži stranicu i pokušaj ponovo.",
+    "Fill in your business brief first — it takes a minute.":
+      "Prvo popuni brif o svom biznisu — traje minut.",
+    "Start over →": "Kreni ispočetka →",
+    "Sign up or log in →": "Registruj se ili se prijavi →",
+    "Go to the brief →": "Idi na brif →",
+
+    /* --- Account: what the script writes --------------------------------- */
+    "Active — nothing to pay": "Aktivan — nema plaćanja",
+    "PAID": "PLAĆENO",
+    "UPCOMING": "PREDSTOJI",
+
+    /* --- Control room and approvals: what the scripts write -------------- */
+    "Untitled creative": "Kreativ bez naslova",
+    "Couldn't load your control room.": "Nismo uspeli da učitamo tvoju kontrolnu sobu.",
+    "Your brief didn't save — the database is missing the onboarding columns. Run supabase/schema.sql in the SQL editor and try again.":
+      "Tvoj brif nije sačuvan — u bazi nedostaju kolone za onboarding. Pokreni supabase/schema.sql u SQL editoru i pokušaj ponovo.",
+    "Sample drop": "Primer dropa",
+    "Every creative": "Svi kreativi",
+    "This week's drop": "Ovonedeljni drop",
+    "AI-generated creative": "AI-generisan kreativ",
+    "Approve": "Odobri",
+    "Reject": "Odbaci",
+    "Undo approval": "Poništi odobrenje",
+    "Creative, full size": "Kreativ, puna veličina",
+    "This is a sample drop so you can see how approvals work. Nothing here is saved.":
+      "Ovo je primer dropa da vidiš kako odobravanje radi. Ništa se ovde ne čuva.",
+    "Nothing approved yet.": "Još ništa nije odobreno.",
+    "Approve a creative and it moves here, then gets scheduled and published.":
+      "Odobri kreativ i on prelazi ovde, a zatim se zakazuje i objavljuje.",
+    "Nothing rejected.": "Ništa nije odbačeno.",
+    "Anything you kill shows up here — you can always put it back in the queue.":
+      "Sve što odbaciš pojavljuje se ovde — uvek možeš da ga vratiš u red.",
+    "Nothing in this drop.": "U ovom dropu nema ničega.",
+    "This drop has no creatives attached to it yet.": "Ovaj drop još nema nijedan kreativ.",
+    "Your free ads are on the way.": "Tvoji besplatni oglasi su na putu.",
+    "As soon as the engine renders them, they show up here for approval.":
+      "Čim ih mašina napravi, pojavljuju se ovde na odobravanje.",
+    "Brief the engine first.": "Prvo napravi brif za mašinu.",
+    "Tell us about your business and your free ads start rendering.":
+      "Reci nam nešto o svom biznisu i tvoji besplatni oglasi počinju da se renderuju.",
+    "Fill in the brief →": "Popuni brif →",
+    "Couldn't load your drop.": "Nismo uspeli da učitamo tvoj drop.",
+    "WAITING": "NA ČEKANJU",
+    "REJECTED": "ODBAČENO",
+    "LOADING": "UČITAVANJE",
+    "waiting": "na čekanju",
+    "approved": "odobreno",
+    "rejected": "odbačeno",
+    "published": "objavljeno",
+    // The sample drop's ads.
+    "Morning rush, sorted.": "Jutarnja gužva, rešena.",
+    "Two blocks from the office and open at 6:30. First coffee is on the house this week.":
+      "Dva bloka od kancelarije i otvoreno od 6:30. Ove nedelje prva kafa je na račun kuće.",
+    "The corner table is free.": "Sto u ćošku je slobodan.",
+    "Quiet hours, fast wifi, no queue. Weekdays between 2 and 5.":
+      "Mirni sati, brz wifi, bez čekanja. Radnim danima između 14 i 17h.",
+    "Fresh trays out of the oven every morning — get there early.":
+      "Sveže ture iz rerne svako jutro — dođi ranije.",
+    "Same-day repairs, no appointment.": "Popravka istog dana, bez zakazivanja.",
+    "Walk in before 3pm and it's ready the same day.":
+      "Svrati pre 15h i gotovo je istog dana.",
+
+    /* --- Log in, sign up, contact: what the scripts write ---------------- */
+    "Create your account.": "Napravi svoj nalog.",
+    "Just enough to hold your spot — you'll pick a plan and brief the engine next.":
+      "Tek toliko da rezervišeš mesto — plan biraš i brif praviš u sledećem koraku.",
+    "Logged in — taking you to your control room...": "Prijavljen si — vodimo te u kontrolnu sobu...",
+    "Confirm your email first — check your inbox for the link we sent.":
+      "Prvo potvrdi email — u sandučetu te čeka link koji smo poslali.",
+    "Check your inbox — confirm your email, then log in to brief the engine.":
+      "Proveri sanduče — potvrdi email, pa se prijavi da napraviš brif za mašinu.",
+    "Account created — let's brief the engine...": "Nalog je napravljen — idemo na brif za mašinu...",
+    "You're already signed in.": "Već si prijavljen.",
+    "Not started": "Nije počeo",
+    "You're on the Free plan — pick a paid plan to start one":
+      "Koristiš besplatni plan — izaberi plaćeni plan da ga pokreneš",
+    "Finish your business brief to start it": "Završi brif o biznisu da ga pokreneš",
+    "Onboard in ten minutes. Your free ads land in Approvals as soon as the engine renders them.":
+      "Podešavanje traje deset minuta. Tvoji besplatni oglasi stižu u Odobravanja čim ih mašina napravi.",
+    "No need to sign up again — your account already has this covered.":
+      "Ne moraš ponovo da se registruješ — tvoj nalog ovo već pokriva.",
+    "Couldn't load the site's messaging system. Refresh the page and try again.":
+      "Nismo uspeli da učitamo sistem za poruke. Osveži stranicu i pokušaj ponovo.",
+    "Could not send:": "Slanje nije uspelo:"
 
   },
 
@@ -1212,6 +1328,8 @@ window.LB_I18N_SR = {
     [/^(\d+) \/ WK$/, "$1 / NED"],
     [/^(\d+) drops$/, "$1 dropova"],
     [/^(\d+) formats$/, "$1 formata"],
+    // Ahead of the bare "WEEK OF" rule, which would otherwise swallow the count.
+    [/^WEEK OF (.+?) · (\d+) CREATIVES?$/, "NEDELJA OD $1 · KREATIVA: $2"],
     [/^Week of (.+)$/, "Nedelja od $1"],
     [/^WEEK OF (.+)$/, "NEDELJA OD $1"],
     [/^(\d+) CREATIVES?$/, "KREATIVA: $1"],
@@ -1221,6 +1339,46 @@ window.LB_I18N_SR = {
     [/^PUBLISHED (.+)$/, "OBJAVLJENO $1"],
     [/^SAMPLE (\d+)$/, "PRIMER $1"],
     [/^Couldn't save that — (.+)$/, "Nismo uspeli to da sačuvamo — $1"],
-    [/^Couldn't undo — (.+)$/, "Nismo uspeli da poništimo — $1"]
+    [/^Couldn't undo — (.+)$/, "Nismo uspeli da poništimo — $1"],
+    [/^(.+?) — (.+?) — (.+?) \/ month, billed (monthly|yearly)\. Takes effect on your next billing date, (.+?) — this period is already paid for\.$/,
+      "$1 — $2 — $3 / mesečno, naplata $4. Stupa na snagu na sledeći datum naplate, $5 — ovaj period je već plaćen."],
+    // Checkout summary lines and the fine print under the total.
+    [/^(.+?) · (1 month|12 months)$/, "$1 · $2"],
+    [/^Your card is on file and the free trial has started — nothing was charged today\. First invoice on (.+?), and you can cancel before then\.$/,
+      "Tvoja kartica je sačuvana i besplatna proba je počela — danas nije ništa naplaćeno. Prvi račun $1, a otkazati možeš pre toga."],
+    [/^Payment received — your plan is running again\. Next invoice on (.+?), and you can cancel any time before then\.$/,
+      "Uplata je primljena — tvoj plan ponovo radi. Sledeći račun $1, a otkazati možeš bilo kad pre toga."],
+    [/^Promo (\S+) \((\d+)%\)$/, "Promo kod $1 ($2%)"],
+    [/^VAT \((\d+)%\)$/, "PDV ($1%)"],
+    [/^First drop \((\d+)-day trial\)$/, "Prvi drop ($1 dana probe)"],
+    [/^(\S+) applied — (.+)$/, "$1 primenjen — $2"],
+    [/^Couldn't load your account: (.+)$/, "Nismo uspeli da učitamo tvoj nalog: $1"],
+    [/^Your free trial was already used on this account, so billing starts today\. Then (.+?) (per month|per year) including tax, renewing automatically, next charged (.+?)\. Cancel any time from your account — access runs to the end of the period you paid for\.$/,
+      "Besplatna proba je već iskorišćena na ovom nalogu, pa naplata počinje danas. Zatim $1 $2 sa porezom, uz automatsku obnovu, sledeća naplata $3. Otkazati možeš bilo kad sa svog naloga — pristup traje do kraja plaćenog perioda."],
+    [/^After the 7-day free trial this becomes a paid subscription automatically: (.+?) (per month|per year) including tax, first charged (.+?) and renewing until you cancel\. Cancel before that date from your account and you pay nothing\.$/,
+      "Posle 7 dana besplatne probe ovo automatski postaje plaćena pretplata: $1 $2 sa porezom, prva naplata $3, uz obnovu dok ne otkažeš. Otkaži pre tog datuma sa svog naloga i ne plaćaš ništa."],
+    [/^Check your inbox — confirm your email to carry on with the (.+?) plan\.$/,
+      "Proveri sanduče — potvrdi email da nastaviš sa planom $1."],
+    [/^You're reaching out about the (.+?) plan\.$/, "Pišeš nam povodom plana $1."],
+    [/^Could not send: (.+)$/, "Slanje nije uspelo: $1"],
+    // Approvals: the lightbox, and a creative's channel and format badge.
+    [/^View full size: (.+)$/, "Prikaži u punoj veličini: $1"],
+    [/^(.+?) · (\d+) CREATIVES?$/, "$1 · KREATIVA: $2"],
+    [/^(Waiting on you|Approved|Rejected|Everything) \((\d+)\)$/, "$1 ($2)"],
+    [/^(.+) — (waiting|approved|rejected|published)$/, "$1 — $2"],
+    [/^(.+) — full size$/, "$1 — puna veličina"],
+    [/^(.+?) · (\d+:\d+) POST$/, "$1 · $2 OBJAVA"],
+    [/^(.+?) · (\d+:\d+) post$/, "$1 · $2 objava"],
+    [/^(.+?) · SEARCH AD$/, "$1 · OGLAS U PRETRAZI"],
+    [/^(.+?) · Search ad$/, "$1 · Oglas u pretrazi"],
+    // What's left of the Free plan's monthly allowance.
+    [/^All (\d+) free ads used this month — the next ones arrive from (.+?)\.$/,
+      "Iskoristio si sve besplatne oglase za ovaj mesec ($1) — sledeći stižu od $2."],
+    [/^(\d+) of (\d+) free ads used this month\.$/,
+      "Besplatni oglasi ovog meseca: iskorišćeno $1 od $2."],
+    [/^You've used all (\d+) free ads for (.+?)\. The next (\d+) arrive from (.+?) — or get a full drop every week\.$/,
+      "Iskoristio si sve besplatne oglase za $2 ($1). Sledeći ($3) stižu od $4 — ili uzmi pun drop svake nedelje."],
+    [/^(\d+) of (\d+) free ads left this month — they land in Approvals as soon as they're rendered\. Want a full drop every week\?$/,
+      "Besplatni oglasi ovog meseca: ostalo $1 od $2 — stižu u Odobravanja čim se naprave. Želiš pun drop svake nedelje?"]
   ]
 };
