@@ -1175,6 +1175,10 @@ window.LB_I18N_SR = {
     "Start with Counter": "Počni sa Counter planom",
     "Start with Storefront": "Počni sa Storefront planom",
     "Enough to stay visible.": "Dovoljno da ostaneš vidljiv.",
+    "The sweet spot for a single location.": "Idealna mera za jednu lokaciju.",
+    "Multi-location or multi-offer volume.": "Obim za više lokacija ili više ponuda.",
+    // The drop sizer writes the count and this label as two separate text nodes.
+    "ads per week": "oglasa nedeljno",
     "THE DROP": "DROP",
     "YOUR CALL": "TVOJA ODLUKA",
     "DISTRIBUTION": "DISTRIBUCIJA"
