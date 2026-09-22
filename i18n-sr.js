@@ -170,7 +170,7 @@ window.LB_I18N_SR = {
     "Adronis — weekly ad drops for local business":
       "Adronis — nedeljni dropovi oglasa za lokalni biznis",
     "DROP 34 RENDERING — MON 09:00": "DROP 34 SE RENDERUJE — PON 09:00",
-    "Your next forty ads are": "Tvojih narednih četrdeset oglasa je",
+    "Your next forty ads are": "Narednih 40 oglasa je",
     "already": "već",
     "in production.": "u produkciji.",
     "Adronis renders a fresh batch of photoreal ads for your business every week — shot in your voice, set in your city — then publishes them to your channels while you run the shop.":
@@ -1096,7 +1096,73 @@ window.LB_I18N_SR = {
     "Nothing is waiting on you here. New free ads show up the moment they're rendered.":
       "Ovde ništa ne čeka na tebe. Novi besplatni oglasi se pojavljuju čim se izrenderuju.",
     "NOT YET SLOTTED": "JOŠ BEZ TERMINA",
-    "Baked at 5am. Gone by noon.": "Pečeno u 5 ujutru. Nestane do podne."
+    "Baked at 5am. Gone by noon.": "Pečeno u 5 ujutru. Nestane do podne.",
+
+    /* --- Home page: copy the template runtime holds as data ---------------
+       The four steps, the panels behind them, the sample creatives and the
+       dashboard live in the page's own script rather than in its markup, so
+       they only reach the DOM once the runtime renders. Keyed the same way. */
+    "Brief once": "Brifuj jednom",
+    "Ten minutes. Your offer, your voice, your street. We build a brand fingerprint and never ask you again.":
+      "Deset minuta. Tvoja ponuda, tvoj ton, tvoja ulica. Napravimo otisak brenda i više te ne pitamo.",
+    "The studio runs": "Studio radi",
+    "Every Monday at 09:00 the engine renders a fresh batch — photoreal scenes, seasonal hooks, local references, one per channel format.":
+      "Svakog ponedeljka u 09:00 mašina renderuje novu turu — fotorealistične scene, sezonske kuke, lokalne reference, po jedna za svaki format kanala.",
+    "You approve, or you don't": "Ti odobriš, ili ne odobriš",
+    "Swipe the drop in under two minutes. Kill anything off-brand. What survives enters the queue.":
+      "Prođi kroz drop za manje od dva minuta. Odbaci sve što nije u duhu brenda. Šta preživi, ulazi u red.",
+    "It publishes itself": "Samo se objavljuje",
+    "Best-time slotting, caption variants, hashtags, cross-posting. You find out it happened from the customers.":
+      "Termini u najbolje vreme, varijante opisa, heštegovi, objava na više mreža. Da se desilo, saznaš od mušterija.",
+
+    "BRAND FINGERPRINT": "OTISAK BRENDA",
+    "LOCKED": "ZAKLJUČANO",
+    "REFERENCE SET · 24 IMAGES": "REFERENTNI SET · 24 SLIKE",
+    "Warm oak, matte black, morning light. Never neon, never stock-smiling.":
+      "Topli hrast, mat crna, jutarnje svetlo. Nikad neon, nikad osmeh sa stok fotografije.",
+    "RENDER QUEUE": "RED ZA RENDER",
+    "SCENE 34-07 · REEL 9:16": "SCENA 34-07 · REEL 9:16",
+    "Twelve creatives rendered in 41 minutes, formatted per channel.":
+      "Dvanaest kreativa izrenderovano za 41 minut, formatirano po kanalu.",
+    "APPROVAL": "ODOBRAVANJE",
+    "9 KEPT": "9 ZADRŽANO",
+    "SWIPE TO KEEP OR KILL": "PREVUCI DA ZADRŽIŠ ILI ODBACIŠ",
+    "Three killed. The engine notes why and adjusts next Monday.":
+      "Tri odbačena. Mašina beleži zašto i prilagođava se sledećeg ponedeljka.",
+    "LIVE": "UŽIVO",
+    "MON 18:30 · INSTAGRAM STORY": "PON 18:30 · INSTAGRAM STORY",
+    "Nine creatives slotted across four channels for the next seven days.":
+      "Devet kreativa raspoređeno na četiri kanala za narednih sedam dana.",
+
+    "Two chairs free today.": "Dve stolice slobodne danas.",
+    "Rain outside. Soup inside.": "Napolju kiša. Unutra supa.",
+    "The 6am crowd knows.": "Ekipa od 6 ujutru zna.",
+    "New in: local pears.": "Novo: domaće kruške.",
+    "Parking, finally, out back.": "Parking, konačno, iza zgrade.",
+    "Booked out by Thursday.": "Popunjeno do četvrtka.",
+    "Ten minutes, no appointment.": "Deset minuta, bez zakazivanja.",
+    "Same recipe since 1998.": "Isti recept od 1998.",
+
+    "Content calendar": "Kalendar sadržaja",
+    "Creatives": "Kreativi",
+    "Performance": "Rezultati",
+    "MON": "PON",
+    "TUE": "UTO",
+    "WED": "SRE",
+    "THU": "ČET",
+    "FRI": "PET",
+    "SAT": "SUB",
+    "SUN": "NED",
+    "APPROVED": "ODOBRENO",
+    "PENDING": "NA ČEKANJU",
+    "KILLED": "ODBAČENO",
+    "ALMOST SET UP": "SKORO POSTAVLJENO",
+    "Start with Counter": "Počni sa Counter planom",
+    "Start with Storefront": "Počni sa Storefront planom",
+    "Enough to stay visible.": "Dovoljno da ostaneš vidljiv.",
+    "THE DROP": "DROP",
+    "YOUR CALL": "TVOJA ODLUKA",
+    "DISTRIBUTION": "DISTRIBUCIJA"
 
   },
 
@@ -1122,6 +1188,7 @@ window.LB_I18N_SR = {
       "Prvi račun $1, a otkazati možeš pre toga."],
     [/^Your card is on file and the free trial has started — nothing was charged today\.$/,
       "Tvoja kartica je sačuvana i besplatna proba je počela — danas nije ništa naplaćeno."],
+    [/^CREATIVE (.+)$/, "KREATIV $1"],
     // The home page's counters animate, writing a new value every frame.
     [/^(\d+) \/ WK$/, "$1 / NED"],
     [/^(\d+) drops$/, "$1 dropova"],
