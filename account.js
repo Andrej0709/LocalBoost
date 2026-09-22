@@ -183,9 +183,14 @@
     $("bill-rate").textContent = plan.rate;
     $("bill-cycle").textContent = cycle === "annual" ? "Annual" : "Monthly";
 
+    // A plan with no period end on it never renews and is never charged — it
+    // was granted outright. There is no date to show and nothing to cancel,
+    // so the whole self-serve block below steps out of the way.
+    var openEnded = profile.subscription_status === "active" && !periodEndDate(profile);
+
     var statusText = {
       trialing: "Free trial",
-      active: "Active",
+      active: openEnded ? "Active — nothing to pay" : "Active",
       past_due: "Past due — update your card",
       canceled: "Canceled — you're on the Free plan"
     }[profile.subscription_status] || "No active plan";
@@ -207,7 +212,8 @@
     // Managing a plan (switching or cancelling) only makes sense while it's
     // actually running — a trial that already lapsed into "canceled" has
     // nothing left to change.
-    var manageable = profile.subscription_status === "trialing" || profile.subscription_status === "active";
+    var manageable = (profile.subscription_status === "trialing" ||
+                      profile.subscription_status === "active") && !openEnded;
 
     $("bill-plan-toggle").hidden = !manageable || !!profile.cancel_at_period_end;
     $("cancel-plan-row").hidden = !manageable || !!profile.cancel_at_period_end;
@@ -410,7 +416,11 @@
       });
     });
 
-    if (profile.subscription_status === "trialing" || profile.subscription_status === "active") {
+    // No period end means nothing is coming: the plan was granted outright.
+    // Without this check the row below would print an invalid date and a
+    // charge that will never happen.
+    if ((profile.subscription_status === "trialing" || profile.subscription_status === "active") &&
+        periodEndDate(profile)) {
       // What's actually charged next is the pending plan/cycle if a switch is
       // scheduled — not the plan running today.
       var upcomingPlan = PLANS[profile.pending_plan] || plan;
