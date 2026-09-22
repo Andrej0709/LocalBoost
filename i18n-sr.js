@@ -274,6 +274,12 @@ window.LB_I18N_SR = {
     "SEASONAL PINS": "SEZONSKI PINOVI",
     "APPROVED 09:02 · LIVE 09:03": "ODOBRENO 09:02 · OBJAVLJENO 09:03",
     "06 — WHAT MONDAY LOOKS LIKE": "06 — KAKO IZGLEDA PONEDELJAK",
+    "A batch of creatives is waiting in your queue when the week starts — built from the brief you wrote once.":
+      "Kad nedelja počne, u tvom redu već čeka tura kreativa — napravljena po brifu koji si napisao jednom.",
+    "You swipe through them and keep what fits. Nothing publishes until you approve it.":
+      "Prelistaš ih i zadržiš ono što ti odgovara. Ništa se ne objavljuje dok ti ne odobriš.",
+    "What survives is resized, captioned and posted to every channel you connected, at the slot you set.":
+      "Ono što prođe dobija pravu veličinu i opis i objavljuje se na svakom kanalu koji si povezao, u terminu koji si podesio.",
 
     /* --- Home page: pricing ---------------------------------------------- */
     "07 — PRICING": "07 — CENE",
