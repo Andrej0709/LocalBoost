@@ -361,7 +361,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 [data-faq] summary::-webkit-details-marker{display:none}
 [data-faq] summary:hover [data-faqicon]{border-color:#4a4d54}
 [data-faqicon]{transition:transform .3s cubic-bezier(.22,1,.36,1),border-color .2s ease}
-@media (prefers-reduced-motion:reduce){[data-plans]>*,[data-chip]{transition:none !important}}
+@media (prefers-reduced-motion:reduce){[data-plans]>*,[data-chip],[data-storycard],[data-examplecard]{transition:none !important}}
 [data-faq][open] [data-faqicon]{transform:rotate(45deg)}
 @media (prefers-reduced-motion:reduce){[data-faqicon]{transition:none}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
@@ -518,7 +518,7 @@ input[type=range]{height:30px !important}
 
     <div data-showcase="1" style="margin-top:clamp(36px,4.5vw,56px);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto;gap:16px">
 
-      <div data-storycard="1" style="grid-row:span 2;position:relative;border-radius:22px;border:1px solid #23252a;background:#0e0f12;overflow:hidden;min-height:520px;box-shadow:0 40px 90px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease" style-hover="transform:translateY(-4px);border-color:#3a3d43">
+      <div data-storycard="1" style="grid-row:span 2;position:relative;border-radius:22px;border:1px solid #23252a;background:#0e0f12;overflow:hidden;min-height:520px;box-shadow:0 40px 90px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)">
         <div style="position:absolute;inset:-40px;background:url(examples/cafe.jpg) center/cover;filter:blur(34px) brightness(.55);transform:scale(1.1)"></div>
         <div style="position:relative;display:flex;flex-direction:column;height:100%;min-height:inherit">
           <div style="display:flex;gap:4px;padding:14px 14px 0">
@@ -540,7 +540,7 @@ input[type=range]{height:30px !important}
       </div>
 
       <sc-for list="{{ posts }}" as="p" hint-placeholder-count="4">
-        <div style="border-radius:18px;border:1px solid #1f2226;background:#0e0f12;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease" style-hover="transform:translateY(-4px);border-color:#3a3d43">
+        <div style="border-radius:18px;border:1px solid #1f2226;background:#0e0f12;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)" data-examplecard="1">
           <div style="display:flex;align-items:center;gap:9px;padding:11px 14px">
             <span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:9999px;background:{{ p.tint }};color:#16130f;font-size:12px;font-weight:600">{{ p.initial }}</span>
             <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#fff;font-weight:500">{{ p.name }}</span>
