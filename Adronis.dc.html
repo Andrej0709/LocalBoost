@@ -149,6 +149,19 @@ if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHa
 } else {
   lbBootDone();
 }
+
+// "Control room" in the nav, the mobile menu and the footer: a signed-in
+// customer goes to their real control room, everyone else scrolls to the
+// section on this page. Caught on the document because the template runtime
+// re-renders those links. Before auth has loaded, isLoggedIn() is false and
+// the link just scrolls, same as for a visitor.
+document.addEventListener("click", function (e) {
+  var link = e.target.closest && e.target.closest('a[href="#control"]');
+  if (!link || !window.LBAuth || !LBAuth.isLoggedIn()) return;
+  if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+  e.preventDefault();
+  location.href = "control-room.html";
+}, true);
 </script>
 <script src="./reveal-main.js"></script>
 <script type="application/ld+json">
