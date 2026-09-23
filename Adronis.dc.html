@@ -377,7 +377,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 [data-railhide]{display:none !important}
 [data-faqside]{position:static !important}
 [data-showcase]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
-[data-storycard]{grid-row:auto !important;grid-column:1 / -1;min-height:440px !important}
+[data-storycard]{grid-row:auto !important;grid-column:auto !important}
 [data-plans]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
 }
 @media (max-width:900px){
@@ -516,28 +516,31 @@ input[type=range]{height:30px !important}
     <h2 style="margin:0;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Examples of what you get</h2>
     <p style="margin:18px 0 0;max-width:52ch;font-size:17px;line-height:1.6;color:#a3a9b3">Posts for a few local businesses, the way they show up on each network. Yours are made for your business.</p>
 
-    <div data-showcase="1" style="max-width:1110px;margin-top:clamp(36px,4.5vw,56px);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto;gap:16px">
+    <div data-showcase="1" style="max-width:1110px;margin-top:clamp(36px,4.5vw,56px);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);gap:16px">
 
-      <div data-storycard="1" style="grid-row:span 2;position:relative;border-radius:22px;border:1px solid #23252a;background:#0e0f12;overflow:hidden;min-height:520px;box-shadow:0 40px 90px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)">
-        <div style="position:absolute;inset:-40px;background:url(examples/cafe.jpg) center/cover;filter:blur(34px) brightness(.55);transform:scale(1.1)"></div>
-        <div style="position:relative;display:flex;flex-direction:column;height:100%;min-height:inherit">
-          <div style="display:flex;gap:4px;padding:14px 14px 0">
-            <span style="flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.9)"></span><span style="flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.35)"></span><span style="flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.35)"></span>
-          </div>
-          <div style="display:flex;align-items:center;gap:9px;padding:12px 16px">
-            <span style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9999px;background:#e8d5b8;color:#2a1f14;font-size:13px;font-weight:600">D</span>
-            <span style="font-size:13px;color:#fff;font-weight:500">The Daily Grind Café</span>
-            <span style="margin-left:auto;padding:4px 10px;border-radius:9999px;background:rgba(0,0,0,.35);font-size:11px;color:#fff">Instagram story</span>
-          </div>
-          <div style="flex:1;display:flex;align-items:center;padding:8px 0">
-            <img src="examples/cafe.jpg" alt="Example story for a café: Hard Monday? Get your perfect coffee fix." width="307" height="316" loading="lazy" style="display:block;width:100%;height:auto;aspect-ratio:307/316">
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;padding:0 16px 18px">
-            <span style="flex:1;padding:10px 16px;border-radius:9999px;border:1px solid rgba(255,255,255,.45);font-size:13px;color:rgba(255,255,255,.85)">Send message</span>
-            <span style="font-size:18px;color:#fff">&#9825;</span>
+      <sc-for list="{{ stories }}" as="st" hint-placeholder-count="2">
+        <div data-storycard="1" style="grid-row:{{ st.row }};grid-column:1;position:relative;border-radius:18px;border:1px solid #23252a;background:#0e0f12;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)">
+          <div style="position:absolute;inset:-40px;background:url({{ st.img }}) center/cover;filter:blur(34px) brightness(.55);transform:scale(1.1)"></div>
+          <div style="position:relative;display:flex;flex-direction:column;height:100%;min-height:inherit">
+            <div style="display:flex;gap:4px;padding:14px 14px 0">
+              <span style="flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.9)"></span><span style="flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.35)"></span><span style="flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.35)"></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;padding:12px 16px">
+              <span style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9999px;background:{{ st.tint }};color:#16130f;font-size:13px;font-weight:600">{{ st.initial }}</span>
+              <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#fff;font-weight:500">{{ st.name }}</span>
+              <span style="margin-left:auto;flex-shrink:0;padding:4px 10px;border-radius:9999px;background:rgba(0,0,0,.35);font-size:11px;color:#fff">Instagram story</span>
+            </div>
+            <div style="flex:1;display:flex;align-items:center;padding:4px 0">
+              <img src="{{ st.img }}" alt="{{ st.alt }}" width="307" height="316" loading="lazy" style="display:block;width:100%;height:auto;aspect-ratio:307/316">
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:6px 16px 16px">
+              <span style="flex:1;padding:10px 16px;border-radius:9999px;border:1px solid rgba(255,255,255,.45);font-size:13px;color:rgba(255,255,255,.85)">Send message</span>
+              <span style="font-size:18px;color:#fff">&#9825;</span>
+            </div>
           </div>
         </div>
-      </div>
+  
+      </sc-for>
 
       <sc-for list="{{ posts }}" as="p" hint-placeholder-count="4">
         <div style="border-radius:18px;border:1px solid #1f2226;background:#0e0f12;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)" data-examplecard="1">
@@ -748,6 +751,12 @@ class Component extends DCLogic {
     ];
 
     // A week of example posts, each dressed as it would appear on its network.
+    // Two example Instagram stories, stacked in the first column on desktop.
+    const stories = [
+      { row: 1, name: "The Daily Grind Café", initial: "D", tint: "#e8d5b8", img: "examples/cafe.jpg", alt: "Example story for a café: Hard Monday? Get your perfect coffee fix." },
+      { row: 2, name: "Marko Pizza", initial: "M", tint: "#f2b27a", img: "examples/pizza.jpg", alt: "Example story for a pizza place: No ideas for dinner?" }
+    ];
+
     const posts = [
       { channel: "Instagram", name: "The Corner Bakery", initial: "C", tint: "#e8d5b8", img: "examples/bakery.jpg", alt: "Example ad for a bakery: Good morning! Freshly baked donuts and pastry.", caption: "Fresh out of the oven at 7am. Grab one on your way to work." },
       { channel: "Facebook", name: "Glow Hair Salon", initial: "G", tint: "#f0c9c9", img: "examples/salon.jpg", alt: "Example ad for a hair salon: Time for a change?", caption: "Book a quick trim this week and walk out feeling new." },
@@ -802,7 +811,7 @@ class Component extends DCLogic {
     });
 
     return {
-      steps, posts, plans,
+      steps, stories, posts, plans,
       verticals: ["Bakeries", "Barbershops", "Dental clinics", "Gyms & studios", "Wine bars", "Florists", "Auto detailers", "Physiotherapy", "Nail studios"],
       navIcon: this.state.navOpen ? "✕" : "≡",
       navExpanded: this.state.navOpen ? "true" : "false",
