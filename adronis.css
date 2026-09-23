@@ -93,6 +93,12 @@ footer{position:relative;margin-top:64px;padding:44px 24px 44px;background:trans
 .checkbox-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:10px}
 .checkbox-row{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:10px;border:1px solid #23252a;background:#0e0f12;font-size:13.5px;color:#d0d6e0;cursor:pointer}
 .checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--acc);cursor:pointer}
+/* A consent line is a sentence, not a chip: the text wraps as one block beside the box. */
+.consent-group{grid-template-columns:1fr}
+.consent-row{align-items:flex-start;gap:12px;padding:14px 16px;line-height:1.6;color:#b4bac4}
+.consent-row input[type=checkbox]{flex:none;margin:3px 0 0}
+.consent-row a{color:var(--acc);text-decoration:underline;text-decoration-color:rgba(168,198,240,.35);text-underline-offset:3px}
+.consent-row a:hover{text-decoration-color:var(--acc)}
 
 .section-label{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;color:#7b8089;margin:36px 0 16px;padding-top:20px;border-top:1px solid #15171b}
 .section-label:first-child{margin-top:0;padding-top:0;border-top:none}
