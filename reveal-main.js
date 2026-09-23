@@ -8,7 +8,7 @@
 (function () {
   // #control (data-dash) already runs its own scroll-driven animation that
   // fights an external opacity/transform override, so it's left alone here.
-  var IDS = ["operators", "silence", "engine", "live", "pricing", "testimonials", "finalcta"];
+  var IDS = ["operators", "silence", "engine", "live", "faq", "pricing", "testimonials", "finalcta"];
   var observedNodes = new WeakSet();
   var io = null;
 

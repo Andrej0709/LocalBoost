@@ -302,52 +302,130 @@
     renderCalendar();
   });
 
-  // --- Optional extras: things the customer can tell the engine ---
+  // --- Profile strength: things the customer can tell the engine ---
   // None of them gate anything. Each one is a profile column the customer may
   // edit; the database stamps next_week_note_at whenever that note changes.
+  // Weights add up to 100 and follow how much each answer changes the ads.
+  // Channels are edited on the account page, so that row links there instead
+  // of opening a form.
   var EXTRAS = [
-    { key: "next_week_note", title: "What's happening next week?", max: 1000, multiline: true,
-      why: "A sale, a new product, holiday hours, an event — the engine builds next week's ads around it.",
-      placeholder: "e.g. 20% off all coffee Mon–Wed, closed Friday for the holiday, new pumpkin pastry from Tuesday" },
-    { key: "differentiator", title: "What makes you different", max: 1000, multiline: true,
+    { key: "differentiator", weight: 25, title: "What makes you different", max: 1000, multiline: true,
       why: "Gives every ad a reason to pick you over the place down the street.",
       placeholder: "e.g. Everything's made from scratch, third-generation family recipes, open from 6am" },
-    { key: "brand_colors", title: "Your brand colors", max: 200,
+    { key: "next_week_note", weight: 20, title: "What's happening next week?", max: 1000, multiline: true,
+      why: "A sale, a new product, holiday hours, an event — the engine builds next week's ads around it.",
+      placeholder: "e.g. 20% off all coffee Mon–Wed, closed Friday for the holiday, new pumpkin pastry from Tuesday" },
+    { key: "brand_colors", weight: 15, title: "Your brand colors", max: 200,
       why: "Keeps the images in your colors, so people recognise you before they read a word.",
       placeholder: "e.g. Deep green and cream, with gold accents" },
-    { key: "website", title: "Website or Instagram", max: 300,
+    { key: "avoid_notes", weight: 15, title: "Anything to avoid", max: 1000, multiline: true,
+      why: "Things that should never show up in your ads — the engine steers clear of them.",
+      placeholder: "e.g. No jokes about prices, never show the back kitchen" },
+    { key: "website", weight: 15, title: "Website or Instagram", max: 300,
       why: "Shows the engine how you already present yourself, so new ads match it.",
       placeholder: "e.g. @milenasbakery or milenas.rs" },
-    { key: "avoid_notes", title: "Anything to avoid", max: 1000, multiline: true,
-      why: "Things that should never show up in your ads — the engine steers clear of them.",
-      placeholder: "e.g. No jokes about prices, never show the back kitchen" }
+    { key: "channels", weight: 10, title: "Where your ads go", link: "account.html",
+      why: "Pick at least one channel so every drop has somewhere to publish." }
   ];
+  // A weekly note only counts while it is about the week ahead.
+  var NOTE_FRESH_MS = 7 * 24 * 60 * 60 * 1000;
   var openExtra = null;
+  var completeOpen = false;
+
+  function extraValue(x, profile) {
+    var v = profile[x.key];
+    if (Array.isArray(v)) return v.join(", ");
+    return v || "";
+  }
+
+  // "done", "stale" (a weekly note that has gone out of date) or "missing".
+  function extraState(x, profile) {
+    if (!extraValue(x, profile)) return "missing";
+    if (x.key === "next_week_note") {
+      var at = profile.next_week_note_at ? new Date(profile.next_week_note_at).getTime() : 0;
+      if (!at || Date.now() - at > NOTE_FRESH_MS) return "stale";
+    }
+    return "done";
+  }
+
+  function shortDate(iso) {
+    return new Date(iso).toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), { month: "short", day: "numeric" });
+  }
+
+  function renderScore(profile) {
+    var card = document.getElementById("engine-help");
+    var score = 0;
+    var next = null;
+    EXTRAS.forEach(function (x) {
+      if (extraState(x, profile) === "done") score += x.weight;
+      else if (!next || x.weight > next.weight) next = x;
+    });
+    var complete = score >= 100;
+
+    document.getElementById("eh-pct").textContent = score + "%";
+    document.getElementById("eh-level").textContent =
+      score >= 80 ? "EXCELLENT" : score >= 40 ? "GOOD" : "BASIC";
+    document.getElementById("eh-ring").style.strokeDashoffset = (169.65 * (1 - score / 100)).toFixed(2);
+    card.classList.toggle("is-complete", complete);
+
+    var nextBtn = document.getElementById("eh-next");
+    nextBtn.hidden = !next;
+    if (next) {
+      document.getElementById("eh-next-title").textContent =
+        extraState(next, profile) === "stale" ? "Refresh your note for next week" : next.title;
+      document.getElementById("eh-next-gain").textContent = "+" + next.weight + "%";
+      nextBtn.onclick = function () {
+        if (next.link) { location.href = next.link; return; }
+        openExtra = next.key;
+        renderExtras();
+        var row = document.querySelector('[data-extra="' + next.key + '"]');
+        if (row) row.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      };
+    }
+
+    // At 100% the list folds away behind one line, so a finished profile
+    // doesn't keep taking up the top of the page.
+    document.getElementById("eh-complete").hidden = !complete;
+    var toggle = document.getElementById("eh-complete-toggle");
+    toggle.textContent = completeOpen ? "Hide answers" : "Review answers";
+    toggle.setAttribute("aria-expanded", completeOpen ? "true" : "false");
+    document.getElementById("eh-list").hidden = complete && !completeOpen;
+  }
+
+  document.getElementById("eh-complete-toggle").addEventListener("click", function () {
+    completeOpen = !completeOpen;
+    renderExtras();
+  });
 
   function renderExtras() {
     var profile = LBAuth.getProfile() || {};
     var list = document.getElementById("eh-list");
     list.innerHTML = "";
-
-    var done = EXTRAS.filter(function (x) { return profile[x.key]; }).length;
-    document.getElementById("eh-count").textContent = done + " OF " + EXTRAS.length + " ADDED";
-    document.getElementById("eh-bar").style.width = Math.round(done / EXTRAS.length * 100) + "%";
+    renderScore(profile);
 
     EXTRAS.forEach(function (x) {
-      var value = profile[x.key] || "";
+      var value = extraValue(x, profile);
+      var state = extraState(x, profile);
       var open = openExtra === x.key;
       var item = document.createElement("div");
-      item.className = "eh-item" + (value ? " is-done" : "");
+      item.className = "eh-item" + (state === "done" ? " is-done" : state === "stale" ? " is-stale" : "");
+      item.setAttribute("data-extra", x.key);
 
-      var toggle = document.createElement("button");
-      toggle.type = "button";
+      var toggle;
+      if (x.link) {
+        toggle = document.createElement("a");
+        toggle.href = x.link;
+      } else {
+        toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      }
       toggle.className = "eh-toggle";
-      toggle.setAttribute("aria-expanded", open ? "true" : "false");
 
       var dot = document.createElement("span");
       dot.className = "eh-dot";
       dot.setAttribute("aria-hidden", "true");
-      dot.textContent = "✓";
+      dot.textContent = state === "stale" ? "!" : "✓";
 
       var text = document.createElement("span");
       text.className = "eh-text";
@@ -356,7 +434,11 @@
       title.textContent = x.title;
       var why = document.createElement("span");
       why.className = "eh-why";
-      why.textContent = x.why;
+      why.textContent = state === "stale"
+        ? (profile.next_week_note_at
+            ? "Out of date — last changed " + shortDate(profile.next_week_note_at) + ". A fresh note keeps next week's ads current."
+            : "Out of date. A fresh note keeps next week's ads current.")
+        : x.why;
       text.appendChild(title);
       text.appendChild(why);
       if (value && !open) {
@@ -366,17 +448,28 @@
         text.appendChild(shown);
       }
 
-      var action = document.createElement("span");
-      action.className = "eh-action";
-      action.textContent = open ? "Close" : value ? "Edit" : "Add";
-
       toggle.appendChild(dot);
       toggle.appendChild(text);
+
+      if (state !== "done") {
+        var weight = document.createElement("span");
+        weight.className = "eh-weight";
+        weight.textContent = "+" + x.weight + "%";
+        toggle.appendChild(weight);
+      }
+
+      var action = document.createElement("span");
+      action.className = "eh-action";
+      action.textContent = x.link ? "Change in account"
+        : open ? "Close" : state === "stale" ? "Update" : value ? "Edit" : "Add";
       toggle.appendChild(action);
-      toggle.addEventListener("click", function () {
-        openExtra = open ? null : x.key;
-        renderExtras();
-      });
+
+      if (!x.link) {
+        toggle.addEventListener("click", function () {
+          openExtra = open ? null : x.key;
+          renderExtras();
+        });
+      }
       item.appendChild(toggle);
 
       if (open) item.appendChild(buildExtraForm(x, value, profile));

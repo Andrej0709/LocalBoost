@@ -44,15 +44,36 @@
 .eh-eyebrow{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--acc)}
 .eh h3{margin:10px 0 8px;font-size:22px;letter-spacing:-.02em}
 .eh-intro{margin:0;max-width:640px;font-size:14px;line-height:1.6;color:#8a8f98}
-.eh-progress{flex:none;width:150px;text-align:right}
-.eh-count{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;color:#d0d6e0}
-.eh-bar{margin-top:8px;height:4px;border-radius:9999px;background:#1b1e22;overflow:hidden}
-.eh-bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:inherit;transition:width .3s ease}
+.eh-score{flex:none;display:flex;align-items:center;gap:14px}
+.eh-ring{width:64px;height:64px;transform:rotate(-90deg)}
+.eh-ring circle{fill:none;stroke-width:5}
+.eh-ring-track{stroke:#1b1e22}
+.eh-ring-fill{stroke:var(--acc);stroke-linecap:round;stroke-dasharray:169.65;stroke-dashoffset:169.65;transition:stroke-dashoffset .6s cubic-bezier(.22,1,.36,1),stroke .3s ease}
+.eh.is-complete .eh-ring-fill{stroke:#9fd7b0}
+.eh-pct{font-size:26px;color:#fff;letter-spacing:-.03em;line-height:1}
+.eh-level{margin-top:6px;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--acc)}
+.eh.is-complete .eh-level{color:#9fd7b0}
+.eh-next{display:flex;align-items:center;gap:12px;width:100%;margin-top:20px;padding:14px 16px;border-radius:10px;border:1px solid rgba(168,198,240,.28);background:var(--acc-soft);color:inherit;text-align:left;cursor:pointer;font-family:'Geist',sans-serif;transition:border-color .2s ease,background .2s ease}
+.eh-next:hover{border-color:rgba(168,198,240,.55);background:rgba(168,198,240,.2)}
+.eh-next-label{flex:none;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--acc)}
+.eh-next-title{flex:1;min-width:0;font-size:14.5px;color:#fff;letter-spacing:-.01em}
+.eh-next-gain{flex:none;font-family:'Geist Mono',monospace;font-size:12px;color:var(--acc)}
+.eh-next-arrow{flex:none;color:var(--acc)}
+.eh-complete{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-top:18px}
+.eh-complete p{margin:0;font-size:14px;line-height:1.6;color:#b8bec7}
+.eh-complete .eh-plain:hover{color:#fff}
+.eh.is-complete .eh-intro{display:none}
+.eh-weight{flex:none;margin-top:2px;font-family:'Geist Mono',monospace;font-size:11px;color:#7b8089}
+.eh-item.is-stale .eh-dot{border-color:rgba(240,200,120,.5);background:rgba(240,200,120,.12);color:#f0c878}
+.eh-item.is-stale .eh-why{color:#f0c878}
 .eh-list{margin-top:20px;border-top:1px solid #1b1e22}
+.eh-list[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.eh-ring-fill,.eh-next{transition:none}}
 .eh-item{border-bottom:1px solid #1b1e22}
 .eh-toggle{display:flex;align-items:flex-start;gap:14px;width:100%;padding:14px 2px;background:none;border:none;text-align:left;cursor:pointer;font-family:'Geist',sans-serif;color:inherit}
 .eh-dot{flex:none;width:20px;height:20px;margin-top:1px;border-radius:9999px;border:1px solid #2a2d33;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent}
 .eh-item.is-done .eh-dot{border-color:rgba(159,215,176,.45);background:rgba(159,215,176,.14);color:#9fd7b0}
+a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 .eh-text{flex:1;min-width:0}
 .eh-title{display:block;font-size:14.5px;color:#fff;letter-spacing:-.01em}
 .eh-why{display:block;margin-top:3px;font-size:13px;line-height:1.5;color:#7b8089}
@@ -68,8 +89,9 @@
 @media (max-width:640px){
   .eh{padding:18px}
   .eh-head{flex-direction:column;gap:14px}
-  .eh-progress{width:100%;text-align:left}
   .eh-action{display:none}
+  .eh-next{flex-wrap:wrap;gap:6px 12px}
+  .eh-next-label{width:100%}
   .eh-form{padding-left:0}
 }
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:44px 0 14px}
@@ -153,14 +175,30 @@
     <div id="engine-help" class="eh" hidden>
       <div class="eh-head">
         <div>
-          <div class="eh-eyebrow">OPTIONAL · HELP THE ENGINE KNOW YOU</div>
+          <div class="eh-eyebrow">PROFILE STRENGTH · OPTIONAL</div>
           <h3>Make every ad look like <em>your</em> business.</h3>
           <p class="eh-intro">None of this is required — your ads render either way. But the engine only knows what you tell it, and everything you add here goes straight into your next drop: your colors, your offers, what sets you apart. The more it knows, the less your ads look like anyone else's.</p>
         </div>
-        <div class="eh-progress">
-          <div class="eh-count" id="eh-count">&mdash;</div>
-          <div class="eh-bar"><i id="eh-bar"></i></div>
+        <div class="eh-score">
+          <svg class="eh-ring" viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="32" r="27" class="eh-ring-track"></circle>
+            <circle cx="32" cy="32" r="27" class="eh-ring-fill" id="eh-ring"></circle>
+          </svg>
+          <div class="eh-score-text">
+            <div class="eh-pct" id="eh-pct">&mdash;</div>
+            <div class="eh-level" id="eh-level">&mdash;</div>
+          </div>
         </div>
+      </div>
+      <button type="button" class="eh-next" id="eh-next" hidden>
+        <span class="eh-next-label">NEXT STEP</span>
+        <span class="eh-next-title" id="eh-next-title"></span>
+        <span class="eh-next-gain" id="eh-next-gain"></span>
+        <span class="eh-next-arrow" aria-hidden="true">&rarr;</span>
+      </button>
+      <div class="eh-complete" id="eh-complete" hidden>
+        <p>Your profile is complete — the engine has everything it needs for your next drop.</p>
+        <button type="button" class="eh-plain" id="eh-complete-toggle" aria-expanded="false">Review answers</button>
       </div>
       <div class="eh-list" id="eh-list"></div>
     </div>
