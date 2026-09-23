@@ -119,6 +119,10 @@
     <!-- Main board -->
     <div id="board" hidden>
 
+      <div id="sample-notice" class="notice" role="status" hidden style="margin:0 0 20px;color:#d0d6e0">
+        <span class="mono" style="margin-right:10px;font-size:10px;letter-spacing:.12em;color:var(--acc)">SAMPLE</span>This is a made-up week so you can see how the control room looks. Your real schedule shows up here once you approve creatives.
+      </div>
+
       <div class="cr-stats">
         <div class="cr-stat">
           <div class="cr-stat-n" id="stat-scheduled">0</div>
@@ -177,8 +181,8 @@
       <h3>Nothing to show yet.</h3>
       <p>Once your first drop renders and you approve a few creatives, this is where you'll see exactly what's posting and when.</p>
       <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <button type="button" id="sample-btn" class="btn-ghost">See a sample week</button>
         <a href="approvals.html" class="btn-ghost">Go to approvals</a>
-        <a href="account.html" class="btn-ghost">Account settings</a>
       </div>
     </div>
 

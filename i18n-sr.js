@@ -1341,7 +1341,13 @@ window.LB_I18N_SR = {
     "Next week": "Sledeća nedelja",
     "This week": "Ova nedelja",
     "Scheduled": "Zakazano",
-    "SCHEDULED": "ZAKAZANO"
+    "SCHEDULED": "ZAKAZANO",
+    "SAMPLE": "PRIMER",
+    "See a sample week": "Pogledaj primer nedelje",
+    "This is a made-up week so you can see how the control room looks. Your real schedule shows up here once you approve creatives.":
+      "Ovo je izmišljena nedelja da vidiš kako kontrolna soba izgleda. Tvoj pravi raspored se pojavljuje ovde čim odobriš kreative.",
+    "Friday, but make it pastry.": "Petak, ali uz pecivo.",
+    "Weekend hours: 8 to 2.": "Vikendom radimo od 8 do 14."
 
   },
 

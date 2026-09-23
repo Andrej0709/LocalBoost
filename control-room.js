@@ -246,6 +246,62 @@
     renderCalendar();
   });
 
+  // A made-up week so the page can be seen before anything is approved.
+  // Nothing here touches the database.
+  function sampleImage(from, to) {
+    var svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">' +
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="' + from + '"/><stop offset="1" stop-color="' + to + '"/>' +
+      '</linearGradient></defs><rect width="80" height="80" fill="url(#g)"/></svg>';
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+
+  function sampleCreatives() {
+    var monday = startOfWeek(new Date());
+    function at(dayOffset, hour, minute) {
+      var d = new Date(monday);
+      d.setDate(d.getDate() + dayOffset);
+      d.setHours(hour, minute, 0, 0);
+      return d.toISOString();
+    }
+    var now = Date.now();
+    var slots = [
+      [0, 8, 30, "Instagram", "4:5 post", "Morning rush, sorted.", "#1b2432", "#3a4a63"],
+      [1, 12, 15, "Facebook", "1:1 post", "The corner table is free.", "#2a2233", "#57405f"],
+      [2, 18, 0, "Instagram", "9:16 story", "Baked at 5am. Gone by noon.", "#20291f", "#3f5a3c"],
+      [3, 9, 45, "Google Business", "1:1 post", "Same-day repairs, no appointment.", "#33261f", "#63432f"],
+      [4, 17, 30, "Instagram", "4:5 post", "Friday, but make it pastry.", "#1b2432", "#3a4a63"],
+      [5, 10, 0, "Facebook", "1:1 post", "Weekend hours: 8 to 2.", "#2a2233", "#57405f"]
+    ];
+    return slots.map(function (s) {
+      var when = at(s[0], s[1], s[2]);
+      var live = new Date(when).getTime() < now;
+      return {
+        status: live ? "published" : "approved",
+        scheduled_at: when,
+        published_at: live ? when : null,
+        channel: s[3],
+        format: s[4],
+        headline: s[5],
+        image_url: sampleImage(s[6], s[7])
+      };
+    });
+  }
+
+  document.getElementById("sample-btn").addEventListener("click", function () {
+    var creatives = sampleCreatives();
+    noDrops.hidden = true;
+    board.hidden = false;
+    document.getElementById("sample-notice").hidden = false;
+    renderStats(creatives);
+    renderScheduled(creatives);
+    renderLive(creatives);
+    calStart = startOfWeek(new Date());
+    calCreatives = creatives;
+    renderCalendar();
+  });
+
   LBAuth.ready.then(async function () {
     if (!LBAuth.isLoggedIn()) {
       loading.hidden = true;
