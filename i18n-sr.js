@@ -1470,9 +1470,15 @@ window.LB_I18N_SR = {
     "Examples of what you get": "Primeri onoga što dobijaš",
     "Sample ads for a neighbourhood café. Yours are made for your business, in your style.":
       "Primeri oglasa za kafić iz kraja. Tvoji se prave za tvoj biznis, u tvom stilu.",
-    "Drag or use the arrows to see more": "Prevuci ili koristi strelice da vidiš još",
-    "Previous example": "Prethodni primer",
-    "Next example": "Sledeći primer",
+    "A week of posts for a neighbourhood café, the way they show up on each network. Yours are made for your business.":
+      "Nedelja objava za kafić iz kraja, onako kako izgledaju na svakoj mreži. Tvoje se prave za tvoj biznis.",
+    "Corner Café": "Kafić na uglu",
+    "Five new coffees, free to try. Just come in.": "Pet novih kafa, degustacija je besplatna. Samo svrati.",
+    "See you Saturday": "Vidimo se u subotu",
+    "From a farm ten minutes away. Only this week, while they last.": "Sa farme deset minuta od nas. Samo ove nedelje, dok ih ima.",
+    "Soup of the day with fresh bread, served until 3pm.": "Supa dana uz sveži hleb, služimo do 15h.",
+    "Free parking behind the building for all our guests.": "Besplatan parking iza zgrade za sve naše goste.",
+    "Our cinnamon rolls, made by hand every morning at six.": "Naše rolnice sa cimetom, ručno pravljene svakog jutra u šest.",
     "Instagram and TikTok": "Instagram i TikTok",
     "Instagram and Facebook": "Instagram i Facebook",
     "Google and Facebook": "Google i Facebook",
