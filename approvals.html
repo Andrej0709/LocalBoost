@@ -453,9 +453,11 @@
   }
 
   // Once a drop has nothing left waiting, mark the drop itself approved.
+  // Only between those two states — the engine owns every other one, and the
+  // database refuses the rest.
   async function maybeCloseDrop(dropId) {
     var drop = drops.filter(function (d) { return d.id === dropId; })[0];
-    if (!drop || drop.status === "published") return;
+    if (!drop || (drop.status !== "awaiting_approval" && drop.status !== "approved")) return;
 
     var stillWaiting = creatives.some(function (creative) {
       return creative.drop_id === dropId && creative.status === "pending";

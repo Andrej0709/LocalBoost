@@ -58,15 +58,15 @@
     <form id="message-form">
       <div class="field">
         <label for="m-name">NAME</label>
-        <input id="m-name" type="text" required autocomplete="name" placeholder="Your name">
+        <input id="m-name" type="text" maxlength="200" required autocomplete="name" placeholder="Your name">
       </div>
       <div class="field">
         <label for="m-email">EMAIL</label>
-        <input id="m-email" type="email" required autocomplete="email" placeholder="you@example.com">
+        <input id="m-email" type="email" maxlength="320" required autocomplete="email" placeholder="you@example.com">
       </div>
       <div class="field">
         <label for="m-message">MESSAGE</label>
-        <textarea id="m-message" required placeholder="Whatever you'd like to tell us..."></textarea>
+        <textarea id="m-message" maxlength="5000" required placeholder="Whatever you'd like to tell us..."></textarea>
       </div>
       <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
         <label for="m-company">Company (leave empty)</label>

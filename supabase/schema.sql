@@ -278,7 +278,9 @@ begin
       '{}'
     ),
     (nullif(new.raw_user_meta_data ->> 'plan', ''))::public.plan_tier,
-    (nullif(new.raw_user_meta_data ->> 'terms_accepted_at', ''))::timestamptz,
+    /* The server clock, not the browser's: the signup request is the moment the
+       box was ticked, and a timestamp the browser sends could say anything. */
+    case when nullif(new.raw_user_meta_data ->> 'terms_version', '') is not null then now() end,
     nullif(new.raw_user_meta_data ->> 'terms_version', '')
   )
   on conflict (id) do nothing;
@@ -291,6 +293,35 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+/* profiles.email follows the login email. The customer can't edit it directly
+   (see protect_profile_billing) - it changes only once Supabase has confirmed a
+   new address, so mail meant for the account never goes somewhere unverified. */
+create or replace function public.sync_profile_email()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  update public.profiles set email = new.email where id = new.id;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_email_changed on auth.users;
+create trigger on_auth_user_email_changed
+  after update of email on auth.users
+  for each row
+  when (new.email is distinct from old.email)
+  execute function public.sync_profile_email();
+
+/* Bring rows already out of step (email changed before this trigger existed). */
+update public.profiles p
+   set email = u.email
+  from auth.users u
+ where u.id = p.id
+   and p.email is distinct from u.email;
 
 /* ------------------------------------------------------------ */
 /* 8b. start_trial - the only way a trial ever begins. */
@@ -716,11 +747,12 @@ begin
        or new.billing_history <> '[]'::jsonb then
       raise exception 'Billing details can only be set through checkout.';
     end if;
+    /* The row's email is the signed-in account's, whatever the browser sent. */
+    new.email := coalesce(auth.jwt() ->> 'email', new.email);
     return new;
   end if;
 
   editable                  := old;
-  editable.email            := new.email;
   editable.business_name    := new.business_name;
   editable.country          := new.country;
   editable.city             := new.city;
@@ -819,7 +851,7 @@ begin
 
   if new.status is distinct from old.status
      and (new.status not in ('awaiting_approval', 'approved')
-          or old.status = 'published') then
+          or old.status not in ('awaiting_approval', 'approved')) then
     raise exception 'Adronis moves a drop through the rest of the queue.';
   end if;
 
@@ -883,3 +915,24 @@ create policy "contact insert public" on public.contact_requests
 drop policy if exists "messages insert public" on public.messages;
 create policy "messages insert public" on public.messages
   for insert to anon, authenticated with check (status = 'new');
+
+/* Size caps on the public forms. Anyone can insert, so without these a script
+   could post megabytes per row. Generous for a real person; not valid-checked
+   against rows already stored, so re-running never fails on old data. */
+do $$ begin
+  alter table public.contact_requests add constraint contact_requests_sizes check (
+    char_length(email) <= 320
+    and char_length(coalesce(business_name, '')) <= 200
+    and char_length(coalesce(full_name, '')) <= 200
+    and char_length(coalesce(plan_interest, '')) <= 50
+    and char_length(coalesce(message, '')) <= 5000
+  ) not valid;
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  alter table public.messages add constraint messages_sizes check (
+    char_length(email) <= 320
+    and char_length(coalesce(full_name, '')) <= 200
+    and char_length(message) <= 5000
+  ) not valid;
+exception when duplicate_object then null; end $$;
