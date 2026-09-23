@@ -488,8 +488,8 @@ window.LB_I18N_SR = {
     "Approved": "Odobreno",
     "Rejected": "Odbačeno",
     "Everything": "Sve",
-    "Y approve · N reject · ←→ navigate":
-      "Y odobri · N odbaci · ←→ kretanje",
+    "Y approve · N reject · 1–5 say why · ←→ navigate":
+      "Y odobri · N odbaci · 1–5 razlog · ←→ kretanje",
     "NOTHING HERE": "OVDE NEMA NIČEGA",
     "All caught up.": "Sve je rešeno.",
     "Nothing in this view right now.": "Trenutno ništa u ovom prikazu.",
@@ -581,10 +581,10 @@ window.LB_I18N_SR = {
     "Deleted 90 days later": "Briše se nakon 90 dana",
     "Invoices": "Računi",
     "Kept as long as tax law requires": "Čuvaju se koliko poreski propisi nalažu",
-    "Ask for a copy of your data, a correction, or deletion at":
-      "Kopiju svojih podataka, ispravku ili brisanje zatraži na",
-    "— email us from the address on this account and we answer within one month. Full detail is in the":
-      "— piši nam sa adrese sa ovog naloga i odgovaramo u roku od mesec dana. Sve pojedinosti su u dokumentu",
+    "The download is one file with your account, brief and every creative. For a correction, or anything else, write to":
+      "Preuzimanje je jedan fajl sa tvojim nalogom, opisom posla i svim kreativima. Za ispravku ili bilo šta drugo piši na",
+    "from the address on this account — we answer within one month. Full detail is in the":
+      "sa adrese sa ovog naloga — odgovaramo u roku od mesec dana. Sve pojedinosti su u dokumentu",
     "Privacy Policy": "Politika privatnosti",
 
     /* --- AI disclosure ---------------------------------------------------- */
@@ -1297,7 +1297,51 @@ window.LB_I18N_SR = {
       "Ne moraš ponovo da se registruješ — tvoj nalog ovo već pokriva.",
     "Couldn't load the site's messaging system. Refresh the page and try again.":
       "Nismo uspeli da učitamo sistem za poruke. Osveži stranicu i pokušaj ponovo.",
-    "Could not send:": "Slanje nije uspelo:"
+    "Could not send:": "Slanje nije uspelo:",
+
+    /* --- Approvals: text edits and reject reasons ------------------------ */
+    "EDITED BY YOU": "TVOJA IZMENA",
+    "Edit text": "Izmeni tekst",
+    "Restore original": "Vrati original",
+    "HEADLINE": "NASLOV",
+    "CAPTION": "OPIS",
+    "Only the text posted with the ad changes — the image stays as it is.":
+      "Menja se samo tekst koji ide uz oglas — slika ostaje ista.",
+    "Save text": "Sačuvaj tekst",
+    "WHY IT WAS REJECTED": "ZAŠTO JE ODBAČENO",
+    "Image doesn't fit": "Slika ne odgovara",
+    "Wrong tone": "Pogrešan ton",
+    "Wrong facts or price": "Netačni podaci ili cena",
+    "Wrong timing": "Nije pravo vreme",
+    "Something else": "Nešto drugo",
+    "Add a note for the engine (optional)": "Dodaj napomenu za mašinu (nije obavezno)",
+    "Save note": "Sačuvaj napomenu",
+    "Rejected. Why?": "Odbačeno. Zašto?",
+    "Skip": "Preskoči",
+    "Thanks — the engine will take that into the next drop.":
+      "Hvala — mašina će to uzeti u obzir za sledeći drop.",
+    "Couldn't save that — please try again.": "Nismo uspeli da sačuvamo — pokušaj ponovo.",
+
+    /* --- Account: your data ---------------------------------------------- */
+    "Download my data": "Preuzmi moje podatke",
+    "Delete my account": "Obriši moj nalog",
+    "This removes your login, brief and every creative for good — it can't be undone. Anything already posted stays on your own channels. Download your data first if you want a copy.":
+      "Ovo trajno briše tvoju prijavu, opis posla i sve kreative — ne može da se vrati. Ono što je već objavljeno ostaje na tvojim kanalima. Ako želiš kopiju, prvo preuzmi svoje podatke.",
+    "TYPE YOUR PASSWORD TO CONFIRM": "UNESI LOZINKU ZA POTVRDU",
+    "Delete for good": "Obriši zauvek",
+    "ACCOUNT DELETED": "NALOG OBRISAN",
+    "Your account is gone.": "Tvoj nalog je obrisan.",
+    "Your login, brief and creatives have been removed. Thanks for trying Adronis.":
+      "Tvoja prijava, opis posla i kreativi su uklonjeni. Hvala što si probao Adronis.",
+    "Back to the home page": "Nazad na početnu",
+
+    /* --- Control room: posting calendar ---------------------------------- */
+    "POSTING CALENDAR": "KALENDAR OBJAVA",
+    "Previous week": "Prethodna nedelja",
+    "Next week": "Sledeća nedelja",
+    "This week": "Ova nedelja",
+    "Scheduled": "Zakazano",
+    "SCHEDULED": "ZAKAZANO"
 
   },
 

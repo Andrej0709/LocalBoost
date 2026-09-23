@@ -484,6 +484,107 @@
     });
   }
 
+  // ------------------------------------------------------------ your data
+  // Everything this account can read about itself, as one JSON file. RLS
+  // already limits each query to the signed-in account's own rows.
+  function wireExport() {
+    $("export-btn").addEventListener("click", async function () {
+      var button = this;
+      var user = LBAuth.getUser();
+      button.disabled = true;
+      try {
+        var loaded = await Promise.all([
+          LBAuth.db.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+          LBAuth.db.from("drops").select("*").eq("user_id", user.id).order("week_starting"),
+          LBAuth.db.from("creatives").select("*").eq("user_id", user.id).order("created_at")
+        ]);
+        loaded.forEach(function (res) { if (res.error) throw res.error; });
+
+        var data = {
+          exported_at: new Date().toISOString(),
+          login_email: user.email,
+          account: loaded[0].data,
+          drops: loaded[1].data || [],
+          creatives: loaded[2].data || []
+        };
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "adronis-data-" + data.exported_at.slice(0, 10) + ".json";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+        $("export-notice").hidden = true;
+      } catch (err) {
+        say($("export-notice"), err.message, true);
+      }
+      button.disabled = false;
+    });
+  }
+
+  // Said in place rather than on another page — there's no account left to
+  // carry a message anywhere.
+  function showDeleted() {
+    var content = $("account-content");
+    content.innerHTML = "";
+    var card = document.createElement("div");
+    card.className = "card";
+    card.style.cssText = "max-width:440px;margin:0 auto;text-align:center";
+    var tag = document.createElement("div");
+    tag.className = "mono";
+    tag.style.cssText = "font-size:11px;letter-spacing:.1em;color:#7b8089";
+    tag.textContent = "ACCOUNT DELETED";
+    var title = document.createElement("h3");
+    title.style.margin = "14px 0 8px";
+    title.textContent = "Your account is gone.";
+    var text = document.createElement("p");
+    text.style.margin = "0";
+    text.textContent = "Your login, brief and creatives have been removed. Thanks for trying Adronis.";
+    var home = document.createElement("a");
+    home.href = "/";
+    home.className = "btn-ghost";
+    home.style.cssText = "margin-top:22px;display:inline-flex";
+    home.textContent = "Back to the home page";
+    card.appendChild(tag);
+    card.appendChild(title);
+    card.appendChild(text);
+    card.appendChild(home);
+    content.appendChild(card);
+    $("nav-cta").hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  function wireDelete() {
+    var form = $("delete-form");
+    var toggle = $("delete-toggle");
+    var notice = $("delete-notice");
+
+    toggle.addEventListener("click", function () {
+      form.hidden = !form.hidden;
+      notice.hidden = true;
+      if (!form.hidden) $("delete-password").focus();
+    });
+    $("delete-cancel").addEventListener("click", function () {
+      form.hidden = true;
+      $("delete-password").value = "";
+    });
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var button = form.querySelector("button[type=submit]");
+      button.disabled = true;
+      try {
+        await LBAuth.verifyPassword($("delete-password").value);
+        await LBAuth.deleteAccount();
+        showDeleted();
+      } catch (err) {
+        say(notice, err.message, true);
+        button.disabled = false;
+      }
+    });
+  }
+
   // ---------------------------------------------------------------- boot
   wireSecurity();
   wireChannels();
@@ -507,6 +608,8 @@
     renderPayments(profile);
     wirePlanChange(function () { return currentProfile; });
     wireCancelSubscription(function () { return currentProfile; });
+    wireExport();
+    wireDelete();
 
     loading.hidden = true;
     $("account-content").hidden = false;

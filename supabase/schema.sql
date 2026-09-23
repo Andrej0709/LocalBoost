@@ -178,6 +178,28 @@ create table if not exists public.creatives (
   updated_at   timestamptz not null default now()
 );
 
+/* --- Migration for customer feedback and text edits ------------------------ */
+/* reject_reason / reject_note: why the customer killed a creative, read by the  */
+/* engine when it renders the next drop. Cleared when the creative goes back to  */
+/* the queue or gets approved.                                                    */
+/* original_headline / original_caption: what the engine wrote, kept the first   */
+/* time the customer edits the text so the engine can learn from the difference. */
+/* Null means the text was never edited.                                          */
+alter table public.creatives add column if not exists reject_reason     text;
+alter table public.creatives add column if not exists reject_note       text;
+alter table public.creatives add column if not exists original_headline text;
+alter table public.creatives add column if not exists original_caption  text;
+alter table public.creatives add column if not exists edited_at         timestamptz;
+
+do $$ begin
+  alter table public.creatives add constraint creatives_customer_fields check (
+    (reject_reason is null or reject_reason in ('image', 'tone', 'facts', 'timing', 'other'))
+    and char_length(coalesce(reject_note, '')) <= 500
+    and char_length(coalesce(headline, '')) <= 200
+    and char_length(coalesce(caption, '')) <= 2200
+  ) not valid;
+exception when duplicate_object then null; end $$;
+
 create index if not exists creatives_drop_idx on public.creatives (drop_id);
 create index if not exists creatives_user_idx on public.creatives (user_id, created_at desc);
 
@@ -322,6 +344,31 @@ update public.profiles p
   from auth.users u
  where u.id = p.id
    and p.email is distinct from u.email;
+
+/* ------------------------------------------------------------ */
+/* 8a. delete_my_account - self-serve account deletion. */
+/*     Removes the login itself; profiles, drops and creatives go with it      */
+/*     through their on delete cascade. The account page asks for the         */
+/*     password first. Once Stripe is wired, the subscription must be          */
+/*     cancelled there before this runs. */
+/* ------------------------------------------------------------ */
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in.';
+  end if;
+
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+
+revoke execute on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;
 
 /* ------------------------------------------------------------ */
 /* 8b. start_trial - the only way a trial ever begins. */
@@ -791,7 +838,9 @@ create trigger profiles_protect_billing
   before insert or update on public.profiles
   for each row execute function public.protect_profile_billing();
 
-/* Approving and rejecting is all a customer does to a creative. */
+/* A customer approves or rejects a creative, says why they rejected it, and
+   may rewrite its headline and caption before it goes out. The image, channel,
+   schedule and everything else belong to the engine. */
 create or replace function public.protect_creative_fields()
 returns trigger
 language plpgsql
@@ -804,17 +853,39 @@ begin
     return new;
   end if;
 
-  editable            := old;
-  editable.status     := new.status;
-  editable.updated_at := new.updated_at;
+  editable               := old;
+  editable.status        := new.status;
+  editable.reject_reason := new.reject_reason;
+  editable.reject_note   := new.reject_note;
+  editable.headline      := new.headline;
+  editable.caption       := new.caption;
+  editable.updated_at    := new.updated_at;
 
   if new is distinct from editable then
-    raise exception 'Only a creative''s approval can be changed.';
+    raise exception 'Only a creative''s approval, feedback and text can be changed.';
   end if;
 
   if new.status is distinct from old.status
      and (old.status = 'published' or new.status = 'published') then
     raise exception 'Publishing is handled by Adronis.';
+  end if;
+
+  if new.headline is distinct from old.headline or new.caption is distinct from old.caption then
+    if old.status = 'published' then
+      raise exception 'This creative is already live - its text can''t change now.';
+    end if;
+    /* Keep what the engine wrote, once - later edits never overwrite it. */
+    if old.edited_at is null then
+      new.original_headline := old.headline;
+      new.original_caption  := old.caption;
+    end if;
+    new.edited_at := now();
+  end if;
+
+  /* A reason only means something while the creative stays rejected. */
+  if new.status <> 'rejected' then
+    new.reject_reason := null;
+    new.reject_note   := null;
   end if;
 
   return new;

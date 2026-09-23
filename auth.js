@@ -295,6 +295,19 @@
       return res.data.user;
     },
 
+    // Deletes the login and, through the database's cascades, the profile,
+    // drops and creatives with it. The caller checks the password first.
+    deleteAccount: async function () {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.rpc("delete_my_account");
+      if (res.error) throw res.error;
+      // The session's user no longer exists — drop it locally, ignore the
+      // server's answer to signing out a deleted user.
+      try { await db.auth.signOut({ scope: "local" }); } catch (e) {}
+      session = null;
+      profile = null;
+    },
+
     // Cancels at the end of the current paid period — access continues until
     // current_period_end, finalize_billing_period() ends it when that arrives.
     cancelAtPeriodEnd: async function () {

@@ -141,6 +141,111 @@
     if (waiting > 0) link.textContent = "Review " + waiting + " waiting →";
   }
 
+  // --- Posting calendar: one week, Monday first ---
+  var calStart = startOfWeek(new Date());
+  var calCreatives = [];
+
+  function startOfWeek(date) {
+    var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return d;
+  }
+
+  function sameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  // A published creative sits on the day it went out; an approved one on the
+  // day it's slotted for. Approved but not yet slotted has no day to sit on.
+  function calendarDate(c) {
+    if (c.status === "published") return c.published_at || c.scheduled_at;
+    if (c.status === "approved") return c.scheduled_at;
+    return null;
+  }
+
+  function renderCalendar() {
+    var locale = window.LBLang ? LBLang.locale() : "en-US";
+    var grid = document.getElementById("cal-grid");
+    grid.innerHTML = "";
+
+    var end = new Date(calStart);
+    end.setDate(end.getDate() + 6);
+    document.getElementById("cal-range").textContent =
+      calStart.toLocaleDateString(locale, { month: "short", day: "numeric" }).toUpperCase() + " – " +
+      end.toLocaleDateString(locale, { month: "short", day: "numeric" }).toUpperCase();
+
+    var today = new Date();
+    for (var i = 0; i < 7; i++) {
+      var day = new Date(calStart);
+      day.setDate(day.getDate() + i);
+
+      var cell = document.createElement("div");
+      cell.className = "cal-day" +
+        (sameDay(day, today) ? " is-today" : day < startOfDay(today) ? " is-past" : "");
+      var label = document.createElement("div");
+      label.className = "cal-date";
+      label.textContent = day.toLocaleDateString(locale, { weekday: "short", day: "numeric" }).toUpperCase();
+      cell.appendChild(label);
+
+      var items = calCreatives
+        .filter(function (c) { var at = calendarDate(c); return at && sameDay(new Date(at), day); })
+        .sort(function (a, b) { return new Date(calendarDate(a)) - new Date(calendarDate(b)); });
+
+      items.forEach(function (c) {
+        var item = document.createElement("div");
+        item.className = "cal-item" + (c.status === "published" ? " is-live" : "");
+        item.title = c.headline || "";
+        if (c.image_url) {
+          var img = new Image();
+          img.src = c.image_url;
+          img.alt = "";
+          img.loading = "lazy";
+          item.appendChild(img);
+        } else {
+          var ph = document.createElement("div");
+          ph.className = "cal-ph";
+          item.appendChild(ph);
+        }
+        var text = document.createElement("div");
+        text.className = "cal-item-text";
+        var time = document.createElement("span");
+        time.className = "cal-item-time";
+        time.textContent = fmtTime(calendarDate(c));
+        var ch = document.createElement("span");
+        ch.className = "cal-item-ch";
+        ch.textContent = c.channel || c.headline || "";
+        text.appendChild(time);
+        text.appendChild(ch);
+        item.appendChild(text);
+        cell.appendChild(item);
+      });
+
+      if (!items.length) {
+        var none = document.createElement("div");
+        none.className = "cal-none";
+        none.textContent = "—";
+        cell.appendChild(none);
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  function startOfDay(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function shiftWeek(weeks) {
+    calStart.setDate(calStart.getDate() + weeks * 7);
+    renderCalendar();
+  }
+
+  document.getElementById("cal-prev").addEventListener("click", function () { shiftWeek(-1); });
+  document.getElementById("cal-next").addEventListener("click", function () { shiftWeek(1); });
+  document.getElementById("cal-today").addEventListener("click", function () {
+    calStart = startOfWeek(new Date());
+    renderCalendar();
+  });
+
   LBAuth.ready.then(async function () {
     if (!LBAuth.isLoggedIn()) {
       loading.hidden = true;
@@ -178,5 +283,7 @@
     renderStats(creatives);
     renderScheduled(creatives);
     renderLive(creatives);
+    calCreatives = creatives;
+    renderCalendar();
   });
 })();

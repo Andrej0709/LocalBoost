@@ -277,10 +277,31 @@
           <div class="acc-row"><div class="acc-row-label">After cancellation</div><div class="acc-row-value">Deleted 90 days later</div></div>
           <div class="acc-row"><div class="acc-row-label">Invoices</div><div class="acc-row-value">Kept as long as tax law requires</div></div>
 
+          <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:10px">
+            <button type="button" id="export-btn" class="btn-ghost">Download my data</button>
+          </div>
+          <div id="export-notice" class="notice" role="status" hidden></div>
+
           <div style="margin-top:18px;font-size:13px;line-height:1.6;color:#8a8f98">
-            Ask for a copy of your data, a correction, or deletion at
-            <a href="mailto:privacy@adronis.app">privacy@adronis.app</a> — email us from the address on this account and we answer within one month.
+            The download is one file with your account, brief and every creative. For a correction, or anything else, write to
+            <a href="mailto:privacy@adronis.app">privacy@adronis.app</a> from the address on this account — we answer within one month.
             Full detail is in the <a href="privacy.html">Privacy Policy</a>.
+          </div>
+
+          <div style="margin-top:20px;padding-top:18px;border-top:1px solid #1b1e22">
+            <button type="button" id="delete-toggle" style="background:none;border:none;padding:0;color:#f0a8a8;font-size:13.5px;cursor:pointer;font-family:'Geist',sans-serif">Delete my account</button>
+            <form id="delete-form" hidden style="margin-top:14px">
+              <p style="font-size:13.5px;line-height:1.6;color:#8a8f98;margin:0 0 14px">This removes your login, brief and every creative for good — it can't be undone. Anything already posted stays on your own channels. Download your data first if you want a copy.</p>
+              <div class="field">
+                <label for="delete-password">TYPE YOUR PASSWORD TO CONFIRM</label>
+                <input id="delete-password" type="password" required autocomplete="current-password" placeholder="Your current password">
+              </div>
+              <div style="display:flex;gap:10px">
+                <button type="submit" class="btn-ghost" style="border-color:rgba(240,168,168,.35);color:#f0a8a8">Delete for good</button>
+                <button type="button" id="delete-cancel" style="background:none;border:none;padding:10px 8px;margin:-10px -8px;color:#9aa0a8;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Never mind</button>
+              </div>
+            </form>
+            <div id="delete-notice" class="notice" role="status" hidden></div>
           </div>
         </div>
       </div>
