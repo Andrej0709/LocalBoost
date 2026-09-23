@@ -1473,6 +1473,14 @@ window.LB_I18N_SR = {
     "A week of posts for a neighbourhood café, the way they show up on each network. Yours are made for your business.":
       "Nedelja objava za kafić iz kraja, onako kako izgledaju na svakoj mreži. Tvoje se prave za tvoj biznis.",
     "Corner Café": "Kafić na uglu",
+    "Posts for a few local businesses, the way they show up on each network. Yours are made for your business.":
+      "Objave za nekoliko lokalnih biznisa, onako kako izgledaju na svakoj mreži. Tvoje se prave za tvoj biznis.",
+    "No ideas for dinner?": "Nemaš ideju za večeru?",
+    "Posted to Instagram and Facebook": "Objavljeno na Instagramu i Facebooku",
+    "Fresh out of the oven at 7am. Grab one on your way to work.": "Sveže iz rerne u 7h. Uzmi jedno usput do posla.",
+    "Book a quick trim this week and walk out feeling new.": "Zakaži brzo šišanje ove nedelje i izađi kao nov.",
+    "Personal plans and expert guidance. Your first session is on us.": "Lični planovi i stručno vođenje. Prvi trening je na nama.",
+    "Fast, detailed cleaning and polishing. Drive in, shine out.": "Brzo i detaljno pranje i poliranje. Uđeš prljav, izađeš sjajan.",
     "Five new coffees, free to try. Just come in.": "Pet novih kafa, degustacija je besplatna. Samo svrati.",
     "See you Saturday": "Vidimo se u subotu",
     "From a farm ten minutes away. Only this week, while they last.": "Sa farme deset minuta od nas. Samo ove nedelje, dok ih ima.",
