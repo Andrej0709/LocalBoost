@@ -361,7 +361,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 [data-faq] summary::-webkit-details-marker{display:none}
 [data-faq] summary:hover [data-faqicon]{border-color:#4a4d54}
 [data-faqicon]{transition:transform .3s cubic-bezier(.22,1,.36,1),border-color .2s ease}
-@media (prefers-reduced-motion:reduce){[data-plans]>*{transition:none !important}}
+@media (prefers-reduced-motion:reduce){[data-plans]>*,[data-chip]{transition:none !important}}
 [data-faq][open] [data-faqicon]{transform:rotate(45deg)}
 @media (prefers-reduced-motion:reduce){[data-faqicon]{transition:none}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
@@ -489,7 +489,7 @@ input[type=range]{height:30px !important}
     <h2 style="margin:0;max-width:30ch;font-size:clamp(22px,2.2vw,28px);line-height:1.2;letter-spacing:-.025em;font-weight:500;color:#fff">Made for local businesses with no time for marketing.</h2>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:22px">
       <sc-for list="{{ verticals }}" as="v" hint-placeholder-count="9">
-        <span style="padding:9px 15px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02);font-size:14px;color:#d0d6e0">{{ v }}</span>
+        <span data-chip="1" style="display:inline-block;padding:9px 15px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02);font-size:14px;color:#d0d6e0;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease,color .35s ease" style-hover="transform:translateY(-3px);border-color:rgba(168,198,240,.6);color:#fff;box-shadow:0 14px 34px rgba(0,0,0,.5),0 0 0 1px rgba(168,198,240,.18),0 0 32px rgba(168,198,240,.22)">{{ v }}</span>
       </sc-for>
     </div>
   </div>
