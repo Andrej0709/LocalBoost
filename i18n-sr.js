@@ -1440,7 +1440,63 @@ window.LB_I18N_SR = {
     "Edit": "Izmeni",
     "Close": "Zatvori",
     "Save": "Sačuvaj",
-    "Clear": "Obriši"
+    "Clear": "Obriši",
+
+    /* --- Short home page (Adronis.dc.html) ---------------------------------
+       The long original lives on in Adronis-full.html and keeps using the
+       entries above. */
+    "How it works": "Kako radi",
+    "Examples": "Primeri",
+    "Try it free": "Probaj besplatno",
+    "Ready-made ads for your business, every week.": "Gotovi oglasi za tvoj biznis, svake nedelje.",
+    "We make the posts for your Instagram and Facebook. You approve them in two minutes, and we publish them.":
+      "Mi pravimo objave za tvoj Instagram i Facebook. Ti ih odobriš za dva minuta, a mi ih objavimo.",
+    "See how it works": "Pogledaj kako radi",
+    "Posted to Instagram and TikTok": "Objavljeno na Instagramu i TikToku",
+    "THIS WEEK": "OVE NEDELJE",
+    "3 POSTS": "3 OBJAVE",
+    "Made for local businesses with no time for marketing.": "Za lokalne biznise koji nemaju vremena za marketing.",
+    "You do two things: tell us about your business once, and approve the ads. We do the rest.":
+      "Ti radiš dve stvari: jednom nam opišeš svoj biznis i odobravaš oglase. Ostalo radimo mi.",
+    "Tell us about your business": "Opiši nam svoj biznis",
+    "About ten minutes, once. What you sell, how you talk to customers, where you are.":
+      "Oko deset minuta, samo jednom. Šta prodaješ, kako pričaš sa mušterijama, gde se nalaziš.",
+    "Get new ads every Monday": "Svakog ponedeljka stižu novi oglasi",
+    "Finished pictures with text, made for your business and sized for each network.":
+      "Gotove slike sa tekstom, napravljene za tvoj biznis i prilagođene svakoj mreži.",
+    "Approve, and we post them": "Odobri, a mi ih objavimo",
+    "Keep the ones you like and turn down the rest. Nothing is posted without your OK.":
+      "Zadrži one koji ti se sviđaju, ostale odbij. Ništa se ne objavljuje bez tvog odobrenja.",
+    "Examples of what you get": "Primeri onoga što dobijaš",
+    "Sample ads for a neighbourhood café. Yours are made for your business, in your style.":
+      "Primeri oglasa za kafić iz kraja. Tvoji se prave za tvoj biznis, u tvom stilu.",
+    "Instagram and TikTok": "Instagram i TikTok",
+    "Instagram and Facebook": "Instagram i Facebook",
+    "Google and Facebook": "Google i Facebook",
+    "Simple prices, no contract.": "Jednostavne cene, bez ugovora.",
+    "Start free, or try any paid plan free for 7 days.": "Počni besplatno ili probaj bilo koji plaćeni plan 7 dana bez naplate.",
+    "3 ads a month": "3 oglasa mesečno",
+    "1 network": "1 mreža",
+    "No card needed": "Bez kartice",
+    "4 ads every Monday": "4 oglasa svakog ponedeljka",
+    "1 network, for example Instagram": "1 mreža, na primer Instagram",
+    "Posted for you at the best time": "Objavljujemo ih u najbolje vreme",
+    "Choose Counter": "Izaberi Counter",
+    "12 ads every Monday": "12 oglasa svakog ponedeljka",
+    "Up to 4 networks": "Do 4 mreže",
+    "Ads for holidays and local events": "Oglasi za praznike i lokalne događaje",
+    "Learns which ads work best for you": "Uči koji oglasi ti najbolje prolaze",
+    "Choose Storefront": "Izaberi Storefront",
+    "30 ads every Monday": "30 oglasa svakog ponedeljka",
+    "Any number of networks and locations": "Neograničen broj mreža i lokacija",
+    "Checked by a real designer": "Proverava ih pravi dizajner",
+    "Personal support": "Lična podrška",
+    "Your first ads can be ready this week.": "Tvoji prvi oglasi mogu biti spremni ove nedelje.",
+    "Sign up in about ten minutes. No contract, no meeting, cancel any time.":
+      "Prijava traje oko deset minuta. Bez ugovora, bez sastanka, otkazuješ kad hoćeš.",
+    "The Free plan needs no card.": "Za besplatni plan ne treba kartica.",
+    "Ready-made ads every week for businesses with no time for marketing.":
+      "Gotovi oglasi svake nedelje za biznise koji nemaju vremena za marketing."
 
   },
 

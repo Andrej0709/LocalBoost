@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/Adronis.dc.html" }
+    { "source": "/", "destination": "/Adronis.dc.html" },
+    { "source": "/full", "destination": "/Adronis-full.html" }
   ],
   "headers": [
     {
