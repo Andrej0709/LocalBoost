@@ -376,8 +376,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 [data-pinvis]{display:none !important}
 [data-railhide]{display:none !important}
 [data-faqside]{position:static !important}
-[data-showcase]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
-[data-storycard]{grid-row:auto !important;grid-column:1 / -1;min-height:440px !important}
+[data-showcase]{grid-template-columns:repeat(3,minmax(0,1fr)) !important}
 [data-plans]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
 }
 @media (max-width:900px){
@@ -400,7 +399,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-ra
 [data-pipeviz]{display:none !important}
 [data-ctrlwm]{display:none !important}
 [data-pipemobile]{display:block !important}
-[data-showcase]{grid-template-columns:1fr !important}
+[data-showcase]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
 [data-planlift]{transform:none !important}
 [data-tabbar] button{padding:13px 18px !important;font-size:14px !important}
 [data-billing] button{padding:13px 18px !important;font-size:14px !important}
@@ -412,6 +411,7 @@ input[type=range]{height:30px !important}
 [data-stat]{min-width:calc(50% - 14px)}
 [data-calcstats]{grid-template-columns:1fr !important}
 [data-plans]{grid-template-columns:1fr !important}
+[data-showcase]{grid-template-columns:1fr !important;max-width:380px;margin-left:auto;margin-right:auto}
 }
 </style>
 </helmet>
@@ -516,9 +516,9 @@ input[type=range]{height:30px !important}
     <h2 style="margin:0;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Examples of what you get</h2>
     <p style="margin:18px 0 0;max-width:52ch;font-size:17px;line-height:1.6;color:#a3a9b3">Posts for a few local businesses, the way they show up on each network. Yours are made for your business.</p>
 
-    <div data-showcase="1" style="margin-top:clamp(36px,4.5vw,56px);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto;gap:16px">
+    <div data-showcase="1" style="margin-top:clamp(36px,4.5vw,56px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;align-items:stretch">
 
-      <div data-storycard="1" style="grid-row:span 2;position:relative;border-radius:22px;border:1px solid #23252a;background:#0e0f12;overflow:hidden;min-height:520px;box-shadow:0 40px 90px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)">
+      <div data-storycard="1" style="position:relative;border-radius:18px;border:1px solid #23252a;background:#0e0f12;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)">
         <div style="position:absolute;inset:-40px;background:url(examples/cafe.jpg) center/cover;filter:blur(34px) brightness(.55);transform:scale(1.1)"></div>
         <div style="position:relative;display:flex;flex-direction:column;height:100%;min-height:inherit">
           <div style="display:flex;gap:4px;padding:14px 14px 0">
@@ -526,8 +526,8 @@ input[type=range]{height:30px !important}
           </div>
           <div style="display:flex;align-items:center;gap:9px;padding:12px 16px">
             <span style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9999px;background:#e8d5b8;color:#2a1f14;font-size:13px;font-weight:600">D</span>
-            <span style="font-size:13px;color:#fff;font-weight:500">The Daily Grind Café</span>
-            <span style="margin-left:auto;padding:4px 10px;border-radius:9999px;background:rgba(0,0,0,.35);font-size:11px;color:#fff">Instagram story</span>
+            <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#fff;font-weight:500">The Daily Grind Café</span>
+            <span style="margin-left:auto;flex-shrink:0;padding:3px 9px;border-radius:9999px;background:rgba(0,0,0,.35);font-size:11px;color:#fff">Story</span>
           </div>
           <div style="flex:1;display:flex;align-items:center;padding:8px 0">
             <img src="examples/cafe.jpg" alt="Example story for a café: Hard Monday? Get your perfect coffee fix." width="307" height="316" loading="lazy" style="display:block;width:100%;height:auto;aspect-ratio:307/316">
