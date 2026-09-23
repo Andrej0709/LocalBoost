@@ -324,6 +324,7 @@ window.LB_I18N_SR = {
     "YOUR BUSINESS": "TVOJ BIZNIS",
     "ABOUT YOUR BUSINESS": "O TVOM BIZNISU",
     "CITY": "GRAD",
+    "Choose your country": "Izaberi državu",
     "Where's the shop?": "Gde je radnja?",
     "BUSINESS TYPE": "TIP BIZNISA",
     "Bakery": "Pekara",

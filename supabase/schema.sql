@@ -43,6 +43,7 @@ create table if not exists public.profiles (
   business_name       text,
 
   /* About the business */
+  country             text,
   city                text,
   vertical            text,
   website             text,
@@ -121,6 +122,11 @@ alter table public.profiles add column if not exists why_us text;
 /* they accepted anything. Ask those accounts to re-accept on next login.        */
 alter table public.profiles add column if not exists terms_accepted_at timestamptz;
 alter table public.profiles add column if not exists terms_version     text;
+
+/* --- Migration for the business's country ----------------------------------- */
+/* Stored by its English name, e.g. 'Serbia'. Rows created before the signup     */
+/* form asked for it stay null.                                                   */
+alter table public.profiles add column if not exists country text;
 
 /* Existing paying accounts predate current_period_end - seed it from the trial
    date they already have so finalize_billing_period() has an anchor to work from. */
@@ -242,7 +248,7 @@ set search_path = public, pg_temp
 as $$
 begin
   insert into public.profiles (
-    id, email, business_name, city, vertical, website,
+    id, email, business_name, country, city, vertical, website,
     what_you_sell, typical_customer, differentiator, why_us,
     brand_vibe, brand_colors, avoid_notes, channels, plan,
     terms_accepted_at, terms_version
@@ -251,6 +257,7 @@ begin
     new.id,
     new.email,
     nullif(new.raw_user_meta_data ->> 'business_name', ''),
+    nullif(new.raw_user_meta_data ->> 'country', ''),
     nullif(new.raw_user_meta_data ->> 'city', ''),
     nullif(new.raw_user_meta_data ->> 'vertical', ''),
     nullif(new.raw_user_meta_data ->> 'website', ''),
@@ -715,6 +722,7 @@ begin
   editable                  := old;
   editable.email            := new.email;
   editable.business_name    := new.business_name;
+  editable.country          := new.country;
   editable.city             := new.city;
   editable.vertical         := new.vertical;
   editable.website          := new.website;

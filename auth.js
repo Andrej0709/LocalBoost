@@ -82,7 +82,7 @@
       return session ? session.user : null;
     },
 
-    // The profiles row: business_name, city, vertical, plan, trial dates, etc.
+    // The profiles row: business_name, country, city, vertical, plan, trial dates, etc.
     getProfile: function () {
       return profile;
     },
@@ -189,7 +189,7 @@
       return profile;
     },
 
-    // meta: business_name, city, vertical, website, what_you_sell,
+    // meta: business_name, country, city, vertical, website, what_you_sell,
     // typical_customer, differentiator, why_us, brand_vibe, brand_colors,
     // avoid_notes, channels (array), plan ('counter'|'storefront'|'franchise'|'free').
     // The on_auth_user_created trigger copies these into public.profiles.
