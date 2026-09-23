@@ -302,6 +302,161 @@
     renderCalendar();
   });
 
+  // --- Optional extras: things the customer can tell the engine ---
+  // None of them gate anything. Each one is a profile column the customer may
+  // edit; the database stamps next_week_note_at whenever that note changes.
+  var EXTRAS = [
+    { key: "next_week_note", title: "What's happening next week?", max: 1000, multiline: true,
+      why: "A sale, a new product, holiday hours, an event — the engine builds next week's ads around it.",
+      placeholder: "e.g. 20% off all coffee Mon–Wed, closed Friday for the holiday, new pumpkin pastry from Tuesday" },
+    { key: "differentiator", title: "What makes you different", max: 1000, multiline: true,
+      why: "Gives every ad a reason to pick you over the place down the street.",
+      placeholder: "e.g. Everything's made from scratch, third-generation family recipes, open from 6am" },
+    { key: "brand_colors", title: "Your brand colors", max: 200,
+      why: "Keeps the images in your colors, so people recognise you before they read a word.",
+      placeholder: "e.g. Deep green and cream, with gold accents" },
+    { key: "website", title: "Website or Instagram", max: 300,
+      why: "Shows the engine how you already present yourself, so new ads match it.",
+      placeholder: "e.g. @milenasbakery or milenas.rs" },
+    { key: "avoid_notes", title: "Anything to avoid", max: 1000, multiline: true,
+      why: "Things that should never show up in your ads — the engine steers clear of them.",
+      placeholder: "e.g. No jokes about prices, never show the back kitchen" }
+  ];
+  var openExtra = null;
+
+  function renderExtras() {
+    var profile = LBAuth.getProfile() || {};
+    var list = document.getElementById("eh-list");
+    list.innerHTML = "";
+
+    var done = EXTRAS.filter(function (x) { return profile[x.key]; }).length;
+    document.getElementById("eh-count").textContent = done + " OF " + EXTRAS.length + " ADDED";
+    document.getElementById("eh-bar").style.width = Math.round(done / EXTRAS.length * 100) + "%";
+
+    EXTRAS.forEach(function (x) {
+      var value = profile[x.key] || "";
+      var open = openExtra === x.key;
+      var item = document.createElement("div");
+      item.className = "eh-item" + (value ? " is-done" : "");
+
+      var toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "eh-toggle";
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+
+      var dot = document.createElement("span");
+      dot.className = "eh-dot";
+      dot.setAttribute("aria-hidden", "true");
+      dot.textContent = "✓";
+
+      var text = document.createElement("span");
+      text.className = "eh-text";
+      var title = document.createElement("span");
+      title.className = "eh-title";
+      title.textContent = x.title;
+      var why = document.createElement("span");
+      why.className = "eh-why";
+      why.textContent = x.why;
+      text.appendChild(title);
+      text.appendChild(why);
+      if (value && !open) {
+        var shown = document.createElement("span");
+        shown.className = "eh-value";
+        shown.textContent = value;
+        text.appendChild(shown);
+      }
+
+      var action = document.createElement("span");
+      action.className = "eh-action";
+      action.textContent = open ? "Close" : value ? "Edit" : "Add";
+
+      toggle.appendChild(dot);
+      toggle.appendChild(text);
+      toggle.appendChild(action);
+      toggle.addEventListener("click", function () {
+        openExtra = open ? null : x.key;
+        renderExtras();
+      });
+      item.appendChild(toggle);
+
+      if (open) item.appendChild(buildExtraForm(x, value, profile));
+      list.appendChild(item);
+    });
+  }
+
+  function buildExtraForm(x, value, profile) {
+    var form = document.createElement("form");
+    form.className = "eh-form";
+
+    var field = document.createElement(x.multiline ? "textarea" : "input");
+    if (x.multiline) field.rows = 3; else field.type = "text";
+    field.maxLength = x.max;
+    field.placeholder = x.placeholder;
+    field.setAttribute("aria-label", x.title);
+    field.value = value;
+    form.appendChild(field);
+
+    var row = document.createElement("div");
+    row.className = "eh-form-row";
+    var save = document.createElement("button");
+    save.type = "submit";
+    save.className = "btn-ghost";
+    save.textContent = "Save";
+    row.appendChild(save);
+
+    if (value) {
+      var clear = document.createElement("button");
+      clear.type = "button";
+      clear.className = "eh-plain";
+      clear.textContent = "Clear";
+      clear.addEventListener("click", function () { saveExtra(x.key, null, form); });
+      row.appendChild(clear);
+    }
+
+    if (x.key === "next_week_note" && profile.next_week_note_at) {
+      var meta = document.createElement("span");
+      meta.className = "eh-meta";
+      meta.textContent = "Updated " + new Date(profile.next_week_note_at)
+        .toLocaleDateString((window.LBLang ? LBLang.locale() : "en-US"), { month: "short", day: "numeric" });
+      row.appendChild(meta);
+    }
+    form.appendChild(row);
+
+    var notice = document.createElement("div");
+    notice.className = "notice";
+    notice.setAttribute("role", "status");
+    notice.hidden = true;
+    form.appendChild(notice);
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      saveExtra(x.key, field.value.trim() || null, form);
+    });
+    form.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") { openExtra = null; renderExtras(); }
+    });
+    setTimeout(function () { field.focus(); }, 0);
+    return form;
+  }
+
+  async function saveExtra(key, value, form) {
+    var buttons = form.querySelectorAll("button");
+    Array.prototype.forEach.call(buttons, function (b) { b.disabled = true; });
+    try {
+      var patch = {};
+      patch[key] = value;
+      await LBAuth.updateProfile(patch);
+      openExtra = null;
+      renderExtras();
+    } catch (err) {
+      Array.prototype.forEach.call(buttons, function (b) { b.disabled = false; });
+      var notice = form.querySelector(".notice");
+      notice.hidden = false;
+      notice.textContent = err.message;
+      notice.style.color = "#f0a8a8";
+    }
+  }
+
   LBAuth.ready.then(async function () {
     if (!LBAuth.isLoggedIn()) {
       loading.hidden = true;
@@ -313,6 +468,9 @@
     var cta = document.getElementById("nav-cta");
     cta.textContent = "Approvals";
     cta.href = "approvals.html";
+
+    document.getElementById("engine-help").hidden = false;
+    renderExtras();
 
     var res = await LBAuth.db
       .from("creatives")

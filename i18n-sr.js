@@ -1347,7 +1347,43 @@ window.LB_I18N_SR = {
     "This is a made-up week so you can see how the control room looks. Your real schedule shows up here once you approve creatives.":
       "Ovo je izmišljena nedelja da vidiš kako kontrolna soba izgleda. Tvoj pravi raspored se pojavljuje ovde čim odobriš kreative.",
     "Friday, but make it pastry.": "Petak, ali uz pecivo.",
-    "Weekend hours: 8 to 2.": "Vikendom radimo od 8 do 14."
+    "Weekend hours: 8 to 2.": "Vikendom radimo od 8 do 14.",
+
+    /* --- Control room: optional extras for the engine -------------------- */
+    "OPTIONAL · HELP THE ENGINE KNOW YOU": "NIJE OBAVEZNO · POMOZI MAŠINI DA TE UPOZNA",
+    "Make every ad look like": "Neka svaki oglas izgleda kao",
+    "your": "tvoj",
+    "business.": "posao.",
+    "None of this is required — your ads render either way. But the engine only knows what you tell it, and everything you add here goes straight into your next drop: your colors, your offers, what sets you apart. The more it knows, the less your ads look like anyone else's.":
+      "Ništa od ovoga nije obavezno — oglasi se prave i bez toga. Ali mašina zna samo ono što joj kažeš, a sve što ovde dodaš ide pravo u tvoj sledeći drop: tvoje boje, tvoje ponude, ono po čemu se razlikuješ. Što više zna, to manje tvoji oglasi liče na tuđe.",
+    "What's happening next week?": "Šta se dešava sledeće nedelje?",
+    "A sale, a new product, holiday hours, an event — the engine builds next week's ads around it.":
+      "Akcija, novi proizvod, praznično radno vreme, događaj — mašina pravi oglase za sledeću nedelju oko toga.",
+    "e.g. 20% off all coffee Mon–Wed, closed Friday for the holiday, new pumpkin pastry from Tuesday":
+      "npr. 20% popusta na svu kafu pon–sre, u petak ne radimo zbog praznika, novo pecivo od bundeve od utorka",
+    "What makes you different": "Po čemu se razlikuješ",
+    "Gives every ad a reason to pick you over the place down the street.":
+      "Daje svakom oglasu razlog da ljudi izaberu tebe, a ne lokal niz ulicu.",
+    "e.g. Everything's made from scratch, third-generation family recipes, open from 6am":
+      "npr. Sve pravimo sami, porodični recepti treće generacije, radimo od 6 ujutru",
+    "Your brand colors": "Boje tvog brenda",
+    "Keeps the images in your colors, so people recognise you before they read a word.":
+      "Drži slike u tvojim bojama, da te ljudi prepoznaju pre nego što pročitaju ijednu reč.",
+    "e.g. Deep green and cream, with gold accents": "npr. Tamnozelena i krem, sa zlatnim detaljima",
+    "Website or Instagram": "Sajt ili Instagram",
+    "Shows the engine how you already present yourself, so new ads match it.":
+      "Pokazuje mašini kako se već predstavljaš, da novi oglasi to prate.",
+    "e.g. @milenasbakery or milenas.rs": "npr. @milenasbakery ili milenas.rs",
+    "Anything to avoid": "Šta treba izbegavati",
+    "Things that should never show up in your ads — the engine steers clear of them.":
+      "Stvari koje nikad ne treba da se pojave u tvojim oglasima — mašina ih zaobilazi.",
+    "e.g. No jokes about prices, never show the back kitchen":
+      "npr. Bez šala o cenama, nikad ne prikazuj kuhinju",
+    "Add": "Dodaj",
+    "Edit": "Izmeni",
+    "Close": "Zatvori",
+    "Save": "Sačuvaj",
+    "Clear": "Obriši"
 
   },
 
@@ -1356,6 +1392,8 @@ window.LB_I18N_SR = {
      through the dictionary above before it is put back, so a word like
      "monthly" is translated while a date or a plan name passes through. */
   patterns: [
+    [/^(\d+) OF (\d+) ADDED$/, "DODATO: $1 OD $2"],
+    [/^Updated (.+)$/, "Ažurirano $1"],
     [/^Your plan cancels on (.+?)\. You'll keep full access until then\.$/,
       "Tvoj plan se otkazuje $1. Do tada zadržavaš pun pristup."],
     [/^Switching to (.+?) \((monthly|annual)\) on (.+?)\.$/,

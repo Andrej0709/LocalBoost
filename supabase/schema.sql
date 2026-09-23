@@ -128,6 +128,21 @@ alter table public.profiles add column if not exists terms_version     text;
 /* form asked for it stay null.                                                   */
 alter table public.profiles add column if not exists country text;
 
+/* --- Migration for the optional "help the engine" extras -------------------- */
+/* next_week_note: whatever the customer wants next week's drop built around - a */
+/* sale, holiday hours, a new product. Optional; the engine reads it when it     */
+/* renders. next_week_note_at is stamped by protect_profile_billing whenever the */
+/* note changes, so the engine can tell a fresh note from a stale one.            */
+alter table public.profiles add column if not exists next_week_note    text;
+alter table public.profiles add column if not exists next_week_note_at timestamptz;
+
+/* Only the new column is capped here: a cap on an older brief field would make
+   every later update of a row that already exceeds it fail, billing included. */
+do $$ begin
+  alter table public.profiles add constraint profiles_next_week_note_size
+    check (char_length(coalesce(next_week_note, '')) <= 1000);
+exception when duplicate_object then null; end $$;
+
 /* Existing paying accounts predate current_period_end - seed it from the trial
    date they already have so finalize_billing_period() has an anchor to work from. */
 update public.profiles
@@ -813,6 +828,7 @@ begin
   editable.brand_colors     := new.brand_colors;
   editable.avoid_notes      := new.avoid_notes;
   editable.channels         := new.channels;
+  editable.next_week_note   := new.next_week_note;
   editable.onboarded_at     := new.onboarded_at;
   editable.plan             := new.plan;
   editable.updated_at       := new.updated_at;
@@ -827,6 +843,10 @@ begin
   if new.plan is distinct from old.plan
      and old.subscription_status in ('trialing', 'active', 'past_due') then
     raise exception 'Change your plan from the account page - it switches at your next billing date.';
+  end if;
+
+  if new.next_week_note is distinct from old.next_week_note then
+    new.next_week_note_at := now();
   end if;
 
   return new;

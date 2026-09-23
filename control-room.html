@@ -39,6 +39,39 @@
 .cr-chip.live{border-color:rgba(159,215,176,.4);background:rgba(159,215,176,.14);color:#9fd7b0}
 .cr-chip.slot{border-color:rgba(168,198,240,.4);background:var(--acc-soft);color:var(--acc)}
 #scheduled-wrap{margin-top:36px}
+.eh{margin:0 0 36px;padding:24px;border-radius:14px;border:1px solid #1b1e22;background:#0e0f12}
+.eh-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+.eh-eyebrow{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--acc)}
+.eh h3{margin:10px 0 8px;font-size:22px;letter-spacing:-.02em}
+.eh-intro{margin:0;max-width:640px;font-size:14px;line-height:1.6;color:#8a8f98}
+.eh-progress{flex:none;width:150px;text-align:right}
+.eh-count{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.08em;color:#d0d6e0}
+.eh-bar{margin-top:8px;height:4px;border-radius:9999px;background:#1b1e22;overflow:hidden}
+.eh-bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:inherit;transition:width .3s ease}
+.eh-list{margin-top:20px;border-top:1px solid #1b1e22}
+.eh-item{border-bottom:1px solid #1b1e22}
+.eh-toggle{display:flex;align-items:flex-start;gap:14px;width:100%;padding:14px 2px;background:none;border:none;text-align:left;cursor:pointer;font-family:'Geist',sans-serif;color:inherit}
+.eh-dot{flex:none;width:20px;height:20px;margin-top:1px;border-radius:9999px;border:1px solid #2a2d33;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent}
+.eh-item.is-done .eh-dot{border-color:rgba(159,215,176,.45);background:rgba(159,215,176,.14);color:#9fd7b0}
+.eh-text{flex:1;min-width:0}
+.eh-title{display:block;font-size:14.5px;color:#fff;letter-spacing:-.01em}
+.eh-why{display:block;margin-top:3px;font-size:13px;line-height:1.5;color:#7b8089}
+.eh-value{display:block;margin-top:6px;font-size:13px;color:#b8bec7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eh-action{flex:none;margin-top:1px;font-size:12.5px;color:var(--acc)}
+.eh-form{padding:0 2px 16px 36px}
+.eh-form textarea,.eh-form input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:8px;border:1px solid #23252a;background:#07080a;color:#fff;font-family:'Geist',sans-serif;font-size:14px;line-height:1.5;resize:vertical}
+.eh-form textarea:focus,.eh-form input:focus{outline:none;border-color:rgba(168,198,240,.5)}
+.eh-form-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
+.eh-form-row .eh-meta{margin-left:auto;font-size:12px;color:#7b8089}
+.eh-plain{background:none;border:none;padding:8px 6px;color:#9aa0a8;font-size:13.5px;cursor:pointer;font-family:'Geist',sans-serif}
+.eh-plain:hover{color:#f0a8a8}
+@media (max-width:640px){
+  .eh{padding:18px}
+  .eh-head{flex-direction:column;gap:14px}
+  .eh-progress{width:100%;text-align:left}
+  .eh-action{display:none}
+  .eh-form{padding-left:0}
+}
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:44px 0 14px}
 .cal-head .cr-section-label{margin:0}
 .cal-nav{display:flex;align-items:center;gap:6px}
@@ -114,6 +147,22 @@
     <!-- Loading -->
     <div id="loading" class="empty">
       <div class="mono">LOADING YOUR CONTROL ROOM</div>
+    </div>
+
+    <!-- Optional extras the engine renders better with -->
+    <div id="engine-help" class="eh" hidden>
+      <div class="eh-head">
+        <div>
+          <div class="eh-eyebrow">OPTIONAL · HELP THE ENGINE KNOW YOU</div>
+          <h3>Make every ad look like <em>your</em> business.</h3>
+          <p class="eh-intro">None of this is required — your ads render either way. But the engine only knows what you tell it, and everything you add here goes straight into your next drop: your colors, your offers, what sets you apart. The more it knows, the less your ads look like anyone else's.</p>
+        </div>
+        <div class="eh-progress">
+          <div class="eh-count" id="eh-count">&mdash;</div>
+          <div class="eh-bar"><i id="eh-bar"></i></div>
+        </div>
+      </div>
+      <div class="eh-list" id="eh-list"></div>
     </div>
 
     <!-- Main board -->
