@@ -1470,6 +1470,9 @@ window.LB_I18N_SR = {
     "Examples of what you get": "Primeri onoga što dobijaš",
     "Sample ads for a neighbourhood café. Yours are made for your business, in your style.":
       "Primeri oglasa za kafić iz kraja. Tvoji se prave za tvoj biznis, u tvom stilu.",
+    "Drag or use the arrows to see more": "Prevuci ili koristi strelice da vidiš još",
+    "Previous example": "Prethodni primer",
+    "Next example": "Sledeći primer",
     "Instagram and TikTok": "Instagram i TikTok",
     "Instagram and Facebook": "Instagram i Facebook",
     "Google and Facebook": "Google i Facebook",
