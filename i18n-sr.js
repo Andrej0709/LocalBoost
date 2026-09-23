@@ -286,25 +286,25 @@ window.LB_I18N_SR = {
     "Monthly": "Mesečno",
     "Annual · −20%": "Godišnje · −20%",
     "All prices are per month and": "Sve cene su mesečne i",
-    "exclude VAT": "ne uključuju PDV",
-    "— tax is calculated at checkout from your country. Paid plans start with a 7-day free trial, one per account: a card is required, nothing is charged during the trial, and the plan then renews automatically until you cancel. Cancelling takes effect at the end of the period you have paid for. Annual plans are billed 12 months upfront and unused months are not refunded.":
-      "— porez se obračunava na naplati, prema tvojoj zemlji. Plaćeni planovi počinju besplatnim periodom od 7 dana, jednim po nalogu: kartica je obavezna, tokom probnog perioda se ništa ne naplaćuje, a plan se zatim automatski obnavlja dok ga ne otkažeš. Otkazivanje stupa na snagu na kraju perioda koji si platio. Godišnji planovi se naplaćuju za 12 meseci unapred, a neiskorišćeni meseci se ne refundiraju.",
+    "include VAT": "uključuju PDV",
+    "— what you see here is what you pay, nothing is added at checkout. Paid plans start with a 7-day free trial, one per account: a card is required, nothing is charged during the trial, and the plan then renews automatically until you cancel. Cancelling takes effect at the end of the period you have paid for. Annual plans are billed 12 months upfront and unused months are not refunded.":
+      "— koliko ovde vidiš, toliko plaćaš, ništa se ne dodaje na naplati. Plaćeni planovi počinju besplatnim periodom od 7 dana, jednim po nalogu: kartica je obavezna, tokom probnog perioda se ništa ne naplaćuje, a plan se zatim automatski obnavlja dok ga ne otkažeš. Otkazivanje stupa na snagu na kraju perioda koji si platio. Godišnji planovi se naplaćuju za 12 meseci unapred, a neiskorišćeni meseci se ne refundiraju.",
     "RECOMMENDED": "PREPORUČENO",
-    "/ MONTH · EXCL. VAT": "/ MESEČNO · BEZ PDV-a",
+    "/ MONTH · INCL. VAT": "/ MESEČNO · SA PDV-om",
     "/ MONTH": "/ MESEČNO",
     "Free": "Besplatno",
     "3 ads / month · 1 channel · swipe approval · no card needed":
       "3 oglasa / mesečno · 1 kanal · odobravanje prevlačenjem · bez kartice",
     "SIZE YOUR DROP": "ODMERI SVOJ DROP",
-    "EST. MONTHLY · EXCL. VAT": "PROC. MESEČNO · BEZ PDV-a",
+    "EST. MONTHLY · INCL. VAT": "PROC. MESEČNO · SA PDV-om",
     "ADS / YEAR": "OGLASA / GODIŠNJE",
     "The next drop leaves Monday at 09:00.":
       "Sledeći drop kreće u ponedeljak u 09:00.",
     "Onboard in ten minutes and your first twelve ads are waiting for approval before the week is out. No contract, no retainer, no meeting.":
       "Postavi nalog za deset minuta i tvojih prvih dvanaest oglasa čeka odobrenje pre kraja nedelje. Bez ugovora, bez paušala, bez sastanka.",
     "7-DAY FREE TRIAL · CANCEL ANY TIME": "7 DANA BESPLATNO · OTKAŽI KAD HOĆEŠ",
-    "Paid plans start with a 7-day free trial, one per account. A card is required to start it, nothing is charged during it, and the plan renews automatically at the price shown until you cancel. Prices exclude VAT.":
-      "Plaćeni planovi počinju besplatnim periodom od 7 dana, jednim po nalogu. Za početak je potrebna kartica, tokom probnog perioda se ništa ne naplaćuje, a plan se automatski obnavlja po prikazanoj ceni dok ga ne otkažeš. Cene su bez PDV-a.",
+    "Paid plans start with a 7-day free trial, one per account. A card is required to start it, nothing is charged during it, and the plan renews automatically at the price shown until you cancel. Prices include VAT.":
+      "Plaćeni planovi počinju besplatnim periodom od 7 dana, jednim po nalogu. Za početak je potrebna kartica, tokom probnog perioda se ništa ne naplaćuje, a plan se automatski obnavlja po prikazanoj ceni dok ga ne otkažeš. Cene uključuju PDV.",
     "Contact us": "Kontaktiraj nas",
 
     /* --- Sign up: the brief ----------------------------------------------- */
@@ -381,8 +381,8 @@ window.LB_I18N_SR = {
     ". Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.":
       ". Kreativi su AI-generisani i objavljuju se tek nakon tvog odobrenja — ti ostaješ oglašivač odgovoran za svaki oglas koji odobriš.",
     "YOUR PLAN": "TVOJ PLAN",
-    "Excl. VAT. Tax is calculated at checkout from your country.":
-      "Bez PDV-a. Porez se obračunava na naplati, prema tvojoj zemlji.",
+    "Incl. VAT. The price you see is the price you pay.":
+      "Sa PDV-om. Cena koju vidiš je cena koju plaćaš.",
     "Not the right plan? Compare plans →": "Nije pravi plan? Uporedi planove →",
     "Brief the engine for your": "Brifuj mašinu za svoj",
     "Tell us about the business and your free ads start rendering. No card, nothing to pay.":
@@ -447,8 +447,8 @@ window.LB_I18N_SR = {
     ", the": ", ",
     "and the": "i",
     "AI Disclosure": "AI obaveštenje",
-    ". You agree that the subscription renews automatically at the amount and date shown in the summary until you cancel, that cancelling takes effect at the end of the period you have paid for, and that part-periods are not refunded. Prices are exclusive of VAT; tax is added above based on your country. Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.":
-      ". Saglasan si da se pretplata automatski obnavlja po iznosu i datumu prikazanim u pregledu dok je ne otkažeš, da otkazivanje stupa na snagu na kraju perioda koji si platio i da se započeti periodi ne refundiraju. Cene su bez PDV-a; porez je dodat iznad, prema tvojoj zemlji. Kreativi su AI-generisani i objavljuju se tek nakon tvog odobrenja — ti ostaješ oglašivač odgovoran za svaki oglas koji odobriš.",
+    ". You agree that the subscription renews automatically at the amount and date shown in the summary until you cancel, that cancelling takes effect at the end of the period you have paid for, and that part-periods are not refunded. Prices include VAT where it applies; nothing is added on top of the amount shown. Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.":
+      ". Saglasan si da se pretplata automatski obnavlja po iznosu i datumu prikazanim u pregledu dok je ne otkažeš, da otkazivanje stupa na snagu na kraju perioda koji si platio i da se započeti periodi ne refundiraju. Cene uključuju PDV tamo gde se plaća; ništa se ne dodaje na prikazani iznos. Kreativi su AI-generisani i objavljuju se tek nakon tvog odobrenja — ti ostaješ oglašivač odgovoran za svaki oglas koji odobriš.",
     "ORDER SUMMARY": "PREGLED PORUDŽBINE",
     "Compare plans →": "Uporedi planove →",
     "12 ads / week · 4 channels": "12 oglasa / nedeljno · 4 kanala",
@@ -569,8 +569,8 @@ window.LB_I18N_SR = {
     "Date": "Datum",
     "Description": "Opis",
     "Amount": "Iznos",
-    "Amounts are calculated from your plan and billing date, not pulled from a payment processor yet — connect Stripe to replace this with real invoice receipts. All prices are exclusive of VAT; tax is shown on the invoice.":
-      "Iznosi se računaju iz tvog plana i datuma naplate, još se ne povlače iz procesora plaćanja — poveži Stripe da ovo zameniš stvarnim računima. Sve cene su bez PDV-a; porez se prikazuje na računu.",
+    "Amounts are calculated from your plan and billing date, not pulled from a payment processor yet — connect Stripe to replace this with real invoice receipts. All prices include VAT where it applies; the VAT share is shown on the invoice.":
+      "Iznosi se računaju iz tvog plana i datuma naplate, još se ne povlače iz procesora plaćanja — poveži Stripe da ovo zameniš stvarnim računima. Sve cene uključuju PDV tamo gde se plaća; iznos PDV-a se prikazuje na računu.",
     "Your data": "Tvoji podaci",
     "What we hold on this account, and how to get it out or removed.":
       "Šta držimo na ovom nalogu i kako to da izvučeš ili obrišeš.",
@@ -660,8 +660,8 @@ window.LB_I18N_SR = {
        convenience, so this copy is a reading aid and not a second contract. */
     "Terms of Service — Adronis": "Uslovi korišćenja — Adronis",
     "TERMS": "USLOVI",
-    "Last updated September 21, 2026. These terms form a binding agreement between you and Adronis. Headings are for readability — the wording of each clause governs.":
-      "Poslednja izmena 21. septembra 2026. Ovi uslovi čine obavezujući ugovor između tebe i Adronisa. Naslovi služe radi preglednosti — merodavan je tekst svake klauzule.",
+    "Last updated September 23, 2026. These terms form a binding agreement between you and Adronis. Headings are for readability — the wording of each clause governs.":
+      "Poslednja izmena 23. septembra 2026. Ovi uslovi čine obavezujući ugovor između tebe i Adronisa. Naslovi služe radi preglednosti — merodavan je tekst svake klauzule.",
     "1. Who you are contracting with": "1. Sa kim zaključuješ ugovor",
     "Adronis (\"Adronis\", \"we\", \"us\") is a software service operated by":
       "Adronis („Adronis“, „mi“, „nas“) je softverska usluga koju pruža",
@@ -693,11 +693,11 @@ window.LB_I18N_SR = {
     "5. Plans, prices and taxes": "5. Planovi, cene i porezi",
     "All prices shown on this site and in the app are in euro and":
       "Sve cene prikazane na ovom sajtu i u aplikaciji su u evrima i",
-    "exclusive of VAT and any other applicable tax": "bez PDV-a i drugih primenjivih poreza",
-    ". The tax due is calculated and shown at checkout based on the country you select.":
-      ". Porez koji se plaća obračunava se i prikazuje na naplati, prema zemlji koju izabereš.",
-    "If you supply a valid VAT identification number for an EU business outside our country of establishment, the invoice is issued under the reverse-charge mechanism and you account for the VAT. You are responsible for the accuracy of the VAT number you enter.":
-      "Ako dostaviš važeći PDV identifikacioni broj za biznis iz EU izvan zemlje našeg sedišta, račun se izdaje po mehanizmu obrnutog obračunavanja i PDV obračunavaš ti. Odgovoran si za tačnost PDV broja koji uneseš.",
+    "include VAT where it applies": "uključuju PDV tamo gde se plaća",
+    ". The price shown is the total you pay; the VAT share for the country you select is shown at checkout and on the invoice.":
+      ". Prikazana cena je ukupan iznos koji plaćaš; deo koji otpada na PDV za zemlju koju izabereš prikazuje se na naplati i na računu.",
+    "If you supply a valid VAT identification number for an EU business outside our country of establishment, the invoice is issued under the reverse-charge mechanism, shows no VAT and you account for the VAT. The price you pay does not change. You are responsible for the accuracy of the VAT number you enter.":
+      "Ako dostaviš važeći PDV identifikacioni broj za biznis iz EU izvan zemlje našeg sedišta, račun se izdaje po mehanizmu obrnutog obračunavanja, bez PDV-a, i PDV obračunavaš ti. Cena koju plaćaš se ne menja. Odgovoran si za tačnost PDV broja koji uneseš.",
     "Payments are processed by Stripe. Card details are entered on Stripe's systems; we never receive or store full card numbers.":
       "Plaćanja obrađuje Stripe. Podaci o kartici unose se u Stripe sisteme; mi nikada ne primamo niti čuvamo pune brojeve kartica.",
     "We may change plan prices on at least 30 days' notice by email. A change takes effect at your next renewal, and you may cancel before that renewal if you do not accept it.":
@@ -1191,7 +1191,6 @@ window.LB_I18N_SR = {
     "Open approvals": "Otvori odobravanja",
 
     /* --- Checkout: what the script writes -------------------------------- */
-    "/ MONTH + VAT": "/ MESEČNO + PDV",
     "VAT — reverse charge": "PDV — obrnuto obračunavanje",
     "per month": "mesečno",
     "per year": "godišnje",
@@ -1350,7 +1349,7 @@ window.LB_I18N_SR = {
     [/^Payment received — your plan is running again\. Next invoice on (.+?), and you can cancel any time before then\.$/,
       "Uplata je primljena — tvoj plan ponovo radi. Sledeći račun $1, a otkazati možeš bilo kad pre toga."],
     [/^Promo (\S+) \((\d+)%\)$/, "Promo kod $1 ($2%)"],
-    [/^VAT \((\d+)%\)$/, "PDV ($1%)"],
+    [/^Incl\. VAT \((\d+)%\)$/, "Uključen PDV ($1%)"],
     [/^First drop \((\d+)-day trial\)$/, "Prvi drop ($1 dana probe)"],
     [/^(\S+) applied — (.+)$/, "$1 primenjen — $2"],
     [/^Couldn't load your account: (.+)$/, "Nismo uspeli da učitamo tvoj nalog: $1"],

@@ -69,6 +69,11 @@
     return "€" + Math.round(n).toLocaleString((window.LBLang ? LBLang.locale() : "en-US"));
   }
 
+  // For the VAT share, which is rarely a whole euro.
+  function euroCents(n) {
+    return "€" + n.toLocaleString((window.LBLang ? LBLang.locale() : "en-US"), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
   // Monthly rate for a plan under the current cycle.
   function monthlyRate(plan, cycle) {
     return cycle === "annual" ? plan.base * (1 - ANNUAL_DISCOUNT) : plan.base;
@@ -143,14 +148,15 @@
     var listTotal = state.cycle === "annual" ? plan.base * 12 : plan.base;  // before the annual discount
     var subtotal = invoiceAmount(plan, state.cycle);                        // after it
 
+    // Prices are VAT-inclusive: what the customer saw on the site is what they
+    // pay. VAT is carved out of that amount for the summary, never added on top.
     var discount = state.promo ? subtotal * (state.promo.percent / 100) : 0;
-    var net = subtotal - discount;
-    var vat = net * vatRate();
-    var recurring = net + vat;
+    var recurring = subtotal - discount;
+    var vat = recurring - recurring / (1 + vatRate());
 
     $("co-sum-name").textContent = plan.name;
     $("co-sum-price").textContent = euro(perMonth);
-    $("co-sum-per").textContent = " / MONTH" + (vat > 0 ? " + VAT" : "");
+    $("co-sum-per").textContent = " / MONTH";
     $("co-sum-rate").textContent = plan.rate;
 
     var lines = [];
@@ -165,7 +171,7 @@
       lines.push({ label: "Promo " + state.promo.label + " (" + state.promo.percent + "%)", value: "−" + euro(discount), credit: true });
     }
     if (vat > 0) {
-      lines.push({ label: "VAT (" + Math.round(vatRate() * 100) + "%)", value: euro(vat) });
+      lines.push({ label: "Incl. VAT (" + Math.round(vatRate() * 100) + "%)", value: euroCents(vat), note: true });
     } else if ($("co-vatid").value.trim().length > 3) {
       lines.push({ label: "VAT — reverse charge", value: "€0" });
     }
@@ -174,7 +180,7 @@
     }
 
     $("co-lines").innerHTML = lines.map(function (l) {
-      return '<div class="co-line' + (l.credit ? " is-credit" : "") + '"><span>' +
+      return '<div class="co-line' + (l.credit ? " is-credit" : "") + (l.note ? " is-note" : "") + '"><span>' +
         l.label + '</span><span>' + l.value + '</span></div>';
     }).join("");
 

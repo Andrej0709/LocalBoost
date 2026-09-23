@@ -727,7 +727,7 @@ input[type=range]{height:30px !important}
       <button onClick="{{ setMonthly }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ mBg }};color:{{ mColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Monthly</button>
       <button onClick="{{ setAnnual }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ aBg }};color:{{ aColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Annual · −20%</button>
     </div>
-    <p style="max-width:62ch;margin:18px auto 0;font-size:13px;line-height:1.6;color:#7b8089">All prices are per month and <strong>exclude VAT</strong> — tax is calculated at checkout from your country. Paid plans start with a 7-day free trial, one per account: a card is required, nothing is charged during the trial, and the plan then renews automatically until you cancel. Cancelling takes effect at the end of the period you have paid for. Annual plans are billed 12 months upfront and unused months are not refunded.</p>
+    <p style="max-width:62ch;margin:18px auto 0;font-size:13px;line-height:1.6;color:#7b8089">All prices are per month and <strong>include VAT</strong> — what you see here is what you pay, nothing is added at checkout. Paid plans start with a 7-day free trial, one per account: a card is required, nothing is charged during the trial, and the plan then renews automatically until you cancel. Cancelling takes effect at the end of the period you have paid for. Annual plans are billed 12 months upfront and unused months are not refunded.</p>
     <sc-if value="{{ hasFreeNote }}" hint-placeholder-val="{{ false }}">
       <div role="status" style="max-width:680px;margin:26px auto 0;padding:14px 20px;border-radius:12px;border:1px solid rgba(168,198,240,.25);background:rgba(168,198,240,.06);font-size:14px;line-height:1.6;color:#d0d6e0;text-align:left"><span style="margin-right:10px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--acc)">{{ freeNoteTag }}</span>{{ freeNoteText }}</div>
     </sc-if>
@@ -742,7 +742,7 @@ input[type=range]{height:30px !important}
         </div>
         <div style="display:flex;align-items:baseline;gap:7px;margin-top:20px">
           <span style="font-size:clamp(38px,4vw,50px);letter-spacing:-.04em;color:#fff;font-weight:400">{{ pl.price }}</span>
-          <span style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#7b8089">/ MONTH · EXCL. VAT</span>
+          <span style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#7b8089">/ MONTH · INCL. VAT</span>
         </div>
         <div style="margin-top:8px;font-size:14px;color:#8a8f98">{{ pl.rate }}</div>
         <div style="margin-top:6px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#7b8089">{{ pl.yearly }} billed yearly</div>
@@ -774,7 +774,7 @@ input[type=range]{height:30px !important}
       <input type="range" min="2" max="30" step="1" value="{{ ads }}" onChange="{{ onAds }}" onInput="{{ onAds }}" aria-label="Ads per week" style="width:100%;margin-top:22px;height:16px;--fill:{{ fillPct }}">
     </div>
     <div data-calcstats="1" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div style="padding:18px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#7b8089">EST. MONTHLY · EXCL. VAT</div><div style="margin-top:10px;font-size:30px;letter-spacing:-.035em;color:var(--acc)">{{ estPrice }}</div></div>
+      <div style="padding:18px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#7b8089">EST. MONTHLY · INCL. VAT</div><div style="margin-top:10px;font-size:30px;letter-spacing:-.035em;color:var(--acc)">{{ estPrice }}</div></div>
       <div style="padding:18px;border-radius:10px;border:1px solid #1b1e22;background:#0e0f12"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#7b8089">ADS / YEAR</div><div style="margin-top:10px;font-size:30px;letter-spacing:-.035em;color:#fff">{{ perYear }}</div></div>
     </div>
   </div>
@@ -787,7 +787,7 @@ input[type=range]{height:30px !important}
     <p style="margin:22px auto 0;max-width:46ch;font-size:17px;line-height:1.6;color:#8a8f98">Onboard in ten minutes and your first twelve ads are waiting for approval before the week is out. No contract, no retainer, no meeting.</p>
     <a href="signup.html" style="display:inline-flex;align-items:center;gap:10px;margin-top:34px;padding:16px 28px;border-radius:9999px;background:var(--acc);color:#07080a;font-size:16px;font-weight:600;letter-spacing:-.01em;box-shadow:0 14px 50px rgba(168,198,240,.26)" style-hover="background:#cbdff9">Claim your first drop<span style="font-family:'Geist Mono',monospace;font-size:13px">→</span></a>
     <div style="margin-top:20px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.1em;color:#7b8089">7-DAY FREE TRIAL · CANCEL ANY TIME</div>
-    <div style="margin-top:12px;font-size:12.5px;line-height:1.6;color:#7b8089;max-width:52ch;margin-left:auto;margin-right:auto">Paid plans start with a 7-day free trial, one per account. A card is required to start it, nothing is charged during it, and the plan renews automatically at the price shown until you cancel. Prices exclude VAT.</div>
+    <div style="margin-top:12px;font-size:12.5px;line-height:1.6;color:#7b8089;max-width:52ch;margin-left:auto;margin-right:auto">Paid plans start with a 7-day free trial, one per account. A card is required to start it, nothing is charged during it, and the plan renews automatically at the price shown until you cancel. Prices include VAT.</div>
   </div>
 </section>
 
