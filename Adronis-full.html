@@ -209,13 +209,13 @@ document.addEventListener("click", function (e) {
         {
           "@type": "Offer",
           "name": "Counter",
-          "description": "4 ads per week, one connected channel.",
-          "price": "89",
+          "description": "4 ads per week, two connected channels.",
+          "price": "59",
           "priceCurrency": "EUR",
           "url": "https://adronis.app/signup.html?plan=counter",
           "priceSpecification": {
             "@type": "UnitPriceSpecification",
-            "price": "89",
+            "price": "59",
             "priceCurrency": "EUR",
             "billingDuration": 1,
             "billingIncrement": 1,
@@ -226,12 +226,12 @@ document.addEventListener("click", function (e) {
           "@type": "Offer",
           "name": "Storefront",
           "description": "12 ads per week across four connected channels.",
-          "price": "249",
+          "price": "149",
           "priceCurrency": "EUR",
           "url": "https://adronis.app/signup.html?plan=storefront",
           "priceSpecification": {
             "@type": "UnitPriceSpecification",
-            "price": "249",
+            "price": "149",
             "priceCurrency": "EUR",
             "billingDuration": 1,
             "billingIncrement": 1,
@@ -242,12 +242,12 @@ document.addEventListener("click", function (e) {
           "@type": "Offer",
           "name": "Franchise",
           "description": "30 ads per week, unlimited channels and locations.",
-          "price": "690",
+          "price": "490",
           "priceCurrency": "EUR",
           "url": "https://adronis.app/contact.html?plan=franchise",
           "priceSpecification": {
             "@type": "UnitPriceSpecification",
-            "price": "690",
+            "price": "490",
             "priceCurrency": "EUR",
             "billingDuration": 1,
             "billingIncrement": 1,
@@ -1239,17 +1239,17 @@ class Component extends DCLogic {
     const mk = (n) => "€" + Math.round(annual ? n * 0.8 : n);
     const plans = [
       {
-        name: "Counter", base: 89, rate: "4 ads / week · 1 channel", featured: false,
-        features: ["4 photoreal creatives every Monday", "One connected channel", "Best-time auto-publishing", "Swipe approval in the app"],
+        name: "Counter", base: 59, rate: "4 ads / week · 2 channels", featured: false,
+        features: ["4 photoreal creatives every Monday", "Two connected channels", "Best-time auto-publishing", "Swipe approval in the app"],
         cta: "Start with Counter", href: "signup.html?plan=counter" + (annual ? "&cycle=annual" : "")
       },
       {
-        name: "Storefront", base: 249, rate: "12 ads / week · 4 channels", featured: true,
+        name: "Storefront", base: 149, rate: "12 ads / week · 4 channels", featured: true,
         features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", "Performance feedback into next drop", "Caption variants and A/B slotting"],
         cta: "Start with Storefront", href: "signup.html?plan=storefront" + (annual ? "&cycle=annual" : "")
       },
       {
-        name: "Franchise", base: 690, rate: "30 ads / week · unlimited", featured: false,
+        name: "Franchise", base: 490, rate: "30 ads / week · unlimited", featured: false,
         features: ["30 creatives, multi-location aware", "Unlimited channels and locations", "Human creative director review", "Brand-safety approvals workflow", "Dedicated drop slot and support"],
         cta: "Talk to us", href: "contact.html?plan=franchise"
       }
@@ -1272,7 +1272,8 @@ class Component extends DCLogic {
     }));
 
     const ads = this.state.ads;
-    const est = Math.round((45 + ads * 17) * (annual ? 0.8 : 1));
+    // Fitted so 4 ads a week lands on Counter (€59) and 12 on Storefront (€149).
+    const est = Math.round((14 + ads * 11.25) * (annual ? 0.8 : 1));
 
     return {
       steps, panels, deck, tabs, days, grid, bars, plans,

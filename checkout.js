@@ -8,17 +8,17 @@
   // Mirrors the `plans` array in Adronis.dc.html — keep the two in sync.
   var PLANS = {
     counter: {
-      key: "counter", name: "Counter", base: 89,
-      rate: "4 ads / week · 1 channel",
+      key: "counter", name: "Counter", base: 59,
+      rate: "4 ads / week · 2 channels",
       features: [
         "4 photoreal creatives every Monday",
-        "One connected channel",
+        "Two connected channels",
         "Best-time auto-publishing",
         "Swipe approval in the app"
       ]
     },
     storefront: {
-      key: "storefront", name: "Storefront", base: 249,
+      key: "storefront", name: "Storefront", base: 149,
       rate: "12 ads / week · 4 channels",
       features: [
         "12 creatives across all native formats",
@@ -29,7 +29,7 @@
       ]
     },
     franchise: {
-      key: "franchise", name: "Franchise", base: 690,
+      key: "franchise", name: "Franchise", base: 490,
       rate: "30 ads / week · unlimited",
       features: [
         "30 creatives, multi-location aware",

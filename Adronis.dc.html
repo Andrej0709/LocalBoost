@@ -208,13 +208,13 @@ document.addEventListener("click", function (e) {
         {
           "@type": "Offer",
           "name": "Counter",
-          "description": "4 ads per week, one connected channel.",
-          "price": "89",
+          "description": "4 ads per week, two connected channels.",
+          "price": "59",
           "priceCurrency": "EUR",
           "url": "https://adronis.app/signup.html?plan=counter",
           "priceSpecification": {
             "@type": "UnitPriceSpecification",
-            "price": "89",
+            "price": "59",
             "priceCurrency": "EUR",
             "billingDuration": 1,
             "billingIncrement": 1,
@@ -225,12 +225,12 @@ document.addEventListener("click", function (e) {
           "@type": "Offer",
           "name": "Storefront",
           "description": "12 ads per week across four connected channels.",
-          "price": "249",
+          "price": "149",
           "priceCurrency": "EUR",
           "url": "https://adronis.app/signup.html?plan=storefront",
           "priceSpecification": {
             "@type": "UnitPriceSpecification",
-            "price": "249",
+            "price": "149",
             "priceCurrency": "EUR",
             "billingDuration": 1,
             "billingIncrement": 1,
@@ -241,12 +241,12 @@ document.addEventListener("click", function (e) {
           "@type": "Offer",
           "name": "Franchise",
           "description": "30 ads per week, unlimited channels and locations.",
-          "price": "690",
+          "price": "490",
           "priceCurrency": "EUR",
           "url": "https://adronis.app/contact.html?plan=franchise",
           "priceSpecification": {
             "@type": "UnitPriceSpecification",
-            "price": "690",
+            "price": "490",
             "priceCurrency": "EUR",
             "billingDuration": 1,
             "billingIncrement": 1,
@@ -761,17 +761,17 @@ class Component extends DCLogic {
         href: this.state.onFree ? "approvals.html" : "signup.html?plan=free"
       },
       {
-        name: "Counter", base: 89, featured: false,
-        features: ["4 ads every Monday", "1 network, for example Instagram", "Posted for you at the best time"],
+        name: "Counter", base: 59, featured: false,
+        features: ["4 ads every Monday", "2 networks, for example Instagram and Facebook", "Posted for you at the best time"],
         cta: "Choose Counter", href: "signup.html?plan=counter" + (annual ? "&cycle=annual" : "")
       },
       {
-        name: "Storefront", base: 249, featured: true,
+        name: "Storefront", base: 149, featured: true,
         features: ["12 ads every Monday", "Up to 4 networks", "Ads for holidays and local events", "Learns which ads work best for you"],
         cta: "Choose Storefront", href: "signup.html?plan=storefront" + (annual ? "&cycle=annual" : "")
       },
       {
-        name: "Franchise", base: 690, featured: false,
+        name: "Franchise", base: 490, featured: false,
         features: ["30 ads every Monday", "Any number of networks and locations", "Checked by a real designer", "Personal support"],
         cta: "Talk to us", href: "contact.html?plan=franchise"
       }

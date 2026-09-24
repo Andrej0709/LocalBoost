@@ -1065,7 +1065,7 @@ window.LB_I18N_SR = {
     ", or our": ", ili naša",
 
     /* --- Strings the scripts write into the page -------------------------- */
-    "4 ads / week · 1 channel": "4 oglasa / nedeljno · 1 kanal",
+    "4 ads / week · 2 channels": "4 oglasa / nedeljno · 2 kanala",
     "30 ads / week · unlimited": "30 oglasa / nedeljno · neograničeno",
     "3 ads / month · 1 channel": "3 oglasa / mesečno · 1 kanal",
     "4 photoreal creatives every Monday": "4 fotorealistična kreativa svakog ponedeljka",
@@ -1073,6 +1073,7 @@ window.LB_I18N_SR = {
     "30 creatives, multi-location aware": "30 kreativa, svesnih više lokacija",
     "3 photoreal creatives every month": "3 fotorealistična kreativa svakog meseca",
     "One connected channel": "Jedan povezan kanal",
+    "Two connected channels": "Dva povezana kanala",
     "Four connected channels": "Četiri povezana kanala",
     "Unlimited channels and locations": "Neograničeno kanala i lokacija",
     "Best-time auto-publishing": "Automatska objava u najbolje vreme",
@@ -1496,7 +1497,7 @@ window.LB_I18N_SR = {
     "1 network": "1 mreža",
     "No card needed": "Bez kartice",
     "4 ads every Monday": "4 oglasa svakog ponedeljka",
-    "1 network, for example Instagram": "1 mreža, na primer Instagram",
+    "2 networks, for example Instagram and Facebook": "2 mreže, na primer Instagram i Facebook",
     "Posted for you at the best time": "Objavljujemo ih u najbolje vreme",
     "Choose Counter": "Izaberi Counter",
     "12 ads every Monday": "12 oglasa svakog ponedeljka",
