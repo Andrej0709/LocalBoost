@@ -28,10 +28,20 @@
     { p: 1.0, x: 0.50, y: 1.06, r: 0.98, tilt: -0.02 }
   ];
 
-  function sample(p) {
+  // route="short": for pages with about half the scroll of the long one. Same
+  // start and end as PATH, but one gentle swing instead of five and less spin,
+  // so the planet moves about as fast per scrolled pixel as on the long page.
+  const SHORT_PATH = [
+    { p: 0.0, x: 0.84, y: 0.40, r: 0.52, tilt: -0.34 },
+    { p: 0.45, x: 0.22, y: 0.60, r: 0.60, tilt: 0.06 },
+    { p: 1.0, x: 0.50, y: 1.06, r: 0.98, tilt: -0.02 }
+  ];
+  const SPIN = { full: 1.85, short: 0.85 };
+
+  function sample(path, p) {
     let i = 0;
-    while (i < PATH.length - 2 && p > PATH[i + 1].p) i++;
-    const a = PATH[i], b = PATH[i + 1];
+    while (i < path.length - 2 && p > path[i + 1].p) i++;
+    const a = path[i], b = path[i + 1];
     const t = ease(clamp((p - a.p) / (b.p - a.p), 0, 1));
     return {
       x: a.x + (b.x - a.x) * t,
@@ -73,6 +83,9 @@
       this.accent = hexToRgb(this.getAttribute("accent") || "#a8c6f0");
       this.base = hexToRgb(this.getAttribute("base") || this.getAttribute("accent") || "#a8c6f0");
       this.glowK = parseFloat(this.getAttribute("glow") || "1") || 1;
+      const short = this.getAttribute("route") === "short";
+      this.path = short ? SHORT_PATH : PATH;
+      this.spinK = short ? SPIN.short : SPIN.full;
       this.reduced = matchMedia("(prefers-reduced-motion:reduce)").matches;
       this.mobile = matchMedia("(pointer:coarse)").matches || Math.min(innerWidth, innerHeight) < 700;
 
@@ -206,8 +219,8 @@
       const p = this.prog;
 
       if (!this.reduced) this.spin += dt * 0.055;
-      const rotY = this.spin + p * Math.PI * 1.85;
-      const view = sample(p);
+      const rotY = this.spin + p * Math.PI * this.spinK;
+      const view = sample(this.path, p);
       const tilt = view.tilt + (this.reduced ? 0 : Math.sin(now / 9000) * 0.02);
 
       const cy0 = Math.cos(tilt), sy0 = Math.sin(tilt);
