@@ -45,7 +45,10 @@
   var TRIAL_DAYS = 7;          // "first drop free"
 
   // Demo codes so the promo field is testable before Stripe coupons exist.
+  // ADRONIS20 is the public one, shown to everyone in the pricing section of
+  // Adronis.dc.html and Adronis-full.html — keep the three in sync.
   var PROMO_CODES = {
+    ADRONIS20: { label: "ADRONIS20", percent: 20, note: "20% off every drop, for as long as you stay." },
     LOCAL10: { label: "LOCAL10", percent: 10, note: "10% off every drop, for as long as you stay." },
     FIRSTSHOP: { label: "FIRSTSHOP", percent: 25, note: "25% off your first year." }
   };

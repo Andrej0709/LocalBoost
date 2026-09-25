@@ -555,6 +555,11 @@ input[type=range]{height:30px !important}
       <button onClick="{{ setMonthly }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ mBg }};color:{{ mColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Monthly</button>
       <button onClick="{{ setAnnual }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ aBg }};color:{{ aColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Annual · −20%</button>
     </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;width:fit-content;max-width:100%;margin:20px auto 0;padding:10px 10px 10px 18px;border-radius:14px;border:1px dashed rgba(159,215,176,.5);background:rgba(159,215,176,.07)">
+      <span style="font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#9fd7b0">PROMO CODE</span>
+      <span style="font-size:14px;line-height:1.5;color:#d0d6e0">20% off any paid plan — enter it at checkout.</span>
+      <button type="button" onClick="{{ copyPromo }}" style="display:inline-flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;border-radius:10px;border:1px solid rgba(159,215,176,.35);background:#0a0f0d;color:#fff;font-family:'Geist Mono',monospace;font-size:15px;letter-spacing:.14em;cursor:pointer;transition:border-color .2s ease" style-hover="border-color:rgba(159,215,176,.75)">{{ promoCode }}<span aria-live="polite" style="padding:5px 10px;border-radius:7px;background:#9fd7b0;color:#07080a;font-family:'Geist',sans-serif;font-size:12px;font-weight:600;letter-spacing:0">{{ promoCopyLabel }}</span></button>
+    </div>
     <sc-if value="{{ hasFreeNote }}" hint-placeholder-val="{{ false }}">
       <div role="status" style="max-width:680px;margin:26px auto 0;padding:14px 20px;border-radius:12px;border:1px solid rgba(168,198,240,.25);background:rgba(168,198,240,.06);font-size:14px;line-height:1.6;color:#d0d6e0;text-align:left"><span style="margin-right:10px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--acc)">{{ freeNoteTag }}</span>{{ freeNoteText }}</div>
     </sc-if>
@@ -617,8 +622,11 @@ input[type=range]{height:30px !important}
 // The short version of the home page. The original, longer page lives on
 // unchanged in Adronis-full.html (served at /full).
 class Component extends DCLogic {
-  state = { billing: "monthly", navOpen: false, freeNote: null, onFree: false };
+  state = { billing: "monthly", navOpen: false, freeNote: null, onFree: false, promoCopied: false };
   root = React.createRef();
+  // The public promo code shown in the pricing section. checkout.js holds the
+  // same code in PROMO_CODES — keep the two in sync.
+  promoCode = "ADRONIS20";
 
   componentDidMount() {
     const acc = this.props.accent;
@@ -711,6 +719,34 @@ class Component extends DCLogic {
     window.removeEventListener("resize", this.onScroll);
     if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener("change", this.onMq);
     cancelAnimationFrame(this.rafId);
+    clearTimeout(this.promoTimer);
+  }
+
+  // Copies the promo code and flips the button to "Copied" for two seconds.
+  // The clipboard API needs HTTPS or localhost; anywhere else, fall back to
+  // selecting a hidden textarea.
+  copyPromo() {
+    const code = this.promoCode;
+    const done = () => {
+      this.setState({ promoCopied: true });
+      clearTimeout(this.promoTimer);
+      this.promoTimer = setTimeout(() => this.setState({ promoCopied: false }), 2000);
+    };
+    const fallback = () => {
+      const ta = document.createElement("textarea");
+      ta.value = code;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      ta.remove();
+      if (ok) done();
+    };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(code).then(done, fallback);
+    else fallback();
   }
 
   // Gentle mouse tilt and scroll parallax on the two hero cards, nothing else.
@@ -827,6 +863,9 @@ class Component extends DCLogic {
       mColor: annual ? "#8a8f98" : "#ffffff",
       aBg: annual ? "rgba(168,198,240,.12)" : "transparent",
       aColor: annual ? "var(--acc)" : "#8a8f98",
+      promoCode: this.promoCode,
+      promoCopyLabel: this.state.promoCopied ? "Copied" : "Copy",
+      copyPromo: () => this.copyPromo(),
       hasFreeNote: !!this.state.freeNote,
       freeNoteTag: this.state.freeNote ? this.state.freeNote.tag : "",
       freeNoteText: this.state.freeNote ? this.state.freeNote.text : "",

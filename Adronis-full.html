@@ -830,6 +830,11 @@ input[type=range]{height:30px !important}
       <button onClick="{{ setMonthly }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ mBg }};color:{{ mColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Monthly</button>
       <button onClick="{{ setAnnual }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ aBg }};color:{{ aColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Annual · −20%</button>
     </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;width:fit-content;max-width:100%;margin:20px auto 0;padding:10px 10px 10px 18px;border-radius:14px;border:1px dashed rgba(159,215,176,.5);background:rgba(159,215,176,.07)">
+      <span style="font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#9fd7b0">PROMO CODE</span>
+      <span style="font-size:14px;line-height:1.5;color:#d0d6e0">20% off any paid plan — enter it at checkout.</span>
+      <button type="button" onClick="{{ copyPromo }}" style="display:inline-flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;border-radius:10px;border:1px solid rgba(159,215,176,.35);background:#0a0f0d;color:#fff;font-family:'Geist Mono',monospace;font-size:15px;letter-spacing:.14em;cursor:pointer;transition:border-color .2s ease" style-hover="border-color:rgba(159,215,176,.75)">{{ promoCode }}<span aria-live="polite" style="padding:5px 10px;border-radius:7px;background:#9fd7b0;color:#07080a;font-family:'Geist',sans-serif;font-size:12px;font-weight:600;letter-spacing:0">{{ promoCopyLabel }}</span></button>
+    </div>
     <p style="max-width:62ch;margin:18px auto 0;font-size:13px;line-height:1.6;color:#7b8089">All prices are per month and <strong>include VAT</strong> — what you see here is what you pay, nothing is added at checkout. Paid plans start with a 7-day free trial, one per account: a card is required, nothing is charged during the trial, and the plan then renews automatically until you cancel. Cancelling takes effect at the end of the period you have paid for. Annual plans are billed 12 months upfront and unused months are not refunded.</p>
     <sc-if value="{{ hasFreeNote }}" hint-placeholder-val="{{ false }}">
       <div role="status" style="max-width:680px;margin:26px auto 0;padding:14px 20px;border-radius:12px;border:1px solid rgba(168,198,240,.25);background:rgba(168,198,240,.06);font-size:14px;line-height:1.6;color:#d0d6e0;text-align:left"><span style="margin-right:10px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--acc)">{{ freeNoteTag }}</span>{{ freeNoteText }}</div>
@@ -911,7 +916,10 @@ input[type=range]{height:30px !important}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#a8c6f0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#a8c6f0&quot;,&quot;#d8dbe0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;planetGlow&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:2,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;planetDensity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:5000,&quot;step&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;drumCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:5,&quot;max&quot;:9,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Engine&quot;}}">
 class Component extends DCLogic {
-  state = { step: 0, tab: 0, billing: "monthly", ads: 12, angle: 0, creatives: {}, isMobile: false, navOpen: false, freeNote: null, onFree: false };
+  state = { step: 0, tab: 0, billing: "monthly", ads: 12, angle: 0, creatives: {}, isMobile: false, navOpen: false, freeNote: null, onFree: false, promoCopied: false };
+  // The public promo code shown in the pricing section. checkout.js holds the
+  // same code in PROMO_CODES — keep the two in sync.
+  promoCode = "ADRONIS20";
   root = React.createRef();
 
   componentDidMount() {
@@ -1030,6 +1038,34 @@ class Component extends DCLogic {
     cancelAnimationFrame(this.rafId);
     if (this.io) this.io.disconnect();
     if (this.cio) this.cio.disconnect();
+    clearTimeout(this.promoTimer);
+  }
+
+  // Copies the promo code and flips the button to "Copied" for two seconds.
+  // The clipboard API needs HTTPS or localhost; anywhere else, fall back to
+  // selecting a hidden textarea.
+  copyPromo() {
+    const code = this.promoCode;
+    const done = () => {
+      this.setState({ promoCopied: true });
+      clearTimeout(this.promoTimer);
+      this.promoTimer = setTimeout(() => this.setState({ promoCopied: false }), 2000);
+    };
+    const fallback = () => {
+      const ta = document.createElement("textarea");
+      ta.value = code;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      ta.remove();
+      if (ok) done();
+    };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(code).then(done, fallback);
+    else fallback();
   }
 
   goStep(i) {
@@ -1340,6 +1376,9 @@ class Component extends DCLogic {
       mColor: annual ? "#8a8f98" : "#ffffff",
       aBg: annual ? "rgba(168,198,240,.12)" : "transparent",
       aColor: annual ? "var(--acc)" : "#8a8f98",
+      promoCode: this.promoCode,
+      promoCopyLabel: this.state.promoCopied ? "Copied" : "Copy",
+      copyPromo: () => this.copyPromo(),
       ads,
       adsLabel: ads,
       fillPct: (((ads - 2) / 28) * 100).toFixed(1) + "%",

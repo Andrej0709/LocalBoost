@@ -325,6 +325,9 @@ window.LB_I18N_SR = {
     "08 — PRICING": "08 — CENE",
     "Monthly": "Mesečno",
     "Annual · −20%": "Godišnje · −20%",
+    "20% off any paid plan — enter it at checkout.": "20% popusta na bilo koji plaćeni plan — unesi ga pri plaćanju.",
+    "Copy": "Kopiraj",
+    "Copied": "Kopirano",
     "All prices are per month and": "Sve cene su mesečne i",
     "include VAT": "uključuju PDV",
     "— what you see here is what you pay, nothing is added at checkout. Paid plans start with a 7-day free trial, one per account: a card is required, nothing is charged during the trial, and the plan then renews automatically until you cancel. Cancelling takes effect at the end of the period you have paid for. Annual plans are billed 12 months upfront and unused months are not refunded.":
@@ -1251,6 +1254,7 @@ window.LB_I18N_SR = {
     "free": "besplatni",
     "Brief the engine for your": "Napravi brif za svoj",
     "PLAN ACTIVE": "PLAN AKTIVAN",
+    "20% off every drop, for as long as you stay.": "20% popusta na svaki drop, dok god si sa nama.",
     "10% off every drop, for as long as you stay.": "10% popusta na svaki drop, dok god si sa nama.",
     "25% off your first year.": "25% popusta na prvu godinu.",
     "Couldn't load your account system. Refresh the page and try again.":
