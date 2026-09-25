@@ -211,9 +211,11 @@
 
     // Managing a plan (switching or cancelling) only makes sense while it's
     // actually running — a trial that already lapsed into "canceled" has
-    // nothing left to change.
+    // nothing left to change. Every change goes through Paddle, so a plan
+    // with no Paddle subscription behind it has nothing to manage either.
     var manageable = (profile.subscription_status === "trialing" ||
-                      profile.subscription_status === "active") && !openEnded;
+                      profile.subscription_status === "active") && !openEnded &&
+                     !!profile.paddle_subscription_id;
 
     $("bill-plan-toggle").hidden = !manageable || !!profile.cancel_at_period_end;
     $("cancel-plan-row").hidden = !manageable || !!profile.cancel_at_period_end;
@@ -399,9 +401,10 @@
       tag: "trial"
     }];
 
-    // Each entry is a snapshot finalize_billing_period() wrote at the plan/cycle
-    // that period was actually charged at — never recomputed from the CURRENT
-    // plan, so an earlier plan/cycle switch can't rewrite past invoices.
+    // Each entry is a snapshot of the plan/cycle that period was actually
+    // charged at (the paddle Edge Function writes one per paid invoice) —
+    // never recomputed from the CURRENT plan, so an earlier plan/cycle switch
+    // can't rewrite past invoices.
     var history = Array.isArray(profile.billing_history) ? profile.billing_history : [];
     history.forEach(function (entry, i) {
       var p = PLANS[entry.plan];
@@ -419,9 +422,10 @@
 
     // No period end means nothing is coming: the plan was granted outright.
     // Without this check the row below would print an invalid date and a
-    // charge that will never happen.
+    // charge that will never happen. The same goes for a plan with no Paddle
+    // subscription behind it, or one set to cancel: nothing will charge.
     if ((profile.subscription_status === "trialing" || profile.subscription_status === "active") &&
-        periodEndDate(profile)) {
+        periodEndDate(profile) && profile.paddle_subscription_id && !profile.cancel_at_period_end) {
       // What's actually charged next is the pending plan/cycle if a switch is
       // scheduled — not the plan running today.
       var upcomingPlan = PLANS[profile.pending_plan] || plan;
@@ -431,7 +435,8 @@
       rows.push({
         date: new Date(periodEndDate(profile)),
         desc: upcomingPlan.name + " plan — " + (upcomingCycle === "annual" ? "annual" : "monthly") + " billing",
-        amount: invoiceAmount(upcomingPlan, upcomingCycle),
+        // Net of a discount agreed with Adronis, which Paddle applies too.
+        amount: invoiceAmount(upcomingPlan, upcomingCycle) * (1 - (profile.discount_percent || 0) / 100),
         tag: "upcoming"
       });
     }

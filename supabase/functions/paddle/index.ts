@@ -42,6 +42,7 @@ const CORS = {
 
 const PAID_PLANS = ["counter", "storefront", "franchise"];
 const CYCLES = ["monthly", "annual"];
+const RUNNING = ["trialing", "active", "past_due"];
 
 // ------------------------------------------------------------------ helpers
 
@@ -207,7 +208,47 @@ async function syncSubscription(sub: any, userIdHint?: string) {
 
   const { data, error } = await db.from("profiles").update(patch).eq("id", profile.id).select().single();
   if (error) throw error;
+
+  // A discount agreed in the portal before this subscription existed goes
+  // onto it now - unless a promo code already took the one discount slot.
+  // A failure here must not fail the webhook; the next event tries again.
+  if (RUNNING.includes(sub.status) && !sub.discount && data.discount_percent > 0) {
+    await setSubscriptionDiscount(sub.id, data.discount_percent)
+      .catch((e) => console.error("Could not apply the portal discount", sub.id, e));
+  }
+
   return data;
+}
+
+// One custom Paddle discount per percentage, shared by every account the
+// portal gives that percentage to. Custom discounts stay out of the catalog
+// and can't be typed in at checkout.
+async function portalDiscount(percent: number) {
+  const list = await paddle("GET", "/discounts?mode=custom&status=active&per_page=200");
+  const hit = (list || []).find((d: any) =>
+    d.custom_data?.source === "adronis_portal" && d.type === "percentage" &&
+    Number(d.amount) === percent && d.recur && d.maximum_recurring_intervals == null
+  );
+  if (hit) return hit.id as string;
+
+  const created = await paddle("POST", "/discounts", {
+    description: `Adronis Portal - ${percent}% off, agreed per account`,
+    type: "percentage",
+    amount: String(percent),
+    mode: "custom",
+    recur: true,
+    enabled_for_checkout: false,
+    custom_data: { source: "adronis_portal", percent },
+  });
+  return created.id as string;
+}
+
+// Paddle only takes a discount on a subscription from its next charge on
+// (always, while it's trialing), which is also when the portal means it.
+async function setSubscriptionDiscount(subId: string, percent: number | null) {
+  return await paddle("PATCH", `/subscriptions/${subId}`, {
+    discount: percent ? { id: await portalDiscount(percent), effective_from: "next_billing_period" } : null,
+  });
 }
 
 // A paid invoice goes into billing_history at what was actually charged
@@ -294,7 +335,7 @@ async function handleAction(req: Request) {
   if (!auth?.user) return json({ error: "Not signed in." }, 401);
 
   const body = await req.json().catch(() => ({}));
-  if (body.action === "admin_set_plan") return handleAdmin(auth.user.id, body);
+  if (String(body.action || "").startsWith("admin_")) return handleAdmin(auth.user.id, body);
 
   const profile = await profileById(auth.user.id);
   if (!profile) return json({ error: "No profile for this account." }, 400);
@@ -388,8 +429,11 @@ async function handleAction(req: Request) {
 //   none     cancel at the end of the period, or today
 // A plan or cycle switch applies from the next charge, the same as a
 // customer switching on their own account page.
+//
+// The per-account discount goes through here too (admin_set_discount), so a
+// discount agreed in the portal is what Paddle actually charges.
 
-const RUNNING = ["trialing", "active", "past_due"];
+type Admin = { user_id: string; email: string };
 
 async function handleAdmin(userId: string, body: any) {
   const { data: admin, error } = await db.from("portal_admins")
@@ -401,16 +445,67 @@ async function handleAdmin(userId: string, body: any) {
   if (!admin) return json({ error: "Not an admin." }, 403);
 
   try {
-    return json({ profile: await adminSetPlan(admin, body) });
+    if (body.action === "admin_set_plan") return json({ profile: await adminSetPlan(admin, body) });
+    if (body.action === "admin_set_discount") return json({ profile: await adminSetDiscount(admin, body) });
+    throw new UserError("Unknown action.");
   } catch (e) {
     if (e instanceof UserError) return json({ error: e.message }, 400);
-    console.error("Admin action error", body.mode, e);
+    console.error("Admin action error", body.action, body.mode, e);
     // Admins see what Paddle actually said.
     return json({ error: e instanceof Error ? e.message : "Paddle did not accept that change." }, 502);
   }
 }
 
-async function adminSetPlan(admin: { user_id: string; email: string }, body: any) {
+async function audit(admin: Admin, profile: any, action: string, changes: Record<string, unknown>) {
+  const { error } = await db.from("admin_audit").insert({
+    actor_id: admin.user_id,
+    actor_email: admin.email,
+    target_user: profile.id,
+    target_email: profile.email,
+    action,
+    changes,
+  });
+  // The change itself already happened in Paddle - a missing log row must
+  // not report it as failed.
+  if (error) console.error("Audit write failed", error);
+}
+
+// Percent off every charge from the next one on, for as long as it's set.
+// On an account with no running subscription it is only recorded, and goes
+// onto the subscription the moment one starts (see syncSubscription).
+async function adminSetDiscount(admin: Admin, body: any) {
+  const profile = await profileById(String(body.user_id || ""));
+  if (!profile) throw new UserError("No such account.");
+
+  const raw = body.percent;
+  const percent = raw === null || raw === undefined || raw === "" ? 0 : Number(raw);
+  if (!(Number.isInteger(percent) && percent >= 0 && percent <= 100)) {
+    throw new UserError("A discount is a whole number from 0 to 100.");
+  }
+  const note = String(body.note ?? "").trim() || null;
+  const was = profile.discount_percent || 0;
+
+  const running = !!profile.paddle_subscription_id && !profile.comped &&
+    RUNNING.includes(profile.subscription_status);
+  if (running && percent !== was) {
+    await setSubscriptionDiscount(profile.paddle_subscription_id, percent || null);
+  }
+
+  const { data, error } = await db.from("profiles")
+    .update({ discount_percent: percent || null, discount_note: note })
+    .eq("id", profile.id).select().single();
+  if (error) throw error;
+
+  await audit(admin, profile, "set_discount", {
+    from: was || null,
+    to: percent || null,
+    note,
+    in_paddle: running && percent !== was,
+  });
+  return data;
+}
+
+async function adminSetPlan(admin: Admin, body: any) {
   const profile = await profileById(String(body.user_id || ""));
   if (!profile) throw new UserError("No such account.");
   if (!profile.paddle_subscription_id) throw new UserError("This account has no Paddle subscription.");
@@ -515,27 +610,19 @@ async function adminSetPlan(admin: { user_id: string; email: string }, body: any
 
   if (!after) after = await syncSubscription(sub, profile.id);
 
-  const { error: logError } = await db.from("admin_audit").insert({
-    actor_id: admin.user_id,
-    actor_email: admin.email,
-    target_user: profile.id,
-    target_email: profile.email,
-    action: "set_plan_state",
-    changes: {
-      mode,
-      via: "paddle",
-      plan: after.plan,
-      cycle: after.billing_cycle,
-      status: after.subscription_status,
-      runs_until: after.current_period_end,
-      pending_plan: after.pending_plan,
-      at_period_end: mode === "none" && after.cancel_at_period_end,
-      comped: after.comped,
-      reason: after.comped_reason,
-      was: { plan: profile.plan, status: profile.subscription_status, comped: profile.comped },
-    },
+  await audit(admin, profile, "set_plan_state", {
+    mode,
+    via: "paddle",
+    plan: after.plan,
+    cycle: after.billing_cycle,
+    status: after.subscription_status,
+    runs_until: after.current_period_end,
+    pending_plan: after.pending_plan,
+    at_period_end: mode === "none" && after.cancel_at_period_end,
+    comped: after.comped,
+    reason: after.comped_reason,
+    was: { plan: profile.plan, status: profile.subscription_status, comped: profile.comped },
   });
-  if (logError) console.error("Audit write failed", logError);
 
   return after;
 }

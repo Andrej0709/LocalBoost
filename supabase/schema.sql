@@ -491,12 +491,15 @@ $$;
 revoke execute on function public.start_trial(public.plan_tier, text) from public, anon, authenticated;
 
 /* ------------------------------------------------------------ */
-/* 8c. finalize_billing_period - fast-forwards a subscription past any renewal */
-/*     dates that have already come and gone, applying whatever was scheduled  */
-/*     for each one: a cancellation, or a pending plan/cycle switch. Called    */
-/*     from auth.js on every profile load, so the account.html gate reflects   */
-/*     a cancellation or plan switch the moment its date arrives - nothing     */
-/*     needs to run in the background to make that happen. */
+/* 8c. finalize_billing_period - ends a plan whose date has passed with no    */
+/*     Paddle subscription behind it. Every trial and paid plan is a Paddle    */
+/*     subscription, which renews, switches and ends through Paddle's own     */
+/*     webhooks. A dated plan without one (only ever set by hand, before       */
+/*     Paddle) is never renewed here - nobody would be charged for it - so    */
+/*     once its date passes it ends and the account drops to Free. Called     */
+/*     from auth.js on every profile load, so the account.html gate reflects  */
+/*     it the moment the date arrives. A plan given for good has no date and  */
+/*     is left alone. */
 /* ------------------------------------------------------------ */
 create or replace function public.finalize_billing_period()
 returns public.profiles
@@ -505,11 +508,7 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  row_out     public.profiles;
-  plan_months int;
-  guard       int := 0;
-  period_start timestamptz;
-  entry        jsonb;
+  row_out public.profiles;
 begin
   if auth.uid() is null then
     raise exception 'Not signed in.';
@@ -517,53 +516,20 @@ begin
 
   select * into row_out from public.profiles where id = auth.uid();
 
-  /* Paddle subscriptions renew, switch and end through Paddle's own webhooks. */
   if row_out.paddle_subscription_id is not null
      or row_out.current_period_end is null
+     or row_out.current_period_end > now()
      or row_out.subscription_status not in ('trialing', 'active') then
     return row_out;
   end if;
 
-  while row_out.current_period_end <= now() and guard < 1000 loop
-    guard := guard + 1;
-
-    if row_out.cancel_at_period_end then
-      update public.profiles
-         set subscription_status = 'canceled'
-       where id = auth.uid()
-       returning * into row_out;
-      exit;
-    end if;
-
-    if row_out.pending_plan is not null then
-      update public.profiles
-         set plan                  = row_out.pending_plan,
-             billing_cycle         = coalesce(row_out.pending_billing_cycle, row_out.billing_cycle),
-             pending_plan          = null,
-             pending_billing_cycle = null
-       where id = auth.uid()
-       returning * into row_out;
-    end if;
-
-    /* The period that just renewed is charged at whatever plan/cycle is now
-       active (after the switch above, if any) - matches "a plan change takes
-       effect at the next renewal". Snapshot it so this period's invoice never
-       changes retroactively if the plan changes again later. */
-    period_start := row_out.current_period_end;
-    plan_months  := case when row_out.billing_cycle = 'annual' then 12 else 1 end;
-    entry := jsonb_build_object(
-      'period_start', period_start,
-      'plan', row_out.plan,
-      'cycle', coalesce(row_out.billing_cycle, 'monthly')
-    );
-
-    update public.profiles
-       set subscription_status = 'active',
-           current_period_end  = period_start + (plan_months || ' months')::interval,
-           billing_history      = row_out.billing_history || jsonb_build_array(entry)
-     where id = auth.uid()
-     returning * into row_out;
-  end loop;
+  update public.profiles
+     set subscription_status   = 'canceled',
+         cancel_at_period_end  = false,
+         pending_plan          = null,
+         pending_billing_cycle = null
+   where id = auth.uid()
+   returning * into row_out;
 
   return row_out;
 end;
