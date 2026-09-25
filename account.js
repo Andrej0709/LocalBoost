@@ -152,6 +152,29 @@
     return cycle === "annual" ? monthlyRate(plan, cycle) * 12 : monthlyRate(plan, cycle);
   }
 
+  // The discount Paddle takes off a charge made on `date` — a promo code from
+  // checkout or one agreed with Adronis — or null. The paddle Edge Function
+  // mirrors it from the subscription, dates included. A minute of slack, since
+  // a discount that starts with the first charge starts at that same moment.
+  function discountOn(profile, date) {
+    var d = profile.paddle_discount;
+    if (!d || !profile.paddle_subscription_id) return null;
+    if (d.starts_at && new Date(d.starts_at) - date > 60000) return null;
+    if (d.ends_at && new Date(d.ends_at) <= date) return null;
+    return d;
+  }
+
+  function discounted(amount, d) {
+    if (!d) return amount;
+    if (d.type === "percentage") return amount * (1 - Number(d.amount) / 100);
+    return Math.max(0, amount - Number(d.amount) / 100);
+  }
+
+  // "20%" or "€10" — the size of a discount, the same in both languages.
+  function discountSize(d) {
+    return d.type === "percentage" ? Number(d.amount) + "%" : euro(Number(d.amount) / 100);
+  }
+
   function periodEndDate(profile) {
     return profile.current_period_end || profile.trial_ends_at;
   }
@@ -195,6 +218,21 @@
       canceled: "Canceled — you're on the Free plan"
     }[profile.subscription_status] || "No active plan";
     $("bill-status").textContent = statusText;
+
+    // Each part is its own text node, so the Serbian copy can match it whole.
+    var disc = profile.subscription_status === "canceled" ? null : profile.paddle_discount;
+    $("bill-discount-row").hidden = !disc || !profile.paddle_subscription_id;
+    if (disc && profile.paddle_subscription_id) {
+      var when = disc.starts_at && new Date(disc.starts_at) > new Date()
+        ? " from " + fmtDate(disc.starts_at)
+        : (disc.ends_at ? " until " + fmtDate(disc.ends_at) : "");
+      $("bill-discount").innerHTML =
+        "<span>" + discountSize(disc) + " off every charge" + when + "</span>" +
+        '<br><span style="color:#8a8f98;font-size:12.5px">' +
+        (disc.code ? "promo code " + disc.code
+                   : disc.source === "portal" ? "agreed with Adronis" : "applied by Adronis") +
+        "</span>";
+    }
 
     var dateLabel = $("bill-date-label");
     var dateValue = $("bill-date");
@@ -432,11 +470,14 @@
       var upcomingCycle = profile.pending_plan
         ? (profile.pending_billing_cycle || profile.billing_cycle || "monthly")
         : (profile.billing_cycle || "monthly");
+      var upcomingDate = new Date(periodEndDate(profile));
+      var upcomingDiscount = discountOn(profile, upcomingDate);
       rows.push({
-        date: new Date(periodEndDate(profile)),
+        date: upcomingDate,
         desc: upcomingPlan.name + " plan — " + (upcomingCycle === "annual" ? "annual" : "monthly") + " billing",
-        // Net of a discount agreed with Adronis, which Paddle applies too.
-        amount: invoiceAmount(upcomingPlan, upcomingCycle) * (1 - (profile.discount_percent || 0) / 100),
+        // Net of the discount Paddle will take off this charge.
+        amount: discounted(invoiceAmount(upcomingPlan, upcomingCycle), upcomingDiscount),
+        note: upcomingDiscount ? "−" + discountSize(upcomingDiscount) : "",
         tag: "upcoming"
       });
     }
@@ -464,7 +505,8 @@
         "<td>" + fmtDate(r.date) + "</td>" +
         "<td>" + r.desc + "</td>" +
         "<td>" + chipFor(r.tag) + "</td>" +
-        "<td>" + (r.amount ? euro(r.amount) : "—") + "</td>" +
+        "<td>" + (r.amount ? euro(r.amount) : "—") +
+          (r.note ? ' <span style="color:#8a8f98;font-size:12.5px">' + r.note + "</span>" : "") + "</td>" +
         "</tr>";
     }).join("");
   }

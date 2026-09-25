@@ -187,6 +187,15 @@ async function syncSubscription(sub: any, userIdHint?: string) {
     patch.pending_billing_cycle = null;
   }
 
+  // What Paddle takes off this subscription's charges - a promo code from
+  // checkout or a discount agreed in the portal - so the account page and the
+  // portal show the price Paddle will actually charge.
+  patch.paddle_discount = status === "canceled" ? null
+    : await discountSnapshot(sub, profile.paddle_discount).catch((e) => {
+      console.error("Could not read the subscription's discount", sub.id, e);
+      return profile.paddle_discount ?? null; // the next event tries again
+    });
+
   if (status === "canceled") {
     patch.cancel_at_period_end = false;
     patch.pending_plan = null;
@@ -218,6 +227,28 @@ async function syncSubscription(sub: any, userIdHint?: string) {
   }
 
   return data;
+}
+
+// The subscription's discount as the profile keeps it. The subscription only
+// names it, so the discount itself is looked up - but only when it changed.
+async function discountSnapshot(sub: any, current: any) {
+  const d = sub.discount;
+  if (!d?.id) return null;
+  if (current?.id === d.id && current?.starts_at === (d.starts_at ?? null) &&
+      current?.ends_at === (d.ends_at ?? null)) {
+    return current;
+  }
+  const full = await paddle("GET", `/discounts/${d.id}`);
+  return {
+    id: d.id,
+    type: full.type, // percentage, or flat / flat_per_seat in the currency's lowest unit
+    amount: full.amount,
+    currency: full.currency_code ?? null,
+    code: full.code ?? null,
+    source: full.custom_data?.source === "adronis_portal" ? "portal" : (full.code ? "promo" : "paddle"),
+    starts_at: d.starts_at ?? null,
+    ends_at: d.ends_at ?? null,
+  };
 }
 
 // One custom Paddle discount per percentage, shared by every account the
@@ -487,14 +518,17 @@ async function adminSetDiscount(admin: Admin, body: any) {
 
   const running = !!profile.paddle_subscription_id && !profile.comped &&
     RUNNING.includes(profile.subscription_status);
-  if (running && percent !== was) {
-    await setSubscriptionDiscount(profile.paddle_subscription_id, percent || null);
-  }
+  const sub = running && percent !== was
+    ? await setSubscriptionDiscount(profile.paddle_subscription_id, percent || null)
+    : null;
 
-  const { data, error } = await db.from("profiles")
+  // The agreed percentage is written before the subscription is mirrored, so
+  // a cleared discount is not put straight back on (see syncSubscription).
+  const { data: saved, error } = await db.from("profiles")
     .update({ discount_percent: percent || null, discount_note: note })
     .eq("id", profile.id).select().single();
   if (error) throw error;
+  const data = sub ? await syncSubscription(sub, profile.id) : saved;
 
   await audit(admin, profile, "set_discount", {
     from: was || null,
@@ -590,6 +624,7 @@ async function adminSetPlan(admin: Admin, body: any) {
         paddle_subscription_id: null,
         paddle_period_start: null,
         paddle_updated_at: null,
+        paddle_discount: null,
       }).eq("id", profile.id).select().single();
       if (error) throw error;
       after = data;

@@ -92,6 +92,7 @@ create table if not exists public.profiles (
   paddle_subscription_id text,
   paddle_period_start    timestamptz,
   paddle_updated_at      timestamptz,
+  paddle_discount        jsonb,
 
   /* Proof of what the customer accepted and when. Written once at signup from
      the consent checkbox, and again whenever they accept a newer version. Never
@@ -127,10 +128,14 @@ alter table public.profiles add column if not exists billing_history       jsonb
 /* plan switch waits in pending_plan until Paddle starts a newer period.        */
 /* paddle_updated_at: the subscription's own updated_at, so an out-of-order     */
 /* webhook never overwrites a newer state.                                      */
+/* paddle_discount: what Paddle takes off the subscription's charges - a promo  */
+/* code from checkout or a discount agreed in the portal - with its dates, so   */
+/* the account page and the portal show the price Paddle will really charge.    */
 alter table public.profiles add column if not exists paddle_customer_id     text;
 alter table public.profiles add column if not exists paddle_subscription_id text;
 alter table public.profiles add column if not exists paddle_period_start    timestamptz;
 alter table public.profiles add column if not exists paddle_updated_at      timestamptz;
+alter table public.profiles add column if not exists paddle_discount        jsonb;
 create unique index if not exists profiles_paddle_subscription_idx
   on public.profiles (paddle_subscription_id);
 
@@ -804,7 +809,8 @@ begin
        or new.paddle_customer_id is not null
        or new.paddle_subscription_id is not null
        or new.paddle_period_start is not null
-       or new.paddle_updated_at is not null then
+       or new.paddle_updated_at is not null
+       or new.paddle_discount is not null then
       raise exception 'Billing details can only be set through checkout.';
     end if;
     /* The row's email is the signed-in account's, whatever the browser sent. */
