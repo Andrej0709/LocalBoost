@@ -10,6 +10,9 @@
 //      (trial or not, from the database) so a customer can't hand themselves a
 //      second free trial from the browser console.
 //
+//   3. Plan changes from the Adronis Portal, for admins listed in
+//      portal_admins, on accounts that pay through Paddle (see handleAdmin).
+//
 // Deploy with "Verify JWT" OFF: Paddle can't send a Supabase JWT. Customer
 // calls are authenticated below with supabase.auth.getUser() instead.
 //
@@ -120,7 +123,17 @@ async function syncSubscription(sub: any, userIdHint?: string) {
   const userId = sub.custom_data?.user_id || userIdHint;
   let profile = userId ? await profileById(userId) : null;
   if (!profile) profile = await profileBySubscription(sub.id);
-  if (!profile) throw new Error("No profile for subscription " + sub.id);
+  if (!profile) {
+    // An ended subscription nobody points at any more (the account was
+    // deleted, or given its plan for good in the portal) has nothing to update.
+    if (sub.status === "canceled") return null;
+    throw new Error("No profile for subscription " + sub.id);
+  }
+
+  // A plan given for good in the Adronis Portal is not Paddle's to change:
+  // the portal cancels the Paddle subscription behind it, and that
+  // cancellation must not take the plan away again.
+  if (profile.comped) return profile;
 
   const sameSub = profile.paddle_subscription_id === sub.id;
   // A late event from an older, ended subscription must not replace the one
@@ -187,6 +200,9 @@ async function syncSubscription(sub: any, userIdHint?: string) {
   if (!profile.trial_started_at && (sub.status === "trialing" || trial)) {
     patch.trial_started_at = trial?.starts_at || sub.started_at || sub.created_at;
     patch.trial_ends_at = trial?.ends_at || sub.current_billing_period?.ends_at || null;
+  } else if (sub.status === "trialing" && trial?.ends_at) {
+    // A running trial moved from the portal: follow its new end date.
+    patch.trial_ends_at = trial.ends_at;
   }
 
   const { data, error } = await db.from("profiles").update(patch).eq("id", profile.id).select().single();
@@ -278,6 +294,8 @@ async function handleAction(req: Request) {
   if (!auth?.user) return json({ error: "Not signed in." }, 401);
 
   const body = await req.json().catch(() => ({}));
+  if (body.action === "admin_set_plan") return handleAdmin(auth.user.id, body);
+
   const profile = await profileById(auth.user.id);
   if (!profile) return json({ error: "No profile for this account." }, 400);
 
@@ -354,6 +372,172 @@ async function handleAction(req: Request) {
     console.error("Action error", body.action, e);
     return json({ error: "Payments are having a problem right now. Please try again in a minute." }, 502);
   }
+}
+
+// ------------------------------------------------------ portal (admins)
+// The Adronis Portal changes the plan of an account that pays through Paddle
+// by calling this, never by writing the profile itself: the change is made in
+// Paddle - the card is charged, left alone or stopped for real - and the
+// profile follows from Paddle's answer. Accounts with no running Paddle
+// subscription are still set straight in the database by the portal.
+//
+// The four states are the portal's plan editor:
+//   trial    move the end of a running trial (a paying plan can't go back)
+//   paying   end a trial and charge today, or move the next charge date
+//   forever  cancel the Paddle subscription today and give the plan for good
+//   none     cancel at the end of the period, or today
+// A plan or cycle switch applies from the next charge, the same as a
+// customer switching on their own account page.
+
+const RUNNING = ["trialing", "active", "past_due"];
+
+async function handleAdmin(userId: string, body: any) {
+  const { data: admin, error } = await db.from("portal_admins")
+    .select("user_id, email").eq("user_id", userId).maybeSingle();
+  if (error) {
+    console.error("Admin check failed", error);
+    return json({ error: "Could not check the admin list." }, 500);
+  }
+  if (!admin) return json({ error: "Not an admin." }, 403);
+
+  try {
+    return json({ profile: await adminSetPlan(admin, body) });
+  } catch (e) {
+    if (e instanceof UserError) return json({ error: e.message }, 400);
+    console.error("Admin action error", body.mode, e);
+    // Admins see what Paddle actually said.
+    return json({ error: e instanceof Error ? e.message : "Paddle did not accept that change." }, 502);
+  }
+}
+
+async function adminSetPlan(admin: { user_id: string; email: string }, body: any) {
+  const profile = await profileById(String(body.user_id || ""));
+  if (!profile) throw new UserError("No such account.");
+  if (!profile.paddle_subscription_id) throw new UserError("This account has no Paddle subscription.");
+
+  const mode = body.mode;
+  if (!["trial", "paying", "forever", "none"].includes(mode)) throw new UserError("Unknown plan state.");
+
+  let sub = await paddle("GET", `/subscriptions/${profile.paddle_subscription_id}`);
+  if (!RUNNING.includes(sub.status)) {
+    await syncSubscription(sub, profile.id);
+    throw new UserError(`The Paddle subscription behind this account has already ended (${sub.status}). Reload the portal.`);
+  }
+
+  const meta = (sub.items || [])[0]?.price?.custom_data || {};
+  const plan = body.plan || meta.plan || profile.plan;
+  const cycle = body.cycle || meta.cycle || profile.billing_cycle || "monthly";
+  if (mode !== "none" && mode !== "forever" && (!PAID_PLANS.includes(plan) || !CYCLES.includes(cycle))) {
+    throw new UserError("Pick a paid plan - Paddle has no price for Free.");
+  }
+
+  const update = async (patch: unknown) => {
+    sub = await paddle("PATCH", `/subscriptions/${sub.id}`, patch);
+  };
+  // A scheduled cancel or pause has to go before anything else is changed.
+  const clearScheduled = async () => {
+    if (sub.scheduled_change) await update({ scheduled_change: null });
+  };
+  // Paddle won't take new items and a new billing date in one request.
+  const switchItems = async () => {
+    if (plan === meta.plan && cycle === meta.cycle) return;
+    await update({
+      items: [{ price_id: await findPrice(plan, cycle, false), quantity: 1 }],
+      proration_billing_mode: "do_not_bill",
+    });
+  };
+  const moveNextCharge = async (iso: string) => {
+    const at = new Date(iso);
+    if (isNaN(at.getTime()) || at <= new Date()) throw new UserError("Pick a date in the future.");
+    await update({ next_billed_at: at.toISOString(), proration_billing_mode: "do_not_bill" });
+  };
+
+  let after;
+  try {
+    if (mode === "trial") {
+      if (sub.status !== "trialing") {
+        throw new UserError("This account already pays through Paddle, so it can't go back on a trial. " +
+          "To give it free days, use Paying and move the next charge date.");
+      }
+      await clearScheduled();
+      await switchItems();
+      if (body.days != null) {
+        const days = Number(body.days);
+        if (!(days >= 1 && days <= 3650)) throw new UserError("A trial runs between 1 and 3650 days.");
+        await moveNextCharge(new Date(Date.now() + days * 86400000).toISOString());
+      }
+    } else if (mode === "paying") {
+      await clearScheduled();
+      await switchItems();
+      if (sub.status === "trialing") {
+        // Ends the trial and charges the card on file today.
+        sub = await paddle("POST", `/subscriptions/${sub.id}/activate`);
+      } else if (body.until) {
+        await moveNextCharge(String(body.until));
+      }
+    } else if (mode === "forever") {
+      await clearScheduled();
+      await paddle("POST", `/subscriptions/${sub.id}/cancel`, { effective_from: "immediately" });
+      // Whichever lands first, this write or the cancellation webhook, the
+      // account ends up comped: a webhook after it finds comped and leaves the
+      // row alone (see syncSubscription), and one before it is overwritten.
+      const { data, error } = await db.from("profiles").update({
+        plan: PAID_PLANS.includes(body.plan) ? body.plan : profile.plan,
+        billing_cycle: CYCLES.includes(body.cycle) ? body.cycle : (profile.billing_cycle || "monthly"),
+        subscription_status: "active",
+        trial_ends_at: null,
+        current_period_end: null,
+        cancel_at_period_end: false,
+        pending_plan: null,
+        pending_billing_cycle: null,
+        comped: true,
+        comped_reason: String(body.reason || "").trim() || null,
+        paddle_subscription_id: null,
+        paddle_period_start: null,
+        paddle_updated_at: null,
+      }).eq("id", profile.id).select().single();
+      if (error) throw error;
+      after = data;
+    } else {
+      const runOut = !!body.at_period_end && ["trialing", "active"].includes(sub.status);
+      if (!(runOut && sub.scheduled_change?.action === "cancel")) {
+        await clearScheduled();
+        sub = await paddle("POST", `/subscriptions/${sub.id}/cancel`, {
+          effective_from: runOut ? "next_billing_period" : "immediately",
+        });
+      }
+    }
+  } catch (e) {
+    // Whatever Paddle did accept before the failure still lands on the profile.
+    if (mode !== "forever") await syncSubscription(sub, profile.id).catch(() => {});
+    throw e;
+  }
+
+  if (!after) after = await syncSubscription(sub, profile.id);
+
+  const { error: logError } = await db.from("admin_audit").insert({
+    actor_id: admin.user_id,
+    actor_email: admin.email,
+    target_user: profile.id,
+    target_email: profile.email,
+    action: "set_plan_state",
+    changes: {
+      mode,
+      via: "paddle",
+      plan: after.plan,
+      cycle: after.billing_cycle,
+      status: after.subscription_status,
+      runs_until: after.current_period_end,
+      pending_plan: after.pending_plan,
+      at_period_end: mode === "none" && after.cancel_at_period_end,
+      comped: after.comped,
+      reason: after.comped_reason,
+      was: { plan: profile.plan, status: profile.subscription_status, comped: profile.comped },
+    },
+  });
+  if (logError) console.error("Audit write failed", logError);
+
+  return after;
 }
 
 // ------------------------------------------------------------------- entry
