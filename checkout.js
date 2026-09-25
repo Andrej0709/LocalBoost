@@ -1,7 +1,8 @@
-/* Adronis checkout — front end only.
-   No payment is taken here. The submit handler builds the exact payload that a
-   future `create-checkout-session` endpoint will consume, then stops. Wire the
-   backend at the one marked spot below and nothing else on this page changes. */
+/* Adronis checkout.
+   The page only shows the order. Payment happens in Paddle's overlay: the
+   paddle Edge Function creates the transaction (it picks the price, so the
+   trial rule can't be skipped from the browser), Paddle.js opens it, and
+   Paddle's webhook is what actually starts the trial or subscription. */
 (function () {
 
   // ---------------------------------------------------------------- plan data
@@ -44,13 +45,12 @@
   var ANNUAL_DISCOUNT = 0.2;   // 20% off, matches the pricing section
   var TRIAL_DAYS = 7;          // "first drop free"
 
-  // Demo codes so the promo field is testable before Stripe coupons exist.
+  // Codes the summary can price. Each one must also exist as a discount in
+  // Paddle (Catalog > Discounts) — Paddle checks it again at payment.
   // ADRONIS20 is the public one, shown to everyone in the pricing section of
   // Adronis.dc.html and Adronis-full.html — keep the three in sync.
   var PROMO_CODES = {
-    ADRONIS20: { label: "ADRONIS20", percent: 20, note: "20% off every drop, for as long as you stay." },
-    LOCAL10: { label: "LOCAL10", percent: 10, note: "10% off every drop, for as long as you stay." },
-    FIRSTSHOP: { label: "FIRSTSHOP", percent: 25, note: "25% off your first year." }
+    ADRONIS20: { label: "ADRONIS20", percent: 20, note: "20% off every drop, for as long as you stay." }
   };
 
   // ------------------------------------------------------------------- state
@@ -82,16 +82,16 @@
     return cycle === "annual" ? plan.base * (1 - ANNUAL_DISCOUNT) : plan.base;
   }
 
-  // What Stripe would actually charge per invoice: 12 months up front on annual.
+  // What Paddle actually charges per invoice: 12 months up front on annual.
   function invoiceAmount(plan, cycle) {
     return cycle === "annual" ? monthlyRate(plan, cycle) * 12 : monthlyRate(plan, cycle);
   }
 
+  // An estimate for the summary only — Paddle works out the exact tax (and a
+  // business's VAT number, if they give one) in its own checkout.
   function vatRate() {
     var opt = $("co-country").selectedOptions[0];
     var pct = opt ? Number(opt.getAttribute("data-vat")) : 0;
-    // A valid VAT ID in the EU means reverse charge — no VAT on the invoice.
-    if ($("co-vatid").value.trim().length > 3 && state.country !== "RS") return 0;
     return pct / 100;
   }
 
@@ -175,8 +175,6 @@
     }
     if (vat > 0) {
       lines.push({ label: "Incl. VAT (" + Math.round(vatRate() * 100) + "%)", value: euroCents(vat), note: true });
-    } else if ($("co-vatid").value.trim().length > 3) {
-      lines.push({ label: "VAT — reverse charge", value: "€0" });
     }
     if (!state.paidNow) {
       lines.push({ label: "First drop (" + TRIAL_DAYS + "-day trial)", value: "Free", credit: true });
@@ -244,8 +242,6 @@
     state.country = $("co-country").value;
     renderSummary();
   });
-
-  $("co-vatid").addEventListener("input", renderSummary);
 
   $("co-promo-apply").addEventListener("click", function () {
     var code = $("co-promo").value.trim().toUpperCase();
@@ -343,50 +339,12 @@
       notice.style.borderColor = "rgba(240,168,168,.3)";
       notice.style.background = "rgba(240,168,168,.08)";
       notice.style.color = "#f0a8a8";
-      notice.textContent = "We need a billing email before we can hand you to Stripe.";
+      notice.textContent = "We need a billing email before we can hand you to Paddle.";
       $("co-email").focus();
       return;
     }
 
-    // This is the payload the backend session endpoint will receive.
-    var payload = {
-      plan: state.plan,
-      cycle: state.cycle,
-      email: email,
-      country: $("co-country").value,
-      vat_id: $("co-vatid").value.trim() || null,
-      promo_code: state.promo ? state.promo.label : null,
-      trial_days: state.paidNow ? 0 : TRIAL_DAYS,
-      success_url: location.origin + "/checkout.html?state=success&plan=" + state.plan,
-      cancel_url: location.origin + "/checkout.html?state=cancelled&plan=" + state.plan
-    };
-
-    button.disabled = true;
-    button.style.opacity = ".6";
-    button.innerHTML = 'Opening secure payment<span class="mono" style="font-size:13px">…</span>';
-
-    // ---- BACKEND GOES HERE -------------------------------------------------
-    // Stripe collects the card in setup mode — no money moves today, the card
-    // is only stored so the first invoice can be charged when the trial ends.
-    // With trial_days 0 (returning customer) it's a normal subscription
-    // checkout and the first invoice is charged right away.
-    // const res = await fetch("/functions/v1/create-checkout-session", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(payload)
-    // });
-    // const { url } = await res.json();
-    // location.href = url;   // Stripe hosted Checkout
-    // The webhook then calls start_trial() — drop the client-side call below.
-    // ------------------------------------------------------------------------
-
-    console.log("[checkout] payload for create-checkout-session:", payload);
-
-    // Until Stripe is wired, treat reaching this point as "card captured" and
-    // start the trial here. This is the ONLY place a trial ever begins.
-    try {
-      await LBAuth.startTrial(state.plan, state.cycle);
-    } catch (err) {
+    function fail(message) {
       button.disabled = false;
       button.style.opacity = "";
       button.innerHTML = 'Continue to secure payment<span class="mono" style="font-size:13px">→</span>';
@@ -394,13 +352,70 @@
       notice.style.borderColor = "rgba(240,168,168,.3)";
       notice.style.background = "rgba(240,168,168,.08)";
       notice.style.color = "#f0a8a8";
-      notice.textContent = err.message;
+      notice.textContent = message;
+    }
+
+    if (!paddleReady) {
+      fail("Payments couldn't load. Refresh the page and try again.");
       return;
     }
 
-    location.href = "checkout.html?state=success&plan=" + state.plan + "&cycle=" + state.cycle +
-      (state.paidNow ? "&paid=1" : "");
+    button.disabled = true;
+    button.style.opacity = ".6";
+    button.innerHTML = 'Opening secure payment<span class="mono" style="font-size:13px">…</span>';
+    notice.hidden = true;
+
+    // The server picks the price: with a trial (card saved, nothing charged
+    // until the trial ends) only if this account never had one. Paddle's
+    // webhook then starts the trial or subscription — nothing here does.
+    var checkout;
+    try {
+      checkout = await LBAuth.createCheckout(state.plan, state.cycle, state.promo ? state.promo.label : null);
+    } catch (err) {
+      fail(err.message);
+      return;
+    }
+    state.paidNow = !checkout.trial;
+
+    var country = $("co-country").value;
+    var open = {
+      transactionId: checkout.transaction_id,
+      settings: {
+        displayMode: "overlay",
+        variant: "one-page",
+        theme: "dark",
+        successUrl: location.origin + location.pathname + "?state=success&plan=" + state.plan +
+          "&cycle=" + state.cycle + (state.paidNow ? "&paid=1" : "")
+      }
+    };
+    // A returning Paddle customer is already on the transaction.
+    if (!checkout.has_customer) {
+      open.customer = { email: email };
+      if (country !== "OTHER") open.customer.address = { countryCode: country };
+    }
+    Paddle.Checkout.open(open);
   });
+
+  // ------------------------------------------------------------ Paddle.js
+  var paddleReady = false;
+  var paddleCompleted = false;
+  if (window.Paddle && window.LB_PADDLE_CLIENT_TOKEN) {
+    if (window.LB_PADDLE_ENV !== "production") Paddle.Environment.set("sandbox");
+    Paddle.Initialize({
+      token: window.LB_PADDLE_CLIENT_TOKEN,
+      eventCallback: function (event) {
+        if (event.name === "checkout.completed") paddleCompleted = true;
+        // Closed without paying: give the button back.
+        if (event.name === "checkout.closed" && !paddleCompleted) {
+          var button = $("co-submit");
+          button.disabled = false;
+          button.style.opacity = "";
+          button.innerHTML = 'Continue to secure payment<span class="mono" style="font-size:13px">→</span>';
+        }
+      }
+    });
+    paddleReady = true;
+  }
 
   // Skip the card entirely: record the free-plan choice (so login/signup stop
   // steering back to checkout) and go straight into the app.

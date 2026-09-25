@@ -87,6 +87,12 @@ create table if not exists public.profiles (
      rewrite what earlier periods actually billed. */
   billing_history     jsonb not null default '[]'::jsonb,
 
+  /* Paddle links. Written only by the paddle Edge Function (service role). */
+  paddle_customer_id     text,
+  paddle_subscription_id text,
+  paddle_period_start    timestamptz,
+  paddle_updated_at      timestamptz,
+
   /* Proof of what the customer accepted and when. Written once at signup from
      the consent checkbox, and again whenever they accept a newer version. Never
      cleared - it is the evidence that the contract was formed. */
@@ -112,6 +118,21 @@ alter table public.profiles add column if not exists cancel_at_period_end  boole
 alter table public.profiles add column if not exists pending_plan          public.plan_tier;
 alter table public.profiles add column if not exists pending_billing_cycle text;
 alter table public.profiles add column if not exists billing_history       jsonb not null default '[]'::jsonb;
+
+/* --- Migration for Paddle billing ------------------------------------------- */
+/* Paddle is the source of truth for subscriptions. supabase/functions/paddle   */
+/* mirrors every subscription event onto these columns (and the billing ones    */
+/* above) using the service role, so none of them are writable from the browser. */
+/* paddle_period_start: start of the billing period the plan was set for - a    */
+/* plan switch waits in pending_plan until Paddle starts a newer period.        */
+/* paddle_updated_at: the subscription's own updated_at, so an out-of-order     */
+/* webhook never overwrites a newer state.                                      */
+alter table public.profiles add column if not exists paddle_customer_id     text;
+alter table public.profiles add column if not exists paddle_subscription_id text;
+alter table public.profiles add column if not exists paddle_period_start    timestamptz;
+alter table public.profiles add column if not exists paddle_updated_at      timestamptz;
+create unique index if not exists profiles_paddle_subscription_idx
+  on public.profiles (paddle_subscription_id);
 
 /* --- Migration for the "what made you come to us?" answer ------------------- */
 /* Rows created before the question stay null - they were never asked.           */
@@ -364,8 +385,8 @@ update public.profiles p
 /* 8a. delete_my_account - self-serve account deletion. */
 /*     Removes the login itself; profiles, drops and creatives go with it      */
 /*     through their on delete cascade. The account page asks for the         */
-/*     password first. Once Stripe is wired, the subscription must be          */
-/*     cancelled there before this runs. */
+/*     password first. auth.js cancels the Paddle subscription (through the   */
+/*     paddle Edge Function) before this runs. */
 /* ------------------------------------------------------------ */
 create or replace function public.delete_my_account()
 returns void
@@ -466,7 +487,8 @@ begin
 end;
 $$;
 
-grant execute on function public.start_trial(public.plan_tier, text) to authenticated;
+/* Paddle handles this now (supabase/functions/paddle) - the browser may not call it. */
+revoke execute on function public.start_trial(public.plan_tier, text) from public, anon, authenticated;
 
 /* ------------------------------------------------------------ */
 /* 8c. finalize_billing_period - fast-forwards a subscription past any renewal */
@@ -495,7 +517,9 @@ begin
 
   select * into row_out from public.profiles where id = auth.uid();
 
-  if row_out.current_period_end is null
+  /* Paddle subscriptions renew, switch and end through Paddle's own webhooks. */
+  if row_out.paddle_subscription_id is not null
+     or row_out.current_period_end is null
      or row_out.subscription_status not in ('trialing', 'active') then
     return row_out;
   end if;
@@ -580,7 +604,8 @@ begin
 end;
 $$;
 
-grant execute on function public.cancel_at_period_end() to authenticated;
+/* Paddle handles this now (supabase/functions/paddle) - the browser may not call it. */
+revoke execute on function public.cancel_at_period_end() from public, anon, authenticated;
 
 create or replace function public.resume_subscription()
 returns public.profiles
@@ -604,7 +629,8 @@ begin
 end;
 $$;
 
-grant execute on function public.resume_subscription() to authenticated;
+/* Paddle handles this now (supabase/functions/paddle) - the browser may not call it. */
+revoke execute on function public.resume_subscription() from public, anon, authenticated;
 
 /* ------------------------------------------------------------ */
 /* 8e. schedule_plan_change / cancel_plan_change - self-serve plan switching.  */
@@ -659,7 +685,8 @@ begin
 end;
 $$;
 
-grant execute on function public.schedule_plan_change(public.plan_tier, text) to authenticated;
+/* Paddle handles this now (supabase/functions/paddle) - the browser may not call it. */
+revoke execute on function public.schedule_plan_change(public.plan_tier, text) from public, anon, authenticated;
 
 create or replace function public.cancel_plan_change()
 returns public.profiles
@@ -683,7 +710,8 @@ begin
 end;
 $$;
 
-grant execute on function public.cancel_plan_change() to authenticated;
+/* Paddle handles this now (supabase/functions/paddle) - the browser may not call it. */
+revoke execute on function public.cancel_plan_change() from public, anon, authenticated;
 
 /* ------------------------------------------------------------ */
 /* 8f. Free plan - a monthly allowance of creatives for every account without  */
@@ -806,7 +834,11 @@ begin
        or new.cancel_at_period_end
        or new.pending_plan is not null
        or new.pending_billing_cycle is not null
-       or new.billing_history <> '[]'::jsonb then
+       or new.billing_history <> '[]'::jsonb
+       or new.paddle_customer_id is not null
+       or new.paddle_subscription_id is not null
+       or new.paddle_period_start is not null
+       or new.paddle_updated_at is not null then
       raise exception 'Billing details can only be set through checkout.';
     end if;
     /* The row's email is the signed-in account's, whatever the browser sent. */

@@ -156,10 +156,6 @@
         </select>
       </div>
       <div class="field">
-        <label for="co-vatid">VAT ID (OPTIONAL)</label>
-        <input id="co-vatid" type="text" placeholder="For reverse charge, if your business has one" autocomplete="off">
-      </div>
-      <div class="field">
         <label for="co-promo">PROMO CODE</label>
         <div class="co-promo">
           <input id="co-promo" type="text" placeholder="Have a code?" autocomplete="off">
@@ -172,7 +168,7 @@
 
       <div class="co-secure">
         <span class="co-secure-dot"></span>
-        <span>PAYMENT HANDLED BY STRIPE · CARD DETAILS NEVER TOUCH OUR SERVERS</span>
+        <span>PAYMENT HANDLED BY PADDLE · CARD DETAILS NEVER TOUCH OUR SERVERS</span>
       </div>
 
       <div id="co-free" style="margin-top:14px;text-align:center;font-size:13px;color:#7b8089" hidden>
@@ -188,6 +184,7 @@
         You agree that the subscription renews automatically at the amount and date shown in the summary until you cancel,
         that cancelling takes effect at the end of the period you have paid for, and that part-periods are not refunded.
         Prices include VAT where it applies; nothing is added on top of the amount shown.
+        Our order process is conducted by our online reseller Paddle.com, who is the Merchant of Record for all our orders and handles billing, tax and invoices.
         Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.
       </div>
 
@@ -272,6 +269,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script src="paddle-config.js"></script>
 <script>
 // Arriving here straight from the installed app's boot screen (see
 // Adronis.dc.html): keep #lb-boot up until auth state is known, so that

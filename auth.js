@@ -51,6 +51,26 @@
     return profile;
   }
 
+  // Billing goes through the paddle Edge Function (supabase/functions/paddle),
+  // which talks to Paddle with the secret API key. Its errors carry a message
+  // meant for the customer.
+  async function billing(action, body) {
+    if (!session) throw new Error("Not signed in.");
+    var payload = { action: action };
+    Object.keys(body || {}).forEach(function (k) { payload[k] = body[k]; });
+    var res = await db.functions.invoke("paddle", { body: payload });
+    if (res.error) {
+      var message = "Payments are having a problem right now. Please try again in a minute.";
+      try {
+        var detail = await res.error.context.json();
+        if (detail && detail.error) message = detail.error;
+      } catch (e) {}
+      throw new Error(message);
+    }
+    if (res.data && res.data.profile) profile = res.data.profile;
+    return res.data;
+  }
+
   var ready = (async function () {
     var res = await db.auth.getSession();
     session = res.data.session;
@@ -176,18 +196,14 @@
       return saved;
     },
 
-    // Starts the trial. Called by checkout.js once a card is on file — never
-    // anywhere else. The DB function refuses if the brief is missing.
-    startTrial: async function (planKey, cycle) {
-      if (!session) throw new Error("Not signed in.");
-      var res = await db.rpc("start_trial", {
-        p_plan: planKey || null,
-        p_cycle: cycle || "monthly"
-      });
-      if (res.error) throw res.error;
-      await loadProfile();
-      return profile;
+    // Prepares a Paddle checkout: { transaction_id, trial, has_customer }.
+    // The server picks the price (trial only if this account never had one)
+    // and refuses if the brief is missing. The trial or subscription itself
+    // only starts when Paddle's webhook confirms the card.
+    createCheckout: function (planKey, cycle, promoCode) {
+      return billing("checkout", { plan: planKey, cycle: cycle, promo_code: promoCode || null });
     },
+
 
     // meta: business_name, country, city, vertical, website, what_you_sell,
     // typical_customer, differentiator, why_us, brand_vibe, brand_colors,
@@ -299,6 +315,8 @@
     // drops and creatives with it. The caller checks the password first.
     deleteAccount: async function () {
       if (!session) throw new Error("Not signed in.");
+      // Stop Paddle billing first - a deleted account must never be charged.
+      if (profile && profile.paddle_subscription_id) await billing("cancel_now");
       var res = await db.rpc("delete_my_account");
       if (res.error) throw res.error;
       // The session's user no longer exists — drop it locally, ignore the
@@ -308,42 +326,26 @@
       profile = null;
     },
 
-    // Cancels at the end of the current paid period — access continues until
-    // current_period_end, finalize_billing_period() ends it when that arrives.
+    // Cancels at the end of the current paid period in Paddle — access
+    // continues until current_period_end, then Paddle's webhook ends the plan.
     cancelAtPeriodEnd: async function () {
-      if (!session) throw new Error("Not signed in.");
-      var res = await db.rpc("cancel_at_period_end");
-      if (res.error) throw res.error;
-      profile = res.data;
-      return profile;
+      return (await billing("cancel")).profile;
     },
 
     // Undoes a pending cancellation before the period runs out.
     resumeSubscription: async function () {
-      if (!session) throw new Error("Not signed in.");
-      var res = await db.rpc("resume_subscription");
-      if (res.error) throw res.error;
-      profile = res.data;
-      return profile;
+      return (await billing("resume")).profile;
     },
 
-    // Schedules a plan/cycle switch for the next renewal — never applied on
-    // the spot, since this period is already paid for at the old plan.
+    // Switches the plan/cycle from the next renewal — this period is already
+    // paid for at the old plan, so nothing is charged now.
     schedulePlanChange: async function (planKey, cycle) {
-      if (!session) throw new Error("Not signed in.");
-      var res = await db.rpc("schedule_plan_change", { p_plan: planKey, p_cycle: cycle || null });
-      if (res.error) throw res.error;
-      profile = res.data;
-      return profile;
+      return (await billing("change_plan", { plan: planKey, cycle: cycle || null })).profile;
     },
 
     // Undoes a scheduled plan switch before it takes effect.
     cancelPlanChange: async function () {
-      if (!session) throw new Error("Not signed in.");
-      var res = await db.rpc("cancel_plan_change");
-      if (res.error) throw res.error;
-      profile = res.data;
-      return profile;
+      return (await billing("undo_change")).profile;
     }
   };
 })();

@@ -478,8 +478,10 @@ window.LB_I18N_SR = {
     "Have a code?": "Imaš kod?",
     "Apply": "Primeni",
     "Continue to secure payment": "Nastavi na sigurno plaćanje",
-    "PAYMENT HANDLED BY STRIPE · CARD DETAILS NEVER TOUCH OUR SERVERS":
-      "PLAĆANJE VODI STRIPE · PODACI O KARTICI NIKAD NE DOLAZE DO NAŠIH SERVERA",
+    "PAYMENT HANDLED BY PADDLE · CARD DETAILS NEVER TOUCH OUR SERVERS":
+      "PLAĆANJE VODI PADDLE · PODACI O KARTICI NIKAD NE DOLAZE DO NAŠIH SERVERA",
+    "Our order process is conducted by our online reseller Paddle.com, who is the Merchant of Record for all our orders and handles billing, tax and invoices.":
+      "Porudžbinu obrađuje naš online preprodavac Paddle.com, koji je prodavac (Merchant of Record) za sve naše porudžbine i vodi naplatu, porez i račune.",
     "Not ready to add a card?": "Nisi spreman da dodaš karticu?",
     "Start on the Free plan instead →": "Počni na besplatnom planu →",
     "3 ads a month, no card. Upgrade whenever you like.":
@@ -612,8 +614,8 @@ window.LB_I18N_SR = {
     "Date": "Datum",
     "Description": "Opis",
     "Amount": "Iznos",
-    "Amounts are calculated from your plan and billing date, not pulled from a payment processor yet — connect Stripe to replace this with real invoice receipts. All prices include VAT where it applies; the VAT share is shown on the invoice.":
-      "Iznosi se računaju iz tvog plana i datuma naplate, još se ne povlače iz procesora plaćanja — poveži Stripe da ovo zameniš stvarnim računima. Sve cene uključuju PDV tamo gde se plaća; iznos PDV-a se prikazuje na računu.",
+    "Paid amounts are what Paddle, our reseller and Merchant of Record, actually charged; Paddle emails the invoice for each one. All prices include VAT where it applies; the VAT share is shown on the invoice.":
+      "Plaćeni iznosi su ono što je Paddle, naš preprodavac i prodavac (Merchant of Record), stvarno naplatio; Paddle za svaki šalje račun mejlom. Sve cene uključuju PDV tamo gde se plaća; iznos PDV-a se prikazuje na računu.",
     "Your data": "Tvoji podaci",
     "What we hold on this account, and how to get it out or removed.":
       "Šta držimo na ovom nalogu i kako to da izvučeš ili obrišeš.",
@@ -741,8 +743,8 @@ window.LB_I18N_SR = {
       ". Prikazana cena je ukupan iznos koji plaćaš; deo koji otpada na PDV za zemlju koju izabereš prikazuje se na naplati i na računu.",
     "If you supply a valid VAT identification number for an EU business outside our country of establishment, the invoice is issued under the reverse-charge mechanism, shows no VAT and you account for the VAT. The price you pay does not change. You are responsible for the accuracy of the VAT number you enter.":
       "Ako dostaviš važeći PDV identifikacioni broj za biznis iz EU izvan zemlje našeg sedišta, račun se izdaje po mehanizmu obrnutog obračunavanja, bez PDV-a, i PDV obračunavaš ti. Cena koju plaćaš se ne menja. Odgovoran si za tačnost PDV broja koji uneseš.",
-    "Payments are processed by Stripe. Card details are entered on Stripe's systems; we never receive or store full card numbers.":
-      "Plaćanja obrađuje Stripe. Podaci o kartici unose se u Stripe sisteme; mi nikada ne primamo niti čuvamo pune brojeve kartica.",
+    "Our order process is conducted by our online reseller Paddle.com. Paddle.com is the Merchant of Record for all our orders: it takes the payment, issues the invoice and handles VAT, returns and billing questions, under its own buyer terms. Card details are entered on Paddle's systems; we never receive or store full card numbers.":
+      "Porudžbinu obrađuje naš online preprodavac Paddle.com. Paddle.com je prodavac (Merchant of Record) za sve naše porudžbine: naplaćuje, izdaje račun i vodi PDV, povraćaje i pitanja o naplati, po sopstvenim uslovima za kupce. Podaci o kartici unose se u Paddle sisteme; mi nikada ne primamo niti čuvamo pune brojeve kartica.",
     "We may change plan prices on at least 30 days' notice by email. A change takes effect at your next renewal, and you may cancel before that renewal if you do not accept it.":
       "Cene planova možemo menjati uz obaveštenje emailom najmanje 30 dana unapred. Promena stupa na snagu na tvoje sledeće obnavljanje, a ako je ne prihvataš, možeš otkazati pre tog obnavljanja.",
     "6. Free plan and free trial": "6. Besplatni plan i besplatni probni period",
@@ -951,9 +953,9 @@ window.LB_I18N_SR = {
     "Billing data:": "Podaci o naplati:",
     "billing email, country, VAT identification number if you give one, plan, billing cycle, invoice history and payment status.":
       "email za naplatu, država, PDV identifikacioni broj ako ga daš, plan, ciklus naplate, istorija računa i status plaćanja.",
-    "Card numbers are handled entirely by Stripe": "Brojeve kartica u potpunosti obrađuje Stripe",
-    "— they are entered on Stripe's systems and we never receive or store them.":
-      "— unose se u Stripe sisteme i mi ih nikada ne primamo niti čuvamo.",
+    "Card numbers are handled entirely by Paddle": "Brojeve kartica u potpunosti obrađuje Paddle",
+    "— they are entered on Paddle's systems and we never receive or store them.":
+      "— unose se u Paddle sisteme i mi ih nikada ne primamo niti čuvamo.",
     "Product usage:": "Korišćenje proizvoda:",
     "which creatives you approve or kill, when, and the engagement metrics connected platforms report back.":
       "koje kreative odobriš ili odbaciš, kada, i metrike angažovanja koje povezane platforme vraćaju.",
@@ -1002,8 +1004,8 @@ window.LB_I18N_SR = {
       "Lične podatke delimo samo sa provajderima koji nam pomažu da vodimo uslugu, po ugovorima koji ih obavezuju da ih štite i obrađuju isključivo po našim uputstvima:",
     "— database, authentication and file storage for the product.":
       "— baza podataka, autentifikacija i skladištenje fajlova za proizvod.",
-    "— payment processing, subscriptions and invoicing. Stripe acts as an independent controller for payment and fraud-prevention purposes under its own privacy policy.":
-      "— obrada plaćanja, pretplate i izdavanje računa. Stripe nastupa kao samostalan rukovalac za potrebe plaćanja i sprečavanja prevara, po sopstvenoj politici privatnosti.",
+    "— our online reseller and Merchant of Record: payment processing, subscriptions, invoicing and tax. Paddle acts as an independent controller for payment, tax and fraud-prevention purposes under its own privacy policy.":
+      "— naš online preprodavac i prodavac (Merchant of Record): obrada plaćanja, pretplate, izdavanje računa i porez. Paddle nastupa kao samostalan rukovalac za potrebe plaćanja, poreza i sprečavanja prevara, po sopstvenoj politici privatnosti.",
     "— website and application hosting, including request and security logs.":
       "— hosting sajta i aplikacije, uključujući logove zahteva i bezbednosne logove.",
     "Generative model providers": "Provajderi generativnih modela",
@@ -1122,8 +1124,8 @@ window.LB_I18N_SR = {
     "Not signed in.": "Nisi prijavljen.",
     "You need to be signed in to check out.":
       "Moraš biti prijavljen da bi prešao na naplatu.",
-    "We need a billing email before we can hand you to Stripe.":
-      "Treba nam email za naplatu pre nego što te prosledimo Stripe-u.",
+    "We need a billing email before we can hand you to Paddle.":
+      "Treba nam email za naplatu pre nego što te prosledimo Paddle-u.",
     "That code isn't valid — check it and try again.":
       "Taj kod nije važeći — proveri ga i pokušaj ponovo.",
     "ALREADY RUNNING": "VEĆ TEČE",

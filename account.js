@@ -411,7 +411,8 @@
       rows.push({
         date: new Date(entry.period_start),
         desc: p.name + " plan — " + (cyc === "annual" ? "annual" : "monthly") + " billing",
-        amount: invoiceAmount(p, cyc),
+        // Paddle entries carry what was actually charged (promo codes included).
+        amount: typeof entry.amount === "number" ? entry.amount : invoiceAmount(p, cyc),
         tag: (isLast && profile.subscription_status === "past_due") ? "past_due" : "paid"
       });
     });
