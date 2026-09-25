@@ -864,6 +864,10 @@ begin
   editable.onboarded_at     := new.onboarded_at;
   editable.plan             := new.plan;
   editable.updated_at       := new.updated_at;
+  /* The signup brief re-sends the consent line. Accepted here, but the date
+     is stamped by the database below, never taken from the browser. */
+  editable.terms_version     := new.terms_version;
+  editable.terms_accepted_at := new.terms_accepted_at;
 
   if new is distinct from editable then
     raise exception 'Billing details can only be changed through checkout or your account page.';
@@ -879,6 +883,15 @@ begin
 
   if new.next_week_note is distinct from old.next_week_note then
     new.next_week_note_at := now();
+  end if;
+
+  /* Consent evidence is never cleared or backdated: a new version gets
+     today's date, anything else keeps what was already recorded. */
+  if new.terms_version is not null and new.terms_version is distinct from old.terms_version then
+    new.terms_accepted_at := now();
+  else
+    new.terms_version     := old.terms_version;
+    new.terms_accepted_at := old.terms_accepted_at;
   end if;
 
   return new;
