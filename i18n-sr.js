@@ -1202,6 +1202,7 @@ window.LB_I18N_SR = {
     "NOT YET SLOTTED": "JOŠ BEZ TERMINA",
     "Your time": "Tvoje vreme",
     "POSTS": "IZLAZI",
+    "Download image": "Preuzmi sliku",
     "Adronis picks the best time": "Adronis bira najbolje vreme",
     "Change time": "Promeni vreme",
     "Pick a time": "Izaberi vreme",

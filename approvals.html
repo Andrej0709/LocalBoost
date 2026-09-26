@@ -456,6 +456,15 @@
       retime.addEventListener("click", function () { openTimeEditor(creative, card, body); });
       tools.appendChild(retime);
     }
+    // Only what the customer approved leaves the site, same as on their channels.
+    if (creative.image_url && (creative.status === "approved" || creative.status === "published")) {
+      var download = document.createElement("button");
+      download.type = "button";
+      download.className = "link-btn";
+      download.textContent = "Download image";
+      download.addEventListener("click", function () { downloadImage(creative, download); });
+      tools.appendChild(download);
+    }
     if (isEdited(creative)) {
       var mark = document.createElement("span");
       mark.className = "mono edited-mark";
@@ -597,6 +606,39 @@
     Object.assign(creative, res.data);
     renderAll();
     return true;
+  }
+
+  // e.g. adronis-instagram-2026-09-27-baked-at-5am.png
+  function imageFileName(creative, type) {
+    var ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/svg+xml": "svg" }[type] || "png";
+    var slug = function (text) {
+      return String(text || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+    };
+    var day = (creative.published_at || creative.scheduled_at || creative.created_at || new Date().toISOString()).slice(0, 10);
+    return ["adronis", slug(creative.channel), day, slug(creative.headline)].filter(Boolean).join("-") + "." + ext;
+  }
+
+  // The image lives on another host, where a plain download link would just
+  // open it, so it is fetched and saved from here. If the host won't allow
+  // that, the image opens in a new tab to be saved from there.
+  async function downloadImage(creative, button) {
+    button.disabled = true;
+    try {
+      var res = await fetch(creative.image_url, { mode: "cors" });
+      if (!res.ok) throw new Error(res.status);
+      var blob = await res.blob();
+      var link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = imageFileName(creative, blob.type);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+    } catch (e) {
+      window.open(creative.image_url, "_blank", "noopener");
+    }
+    button.disabled = false;
   }
 
   function fmtPostTime(value) {
