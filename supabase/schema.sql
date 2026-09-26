@@ -289,6 +289,58 @@ create table if not exists public.messages (
 );
 
 /* ------------------------------------------------------------ */
+/* 6b. cancellation_feedback - the optional "why are you leaving?" answer */
+/*     from the account page's Cancel subscription step. A customer may add  */
+/*     their own answer, nobody may read them from the browser - read them in */
+/*     the Supabase dashboard. The plan columns are copied from the profile   */
+/*     by the trigger below, never taken from the browser. Deleting the       */
+/*     account keeps the answer but drops who gave it (on delete set null).   */
+/* ------------------------------------------------------------ */
+create table if not exists public.cancellation_feedback (
+  id                  uuid primary key default gen_random_uuid(),
+  user_id             uuid default auth.uid() references public.profiles (id) on delete set null,
+  reason              text,
+  note                text,
+  plan                public.plan_tier,
+  billing_cycle       text,
+  subscription_status public.subscription_status,
+  subscribed_since    timestamptz,
+  created_at          timestamptz not null default now()
+);
+
+do $$ begin
+  alter table public.cancellation_feedback add constraint cancellation_feedback_fields check (
+    (reason is null or reason in ('price', 'quality', 'time', 'results', 'closing', 'other'))
+    and char_length(coalesce(note, '')) <= 1000
+    and (reason is not null or note is not null)
+  );
+exception when duplicate_object then null; end $$;
+
+create or replace function public.fill_cancellation_feedback()
+returns trigger
+language plpgsql
+set search_path = public, pg_temp
+as $$
+begin
+  if current_user not in ('authenticated', 'anon') then
+    return new;
+  end if;
+  new.user_id := auth.uid();
+  new.created_at := now();
+  select p.plan, p.billing_cycle, p.subscription_status, p.trial_started_at
+    into new.plan, new.billing_cycle, new.subscription_status, new.subscribed_since
+    from public.profiles p
+   where p.id = auth.uid();
+  return new;
+end;
+$$;
+
+drop trigger if exists cancellation_feedback_fill on public.cancellation_feedback;
+create trigger cancellation_feedback_fill
+  before insert on public.cancellation_feedback
+  for each row execute function public.fill_cancellation_feedback();
+
+/* ------------------------------------------------------------ */
 /* 7. updated_at trigger */
 /* ------------------------------------------------------------ */
 create or replace function public.set_updated_at()
@@ -1026,6 +1078,7 @@ alter table public.drops            enable row level security;
 alter table public.creatives        enable row level security;
 alter table public.contact_requests enable row level security;
 alter table public.messages         enable row level security;
+alter table public.cancellation_feedback enable row level security;
 
 /* profiles: a user reads and edits only their own row */
 drop policy if exists "profiles select own" on public.profiles;
@@ -1068,6 +1121,11 @@ create policy "contact insert public" on public.contact_requests
 drop policy if exists "messages insert public" on public.messages;
 create policy "messages insert public" on public.messages
   for insert to anon, authenticated with check (status = 'new');
+
+/* cancellation_feedback: a signed-in customer adds their own answer only. */
+drop policy if exists "cancellation feedback insert own" on public.cancellation_feedback;
+create policy "cancellation feedback insert own" on public.cancellation_feedback
+  for insert to authenticated with check (user_id = auth.uid());
 
 /* Size caps on the public forms. Anyone can insert, so without these a script
    could post megabytes per row. Generous for a real person; not valid-checked

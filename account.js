@@ -501,9 +501,38 @@
     var confirmBtn = $("cancel-sub-confirm");
     var notice = $("plan-notice");
 
+    // "Why are you leaving?" - optional, one reason at most, never in the way.
+    var chips = $("leave-chips");
+    var note = $("leave-note");
+    var reason = null;
+    function pickReason(value) {
+      reason = value;
+      Array.prototype.forEach.call(chips.querySelectorAll("button"), function (b) {
+        b.setAttribute("aria-pressed", b.getAttribute("data-reason") === value ? "true" : "false");
+      });
+    }
+    chips.addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-reason]");
+      if (!btn) return;
+      var value = btn.getAttribute("data-reason");
+      pickReason(reason === value ? null : value);
+    });
+
+    // Recorded once the cancellation went through. The database adds the plan
+    // from the profile; a failure here must never get in the customer's way.
+    function sendFeedback() {
+      var text = note.value.trim();
+      if (!reason && !text) return;
+      LBAuth.db.from("cancellation_feedback")
+        .insert({ reason: reason, note: text || null })
+        .then(function () {}, function () {});
+    }
+
     toggle.addEventListener("click", function () {
       until.textContent = fmtDate(periodEndDate(getProfile()));
       notice.hidden = true;
+      pickReason(null);
+      note.value = "";
       panel.hidden = false;
     });
     $("cancel-sub-back").addEventListener("click", function () { panel.hidden = true; });
@@ -512,6 +541,7 @@
       confirmBtn.disabled = true;
       try {
         var updated = await LBAuth.cancelAtPeriodEnd();
+        sendFeedback();
         panel.hidden = true;
         renderBilling(updated);
         renderPayments(updated);
