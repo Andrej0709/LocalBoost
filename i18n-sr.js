@@ -152,8 +152,8 @@ window.LB_I18N_SR = {
     "That link has expired or was already used. Ask for a new one below.":
       "Taj link je istekao ili je već iskorišćen. Zatraži novi ispod.",
     "Choose a new password.": "Izaberi novu lozinku.",
-    "You're signed in from the reset link. Set a new password to finish.":
-      "Prijavljen si preko linka iz mejla. Postavi novu lozinku da završiš.",
+    "Set a new password to get back into your account. If you leave this page without one, you stay logged out.":
+      "Postavi novu lozinku da se vratiš u nalog. Ako napustiš ovu stranicu bez nove lozinke, ostaješ odjavljen.",
     "Save new password": "Sačuvaj novu lozinku",
     "Those two passwords don't match.": "Te dve lozinke se ne poklapaju.",
     "Password changed — taking you to your control room...":

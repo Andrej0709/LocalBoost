@@ -18,31 +18,36 @@
   var cameWithAuthCode = /[?&]code=/.test(location.search);
   var linkError = /(^|[#&?])error_description=/.test(location.hash + location.search);
 
+  // The recovery flag lives in localStorage, next to Supabase's own session,
+  // so it is still there after the tab is closed. The link-error note only
+  // has to survive one hop, so this tab's sessionStorage is enough.
+  function store(key) {
+    return key === RECOVERY_KEY ? window.localStorage : window.sessionStorage;
+  }
   function remember(key, on) {
-    try { on ? sessionStorage.setItem(key, "1") : sessionStorage.removeItem(key); } catch (e) {}
+    try { on ? store(key).setItem(key, "1") : store(key).removeItem(key); } catch (e) {}
   }
   function remembered(key) {
-    try { return sessionStorage.getItem(key) === "1"; } catch (e) { return false; }
+    try { return store(key).getItem(key) === "1"; } catch (e) { return false; }
   }
 
   function onLoginPage() {
     return /\/login\.html$/.test(location.pathname);
   }
 
-  // The "new password" form is only for the page the reset link opened. A
-  // customer who clicks away without setting one stays signed in, and every
-  // later page is ordinary again. Reloading the form keeps it, and so does the
-  // hop from whichever page Supabase landed on to the login page (#reset).
+  // A reset link signs the customer in, but only so they can choose a new
+  // password - it is not a way into the account. The "new password" form
+  // belongs to the page the link opened: reloading it keeps it, and so does
+  // the hop from whichever page Supabase landed on to the login page (#reset).
+  // Any other page load with the flag still set - clicking away, or coming
+  // back after closing the tab - means the reset was abandoned, and that
+  // sign-in is undone below.
   var navigation = (window.performance && performance.getEntriesByType &&
                     performance.getEntriesByType("navigation")[0]) || {};
-  if (!cameFromResetLink && location.hash !== "#reset" && navigation.type !== "reload") {
-    remember(RECOVERY_KEY, false);
-  }
+  var abandonedRecovery = remembered(RECOVERY_KEY) && !cameFromResetLink &&
+    location.hash !== "#reset" && navigation.type !== "reload";
+  if (abandonedRecovery) remember(RECOVERY_KEY, false);
 
-  // A reset link signs the customer in so they can choose a new password.
-  // That happens on the login page, whichever page Supabase sent them to.
-  // The flag lives in this tab only, so nobody gets the "new password" form
-  // without having opened the link.
   function startRecovery() {
     remember(RECOVERY_KEY, true);
     if (onLoginPage()) document.dispatchEvent(new Event("lb:recovery"));
@@ -118,6 +123,11 @@
   var ready = (async function () {
     var res = await db.auth.getSession();
     session = res.data.session;
+
+    if (abandonedRecovery && session) {
+      try { await db.auth.signOut({ scope: "local" }); } catch (e) {}
+      session = null;
+    }
 
     // An expired or already-used link, or one opened in a different browser
     // than the one that asked for it: the login page explains and offers a
@@ -337,7 +347,7 @@
       if (res.error) throw res.error;
     },
 
-    // Signed in through a reset link in this tab, new password not set yet.
+    // Signed in through a reset link, new password not set yet.
     isRecovering: function () {
       return !!session && remembered(RECOVERY_KEY);
     },

@@ -284,7 +284,7 @@
     document.getElementById("auth-forms").hidden = true;
     resetView.hidden = false;
     title.textContent = "Choose a new password.";
-    sub.textContent = "You're signed in from the reset link. Set a new password to finish.";
+    sub.textContent = "Set a new password to get back into your account. If you leave this page without one, you stay logged out.";
     document.getElementById("rp-password").focus();
   }
   document.addEventListener("lb:recovery", function(){ if (LBAuth.isRecovering()) showReset(); });
