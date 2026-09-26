@@ -1200,6 +1200,23 @@ window.LB_I18N_SR = {
     "Nothing is waiting on you here. New free ads show up the moment they're rendered.":
       "Ovde ništa ne čeka na tebe. Novi besplatni oglasi se pojavljuju čim se izrenderuju.",
     "NOT YET SLOTTED": "JOŠ BEZ TERMINA",
+    "Your time": "Tvoje vreme",
+    "Change time": "Promeni vreme",
+    "Pick a time": "Izaberi vreme",
+    "DAY": "DAN",
+    "TIME": "VREME",
+    "Save time": "Sačuvaj vreme",
+    "Let Adronis pick": "Neka Adronis izabere",
+    "Any time from 10 minutes to 90 days from now, in your device's time zone.":
+      "Bilo koje vreme od 10 minuta do 90 dana od sada, po vremenskoj zoni tvog uređaja.",
+    "Pick a day and a time.": "Izaberi dan i vreme.",
+    "Pick a time at least 10 minutes from now.": "Izaberi vreme najmanje 10 minuta od sada.",
+    "Pick a time within the next 90 days.": "Izaberi vreme u narednih 90 dana.",
+    "Couldn't save the new time — try again.": "Novo vreme nije sačuvano — pokušaj ponovo.",
+    "This creative is about to go out - its time can't change now.":
+      "Ovaj oglas upravo izlazi — vreme mu se sada ne može promeniti.",
+    "Only an approved creative that hasn't gone out can be rescheduled.":
+      "Vreme se može promeniti samo odobrenom oglasu koji još nije izašao.",
     "Baked at 5am. Gone by noon.": "Pečeno u 5 ujutru. Nestane do podne.",
 
     /* --- Home page: copy the template runtime holds as data ---------------
@@ -1584,8 +1601,8 @@ window.LB_I18N_SR = {
     "Every ad the engine makes lands in Approvals first. When something is waiting, this number tells you — one click takes you there.":
       "Svaki oglas koji mašina napravi prvo stiže u Odobravanja. Kad nešto čeka, ovaj broj ti to kaže — jedan klik i tamo si.",
     "Your posting calendar": "Tvoj kalendar objava",
-    "Each ad sits on the day and time it posts — blue is scheduled, green is already live. The arrows flip between weeks.":
-      "Svaki oglas stoji na danu i u vreme kada se objavljuje — plavo je zakazano, zeleno je već objavljeno. Strelicama menjaš nedelje.",
+    "Each ad sits on the day and time it posts — blue is scheduled, green is already live. Click a blue one to change when it posts.":
+      "Svaki oglas stoji na danu i u vreme kada se objavljuje — plavo je zakazano, zeleno je već objavljeno. Klikni na plavi da mu promeniš vreme objave.",
     "Make every ad look like you": "Neka svaki oglas liči na tebe",
     "All optional, but everything you add here goes straight into your next drop — your colors, your offers, what sets you apart. Start with the step worth the most.":
       "Ništa nije obavezno, ali sve što ovde dodaš ide pravo u tvoj sledeći drop — tvoje boje, tvoje ponude, ono što te izdvaja. Kreni od koraka koji najviše vredi.",

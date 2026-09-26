@@ -1,5 +1,6 @@
-// Control room — read-only view of what's scheduled and what's already live.
-// Approvals happen on approvals.html; this page only displays the result.
+// Control room — what's scheduled and what's already live. Approvals happen
+// on approvals.html; the one thing changed here is when an approved creative
+// posts (the database checks the same limits as rescheduleProblem below).
 (function () {
   var loading    = document.getElementById("loading");
   var board      = document.getElementById("board");
@@ -26,7 +27,7 @@
 
   function buildRow(creative, opts) {
     var row = document.createElement("div");
-    row.className = "cr-row";
+    row.className = "cr-row" + (opts.action ? " has-action" : "");
 
     if (creative.image_url) {
       var img = new Image();
@@ -55,6 +56,13 @@
     meta.textContent = [creative.channel, creative.format].filter(Boolean).join(" · ");
     main.appendChild(headline);
     main.appendChild(meta);
+    // Its own node, so the Serbian copy can match it whole.
+    if (creative.rescheduled_at && creative.status === "approved") {
+      var mine = document.createElement("div");
+      mine.className = "cr-mine";
+      mine.textContent = "Your time";
+      main.appendChild(mine);
+    }
     row.appendChild(main);
 
     var chip = document.createElement("div");
@@ -62,7 +70,177 @@
     chip.textContent = opts.chipLabel;
     row.appendChild(chip);
 
+    if (opts.action) {
+      var edit = document.createElement("button");
+      edit.type = "button";
+      edit.className = "cr-edit";
+      edit.textContent = opts.action;
+      edit.setAttribute("aria-expanded", editingId === creative.id ? "true" : "false");
+      edit.addEventListener("click", function () {
+        editingId = editingId === creative.id ? null : creative.id;
+        renderScheduled(allCreatives);
+      });
+      row.appendChild(edit);
+    }
+
     return row;
+  }
+
+  // --- Rescheduling an approved creative ---
+  var allCreatives = [];
+  var editingId = null;
+  var LEAD_MS = 10 * 60 * 1000;
+  var LOCK_AFTER_MS = 15 * 60 * 1000;
+  var MAX_AHEAD_MS = 90 * 24 * 60 * 60 * 1000;
+
+  // Sample creatives have no id: nothing to save them to. A slot about to go
+  // out (or going out right now) stays put.
+  function canReschedule(c) {
+    if (!c.id || c.status !== "approved") return false;
+    if (!c.scheduled_at) return true;
+    var until = new Date(c.scheduled_at).getTime() - Date.now();
+    return !(until > -LOCK_AFTER_MS && until < LEAD_MS);
+  }
+
+  // Same wording as the database's own checks, so either one reads the same.
+  function rescheduleProblem(date) {
+    if (isNaN(date.getTime())) return "Pick a day and a time.";
+    if (date.getTime() < Date.now() + LEAD_MS) return "Pick a time at least 10 minutes from now.";
+    if (date.getTime() > Date.now() + MAX_AHEAD_MS) return "Pick a time within the next 90 days.";
+    return null;
+  }
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function dateValue(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function timeValue(d) { return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
+
+  function buildEditor(c) {
+    var form = document.createElement("form");
+    form.className = "cr-editor";
+
+    // No time yet: start from tomorrow morning.
+    var start = c.scheduled_at ? new Date(c.scheduled_at) : (function () {
+      var d = new Date();
+      d.setDate(d.getDate() + 1);
+      d.setHours(10, 0, 0, 0);
+      return d;
+    })();
+
+    var dayLabel = document.createElement("label");
+    dayLabel.appendChild(document.createTextNode("DAY"));
+    var day = document.createElement("input");
+    day.type = "date";
+    day.required = true;
+    day.value = dateValue(start);
+    day.min = dateValue(new Date());
+    day.max = dateValue(new Date(Date.now() + MAX_AHEAD_MS));
+    dayLabel.appendChild(day);
+
+    var timeLabel = document.createElement("label");
+    timeLabel.appendChild(document.createTextNode("TIME"));
+    var time = document.createElement("input");
+    time.type = "time";
+    time.required = true;
+    time.step = 300;
+    time.value = timeValue(start);
+    timeLabel.appendChild(time);
+
+    var row = document.createElement("div");
+    row.className = "cr-editor-row";
+    var save = document.createElement("button");
+    save.type = "submit";
+    save.className = "btn-ghost";
+    save.textContent = "Save time";
+    row.appendChild(save);
+    var cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.className = "eh-plain";
+    cancel.textContent = "Cancel";
+    cancel.addEventListener("click", function () { editingId = null; renderScheduled(allCreatives); });
+    row.appendChild(cancel);
+
+    // Hands the slot back to the engine's own best time.
+    if (c.rescheduled_at) {
+      var auto = document.createElement("button");
+      auto.type = "button";
+      auto.className = "eh-plain cr-auto";
+      auto.textContent = "Let Adronis pick";
+      auto.addEventListener("click", function () { saveTime(c, null, form); });
+      row.appendChild(auto);
+    }
+
+    var hint = document.createElement("p");
+    hint.className = "cr-editor-hint";
+    hint.textContent = "Any time from 10 minutes to 90 days from now, in your device's time zone.";
+
+    var notice = document.createElement("div");
+    notice.className = "notice";
+    notice.setAttribute("role", "status");
+    notice.hidden = true;
+
+    form.appendChild(dayLabel);
+    form.appendChild(timeLabel);
+    form.appendChild(row);
+    form.appendChild(hint);
+    form.appendChild(notice);
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var parts = day.value.split("-").map(Number);
+      var hm = time.value.split(":").map(Number);
+      var when = new Date(parts[0], parts[1] - 1, parts[2], hm[0], hm[1]);
+      var problem = rescheduleProblem(when);
+      if (problem) { showNotice(form, problem); return; }
+      saveTime(c, when, form);
+    });
+    form.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { editingId = null; renderScheduled(allCreatives); }
+    });
+    setTimeout(function () { day.focus(); }, 0);
+    return form;
+  }
+
+  function showNotice(form, message) {
+    var notice = form.querySelector(".notice");
+    notice.hidden = false;
+    notice.textContent = message;
+    notice.style.color = "#f0a8a8";
+  }
+
+  async function saveTime(c, when, form) {
+    var buttons = form.querySelectorAll("button");
+    Array.prototype.forEach.call(buttons, function (b) { b.disabled = true; });
+    var res = await LBAuth.db
+      .from("creatives")
+      .update({ scheduled_at: when ? when.toISOString() : null })
+      .eq("id", c.id)
+      .select()
+      .maybeSingle();
+    if (res.error || !res.data) {
+      Array.prototype.forEach.call(buttons, function (b) { b.disabled = false; });
+      showNotice(form, res.error ? res.error.message : "Couldn't save the new time — try again.");
+      return;
+    }
+    allCreatives = allCreatives.map(function (x) { return x.id === c.id ? res.data : x; });
+    editingId = null;
+    // Show the week the creative now sits in.
+    if (res.data.scheduled_at) calStart = startOfWeek(new Date(res.data.scheduled_at));
+    renderBoard(allCreatives);
+  }
+
+  function renderBoard(creatives) {
+    renderStats(creatives);
+    renderScheduled(creatives);
+    renderLive(creatives);
+    calCreatives = creatives;
+    renderCalendar();
+  }
+
+  function openEditor(c) {
+    editingId = c.id;
+    renderScheduled(allCreatives);
+    var slot = document.querySelector('[data-creative="' + c.id + '"]');
+    if (slot) slot.scrollIntoView({ block: "center", behavior: "smooth" });
   }
 
   function renderScheduled(creatives) {
@@ -87,7 +265,8 @@
       head.textContent = "NOT YET SLOTTED";
       list.appendChild(head);
       unslotted.forEach(function (c) {
-        list.appendChild(buildRow(c, { time: "—", muted: true, chipClass: "slot", chipLabel: "APPROVED" }));
+        list.appendChild(buildSlot(c, { time: "—", muted: true, chipClass: "slot", chipLabel: "APPROVED",
+          action: canReschedule(c) ? "Pick a time" : null }));
       });
     }
 
@@ -101,8 +280,19 @@
         list.appendChild(head);
         lastDay = day;
       }
-      list.appendChild(buildRow(c, { time: fmtTime(c.scheduled_at), chipClass: "slot", chipLabel: "SCHEDULED" }));
+      list.appendChild(buildSlot(c, { time: fmtTime(c.scheduled_at), chipClass: "slot", chipLabel: "SCHEDULED",
+        action: canReschedule(c) ? "Change time" : null }));
     });
+  }
+
+  // A scheduled row, with the time editor under it while it's open.
+  function buildSlot(c, opts) {
+    var slot = document.createElement("div");
+    slot.className = "cr-slot";
+    if (c.id) slot.setAttribute("data-creative", c.id);
+    slot.appendChild(buildRow(c, opts));
+    if (opts.action && editingId === c.id) slot.appendChild(buildEditor(c));
+    return slot;
   }
 
   function renderLive(creatives) {
@@ -192,9 +382,15 @@
         .sort(function (a, b) { return new Date(calendarDate(a)) - new Date(calendarDate(b)); });
 
       items.forEach(function (c) {
-        var item = document.createElement("div");
-        item.className = "cal-item" + (c.status === "published" ? " is-live" : "");
+        var editable = canReschedule(c);
+        // A scheduled item opens its time editor in the list below.
+        var item = document.createElement(editable ? "button" : "div");
+        item.className = "cal-item" + (c.status === "published" ? " is-live" : "") + (editable ? " is-editable" : "");
         item.title = c.headline || "";
+        if (editable) {
+          item.type = "button";
+          item.addEventListener("click", function () { openEditor(c); });
+        }
         if (c.image_url) {
           var img = new Image();
           img.src = c.image_url;
@@ -336,7 +532,7 @@
         body: "Every ad the engine makes lands in Approvals first. When something is waiting, this number tells you — one click takes you there." },
       { target: "#calendar-wrap",
         title: "Your posting calendar",
-        body: "Each ad sits on the day and time it posts — blue is scheduled, green is already live. The arrows flip between weeks." },
+        body: "Each ad sits on the day and time it posts — blue is scheduled, green is already live. Click a blue one to change when it posts." },
       { target: "#engine-help",
         title: "Make every ad look like you",
         body: "All optional, but everything you add here goes straight into your next drop — your colors, your offers, what sets you apart. Start with the step worth the most." }
@@ -626,11 +822,8 @@
       noDrops.hidden = false;
     } else {
       board.hidden = false;
-      renderStats(creatives);
-      renderScheduled(creatives);
-      renderLive(creatives);
-      calCreatives = creatives;
-      renderCalendar();
+      allCreatives = creatives;
+      renderBoard(creatives);
     }
 
     LBTour.replayButton(TOUR);

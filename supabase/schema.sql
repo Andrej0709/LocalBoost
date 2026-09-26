@@ -251,6 +251,13 @@ do $$ begin
   ) not valid;
 exception when duplicate_object then null; end $$;
 
+/* --- Migration for customer-picked posting times ---------------------------- */
+/* rescheduled_at: stamped by protect_creative_fields when the customer moves an */
+/* approved creative to a time of their own. While it is set, the engine keeps   */
+/* scheduled_at as the customer left it instead of picking its own best time.    */
+/* Null means the time (if any) is the engine's.                                  */
+alter table public.creatives add column if not exists rescheduled_at timestamptz;
+
 create index if not exists creatives_drop_idx on public.creatives (drop_id);
 create index if not exists creatives_user_idx on public.creatives (user_id, created_at desc);
 
@@ -907,10 +914,37 @@ begin
   editable.reject_note   := new.reject_note;
   editable.headline      := new.headline;
   editable.caption       := new.caption;
+  editable.scheduled_at  := new.scheduled_at;
   editable.updated_at    := new.updated_at;
 
   if new is distinct from editable then
-    raise exception 'Only a creative''s approval, feedback and text can be changed.';
+    raise exception 'Only a creative''s approval, feedback, text and posting time can be changed.';
+  end if;
+
+  /* The customer may move an approved creative that hasn't gone out, or hand
+     the time back to the engine (null). A slot about to go out (or going out
+     right now) stays put, so the engine is never publishing something whose
+     time just changed under it. */
+  if new.scheduled_at is distinct from old.scheduled_at then
+    if old.status <> 'approved' or new.status <> 'approved' then
+      raise exception 'Only an approved creative that hasn''t gone out can be rescheduled.';
+    end if;
+    if old.scheduled_at is not null
+       and old.scheduled_at > now() - interval '15 minutes'
+       and old.scheduled_at < now() + interval '10 minutes' then
+      raise exception 'This creative is about to go out - its time can''t change now.';
+    end if;
+    if new.scheduled_at is not null then
+      if new.scheduled_at < now() + interval '10 minutes' then
+        raise exception 'Pick a time at least 10 minutes from now.';
+      end if;
+      if new.scheduled_at > now() + interval '90 days' then
+        raise exception 'Pick a time within the next 90 days.';
+      end if;
+      new.rescheduled_at := now();
+    else
+      new.rescheduled_at := null;
+    end if;
   end if;
 
   if new.status is distinct from old.status
