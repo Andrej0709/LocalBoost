@@ -9,6 +9,36 @@
 //   LBAuth.ready.then(function () { if (LBAuth.isLoggedIn()) { ... } });
 
 (function () {
+  // Links from Supabase's emails (password reset, email confirmation) come
+  // back with their result in the URL. Read it before the client below
+  // consumes it and tidies the address bar.
+  var RECOVERY_KEY = "lb-password-recovery";
+  var LINK_ERROR_KEY = "lb-auth-link-error";
+  var cameFromResetLink = /(^|[#&])type=recovery(&|$)/.test(location.hash);
+  var cameWithAuthCode = /[?&]code=/.test(location.search);
+  var linkError = /(^|[#&?])error_description=/.test(location.hash + location.search);
+
+  function remember(key, on) {
+    try { on ? sessionStorage.setItem(key, "1") : sessionStorage.removeItem(key); } catch (e) {}
+  }
+  function remembered(key) {
+    try { return sessionStorage.getItem(key) === "1"; } catch (e) { return false; }
+  }
+
+  function onLoginPage() {
+    return /\/login\.html$/.test(location.pathname);
+  }
+
+  // A reset link signs the customer in so they can choose a new password.
+  // That happens on the login page, whichever page Supabase sent them to.
+  // The flag lives in this tab only, so nobody gets the "new password" form
+  // without having opened the link.
+  function startRecovery() {
+    remember(RECOVERY_KEY, true);
+    if (onLoginPage()) document.dispatchEvent(new Event("lb:recovery"));
+    else location.replace(siteOrigin() + "login.html");
+  }
+
   var db = window.supabase.createClient(
     window.LB_SUPABASE_URL,
     window.LB_SUPABASE_ANON_KEY
@@ -71,9 +101,23 @@
     return res.data;
   }
 
+  // The page is on its way elsewhere: never resolve, so it doesn't render
+  // itself for the split second before it goes.
+  function leaving() { return new Promise(function () {}); }
+
   var ready = (async function () {
     var res = await db.auth.getSession();
     session = res.data.session;
+
+    // An expired or already-used link, or one opened in a different browser
+    // than the one that asked for it: the login page explains and offers a
+    // fresh one.
+    if (linkError || (cameWithAuthCode && !session)) {
+      remember(LINK_ERROR_KEY, true);
+      if (!onLoginPage()) { location.replace(siteOrigin() + "login.html"); return leaving(); }
+    }
+    if (cameFromResetLink && session) { startRecovery(); if (!onLoginPage()) return leaving(); }
+
     await loadProfile();
     ready_ = true;
   })();
@@ -81,6 +125,7 @@
   db.auth.onAuthStateChange(function (_event, newSession) {
     var hadSession = !!session;
     session = newSession;
+    if (_event === "PASSWORD_RECOVERY" && !remembered(RECOVERY_KEY)) startRecovery();
     // Supabase fires this in every open tab, including ones that didn't cause
     // the change. A tab that goes from signed-in to signed-out (logged out in
     // another tab, session expired, etc.) reloads so its page re-runs the
@@ -240,6 +285,7 @@
     },
 
     logOut: async function () {
+      remember(RECOVERY_KEY, false);
       await db.auth.signOut();
       session = null;
       profile = null;
@@ -272,11 +318,36 @@
       return profile;
     },
 
+    // Emails a link that signs the customer in and brings them back to the
+    // login page to choose a new password (see startRecovery above).
     resetPassword: async function (email) {
       var res = await db.auth.resetPasswordForEmail(email, {
         redirectTo: siteOrigin() + "login.html"
       });
       if (res.error) throw res.error;
+    },
+
+    // Signed in through a reset link in this tab, new password not set yet.
+    isRecovering: function () {
+      return !!session && remembered(RECOVERY_KEY);
+    },
+
+    // Sets the new password at the end of a reset. No current password to
+    // check - opening the emailed link is the proof.
+    finishRecovery: async function (newPassword) {
+      if (!this.isRecovering()) throw new Error("This reset link has run out. Ask for a new one.");
+      var res = await db.auth.updateUser({ password: newPassword });
+      if (res.error) throw res.error;
+      remember(RECOVERY_KEY, false);
+      return res.data.user;
+    },
+
+    // True once after an emailed link failed (expired, already used, or
+    // opened in another browser), so the login page can say so.
+    takeLinkError: function () {
+      var had = remembered(LINK_ERROR_KEY);
+      remember(LINK_ERROR_KEY, false);
+      return had;
     },
 
     // Changes the login email. Supabase sends a confirmation link before the

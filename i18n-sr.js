@@ -141,6 +141,25 @@ window.LB_I18N_SR = {
     "Log in — Adronis": "Prijava — Adronis",
     "LOG IN": "PRIJAVA",
     "Log in to Adronis.": "Prijavi se na Adronis.",
+    "Forgot your password?": "Zaboravio si lozinku?",
+    "Reset your password.": "Resetuj lozinku.",
+    "Enter the email you log in with and we'll send you a link to choose a new password.":
+      "Upiši email kojim se prijavljuješ i poslaćemo ti link za novu lozinku.",
+    "Send reset link": "Pošalji link",
+    "Back to log in": "Nazad na prijavu",
+    "If an account uses that email, a reset link is on its way. The link works once.":
+      "Ako postoji nalog sa tim emailom, link za novu lozinku stiže za koji trenutak. Link radi samo jednom.",
+    "That link has expired or was already used. Ask for a new one below.":
+      "Taj link je istekao ili je već iskorišćen. Zatraži novi ispod.",
+    "Choose a new password.": "Izaberi novu lozinku.",
+    "You're signed in from the reset link. Set a new password to finish.":
+      "Prijavljen si preko linka iz mejla. Postavi novu lozinku da završiš.",
+    "Save new password": "Sačuvaj novu lozinku",
+    "Those two passwords don't match.": "Te dve lozinke se ne poklapaju.",
+    "Password changed — taking you to your control room...":
+      "Lozinka je promenjena — vodim te u kontrolnu sobu...",
+    "This reset link has run out. Ask for a new one.":
+      "Ovaj link za novu lozinku više ne važi. Zatraži novi.",
     "Access your control room, or create a quick account to hold your spot.":
       "Uđi u svoju kontrolnu sobu ili brzo napravi nalog da rezervišeš mesto.",
     "Email:": "Email:",
