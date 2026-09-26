@@ -1201,6 +1201,8 @@ window.LB_I18N_SR = {
       "Ovde ništa ne čeka na tebe. Novi besplatni oglasi se pojavljuju čim se izrenderuju.",
     "NOT YET SLOTTED": "JOŠ BEZ TERMINA",
     "Your time": "Tvoje vreme",
+    "POSTS": "IZLAZI",
+    "Adronis picks the best time": "Adronis bira najbolje vreme",
     "Change time": "Promeni vreme",
     "Pick a time": "Izaberi vreme",
     "DAY": "DAN",

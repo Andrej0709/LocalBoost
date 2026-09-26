@@ -51,6 +51,9 @@
 .creative-card.is-rejected .creative-media,.creative-card.is-rejected .headline,.creative-card.is-rejected .caption{opacity:.5}
 .creative-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:2px}
 .edited-mark{font-size:10px;letter-spacing:.1em;color:var(--acc)}
+.post-time{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:2px;font-size:13px;color:#d0d6e0}
+.post-time-label{font-size:10px;letter-spacing:.1em;color:#7b8089}
+.post-time-mine{text-transform:uppercase}
 .link-btn{background:none;border:none;padding:0;color:#9aa0a8;font-size:12.5px;font-family:'Geist',sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .link-btn:hover{color:var(--acc)}
 .creative-editor{display:flex;flex-direction:column;gap:12px}
@@ -217,6 +220,7 @@
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script src="tour.js"></script>
+<script src="reschedule.js"></script>
 <script>
 (function () {
   var loading   = document.getElementById("loading");
@@ -418,8 +422,40 @@
       body.appendChild(caption);
     }
 
+    // When an approved creative posts. Each part is its own node, so the
+    // Serbian copy can match it whole; the date is already in the reader's
+    // language.
+    if (creative.status === "approved") {
+      var when = document.createElement("div");
+      when.className = "post-time";
+      var whenLabel = document.createElement("span");
+      whenLabel.className = "mono post-time-label";
+      whenLabel.textContent = creative.scheduled_at ? "POSTS" : "NOT YET SLOTTED";
+      var whenValue = document.createElement("span");
+      whenValue.textContent = creative.scheduled_at
+        ? fmtPostTime(creative.scheduled_at)
+        : "Adronis picks the best time";
+      when.appendChild(whenLabel);
+      when.appendChild(whenValue);
+      if (creative.rescheduled_at) {
+        var mine = document.createElement("span");
+        mine.className = "mono edited-mark post-time-mine";
+        mine.textContent = "Your time";
+        when.appendChild(mine);
+      }
+      body.appendChild(when);
+    }
+
     var tools = document.createElement("div");
     tools.className = "creative-tools";
+    if (LBReschedule.canReschedule(creative)) {
+      var retime = document.createElement("button");
+      retime.type = "button";
+      retime.className = "link-btn";
+      retime.textContent = creative.scheduled_at ? "Change time" : "Pick a time";
+      retime.addEventListener("click", function () { openTimeEditor(creative, card, body); });
+      tools.appendChild(retime);
+    }
     if (isEdited(creative)) {
       var mark = document.createElement("span");
       mark.className = "mono edited-mark";
@@ -561,6 +597,29 @@
     Object.assign(creative, res.data);
     renderAll();
     return true;
+  }
+
+  function fmtPostTime(value) {
+    var locale = window.LBLang ? LBLang.locale() : "en-US";
+    var d = new Date(value);
+    return d.toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" }) + " · " +
+      d.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" });
+  }
+
+  // Swaps the card's text for the time picker (reschedule.js) until it's
+  // saved or cancelled.
+  function openTimeEditor(creative, card, body) {
+    body.innerHTML = "";
+    body.appendChild(LBReschedule.form(creative, {
+      onCancel: renderAll,
+      onSave: async function (when) {
+        var at = when ? when.toISOString() : null;
+        // The sample drop saves nothing; mirror what the database stamps.
+        if (demoMode) creative.rescheduled_at = at ? new Date().toISOString() : null;
+        var ok = await saveCreative(creative, { scheduled_at: at }, card);
+        return ok ? null : "Couldn't save the new time — try again.";
+      }
+    }));
   }
 
   function isEdited(creative) {
