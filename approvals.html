@@ -51,6 +51,7 @@
 .creative-card.is-rejected .creative-media,.creative-card.is-rejected .headline,.creative-card.is-rejected .caption{opacity:.5}
 .creative-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:2px}
 .edited-mark{font-size:10px;letter-spacing:.1em;color:var(--acc)}
+.dropbar-link{align-self:center;padding:9px 6px;font-size:13px;white-space:nowrap}
 .post-time{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:2px;font-size:13px;color:#d0d6e0}
 .post-time-label{font-size:10px;letter-spacing:.1em;color:#7b8089}
 .post-time-mine{text-transform:uppercase}
@@ -275,11 +276,18 @@
     });
   }
 
+  // The last few weeks only (plus the one open, if it's older), so the bar
+  // doesn't grow with every week the account has had. Everything older is
+  // on history.html, which links back here with ?drop=.
+  var DROPBAR_WEEKS = 4;
+
   function renderDropbar() {
     dropbar.innerHTML = "";
     if (drops.length < 2) return;
 
-    drops.forEach(function (drop) {
+    drops.filter(function (drop, i) {
+      return i < DROPBAR_WEEKS || drop.id === currentDrop;
+    }).forEach(function (drop) {
       var button = document.createElement("button");
       button.textContent = "Week of " + fmtWeek(drop.week_starting);
       if (drop.id === currentDrop) button.classList.add("active");
@@ -300,6 +308,29 @@
       renderAll();
     });
     dropbar.appendChild(all);
+
+    if (!demoMode) {
+      var past = document.createElement("a");
+      past.href = "history.html";
+      past.className = "dropbar-link";
+      past.textContent = "Past drops →";
+      dropbar.appendChild(past);
+    }
+  }
+
+  // history.html opens a given week: ?drop=<id>&filter=all.
+  function applyLinkedView() {
+    var params = new URLSearchParams(location.search);
+    var wantDrop = params.get("drop");
+    if (wantDrop && drops.some(function (d) { return d.id === wantDrop; })) currentDrop = wantDrop;
+    var wantFilter = params.get("filter");
+    var button = wantFilter && filterbar.querySelector('button[data-filter="' + wantFilter + '"]');
+    if (button) {
+      currentFilter = wantFilter;
+      Array.prototype.forEach.call(filterbar.querySelectorAll("button"), function (other) {
+        other.classList.toggle("active", other === button);
+      });
+    }
   }
 
   function renderHeader() {
@@ -1214,6 +1245,7 @@
       noDrops.hidden = false;
     } else {
       currentDrop = drops.length ? drops[0].id : "all";
+      applyLinkedView();
       board.hidden = false;
       renderAll();
     }

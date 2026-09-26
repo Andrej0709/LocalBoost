@@ -173,6 +173,41 @@ window.LB_I18N_SR = {
     "Pulled straight from your account — every approved creative and when it posts, every creative that's already out.":
       "Povučeno direktno sa tvog naloga — svaki odobreni kreativ i kad izlazi, i svaki koji je već napolju.",
     "Log in to see your control room.": "Prijavi se da vidiš svoju kontrolnu sobu.",
+
+    /* --- Past drops (history.html) ---------------------------------------- */
+    "Past drops — Adronis": "Prethodni dropovi — Adronis",
+    "PAST DROPS": "PRETHODNI DROPOVI",
+    "Every week,": "Svaka nedelja,",
+    "on the record": "zabeležena",
+    "What each drop held, what you kept, what went out — and why the rest didn't make it.":
+      "Šta je bilo u svakom dropu, šta si zadržao, šta je izašlo — i zašto ostalo nije prošlo.",
+    "Log in to see your past drops.": "Prijavi se da vidiš prethodne dropove.",
+    "Your drops are tied to your account — sign in and every week loads here.":
+      "Dropovi su vezani za tvoj nalog — prijavi se i ovde se učitava svaka nedelja.",
+    "LOADING YOUR DROPS": "UČITAVAM TVOJE DROPOVE",
+    "NO DROPS YET": "JOŠ NEMA DROPOVA",
+    "Nothing here yet.": "Ovde još nema ničega.",
+    "Once your first drop lands, every week is kept here — what you approved, what went live and what you turned down.":
+      "Čim stigne tvoj prvi drop, svaka nedelja se čuva ovde — šta si odobrio, šta je izašlo i šta si odbio.",
+    "Go to approvals": "Idi na odobravanja",
+    "Couldn't load your drops.": "Nismo uspeli da učitamo tvoje dropove.",
+    "WEEKS": "NEDELJE",
+    "ADS APPROVED": "ODOBRENIH OGLASA",
+    "WENT LIVE": "OBJAVLJENO",
+    "TURNED DOWN": "ODBIJENO",
+    "WEEK BY WEEK": "NEDELJU PO NEDELJU",
+    "Show older weeks": "Prikaži starije nedelje",
+    "SKIPPED": "PRESKOČENO",
+    "RENDERING": "U IZRADI",
+    "LATEST": "NAJNOVIJI",
+    "No drop this week.": "Ove nedelje nije bilo dropa.",
+    "No ads in this drop yet.": "U ovom dropu još nema oglasa.",
+    "ADS": "OGLASI",
+    "WHY YOU REJECTED": "ZAŠTO SI ODBIO",
+    "Open this week →": "Otvori ovu nedelju →",
+    "Most common reason you turned an ad down:": "Najčešći razlog zbog kog si odbio oglas:",
+    "Past drops →": "Prethodni dropovi →",
+    "Every past week, with what you kept and why →": "Sve prethodne nedelje, šta si zadržao i zašto →",
     "Your schedule is tied to your account — sign in and it loads here.":
       "Tvoj raspored je vezan za nalog — prijavi se i učitaće se ovde.",
     "LOADING YOUR CONTROL ROOM": "UČITAVAM TVOJU KONTROLNU SOBU",
