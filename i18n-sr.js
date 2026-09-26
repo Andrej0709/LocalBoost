@@ -615,6 +615,7 @@ window.LB_I18N_SR = {
     "At least 8 characters": "Najmanje 8 znakova",
     "Type it again": "Unesi je ponovo",
     "Update password": "Sačuvaj lozinku",
+    "Forgot it? Email me a reset link": "Zaboravio si je? Pošalji mi link za novu",
     "Cancel": "Otkaži",
     "Connected channels": "Povezani kanali",
     "The channels your weekly drop publishes to. Untick anything you don't want creatives rendered for.":
@@ -1602,6 +1603,8 @@ window.LB_I18N_SR = {
      through the dictionary above before it is put back, so a word like
      "monthly" is translated while a date or a plan name passes through. */
   patterns: [
+    [/^Reset link sent to (.+?)\. Open it to choose a new password\.$/,
+      "Link za novu lozinku je poslat na $1. Otvori ga da izabereš novu lozinku."],
     [/^(\d+) OF (\d+) ADDED$/, "DODATO: $1 OD $2"],
     [/^Out of date — last changed (.+?)\. A fresh note keeps next week's ads current\.$/,
       "Zastarelo — poslednja izmena $1. Sveža beleška drži oglase za sledeću nedelju aktuelnim."],

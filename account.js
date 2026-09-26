@@ -89,6 +89,19 @@
       setPasswordOpen(false);
     });
 
+    // No current password to type: the reset email is the way back in.
+    $("password-forgot").addEventListener("click", async function () {
+      var button = this;
+      button.disabled = true;
+      try {
+        await LBAuth.resetPassword(LBAuth.getUser().email);
+        say(passwordNotice, "Reset link sent to " + LBAuth.getUser().email + ". Open it to choose a new password.");
+      } catch (err) {
+        say(passwordNotice, err.message, true);
+      }
+      button.disabled = false;
+    });
+
     passwordForm.addEventListener("submit", async function (e) {
       e.preventDefault();
       var button = e.target.querySelector("button[type=submit]");

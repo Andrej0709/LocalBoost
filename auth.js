@@ -29,6 +29,16 @@
     return /\/login\.html$/.test(location.pathname);
   }
 
+  // The "new password" form is only for the page the reset link opened. A
+  // customer who clicks away without setting one stays signed in, and every
+  // later page is ordinary again. Reloading the form keeps it, and so does the
+  // hop from whichever page Supabase landed on to the login page (#reset).
+  var navigation = (window.performance && performance.getEntriesByType &&
+                    performance.getEntriesByType("navigation")[0]) || {};
+  if (!cameFromResetLink && location.hash !== "#reset" && navigation.type !== "reload") {
+    remember(RECOVERY_KEY, false);
+  }
+
   // A reset link signs the customer in so they can choose a new password.
   // That happens on the login page, whichever page Supabase sent them to.
   // The flag lives in this tab only, so nobody gets the "new password" form
@@ -36,7 +46,7 @@
   function startRecovery() {
     remember(RECOVERY_KEY, true);
     if (onLoginPage()) document.dispatchEvent(new Event("lb:recovery"));
-    else location.replace(siteOrigin() + "login.html");
+    else location.replace(siteOrigin() + "login.html#reset");
   }
 
   var db = window.supabase.createClient(
