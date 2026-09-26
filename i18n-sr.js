@@ -1523,7 +1523,39 @@ window.LB_I18N_SR = {
       "Prijava traje oko deset minuta. Bez ugovora, bez sastanka, otkazuješ kad hoćeš.",
     "The Free plan needs no card.": "Za besplatni plan ne treba kartica.",
     "Ready-made ads every week for businesses with no time for marketing.":
-      "Gotovi oglasi svake nedelje za biznise koji nemaju vremena za marketing."
+      "Gotovi oglasi svake nedelje za biznise koji nemaju vremena za marketing.",
+
+    /* --- First-visit guided tours (tour.js) ------------------------------ */
+    "SHOW ME AROUND": "PROVEDI ME KROZ STRANICU",
+    "Show me around": "Kreni u obilazak",
+    "WELCOME": "DOBRODOŠLICA",
+    "Welcome,": "Dobro došli,",
+    "Welcome to your": "Dobro došli u svoju",
+    "control room": "kontrolnu sobu",
+    "Skip tour": "Preskoči",
+    "Back": "Nazad",
+    "Next": "Dalje",
+    "Done": "Gotovo",
+    "Four quick stops: what's going out, what's already live, what's waiting on you, and how to make every ad more yours.":
+      "Četiri kratka koraka: šta izlazi, šta je već objavljeno, šta čeka tebe i kako da svaki oglas bude više tvoj.",
+    "Your week at a glance": "Tvoja nedelja na prvi pogled",
+    "How many ads are scheduled to post, how many are already out, and how many are waiting for your yes.":
+      "Koliko oglasa je zakazano za objavu, koliko ih je već izašlo i koliko čeka tvoje odobrenje.",
+    "Nothing goes out without you": "Ništa ne izlazi bez tebe",
+    "Every ad the engine makes lands in Approvals first. When something is waiting, this number tells you — one click takes you there.":
+      "Svaki oglas koji mašina napravi prvo stiže u Odobravanja. Kad nešto čeka, ovaj broj ti to kaže — jedan klik i tamo si.",
+    "Your posting calendar": "Tvoj kalendar objava",
+    "Each ad sits on the day and time it posts — blue is scheduled, green is already live. The arrows flip between weeks.":
+      "Svaki oglas stoji na danu i u vreme kada se objavljuje — plavo je zakazano, zeleno je već objavljeno. Strelicama menjaš nedelje.",
+    "Make every ad look like you": "Neka svaki oglas liči na tebe",
+    "All optional, but everything you add here goes straight into your next drop — your colors, your offers, what sets you apart. Start with the step worth the most.":
+      "Ništa nije obavezno, ali sve što ovde dodaš ide pravo u tvoj sledeći drop — tvoje boje, tvoje ponude, ono što te izdvaja. Kreni od koraka koji najviše vredi.",
+    "Approve or reject": "Odobri ili odbaci",
+    "Every ad waits here for your yes. Approve it and it gets a posting slot; reject it and say why, so next week's drop gets it right. You can also edit the text first.":
+      "Svaki oglas ovde čeka tvoje odobrenje. Odobri ga i dobija termin za objavu; odbaci ga i reci zašto, da sledeći drop bude pogođen. Tekst možeš i da izmeniš pre toga.",
+    "Keep track of every ad": "Prati svaki oglas",
+    "Switch between what's waiting, what you approved and what you rejected. Only approved ads are ever published.":
+      "Prebacuj između onoga što čeka, što si odobrio i što si odbacio. Objavljuju se samo odobreni oglasi."
 
   },
 

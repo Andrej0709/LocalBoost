@@ -169,6 +169,16 @@ do $$ begin
     check (char_length(coalesce(next_week_note, '')) <= 1000);
 exception when duplicate_object then null; end $$;
 
+/* --- Migration for the first-visit guided tours (tour.js) ------------------- */
+/* The ids of the tours this customer has already been shown, e.g.               */
+/* {control_room, approvals}, so a tour never repeats on another device.         */
+alter table public.profiles add column if not exists tours_seen text[] not null default '{}';
+
+do $$ begin
+  alter table public.profiles add constraint profiles_tours_seen_size
+    check (cardinality(tours_seen) <= 20);
+exception when duplicate_object then null; end $$;
+
 /* Existing paying accounts predate current_period_end - seed it from the trial
    date they already have so finalize_billing_period() has an anchor to work from. */
 update public.profiles
@@ -833,6 +843,7 @@ begin
   editable.avoid_notes      := new.avoid_notes;
   editable.channels         := new.channels;
   editable.next_week_note   := new.next_week_note;
+  editable.tours_seen       := new.tours_seen;
   editable.onboarded_at     := new.onboarded_at;
   editable.plan             := new.plan;
   editable.updated_at       := new.updated_at;

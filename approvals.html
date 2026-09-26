@@ -216,6 +216,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
+<script src="tour.js"></script>
 <script>
 (function () {
   var loading   = document.getElementById("loading");
@@ -233,6 +234,8 @@
   var currentDrop = null; // a drop id, or "all"
   var currentFilter = "pending";
   var demoMode = false;
+  // Read before i18n.js translates it, so the tour can put the English back.
+  var pageSubEn = document.getElementById("page-sub").textContent;
 
   // Arriving here straight from the installed app's boot screen (see
   // Adronis.dc.html): #lb-boot keeps covering the page so that screen reads
@@ -996,6 +999,45 @@
   }
   document.getElementById("demo-btn").addEventListener("click", loadDemo);
 
+  // --- First-visit tour (tour.js) ---
+  // It needs a creative waiting on approval to point at. Without one, the
+  // sample drop stands in for the tour and the real page comes back after.
+  var tourSaved = null;
+  var TOUR = {
+    id: "approvals",
+    setup: function () {
+      if (currentFilter !== "pending") filterbar.querySelector('[data-filter="pending"]').click();
+      if (!board.hidden && grid.querySelector(".creative-card.is-pending")) return;
+      tourSaved = {
+        drops: drops, creatives: creatives, currentDrop: currentDrop, demoMode: demoMode,
+        boardHidden: board.hidden, noDropsHidden: noDrops.hidden
+      };
+      loadDemo();
+    },
+    teardown: function () {
+      if (!tourSaved) return;
+      var s = tourSaved;
+      tourSaved = null;
+      drops = s.drops;
+      creatives = s.creatives;
+      currentDrop = s.currentDrop;
+      demoMode = s.demoMode;
+      focusIndex = -1;
+      board.hidden = s.boardHidden;
+      noDrops.hidden = s.noDropsHidden;
+      document.getElementById("page-sub").textContent = pageSubEn;
+      renderAll();
+    },
+    steps: [
+      { target: function () { return grid.querySelector(".creative-card.is-pending"); }, align: "end",
+        title: "Approve or reject",
+        body: "Every ad waits here for your yes. Approve it and it gets a posting slot; reject it and say why, so next week's drop gets it right. You can also edit the text first." },
+      { target: "#filterbar",
+        title: "Keep track of every ad",
+        body: "Switch between what's waiting, what you approved and what you rejected. Only approved ads are ever published." }
+    ]
+  };
+
   // Free plan: no weekly drop, just a monthly allowance — say where it
   // stands instead of promising a Monday batch that isn't coming.
   async function showFreeStrip() {
@@ -1069,12 +1111,14 @@
 
     if (!creatives.length) {
       noDrops.hidden = false;
-      return;
+    } else {
+      currentDrop = drops.length ? drops[0].id : "all";
+      board.hidden = false;
+      renderAll();
     }
 
-    currentDrop = drops.length ? drops[0].id : "all";
-    board.hidden = false;
-    renderAll();
+    LBTour.replayButton(TOUR);
+    LBTour.auto(TOUR);
   });
 })();
 </script>

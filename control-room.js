@@ -289,7 +289,7 @@
     });
   }
 
-  document.getElementById("sample-btn").addEventListener("click", function () {
+  function showSample() {
     var creatives = sampleCreatives();
     noDrops.hidden = true;
     board.hidden = false;
@@ -300,7 +300,48 @@
     calStart = startOfWeek(new Date());
     calCreatives = creatives;
     renderCalendar();
-  });
+  }
+
+  document.getElementById("sample-btn").addEventListener("click", showSample);
+
+  // --- First-visit tour (tour.js) ---
+  // A new account has nothing scheduled yet, so the tour borrows the sample
+  // week to have something to point at, and puts the empty page back after.
+  var tourSample = false;
+  var TOUR = {
+    id: "control_room",
+    setup: function () {
+      tourSample = board.hidden;
+      if (tourSample) showSample();
+    },
+    teardown: function () {
+      if (!tourSample) return;
+      tourSample = false;
+      board.hidden = true;
+      document.getElementById("sample-notice").hidden = true;
+      noDrops.hidden = false;
+    },
+    steps: [
+      { welcome: true, next: "Show me around",
+        title: function () {
+          var name = (LBAuth.getProfile() || {}).business_name;
+          return name ? ["Welcome, ", { em: name }, "."] : ["Welcome to your ", { em: "control room" }, "."];
+        },
+        body: "Four quick stops: what's going out, what's already live, what's waiting on you, and how to make every ad more yours." },
+      { target: ".cr-stats",
+        title: "Your week at a glance",
+        body: "How many ads are scheduled to post, how many are already out, and how many are waiting for your yes." },
+      { target: function () { return document.querySelectorAll(".cr-stat")[2]; },
+        title: "Nothing goes out without you",
+        body: "Every ad the engine makes lands in Approvals first. When something is waiting, this number tells you — one click takes you there." },
+      { target: "#calendar-wrap",
+        title: "Your posting calendar",
+        body: "Each ad sits on the day and time it posts — blue is scheduled, green is already live. The arrows flip between weeks." },
+      { target: "#engine-help",
+        title: "Make every ad look like you",
+        body: "All optional, but everything you add here goes straight into your next drop — your colors, your offers, what sets you apart. Start with the step worth the most." }
+    ]
+  };
 
   // --- Profile strength: things the customer can tell the engine ---
   // None of them gate anything. Each one is a profile column the customer may
@@ -583,14 +624,16 @@
     var creatives = res.data || [];
     if (!creatives.length) {
       noDrops.hidden = false;
-      return;
+    } else {
+      board.hidden = false;
+      renderStats(creatives);
+      renderScheduled(creatives);
+      renderLive(creatives);
+      calCreatives = creatives;
+      renderCalendar();
     }
 
-    board.hidden = false;
-    renderStats(creatives);
-    renderScheduled(creatives);
-    renderLive(creatives);
-    calCreatives = creatives;
-    renderCalendar();
+    LBTour.replayButton(TOUR);
+    LBTour.auto(TOUR);
   });
 })();
