@@ -227,6 +227,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
+<script src="brief-fields.js"></script>
 <script>
 (function(){
   // Bump this whenever terms.html / privacy.html change materially, so the
@@ -369,130 +370,22 @@
     notice.textContent = message;
   }
 
-  // BUSINESS TYPE: picking "Other" opens a free-text box, and whatever the
-  // customer types there is the business type we store.
-  var verticalSelect = document.getElementById("vertical");
-  var verticalOtherField = document.getElementById("field-vertical-other");
-  var verticalOther = document.getElementById("vertical-other");
-
-  function syncVerticalOther(){
-    var isOther = verticalSelect.value === "Other";
-    verticalOtherField.hidden = !isOther;
-    verticalOther.required = isOther;
-    if (!isOther) verticalOther.value = "";
-  }
-  verticalSelect.addEventListener("change", syncVerticalOther);
-  syncVerticalOther();
-
-  function verticalValue(){
-    if (verticalSelect.value !== "Other") return verticalSelect.value;
-    return verticalOther.value.trim() || "Other";
-  }
-
-  // A saved business type that isn't one of the listed options came from the
-  // "Other" box, so put it back there.
-  function setVertical(value){
-    var listed = Array.prototype.some.call(verticalSelect.options, function(opt){
-      return opt.value === value && opt.value !== "Other";
-    });
-    if (listed) {
-      verticalSelect.value = value;
-    } else {
-      verticalSelect.value = "Other";
-      verticalOther.value = value === "Other" ? "" : value;
-    }
-    syncVerticalOther();
-  }
-
-  // COUNTRY and CITY. Every country is listed under its name in the reader's
-  // language, but the option's value is the English name, so the database
-  // keeps one spelling per country. Picking a country loads its towns from
-  // cities/<code>.json as suggestions for the CITY box — the customer can
-  // still type a place that isn't on the list.
-  var COUNTRY_CODES = ("AD AE AF AG AI AL AM AO AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BW BY BZ " +
-    "CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR " +
-    "GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HN HR HT HU ID IE IL IM IN IQ IR IS IT JE JM JO JP " +
-    "KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS " +
-    "MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS " +
-    "RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW " +
-    "TZ UA UG US UY UZ VA VC VE VG VI VN VU WF WS XK YE YT ZA ZM ZW").split(" ");
+  // BUSINESS TYPE and COUNTRY / CITY behave the same here and on the account
+  // page, so both live in brief-fields.js.
+  var verticalField = LBBriefFields.verticalField(
+    document.getElementById("vertical"),
+    document.getElementById("field-vertical-other"),
+    document.getElementById("vertical-other")
+  );
+  function verticalValue(){ return verticalField.value(); }
+  function setVertical(value){ verticalField.set(value); }
 
   var countrySelect = document.getElementById("country");
-  var cityOptions = document.getElementById("city-options");
-
-  function regionNames(locale){
-    try { return new Intl.DisplayNames([locale], { type: "region" }); }
-    catch (e) { return { of: function(code){ return code; } }; }
-  }
-  var englishNames = regionNames("en");
-
-  function uiLocale(){
-    return window.LBLang ? LBLang.locale() : "en-US";
-  }
-
-  function fillCountries(){
-    var local = regionNames(uiLocale());
-    var picked = countrySelect.value;
-    var rows = COUNTRY_CODES.map(function(code){
-      return { code: code, value: englishNames.of(code), label: local.of(code) };
-    });
-    rows.sort(function(a, b){ return a.label.localeCompare(b.label, uiLocale()); });
-    while (countrySelect.options.length > 1) countrySelect.remove(1);
-    rows.forEach(function(row){
-      var opt = new Option(row.label, row.value);
-      opt.dataset.code = row.code;
-      countrySelect.add(opt);
-    });
-    countrySelect.value = picked;
-  }
-
-  function countryCode(){
-    var opt = countrySelect.selectedOptions[0];
-    return opt && opt.dataset.code || "";
-  }
-
-  var cityCache = {};
-  function loadCities(){
-    var code = countryCode();
-    cityOptions.innerHTML = "";
-    if (!code) return;
-    var pending = cityCache[code] || (cityCache[code] = fetch("cities/" + code + ".json")
-      .then(function(res){ return res.ok ? res.json() : []; })
-      .catch(function(){ delete cityCache[code]; return []; }));
-    pending.then(function(names){
-      if (countryCode() !== code) return; // the customer moved on
-      var frag = document.createDocumentFragment();
-      names.forEach(function(name){
-        var opt = document.createElement("option");
-        opt.value = name;
-        frag.appendChild(opt);
-      });
-      cityOptions.innerHTML = "";
-      cityOptions.appendChild(frag);
-    });
-  }
-
-  // A saved country is stored by its English name.
-  function setCountry(value){
-    countrySelect.value = value;
-    if (countrySelect.value !== value) countrySelect.value = "";
-    loadCities();
-  }
+  var countryField = LBBriefFields.countryField(countrySelect, document.getElementById("city-options"));
+  function setCountry(value){ countryField.set(value); }
 
   // Start on the country the browser says the reader is in, if it says.
-  function guessCountry(){
-    var langs = navigator.languages || [navigator.language || ""];
-    for (var i = 0; i < langs.length; i++) {
-      var m = /-([A-Z]{2})$/i.exec(langs[i] || "");
-      if (m && COUNTRY_CODES.indexOf(m[1].toUpperCase()) > -1) return englishNames.of(m[1].toUpperCase());
-    }
-    return "";
-  }
-
-  fillCountries();
-  setCountry(guessCountry());
-  countrySelect.addEventListener("change", loadCities);
-  document.addEventListener("lb:langchange", fillCountries);
+  setCountry(LBBriefFields.guessCountry());
 
   function checkedChannels(){
     return Array.prototype.map.call(

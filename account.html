@@ -7,7 +7,7 @@
 <link rel="manifest" href="site.webmanifest">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Account — Adronis</title>
-<meta name="description" content="Manage your login, connected channels and billing for your Adronis account.">
+<meta name="description" content="Manage your business details, login, connected channels and billing for your Adronis account.">
 <link rel="canonical" href="https://adronis.app/account.html">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#07080a">
@@ -49,7 +49,12 @@
 .acc-table td{padding:12px 0;border-top:1px solid #1b1e22;color:#d0d6e0;vertical-align:middle}
 .acc-table td:last-child,.acc-table th:last-child{text-align:right}
 .acc-table-wrap{overflow-x:auto}
+.acc-link-btn{background:none;border:none;padding:10px 8px;margin:-10px -8px;font-size:12.5px;color:#9aa0a8;cursor:pointer;font-family:'Geist',sans-serif;transition:color .2s ease}
+.acc-link-btn:hover{color:#fff}
+#biz-rows .acc-row-value{max-width:60%;overflow-wrap:anywhere}
 @media (max-width:640px){
+  #biz-rows .acc-row-value{max-width:none}
+  #biz-form .field-pair{grid-template-columns:1fr !important}
   .acc-row{flex-direction:column;align-items:flex-start;gap:4px}
   .acc-row-value{text-align:left}
 }
@@ -72,7 +77,7 @@
   <div class="page-hero-watermark" aria-hidden="true">ACCOUNT</div>
   <div class="eyebrow">YOUR ACCOUNT</div>
   <h1 id="page-title">Account settings.</h1>
-  <p id="page-sub">Your login, your connected channels, and every drop you've been billed for — all in one place.</p>
+  <p id="page-sub">Your business details, your login, your connected channels, and every drop you've been billed for — all in one place.</p>
 </header>
 
 <section class="section-tight">
@@ -109,6 +114,97 @@
           <div class="acc-row-value" style="text-align:left;color:#8a8f98;font-size:13.5px" id="acc-email-display">—</div>
           <button type="button" id="logout-btn" class="acc-logout">Log out</button>
         </div>
+      </div>
+
+      <!-- The business brief from signup: what every drop is rendered from -->
+      <div class="card" id="business-card">
+        <div class="acc-head">
+          <h3 class="acc-card-title" style="margin-bottom:0">Your business</h3>
+          <button type="button" id="biz-edit-btn" class="acc-link-btn">Edit →</button>
+        </div>
+        <p class="acc-card-sub">What the engine builds every drop from. Keep it current when something changes.</p>
+
+        <div id="biz-rows">
+          <div class="acc-row"><div class="acc-row-label">Business name</div><div class="acc-row-value" id="biz-name">—</div></div>
+          <div class="acc-row"><div class="acc-row-label">Location</div><div class="acc-row-value" id="biz-location">—</div></div>
+          <div class="acc-row"><div class="acc-row-label">Business type</div><div class="acc-row-value" id="biz-vertical">—</div></div>
+          <div class="acc-row"><div class="acc-row-label">Website or Instagram</div><div class="acc-row-value" id="biz-website">—</div></div>
+          <div class="acc-row"><div class="acc-row-label">What you sell</div><div class="acc-row-value" id="biz-what">—</div></div>
+          <div class="acc-row"><div class="acc-row-label">Typical customer</div><div class="acc-row-value" id="biz-customer">—</div></div>
+          <div class="acc-row"><div class="acc-row-label">Brand vibe</div><div class="acc-row-value" id="biz-vibe">—</div></div>
+        </div>
+
+        <form id="biz-form" hidden>
+          <div class="field">
+            <label for="biz-in-name">BUSINESS NAME</label>
+            <input id="biz-in-name" type="text" required maxlength="200" autocomplete="organization" placeholder="e.g. Milena's Bakery">
+          </div>
+          <div class="field-pair" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="field">
+              <label for="biz-in-country">COUNTRY</label>
+              <select id="biz-in-country" required autocomplete="country-name">
+                <option value="">Choose your country</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="biz-in-city">CITY</label>
+              <input id="biz-in-city" type="text" required maxlength="200" autocomplete="address-level2" list="biz-city-options" placeholder="Where's the shop?">
+              <datalist id="biz-city-options"></datalist>
+            </div>
+          </div>
+          <div class="field">
+            <label for="biz-in-vertical">BUSINESS TYPE</label>
+            <select id="biz-in-vertical">
+              <option>Bakery</option>
+              <option>Barbershop</option>
+              <option>Dental clinic</option>
+              <option>Gym / studio</option>
+              <option>Wine bar</option>
+              <option>Florist</option>
+              <option>Auto detailer</option>
+              <option>Physiotherapy</option>
+              <option>Nail studio</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field" id="biz-field-vertical-other" hidden>
+            <label for="biz-in-vertical-other">WHAT KIND OF BUSINESS IS IT?</label>
+            <input id="biz-in-vertical-other" type="text" maxlength="200" placeholder="e.g. Record shop, tailor, dog groomer">
+          </div>
+          <div class="field">
+            <label for="biz-in-website">WEBSITE OR INSTAGRAM HANDLE (OPTIONAL)</label>
+            <input id="biz-in-website" type="text" maxlength="300" autocomplete="url" placeholder="@yourbusiness or yourbusiness.com">
+          </div>
+          <div class="field">
+            <label for="biz-in-what">WHAT DO YOU SELL OR DO, IN ONE LINE?</label>
+            <input id="biz-in-what" type="text" required maxlength="500" placeholder="e.g. Sourdough and pastries, baked fresh every morning">
+          </div>
+          <div class="field">
+            <label for="biz-in-customer">WHO'S YOUR TYPICAL CUSTOMER?</label>
+            <input id="biz-in-customer" type="text" required maxlength="500" placeholder="e.g. Neighborhood regulars, 30-55, coffee-first crowd">
+          </div>
+          <div class="field">
+            <label for="biz-in-vibe">BRAND VIBE</label>
+            <select id="biz-in-vibe">
+              <option>Warm & cozy</option>
+              <option>Bold & energetic</option>
+              <option>Minimal & modern</option>
+              <option>Playful & fun</option>
+              <option>Premium & elegant</option>
+              <option>Local & authentic</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button type="submit" class="btn-ghost">Save changes</button>
+            <button type="button" id="biz-cancel" class="acc-link-btn" style="font-size:14px">Cancel</button>
+          </div>
+        </form>
+
+        <div id="biz-notice" class="notice" role="status" hidden></div>
+
+        <p style="margin:18px 0 0;font-size:12.5px;line-height:1.6;color:#7b8089">
+          Changes apply from the next drop that renders. Brand colors, what sets you apart and anything to avoid live in the <a href="control-room.html">control room</a>.
+        </p>
       </div>
 
       <!-- Login & security group: email + password, visually grouped but not merged -->
@@ -335,6 +431,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
+<script src="brief-fields.js"></script>
 <script src="account.js"></script>
 </body>
 </html>

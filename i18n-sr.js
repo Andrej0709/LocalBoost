@@ -554,6 +554,25 @@ window.LB_I18N_SR = {
     "Account settings.": "Podešavanja naloga.",
     "Your login, your connected channels, and every drop you've been billed for — all in one place.":
       "Tvoja prijava, povezani kanali i svaki drop za koji ti je naplaćeno — sve na jednom mestu.",
+    "Your business details, your login, your connected channels, and every drop you've been billed for — all in one place.":
+      "Podaci o biznisu, tvoja prijava, povezani kanali i svaki drop za koji ti je naplaćeno — sve na jednom mestu.",
+    "Your business": "Tvoj biznis",
+    "Edit →": "Izmeni →",
+    "What the engine builds every drop from. Keep it current when something changes.":
+      "Od ovoga mašina pravi svaki drop. Ažuriraj kad se nešto promeni.",
+    "Business name": "Naziv biznisa",
+    "Location": "Lokacija",
+    "Business type": "Tip biznisa",
+    "Website or Instagram": "Sajt ili Instagram",
+    "What you sell": "Šta prodaješ",
+    "Typical customer": "Tipična mušterija",
+    "Brand vibe": "Atmosfera brenda",
+    "Save changes": "Sačuvaj izmene",
+    "Saved — the next drop renders from these details.":
+      "Sačuvano — sledeći drop se pravi od ovih podataka.",
+    "Changes apply from the next drop that renders. Brand colors, what sets you apart and anything to avoid live in the":
+      "Izmene važe od sledećeg dropa koji se renderuje. Boje brenda, ono po čemu se izdvajaš i šta treba izbegavati nalaze se u",
+    "control room": "kontrolnoj sobi",
     "NOT SIGNED IN": "NISI PRIJAVLJEN",
     "Log in to manage your account.": "Prijavi se da upravljaš nalogom.",
     "Password, connected channels and billing all live behind your login.":

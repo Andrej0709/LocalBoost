@@ -113,6 +113,100 @@
     });
   }
 
+  // -------------------------------------------------------------- business
+  // The brief from signup, minus the extras the control room already edits
+  // (colors, differentiator, avoid notes) and the one-off "what made you come
+  // to us" answer. Saved through the same profiles row the engine reads.
+  var bizProfile = null;
+  var bizVertical = null;
+  var bizCountry = null;
+
+  function renderBusiness(profile) {
+    bizProfile = profile;
+    var location = [profile.city, profile.country && LBBriefFields.countryLabel(profile.country)]
+      .filter(Boolean).join(", ");
+    var rows = {
+      "biz-name": profile.business_name,
+      "biz-location": location,
+      "biz-vertical": profile.vertical,
+      "biz-website": profile.website,
+      "biz-what": profile.what_you_sell,
+      "biz-customer": profile.typical_customer,
+      "biz-vibe": profile.brand_vibe
+    };
+    Object.keys(rows).forEach(function (id) {
+      $(id).textContent = rows[id] || "—";
+    });
+  }
+
+  function fillBusinessForm(profile) {
+    $("biz-in-name").value = profile.business_name || "";
+    bizCountry.set(profile.country || LBBriefFields.guessCountry());
+    $("biz-in-city").value = profile.city || "";
+    bizVertical.set(profile.vertical || "Bakery");
+    $("biz-in-website").value = profile.website || "";
+    $("biz-in-what").value = profile.what_you_sell || "";
+    $("biz-in-customer").value = profile.typical_customer || "";
+    if (profile.brand_vibe) $("biz-in-vibe").value = profile.brand_vibe;
+  }
+
+  function wireBusiness() {
+    var form = $("biz-form");
+    var rows = $("biz-rows");
+    var editBtn = $("biz-edit-btn");
+    var notice = $("biz-notice");
+
+    bizVertical = LBBriefFields.verticalField(
+      $("biz-in-vertical"), $("biz-field-vertical-other"), $("biz-in-vertical-other"));
+    bizCountry = LBBriefFields.countryField($("biz-in-country"), $("biz-city-options"));
+
+    function setEditing(on) {
+      form.hidden = !on;
+      rows.hidden = on;
+      editBtn.hidden = on;
+    }
+
+    editBtn.addEventListener("click", function () {
+      fillBusinessForm(bizProfile);
+      notice.hidden = true;
+      setEditing(true);
+      $("biz-in-name").focus();
+    });
+    $("biz-cancel").addEventListener("click", function () { setEditing(false); });
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var button = form.querySelector("button[type=submit]");
+      var patch = {
+        business_name:    $("biz-in-name").value.trim(),
+        country:          $("biz-in-country").value,
+        city:             $("biz-in-city").value.trim(),
+        vertical:         bizVertical.value(),
+        website:          $("biz-in-website").value.trim(),
+        what_you_sell:    $("biz-in-what").value.trim(),
+        typical_customer: $("biz-in-customer").value.trim(),
+        brand_vibe:       $("biz-in-vibe").value
+      };
+      button.disabled = true;
+      try {
+        var saved = await LBAuth.updateProfile(patch);
+        renderBusiness(saved);
+        $("acc-name").textContent = saved.business_name || LBAuth.getUser().email;
+        setEditing(false);
+        say(notice, "Saved — the next drop renders from these details.");
+      } catch (err) {
+        say(notice, err.message, true);
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    // Country names follow the reader's language.
+    document.addEventListener("lb:langchange", function () {
+      if (bizProfile) renderBusiness(bizProfile);
+    });
+  }
+
   // -------------------------------------------------------------- channels
   function renderChannels(profile) {
     var form = $("channels-form");
@@ -635,6 +729,7 @@
 
   // ---------------------------------------------------------------- boot
   wireSecurity();
+  wireBusiness();
   wireChannels();
 
   LBAuth.ready.then(function () {
@@ -651,6 +746,10 @@
     wireNav(true);
     wireLogout();
     renderHeader(user, profile);
+    // No brief yet means signup never finished: signup.html is where it gets
+    // written, with the checkout step after it, so nothing to edit here.
+    $("business-card").hidden = !LBAuth.hasBrief();
+    renderBusiness(profile);
     renderChannels(profile);
     renderBilling(profile);
     renderPayments(profile);
