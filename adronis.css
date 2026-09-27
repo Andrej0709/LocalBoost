@@ -150,12 +150,15 @@ section{position:relative;padding:72px 24px}
 .page-hero.is-app .eyebrow{margin-bottom:16px}
 .page-hero.is-app h1{margin:0;max-width:24ch;font-size:clamp(30px,3.4vw,46px);letter-spacing:-.035em}
 .page-hero.is-app p{margin:14px 0 0;max-width:62ch;font-size:16px}
-.page-hero.is-app .lbt-replay{margin-top:20px}
+/* tour.js adds its replay button to the header itself, outside the inner box:
+   push it in by the same amount so it lines up with the title. */
+.page-hero.is-app .lbt-replay{display:flex;width:fit-content;margin:20px 0 0 calc(max(0px,(100% - 1200px) / 2) + 24px)}
+.page-hero.is-app.is-narrow .lbt-replay{margin-left:calc(max(0px,(100% - 760px) / 2) + 24px)}
 
 /* --------------------------------------------------------------- cards --- */
 .card{position:relative;padding:24px;border-radius:var(--r-lg);border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0) 40%),var(--surface);box-shadow:var(--shadow-card);transition:transform .35s var(--ease),border-color .25s ease,box-shadow .35s var(--ease)}
 a.card{color:inherit;display:block}
-a.card:hover,a.card:focus-visible{transform:translateY(-4px);border-color:var(--line-3);box-shadow:var(--shadow-float)}
+a.card:hover,a.card:focus-visible{transform:translateY(-4px);border-color:rgba(124,198,255,.6);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(124,198,255,.18),0 0 60px rgba(124,198,255,.22)}
 a.card:active{transform:translateY(-1px) scale(.99);transition-duration:.1s}
 .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:16px}
 .card h3:first-child{margin-top:0}
@@ -291,7 +294,7 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
 .creative-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(292px,100%),1fr));gap:20px}
 
 .creative-card{display:flex;flex-direction:column;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--surface);overflow:hidden;box-shadow:var(--shadow-card);transition:border-color .25s ease,transform .35s var(--ease),box-shadow .35s var(--ease),opacity .25s ease}
-.creative-card:hover{border-color:var(--line-3);transform:translateY(-3px);box-shadow:var(--shadow-float)}
+.creative-card:hover{transform:translateY(-3px);border-color:rgba(124,198,255,.6);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(124,198,255,.18),0 0 60px rgba(124,198,255,.22)}
 .creative-card.is-approved,.creative-card.is-published{border-color:rgba(159,215,176,.3)}
 .creative-card.is-rejected{opacity:.5}
 .creative-card.is-busy{opacity:.55;pointer-events:none}
@@ -346,6 +349,7 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
   .wrap,.wrap-wide{padding:0 20px}
   /* On a phone one 20px gutter is plenty: the section already has it. */
   .section-tight .wrap,.section-tight .wrap-wide,.page-hero.is-app .page-hero-inner{padding-left:0;padding-right:0}
+  .page-hero.is-app .lbt-replay,.page-hero.is-app.is-narrow .lbt-replay{margin-left:0}
   h3{margin-top:28px}
   .divider{margin:40px auto}
   footer{margin-top:56px;padding:0 20px 36px}
