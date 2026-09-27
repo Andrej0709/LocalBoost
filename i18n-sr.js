@@ -1738,6 +1738,8 @@ window.LB_I18N_SR = {
     "One click from your account page. No calls, no notice period.":
       "Jedan klik na stranici naloga. Bez poziva, bez otkaznog roka.",
     "Billing": "Naplata",
+    // Also the account page's status chip, which had no entry until now.
+    "ACTIVE": "AKTIVAN",
     "Recommended": "Preporučeno",
     "See it work before you pay.": "Vidi kako radi pre nego što platiš.",
     "/ month, incl. VAT": "/ mesečno, sa PDV-om",

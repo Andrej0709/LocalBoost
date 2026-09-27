@@ -144,8 +144,9 @@ section{position:relative;padding:72px 24px}
 .page-hero.is-app{padding:132px 24px 34px;text-align:left}
 .page-hero.is-app::after{display:none}
 .page-hero.is-app::before{top:-60%;left:30%;height:520px;opacity:.75}
-.page-hero.is-app .page-hero-inner{position:relative;z-index:1;max-width:1152px;margin:0 auto}
-.page-hero.is-app.is-narrow .page-hero-inner{max-width:712px}
+/* Same box as .wrap-wide / .wrap below it, so the title lines up with the content. */
+.page-hero.is-app .page-hero-inner{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 24px}
+.page-hero.is-app.is-narrow .page-hero-inner{max-width:760px}
 .page-hero.is-app .eyebrow{margin-bottom:16px}
 .page-hero.is-app h1{margin:0;max-width:24ch;font-size:clamp(30px,3.4vw,46px);letter-spacing:-.035em}
 .page-hero.is-app p{margin:14px 0 0;max-width:62ch;font-size:16px}
@@ -343,6 +344,8 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
   section{padding:52px 20px}
   .section-tight{padding:0 20px 44px}
   .wrap,.wrap-wide{padding:0 20px}
+  /* On a phone one 20px gutter is plenty: the section already has it. */
+  .section-tight .wrap,.section-tight .wrap-wide,.page-hero.is-app .page-hero-inner{padding-left:0;padding-right:0}
   h3{margin-top:28px}
   .divider{margin:40px auto}
   footer{margin-top:56px;padding:0 20px 36px}
