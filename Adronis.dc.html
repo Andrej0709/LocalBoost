@@ -5,9 +5,9 @@
 <style>
 #lb-boot{display:none}
 @media (display-mode:standalone){
-#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
+#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#050608}
 }
-html.lb-boot-on #lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
+html.lb-boot-on #lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#050608}
 html.lb-booted #lb-boot{display:none}
 #lb-boot img{width:56px;height:auto;animation:lbBootPulse 1.3s ease-in-out infinite}
 @keyframes lbBootPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
@@ -20,7 +20,7 @@ html.lb-booted #lb-boot{display:none}
 <meta name="description" content="Weekly drops of photoreal ads for local business. Render, approve in two minutes, publish everywhere. First drop free, 7-day trial, cancel any time.">
 <link rel="canonical" href="https://adronis.app/">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<meta name="theme-color" content="#07080a">
+<meta name="theme-color" content="#050608">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Adronis">
@@ -36,6 +36,12 @@ html.lb-booted #lb-boot{display:none}
 <meta name="twitter:title" content="Adronis — your next forty ads are already in production">
 <meta name="twitter:description" content="Weekly drops of photoreal ads for local business. The engine renders, you approve in two minutes, Adronis publishes to every channel. First drop free, 7-day trial, cancel any time.">
 <meta name="twitter:image" content="https://adronis.app/logo.png">
+<!-- Fonts and the shared design system load here, in the head, so they are
+     already in hand when the runtime paints the page. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="adronis.css">
 <!-- support.js pulls React from unpkg only after it has downloaded and run, so the
      browser can't start those requests early. Preload them now, with the exact
      URL/integrity/CORS mode support.js uses, so they download in parallel.
@@ -266,6 +272,21 @@ if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHa
         },
         {
           "@type": "Question",
+          "name": "What if I don't like an ad?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Reject it and pick a reason — wrong tone, wrong facts or price, the image doesn't fit. The engine takes that into your next drop. You can also change the text of any ad before you approve it." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which networks can Adronis post to?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Instagram, Facebook, TikTok, Google Business, LinkedIn and Pinterest. How many you connect at once depends on your plan: one on Free, two on Counter, up to four on Storefront and any number on Franchise." }
+        },
+        {
+          "@type": "Question",
+          "name": "Are the ads made with AI?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Every image is generated for your business rather than taken from a stock library, and nothing is published until you approve it. On the Franchise plan a real designer also checks your ads." }
+        },
+        {
+          "@type": "Question",
           "name": "How does the free trial work?",
           "acceptedAnswer": { "@type": "Answer", "text": "Paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." }
         },
@@ -285,330 +306,669 @@ if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHa
 <x-dc>
 <helmet>
 <script src="./lb-planet.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
+<script src="./lb-swipe.js"></script>
 <style>
-:root{--acc:#a8c6f0;--acc-soft:rgba(168,198,240,.14);}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;overflow-x:clip}
-body{margin:0;background:#07080a;color:#d0d6e0;font-family:'Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip;font-feature-settings:"zero" on}
-a{color:var(--acc);text-decoration:none}
-a:hover{color:#cbdff9}
-::selection{background:var(--acc);color:#07080a}
-a:focus-visible,button:focus-visible,[tabindex]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-input[type=range]:focus-visible{outline:2px solid var(--acc);outline-offset:4px;border-radius:9999px}
-input[type=range]{-webkit-appearance:none;appearance:none;background:transparent}
-input[type=range]::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--acc) var(--fill,50%),#23252a var(--fill,50%))}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-7px;border-radius:9999px;background:var(--acc);box-shadow:0 0 0 6px var(--acc-soft)}
-input[type=range]::-moz-range-track{height:2px;background:linear-gradient(90deg,var(--acc) var(--fill,50%),#23252a var(--fill,50%))}
-input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:9999px;background:var(--acc)}
-@keyframes lbMarquee{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
-@keyframes lbPulse{0%{opacity:0;transform:scale(.5)}35%{opacity:.55}100%{opacity:0;transform:scale(2.1)}}
-@keyframes lbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-@keyframes lbBlink{0%,100%{opacity:.25}50%{opacity:1}}
-@keyframes lbShip{0%{left:0%;opacity:0;transform:translate(-50%,-50%) scale(.55) rotate(-6deg)}7%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}64%{left:100%;opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}74%{left:100%;opacity:0;transform:translate(-50%,-50%) scale(.62) rotate(4deg)}100%{left:100%;opacity:0}}
-@keyframes lbLane{0%,55%{opacity:.3}64%{opacity:1}100%{opacity:.3}}
-@keyframes lbLand{0%,58%{border-color:#23252a;background:#0e0f12;box-shadow:none}68%{border-color:rgba(168,198,240,.55);background:rgba(168,198,240,.07);box-shadow:0 0 26px rgba(168,198,240,.16)}100%{border-color:#23252a;background:#0e0f12;box-shadow:none}}
-@keyframes lbPosted{0%,60%{opacity:0;transform:translateY(3px)}70%{opacity:1;transform:translateY(0)}92%{opacity:1}100%{opacity:0}}
-@keyframes lbQueue{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes lbDrop{0%{top:-3%;opacity:0}5%{opacity:1}94%{opacity:1}100%{top:100%;opacity:0}}
-@keyframes lbLandM{0%{border-color:rgba(168,198,240,.55);background:rgba(168,198,240,.07);box-shadow:0 0 26px rgba(168,198,240,.16)}16%{border-color:#23252a;background:#0e0f12;box-shadow:none}100%{border-color:#23252a;background:#0e0f12;box-shadow:none}}
-@keyframes lbSpoke{0%{background:rgba(168,198,240,.5)}18%{background:#1b1e22}100%{background:#1b1e22}}
-[data-faq] summary{list-style:none}
-[data-faq] summary::-webkit-details-marker{display:none}
-[data-faq] summary:hover [data-faqicon]{border-color:#4a4d54}
-[data-faqicon]{transition:transform .3s cubic-bezier(.22,1,.36,1),border-color .2s ease}
-@media (prefers-reduced-motion:reduce){[data-plans]>*,[data-chip],[data-storycard],[data-examplecard]{transition:none !important}}
-[data-faq][open] [data-faqicon]{transform:rotate(45deg)}
-@media (prefers-reduced-motion:reduce){[data-faqicon]{transition:none}}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-[data-glass="nav"]{background:rgba(10,11,13,.96) !important}
-[data-navsheet]{background:rgb(10,11,13) !important}
-[data-glass="pill"]{background:#0d1219 !important}
+/* Home page sections. Tokens, nav, buttons and the footer live in adronis.css. */
+.home{position:relative;width:100%}
+.home-sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.home-sky lb-planet{position:absolute;inset:0;width:100%;height:100%;opacity:.8}
+.home-sky-veil{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,rgba(5,6,8,0) 30%,rgba(5,6,8,.7) 100%),linear-gradient(180deg,rgba(5,6,8,0) 55%,rgba(5,6,8,.55))}
+.home-main{position:relative;z-index:1}
+.home-rail{position:fixed;top:0;right:0;bottom:0;width:2px;background:rgba(255,255,255,.035);z-index:40;pointer-events:none}
+.home-rail>div{position:absolute;top:0;left:0;width:100%;height:0;background:linear-gradient(180deg,rgba(124,198,255,0),var(--acc));box-shadow:0 0 12px rgba(124,198,255,.6)}
+@media (max-width:1080px){.home-rail{display:none}}
+
+.sec{position:relative;padding:clamp(96px,11vw,150px) 24px}
+.sec-in{position:relative;max-width:1200px;margin:0 auto}
+.sec-head{max-width:780px}
+.sec-head.is-center{margin:0 auto;text-align:center}
+.sec-head h2{margin:0;font-size:clamp(36px,4.8vw,64px);line-height:1.02;letter-spacing:-.047em}
+.sec-head .lede{margin:22px 0 0;max-width:54ch;font-size:clamp(17px,1.4vw,20px);line-height:1.55;color:var(--text-2)}
+.sec-head.is-center .lede{margin-left:auto;margin-right:auto}
+.sec-head .eyebrow{margin-bottom:24px}
+
+/* Scroll reveal. The runtime owns every element's class and style, so the
+   switch lives on <html> (html.rv-<section>) and only goes on once the
+   component has mounted — without script, everything is simply visible. */
+html.rv-on [data-rv]{opacity:0;transform:translateY(30px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+html.rv-on.rv-made [data-rv="made"],html.rv-on.rv-why [data-rv="why"],html.rv-on.rv-how [data-rv="how"],
+html.rv-on.rv-ex [data-rv="ex"],html.rv-on.rv-ctl [data-rv="ctl"],html.rv-on.rv-price [data-rv="price"],
+html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:1;transform:none}
+
+/* ------------------------------------------------------------------ hero */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:128px 24px 72px}
+.hero-grid{position:relative;width:100%;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:clamp(40px,6vw,96px);align-items:center}
+.hero-copy{position:relative;z-index:2}
+.hero h1{font-size:clamp(46px,6.4vw,92px);line-height:.97;letter-spacing:-.055em;max-width:11ch}
+.hero-sub{margin:30px 0 0;max-width:44ch;font-size:clamp(17.5px,1.45vw,20.5px);line-height:1.55;color:var(--text-2)}
+.hero-ctas{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:40px}
+.hero-assure{list-style:none;display:flex;flex-wrap:wrap;gap:10px 22px;margin:30px 0 0;padding:0;font-size:14px;color:var(--text-3)}
+.hero-assure li{display:inline-flex;align-items:center;gap:9px}
+.tick{display:inline-flex;flex:none;align-items:center;justify-content:center;width:18px;height:18px;border-radius:9999px;background:rgba(159,215,176,.14);box-shadow:inset 0 0 0 1px rgba(159,215,176,.42);color:var(--ok);font-size:10px;line-height:1}
+.hero-demo{position:relative;z-index:1}
+.hero-demo-glow{position:absolute;left:50%;top:44%;width:140%;aspect-ratio:1;transform:translate(-50%,-50%);background:radial-gradient(closest-side,rgba(92,182,247,.2),rgba(92,182,247,0));pointer-events:none}
+.hero-demo-label{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 20px;font-size:14px;font-weight:500;color:var(--text-2)}
+.hero-demo-label .pulse{position:relative;width:8px;height:8px;border-radius:9999px;background:var(--ok)}
+.hero-demo-label .pulse::after{content:"";position:absolute;inset:-5px;border-radius:9999px;border:1px solid var(--ok);animation:lbPulse 2.4s var(--ease) infinite}
+.float-chip{position:absolute;z-index:3;display:flex;align-items:center;gap:11px;padding:10px 16px 10px 10px;border-radius:18px;border:1px solid rgba(255,255,255,.1);background:rgba(16,18,23,.7);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 24px 50px -16px rgba(0,0,0,.85);font-size:13.5px;font-weight:500;color:var(--text);white-space:nowrap;pointer-events:none;transform:translate3d(0,var(--py,0px),0)}
+.float-chip .ic{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:11px;font-size:15px}
+.float-chip .ic.is-blue{background:rgba(124,198,255,.14);color:var(--acc);box-shadow:inset 0 0 0 1px rgba(124,198,255,.3)}
+.float-chip .ic.is-green{background:rgba(159,215,176,.14);color:var(--ok);box-shadow:inset 0 0 0 1px rgba(159,215,176,.35)}
+.float-chip small{display:block;margin-top:2px;font-family:var(--mono);font-size:10.5px;font-weight:400;letter-spacing:.08em;color:var(--text-3)}
+.fc-a{top:9%;left:-17%}
+.fc-b{top:57%;right:-15%}
+@keyframes heroIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.hero [data-in]{animation:heroIn 1s var(--ease) both}
+@media (prefers-reduced-motion:reduce){.hero [data-in]{animation:none}.hero-demo-label .pulse::after{animation:none}}
+
+/* ------------------------------------------------------------- made for */
+.made{position:relative;padding:8px 0 20px}
+.made-title{margin:0 auto;padding:0 24px;text-align:center;font-size:15px;font-weight:500;color:var(--text-3)}
+.marquee{position:relative;margin-top:24px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.marquee-track{display:flex;width:max-content;animation:lbMarquee 46s linear infinite}
+.marquee:hover .marquee-track{animation-play-state:paused}
+.marquee-set{display:flex;gap:10px;padding-right:10px}
+.vchip{display:inline-flex;align-items:center;gap:10px;padding:11px 18px 11px 14px;border-radius:9999px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);font-size:15px;font-weight:500;color:var(--text);white-space:nowrap}
+.vchip::before{content:"";width:6px;height:6px;border-radius:9999px;background:var(--acc);opacity:.8}
+@media (prefers-reduced-motion:reduce){
+  .marquee{-webkit-mask-image:none;mask-image:none;padding:0 24px}
+  .marquee-track{animation:none;width:auto;justify-content:center}
+  .marquee-set{flex-wrap:wrap;justify-content:center;padding:0}
+  .marquee-set+.marquee-set{display:none}
 }
+
+/* ---------------------------------------------------------------- why */
+.why-grid{margin-top:64px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.why-col{display:flex;flex-direction:column;padding:30px 28px;border-radius:var(--r-xl);border:1px solid var(--line);background:rgba(13,15,19,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.why-col h3{margin:0;font-size:21px}
+.why-kind{margin-top:6px;font-size:14px;color:var(--text-3)}
+.why-list{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:15px;flex:1;align-content:start}
+.why-list li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;font-size:15.5px;line-height:1.5;color:var(--text-2)}
+.why-list .x{display:flex;align-items:center;justify-content:center;width:20px;height:20px;margin-top:1px;border-radius:9999px;background:rgba(255,255,255,.05);color:var(--text-4);font-size:10px}
+.why-list .tick{margin-top:2px}
+.why-foot{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);font-size:14.5px;font-weight:500;color:var(--text-3)}
+.why-col.is-us{position:relative;border-color:var(--acc-line);background:radial-gradient(130% 70% at 50% 0%,rgba(92,182,247,.18),rgba(92,182,247,0) 62%),#0c0f14;box-shadow:var(--glow-acc)}
+.why-col.is-us .why-list li{color:var(--text)}
+.why-col.is-us .why-foot{color:var(--acc-2);border-top-color:rgba(124,198,255,.2)}
+.why-logo{display:flex;align-items:center;gap:10px}
+.why-logo img{width:26px;height:26px;border-radius:7px}
+
+/* ---------------------------------------------------------------- how */
+.how-grid{margin-top:64px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.step{position:relative;display:flex;flex-direction:column;border-radius:var(--r-xl);border:1px solid var(--line);background:var(--surface);overflow:hidden;box-shadow:var(--shadow-card);transition:transform .45s var(--ease),border-color .3s ease,box-shadow .45s var(--ease)}
+.step:hover{transform:translateY(-6px);border-color:var(--line-3);box-shadow:var(--shadow-float)}
+.step-vis{position:relative;height:262px;padding:26px 24px;display:flex;align-items:center;justify-content:center;background:radial-gradient(90% 90% at 50% 0%,rgba(92,182,247,.12),rgba(92,182,247,0) 70%),#0a0c10;border-bottom:1px solid var(--line);overflow:hidden}
+.step-body{padding:26px 28px 30px}
+.step-n{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--acc)}
+.step h3{margin:10px 0 0;font-size:22px}
+.step p{margin:10px 0 0;font-size:15.5px;line-height:1.6;color:var(--text-2)}
+/* step 1: the brief */
+.mk{width:100%;max-width:300px;border-radius:18px;border:1px solid var(--line-2);background:rgba(18,20,26,.9);box-shadow:0 24px 50px -20px rgba(0,0,0,.8);padding:16px}
+.mk-row+.mk-row{margin-top:12px}
+.mk-l{display:block;font-size:11.5px;font-weight:500;color:var(--text-3)}
+.mk-v{display:flex;align-items:center;margin-top:6px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line-2);background:#090b0e;font-size:13.5px;color:var(--text)}
+.mk-v.is-focus{border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(124,198,255,.12)}
+.caret{display:inline-block;width:1.5px;height:15px;margin-left:2px;background:var(--acc);animation:lbBlink 1.1s steps(1) infinite}
+.mk-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.mk-chips span{padding:6px 10px;border-radius:9999px;border:1px solid var(--line-2);font-size:12px;color:var(--text-3)}
+.mk-chips span.on{border-color:var(--acc-line);background:var(--acc-soft);color:var(--acc-2)}
+/* step 2: Monday's notification */
+.mk-note{width:100%;max-width:300px}
+.mk-push{padding:14px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.1);background:rgba(28,31,38,.78);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 24px 50px -20px rgba(0,0,0,.85)}
+.mk-app{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-3)}
+.mk-app img{width:18px;height:18px;border-radius:5px}
+.mk-app .mono{margin-left:auto;font-size:10.5px;letter-spacing:.06em}
+.mk-t{margin-top:8px;font-size:14.5px;font-weight:600;color:var(--text)}
+.mk-d{margin-top:3px;font-size:13px;line-height:1.45;color:var(--text-2)}
+.mk-thumbs{display:flex;gap:8px;margin-top:14px;padding:0 6px}
+.mk-thumbs img,.mk-thumbs span{width:52px;height:52px;flex:none;border-radius:12px;object-fit:cover;border:1px solid var(--line-2)}
+.mk-thumbs span{display:flex;align-items:center;justify-content:center;background:#12151a;font-family:var(--mono);font-size:12px;color:var(--text-2)}
+/* step 3: approved and scheduled */
+.mk-sched{width:100%;max-width:300px;display:grid;gap:8px}
+.ms-row{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:14px;border:1px solid var(--line-2);background:rgba(18,20,26,.9)}
+.ms-row img{width:38px;height:38px;border-radius:9px;object-fit:cover;flex:none}
+.ms-row b{display:block;font-size:13px;font-weight:600;color:var(--text)}
+.ms-row small{display:flex;gap:6px;margin-top:1px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--text-3)}
+.ms-chip{margin-left:auto;flex:none;padding:4px 9px;border-radius:9999px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;border:1px solid}
+.ms-chip.is-live{border-color:var(--ok-line);background:var(--ok-soft);color:var(--ok)}
+.ms-chip.is-slot{border-color:var(--acc-line);background:var(--acc-soft);color:var(--acc)}
+
+/* ----------------------------------------------------------- examples */
+.showcase{margin-top:64px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);gap:16px}
+.story{position:relative;border-radius:24px;border:1px solid var(--line-2);background:#0d0f13;overflow:hidden;box-shadow:0 40px 90px -30px rgba(0,0,0,.8);transition:transform .45s var(--ease),border-color .3s ease,box-shadow .45s var(--ease)}
+.story-bg{position:absolute;inset:-40px;background-position:center;background-size:cover;filter:blur(34px) brightness(.5) saturate(1.2);transform:scale(1.1)}
+.story-in{position:relative;display:flex;flex-direction:column;height:100%}
+.story-bars{display:flex;gap:4px;padding:14px 14px 0}
+.story-bars span{flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.35)}
+.story-bars span:first-child{background:rgba(255,255,255,.92)}
+.story-top{display:flex;align-items:center;gap:9px;padding:12px 16px}
+.story-media{flex:1;display:flex;align-items:center;padding:4px 0}
+.story-media img{display:block;width:100%;height:auto;aspect-ratio:307/316}
+.story-bottom{display:flex;align-items:center;gap:10px;padding:8px 16px 16px}
+.story-msg{flex:1;padding:10px 16px;border-radius:9999px;border:1px solid rgba(255,255,255,.45);font-size:13px;color:rgba(255,255,255,.85)}
+.post{display:flex;flex-direction:column;border-radius:24px;border:1px solid var(--line-2);background:#0d0f13;overflow:hidden;transition:transform .45s var(--ease),border-color .3s ease,box-shadow .45s var(--ease)}
+.post-top{display:flex;align-items:center;gap:9px;padding:12px 14px}
+.post img{display:block;width:100%;height:auto;aspect-ratio:307/316;background:#15171b}
+.post-cap{padding:13px 15px 16px;font-size:13.5px;line-height:1.55;color:var(--text-2)}
+.story:hover,.post:hover{transform:translateY(-6px);border-color:var(--acc-line);box-shadow:0 40px 90px -30px rgba(0,0,0,.85),0 0 0 1px rgba(124,198,255,.14),0 0 60px -10px rgba(124,198,255,.3)}
+.av{display:flex;align-items:center;justify-content:center;flex:none;width:28px;height:28px;border-radius:9999px;color:#16130f;font-size:12px;font-weight:700}
+.nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;font-weight:600;color:var(--text)}
+.chn{margin-left:auto;flex:none;padding:4px 10px;border-radius:9999px;border:1px solid var(--line-3);font-size:11.5px;color:var(--text-2)}
+.story .chn{border-color:transparent;background:rgba(0,0,0,.4);color:#fff}
+.ex-note{margin:28px 0 0;font-size:14px;color:var(--text-3);text-align:center}
+
+/* ------------------------------------------------------------ control */
+.bento{margin-top:64px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tile{position:relative;display:flex;flex-direction:column;padding:26px;border-radius:var(--r-xl);border:1px solid var(--line);background:var(--surface);overflow:hidden;transition:border-color .3s ease,transform .45s var(--ease)}
+.tile:hover{border-color:var(--line-3);transform:translateY(-4px)}
+.tile-vis{display:flex;align-items:center;min-height:92px;margin-bottom:22px}
+.tile h3{margin:0;font-size:19px}
+.tile p{margin:8px 0 0;font-size:15px;line-height:1.6;color:var(--text-2)}
+.tv-btns{display:flex;gap:8px}
+.tv-btns span{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;border-radius:9999px;font-size:14px;font-weight:600;border:1px solid}
+.tv-btns .y{border-color:var(--ok-line);background:var(--ok-soft);color:var(--ok)}
+.tv-btns .n{border-color:var(--line-2);background:rgba(255,255,255,.03);color:var(--text-2)}
+.tv-field{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--acc-line);background:#090b0e;box-shadow:0 0 0 3px rgba(124,198,255,.1);font-size:14px;color:var(--text)}
+.tv-field small{display:block;margin-bottom:4px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--text-3)}
+.tv-time{display:flex;flex-wrap:wrap;gap:8px}
+.tv-time span{padding:9px 13px;border-radius:12px;border:1px solid var(--line-2);background:#090b0e;font-family:var(--mono);font-size:12.5px;color:var(--text-2)}
+.tv-time span.on{border-color:var(--acc-line);background:var(--acc-soft);color:var(--acc-2)}
+.tv-chips{display:flex;flex-wrap:wrap;gap:6px}
+.tv-chips span{padding:7px 12px;border-radius:9999px;border:1px solid var(--line-2);font-size:12.5px;color:var(--text-2)}
+.tv-chips span.on{border-color:var(--bad-line);background:var(--bad-soft);color:var(--bad)}
+.tv-dl{display:inline-flex;align-items:center;gap:10px;padding:10px 16px 10px 10px;border-radius:14px;border:1px solid var(--line-2);background:#090b0e;font-size:13.5px;color:var(--text)}
+.tv-dl img{width:40px;height:40px;border-radius:9px;object-fit:cover}
+.tv-dl .mono{margin-left:6px;color:var(--acc)}
+.tv-toggle{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text-2)}
+.tv-sw{position:relative;width:46px;height:28px;border-radius:9999px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px var(--line-2)}
+.tv-sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:9999px;background:#f2f4f7;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+
+/* ------------------------------------------------------------ pricing */
+.billing{display:inline-flex;margin-top:34px}
+.billing .save-pill{margin-left:8px;padding:3px 8px;border-radius:9999px;background:rgba(159,215,176,.16);color:var(--ok);font-size:11.5px;font-weight:600}
+.promo{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;width:fit-content;max-width:100%;margin:22px auto 0;padding:10px 10px 10px 18px;border-radius:18px;border:1px dashed rgba(159,215,176,.45);background:rgba(159,215,176,.06)}
+.promo-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--ok)}
+.promo-text{font-size:14.5px;line-height:1.5;color:var(--text)}
+.promo-code{display:inline-flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;border-radius:12px;border:1px solid rgba(159,215,176,.35);background:#08100c;color:#fff;font-family:var(--mono);font-size:15px;letter-spacing:.14em;cursor:pointer;transition:border-color .2s ease,transform .12s ease}
+.promo-code:hover{border-color:rgba(159,215,176,.75)}
+.promo-code:active{transform:scale(.97)}
+.promo-code .copy{padding:6px 11px;border-radius:8px;background:var(--ok);color:#06110a;font-family:var(--font);font-size:12.5px;font-weight:600;letter-spacing:0}
+.free-note{max-width:720px;margin:26px auto 0;padding:15px 20px;border-radius:16px;border:1px solid var(--acc-line);background:rgba(124,198,255,.06);font-size:14.5px;line-height:1.6;color:var(--text);text-align:left}
+.free-note .mono{margin-right:10px;font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
+.plans{max-width:1200px;margin:56px auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch}
+.plan{position:relative;display:flex;flex-direction:column;padding:28px 24px 24px;border-radius:var(--r-xl);border:1px solid var(--line);background:rgba(12,14,18,.86);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);text-align:left;transition:transform .45s var(--ease),border-color .3s ease,box-shadow .45s var(--ease)}
+.plan:hover{transform:translateY(-6px);border-color:var(--line-3);box-shadow:var(--shadow-float)}
+.plan.is-featured{border-color:rgba(124,198,255,.55);background:radial-gradient(120% 60% at 50% 0%,rgba(92,182,247,.2),rgba(92,182,247,0) 65%),#0c1016;box-shadow:0 0 0 1px rgba(124,198,255,.18),0 30px 80px -24px rgba(92,182,247,.45)}
+.plan.is-featured:hover{border-color:rgba(124,198,255,.8)}
+.plan-flag{position:absolute;top:-12px;left:24px;padding:5px 11px;border-radius:9999px;background:linear-gradient(180deg,#9dd6ff,#6ec2ff);color:var(--ink);font-size:12px;font-weight:600;box-shadow:0 6px 20px -6px rgba(110,194,255,.8)}
+.plan-name{font-size:18px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+.plan-tag{margin-top:4px;min-height:42px;font-size:13.5px;line-height:1.5;color:var(--text-3)}
+.plan-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;margin-top:18px}
+.plan-price .amt{font-size:clamp(40px,3.8vw,52px);font-weight:600;letter-spacing:-.05em;color:var(--text);line-height:1;font-feature-settings:"tnum" on}
+.plan-price .per{font-size:13px;color:var(--text-3)}
+.plan-meta{display:grid;gap:4px;min-height:44px;margin-top:10px;font-size:13px;color:var(--text-3)}
+.plan-meta .perad{color:var(--text-2)}
+.plan-meta .perad b{font-weight:600;color:var(--acc-2)}
+.plan-meta .save{color:var(--ok)}
+.plan-meta .save b{color:var(--ok)}
+.plan-line{height:1px;background:var(--line);margin:20px 0}
+.plan-feats{display:grid;gap:12px;flex:1;align-content:start}
+.plan-feat{display:grid;grid-template-columns:18px minmax(0,1fr);gap:11px;font-size:14.5px;line-height:1.5;color:var(--text-2)}
+.plan-feat .tick{margin-top:2px}
+.plan-cta{display:flex;align-items:center;justify-content:center;min-height:50px;margin-top:26px;border-radius:9999px;font-size:15px;font-weight:600;transition:filter .2s ease,background .2s ease,border-color .2s ease,transform .12s ease}
+.plan-cta:active{transform:scale(.97)}
+.plan-cta.is-primary{background:linear-gradient(180deg,#9dd6ff 0%,#6ec2ff 100%);color:var(--ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 0 0 1px rgba(110,194,255,.5),0 12px 30px -10px rgba(110,194,255,.75)}
+.plan-cta.is-primary:hover{filter:brightness(1.07);color:var(--ink)}
+.plan-cta.is-quiet{border:1px solid var(--line-3);background:rgba(255,255,255,.04);color:var(--text)}
+.plan-cta.is-quiet:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28);color:var(--text)}
+.plan-after{margin-top:12px;min-height:20px;text-align:center;font-size:12.5px;line-height:1.5;color:var(--text-3)}
+.promise{max-width:1200px;margin:34px auto 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;font-size:14px;color:var(--text-2)}
+.promise span{display:inline-flex;align-items:center;gap:9px}
+.vat-note{max-width:74ch;margin:26px auto 0;font-size:13px;line-height:1.65;color:var(--text-3);text-align:center}
+
+/* ---------------------------------------------------------------- faq */
+.faq-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,6vw,96px);align-items:start}
+.faq-side{position:sticky;top:120px}
+.faq-side p{margin:22px 0 0;max-width:36ch;font-size:16px;color:var(--text-2)}
+.faq-list{border-top:1px solid var(--line)}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 2px;cursor:pointer;font-size:clamp(17px,1.5vw,19px);font-weight:500;line-height:1.4;letter-spacing:-.015em;color:var(--text);transition:color .2s ease}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary:hover{color:var(--acc-2)}
+.faq-icon{position:relative;flex:none;width:32px;height:32px;border-radius:9999px;border:1px solid var(--line-2);transition:transform .45s var(--ease),border-color .2s ease,background .2s ease}
+.faq-icon::before,.faq-icon::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:1.6px;margin:-.8px 0 0 -6px;border-radius:2px;background:var(--acc)}
+.faq-icon::after{transform:rotate(90deg)}
+.faq-item summary:hover .faq-icon{border-color:var(--acc-line)}
+.faq-item[open] .faq-icon{transform:rotate(45deg);background:var(--acc-soft);border-color:var(--acc-line)}
+.faq-item p{margin:0;padding:0 56px 26px 2px;max-width:64ch;font-size:16px;line-height:1.7;color:var(--text-2)}
+.faq-item[open] p{animation:faqIn .45s var(--ease)}
+@keyframes faqIn{from{opacity:0;transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.faq-icon{transition:none}.faq-item[open] p{animation:none}}
+
+/* -------------------------------------------------------------- final */
+.final{padding:clamp(80px,9vw,120px) 24px clamp(40px,5vw,60px)}
+.final-card{position:relative;max-width:1200px;margin:0 auto;padding:clamp(56px,8vw,110px) 28px;border-radius:40px;border:1px solid rgba(124,198,255,.22);background:radial-gradient(70% 90% at 50% 110%,rgba(92,182,247,.3),rgba(92,182,247,0) 70%),radial-gradient(60% 60% at 50% 0%,rgba(255,255,255,.04),rgba(255,255,255,0)),#090b10;text-align:center;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 40px 120px -40px rgba(92,182,247,.4)}
+.final-card::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(124,198,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(124,198,255,.07) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(60% 70% at 50% 100%,#000,transparent);mask-image:radial-gradient(60% 70% at 50% 100%,#000,transparent);pointer-events:none}
+.final-card h2{position:relative;margin:0 auto;max-width:15ch;font-size:clamp(38px,5.4vw,72px);line-height:1;letter-spacing:-.05em}
+.final-card .lede{position:relative;margin:24px auto 0;max-width:44ch}
+.final-card .hero-ctas{position:relative;justify-content:center}
+.final-alt{position:relative;margin-top:18px;font-size:14px;color:var(--text-3)}
+
+/* ------------------------------------------------------------- footer */
+.home footer{margin-top:40px}
+
+/* --------------------------------------------------------- responsive */
 @media (max-width:1080px){
-[data-scene]{position:relative !important;inset:auto !important;width:100% !important;height:430px !important;transform:none !important;margin-top:40px}
-[data-grid2]{grid-template-columns:1fr !important}
-[data-offset]{margin:0 !important;transform:none !important}
-[data-pinvis]{display:none !important}
-[data-railhide]{display:none !important}
-[data-faqside]{position:static !important}
-[data-showcase]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
-[data-storycard]{grid-row:auto !important;grid-column:auto !important}
-[data-plans]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+  .hero{min-height:auto;padding-top:124px}
+  .hero-grid{grid-template-columns:minmax(0,1fr);gap:56px}
+  .hero h1{max-width:13ch}
+  .fc-a{left:-4%}
+  .fc-b{right:-4%}
+  .showcase{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .story{grid-row:auto !important;grid-column:auto !important}
+  .plans{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 14px}
+  .faq-grid{grid-template-columns:minmax(0,1fr)}
+  .faq-side{position:static}
+  .bento{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (max-width:900px){
-[data-navlinks]{display:none !important}
-[data-navburger]{display:inline-flex !important}
-[data-navsheet]{display:grid !important}
-[data-loginlink]{display:none !important}
+@media (max-width:860px){
+  .why-grid,.how-grid{grid-template-columns:minmax(0,1fr);max-width:560px;margin-left:auto;margin-right:auto}
+  .step-vis{height:236px}
+  /* The examples become a row you flick through, one card at a time. */
+  .showcase{display:flex;gap:12px;margin:48px -24px 0;padding:0 24px 8px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .showcase::-webkit-scrollbar{display:none}
+  .showcase>*{flex:none;width:min(78vw,320px);scroll-snap-align:center}
+  .ex-note{text-align:left}
 }
-@media (max-width:820px){
-[data-hero]{min-height:auto !important;padding:126px 20px 56px !important}
-[data-scene]{height:430px !important;margin-top:24px}
-[data-story]{height:auto !important}
-[data-storysticky]{position:static !important;height:auto !important;padding:clamp(64px,11vw,96px) 0 !important}
-[data-stepdesc]{opacity:1 !important;max-height:none !important}
-[data-steptitle]{color:#fff !important}
-[data-steprow]{background:rgba(255,255,255,.025) !important;border-left-color:#23252a !important}
-[data-drum]{height:390px !important}
-[data-calwrap]{overflow-x:auto;-webkit-overflow-scrolling:touch}
-[data-cal]{min-width:600px}
-[data-pipeviz]{display:none !important}
-[data-ctrlwm]{display:none !important}
-[data-pipemobile]{display:block !important}
-[data-showcase]{grid-template-columns:1fr !important}
-[data-planlift]{transform:none !important}
-[data-tabbar] button{padding:13px 18px !important;font-size:14px !important}
-[data-billing] button{padding:13px 18px !important;font-size:14px !important}
-[data-footcol]{gap:4px !important}
-[data-footcol] a{padding:8px 0}
-input[type=range]{height:30px !important}
-}
-@media (max-width:520px){
-[data-stat]{min-width:calc(50% - 14px)}
-[data-calcstats]{grid-template-columns:1fr !important}
-[data-plans]{grid-template-columns:1fr !important}
+@media (max-width:640px){
+  .hero{padding:112px 20px 56px}
+  .hero-sub{margin-top:22px}
+  .hero-ctas{margin-top:30px}
+  .hero-ctas .btn,.hero-ctas .btn-ghost{flex:1 1 100%}
+  .float-chip{display:none}
+  .sec{padding:84px 20px}
+  .bento{grid-template-columns:minmax(0,1fr)}
+  .plans{grid-template-columns:minmax(0,1fr);max-width:440px;margin-top:44px}
+  .plan-tag,.plan-meta{min-height:0}
+  .faq-item p{padding-right:8px}
+  .showcase{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}
+  .final{padding-left:14px;padding-right:14px}
+  .final-card{border-radius:30px}
 }
 </style>
 </helmet>
 
-<div ref="{{ rootRef }}" style="position:relative;width:100%;background:#07080a">
+<div ref="{{ rootRef }}" class="home">
 
-<div style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden">
-  <lb-planet accent="{{ planetAccent }}" base="{{ planetAccent }}" glow="{{ planetGlow }}" count="{{ planetCount }}" route="short" style="position:absolute;inset:0;width:100%;height:100%"></lb-planet>
-  <div style="position:absolute;inset:0;background:radial-gradient(125% 88% at 50% 50%,rgba(7,8,10,0) 40%,rgba(7,8,10,.55) 100%)"></div>
-  <div style="position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,rgba(7,8,10,0),rgba(7,8,10,.55))"></div>
+<div class="home-sky" aria-hidden="true">
+  <lb-planet accent="{{ planetAccent }}" base="#8497b3" glow="{{ planetGlow }}" count="{{ planetCount }}" route="short"></lb-planet>
+  <div class="home-sky-veil"></div>
 </div>
 
-<div data-railhide="1" style="position:fixed;top:0;right:0;bottom:0;width:1px;background:#15171b;z-index:40"><div data-progress="1" style="position:absolute;top:0;left:0;width:100%;height:0%;background:linear-gradient(180deg,rgba(168,198,240,0),var(--acc))"></div></div>
+<div class="home-rail" aria-hidden="true"><div data-progress="1"></div></div>
 
-<nav data-glass="nav" style="position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:8px;padding:8px 10px 8px 16px;width:min(1160px,calc(100% - 32px));border-radius:9999px;border:1px solid rgba(255,255,255,.07);background:rgba(10,11,13,.72);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 12px 40px rgba(0,0,0,.5)">
-  <a href="#top" style="display:flex;align-items:center;gap:9px;color:#fff;font-size:15px;font-weight:500;letter-spacing:-.02em;margin-right:auto">
-    <img src="logo-128.png" alt="" style="display:block;width:22px;height:22px;flex-shrink:0">Adronis
-  </a>
-  <div data-navlinks="1" style="display:flex;align-items:center;gap:2px;font-size:13px">
-    <a href="#drop" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">How it works</a>
-    <a href="#engine" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Examples</a>
-    <a href="#faq" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">FAQ</a>
-    <a href="#pricing" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Pricing</a>
-    <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a href="control-room.html" style="color:#d0d6e0;padding:8px 12px;border-radius:9999px" style-hover="background:rgba(255,255,255,.05)">Control room</a></sc-if>
+<nav class="nav" aria-label="Main">
+  <a href="#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
+  <div class="nav-links">
+    <a href="#drop">How it works</a>
+    <a href="#engine">Examples</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+    <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a href="control-room.html">Control room</a></sc-if>
   </div>
-  <a data-loginlink="1" href="login.html" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px" style-hover="background:rgba(255,255,255,.05)">Log in</a>
-  <a href="signup.html" style="margin-left:6px;padding:11px 16px;border-radius:9999px;background:var(--acc);color:#07080a;font-size:13px;font-weight:600;letter-spacing:-.01em;white-space:nowrap" style-hover="background:#cbdff9">Try it free</a>
-  <button data-navburger="1" onClick="{{ toggleNav }}" aria-label="Menu" aria-expanded="{{ navExpanded }}" style="display:none;align-items:center;justify-content:center;flex:none;width:44px;height:44px;margin-left:2px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#d0d6e0;font-size:16px;line-height:1;cursor:pointer;font-family:'Geist Mono',monospace">{{ navIcon }}</button>
+  <a class="nav-plain nav-login" href="login.html">Log in</a>
+  <a href="signup.html" class="nav-cta">Try it free</a>
+  <button type="button" class="nav-burger" onClick="{{ toggleNav }}" aria-label="Menu" aria-expanded="{{ navExpanded }}" aria-controls="home-sheet"></button>
 </nav>
 
-<div data-navsheet="1" style="display:none;position:fixed;top:86px;left:16px;right:16px;z-index:49;gap:2px;padding:10px;border-radius:22px;border:1px solid rgba(255,255,255,.08);background:rgba(10,11,13,.95);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 24px 60px rgba(0,0,0,.6);opacity:{{ navOp }};transform:{{ navTf }};pointer-events:{{ navPe }};visibility:{{ navVis }};transition:opacity .22s ease,transform .28s cubic-bezier(.22,1,.36,1),visibility .22s linear">
-  <a href="#drop" onClick="{{ closeNav }}" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">How it works</a>
-  <a href="#engine" onClick="{{ closeNav }}" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">Examples</a>
-  <a href="#faq" onClick="{{ closeNav }}" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">FAQ</a>
-  <a href="#pricing" onClick="{{ closeNav }}" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">Pricing</a>
-  <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a href="control-room.html" style="padding:14px;border-radius:14px;color:#d0d6e0;font-size:15px" style-hover="background:rgba(255,255,255,.05)">Control room</a></sc-if>
-  <a href="login.html" style="margin-top:4px;padding:14px;border-radius:14px;border:1px solid #23252a;color:#d0d6e0;font-size:15px" style-hover="border-color:#4a4d54">Log in</a>
+<div id="home-sheet" class="{{ navSheetCls }}">
+  <a href="#drop" onClick="{{ closeNav }}">How it works</a>
+  <a href="#engine" onClick="{{ closeNav }}">Examples</a>
+  <a href="#pricing" onClick="{{ closeNav }}">Pricing</a>
+  <a href="#faq" onClick="{{ closeNav }}">FAQ</a>
+  <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a href="control-room.html" onClick="{{ closeNav }}">Control room</a></sc-if>
+  <a href="login.html" class="nav-sheet-alt">Log in</a>
 </div>
 
-<section id="top" data-hero="1" style="position:relative;min-height:100svh;padding:150px 24px 80px;display:flex;justify-content:center;overflow:hidden">
-  <div style="position:absolute;top:-10vh;left:50%;transform:translateX(-50%);width:min(1400px,140%);height:80vh;background:radial-gradient(60% 50% at 50% 0%,rgba(168,198,240,.10),rgba(7,8,10,0) 70%);pointer-events:none"></div>
-  <div style="position:absolute;left:0;right:0;bottom:0;height:52vh;background:linear-gradient(180deg,rgba(7,8,10,0) 0%,rgba(150,170,200,.09) 58%,rgba(7,8,10,0) 100%);pointer-events:none"></div>
+<main class="home-main">
 
-  <div data-grid2="1" style="position:relative;width:100%;max-width:1200px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:center;gap:32px">
-    <div style="position:relative;z-index:3">
-      <h1 style="margin:0;font-size:clamp(38px,4.6vw,60px);line-height:1.04;letter-spacing:-.035em;font-weight:500;color:#fff;text-wrap:balance">Ready-made ads for your business, every week.</h1>
-      <p style="margin:26px 0 0;max-width:44ch;font-size:clamp(17px,1.35vw,19px);line-height:1.55;color:#a3a9b3">We make the posts for your Instagram and Facebook. You approve them in two minutes, and we publish them.</p>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:34px">
-        <a href="signup.html" style="display:inline-flex;align-items:center;gap:10px;padding:15px 24px;border-radius:9999px;background:var(--acc);color:#07080a;font-size:16px;font-weight:600;letter-spacing:-.01em;box-shadow:0 10px 40px rgba(168,198,240,.22)" style-hover="background:#cbdff9">Try it free</a>
-        <a href="#drop" style="display:inline-flex;align-items:center;gap:10px;padding:15px 24px;border-radius:9999px;border:1px solid #2c2f35;color:#d0d6e0;font-size:16px;background:rgba(255,255,255,.02)" style-hover="border-color:#4a4d54;color:#fff">See how it works</a>
+<section id="top" class="hero">
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow" data-in="1">Weekly ads for local businesses</div>
+      <h1 data-in="1" style="animation-delay:.06s">We make your ads. You just say <em>yes</em>.</h1>
+      <p class="hero-sub" data-in="1" style="animation-delay:.14s">Every Monday you get ready-to-post ads made for your business and sized for Instagram, Facebook and more. Approve them in about two minutes and we publish them for you.</p>
+      <div class="hero-ctas" data-in="1" style="animation-delay:.22s">
+        <a href="signup.html" class="btn btn-lg">Try it free<span class="mono" aria-hidden="true">→</span></a>
+        <a href="#drop" class="btn-ghost btn-lg">See how it works</a>
       </div>
+      <ul class="hero-assure" data-in="1" style="animation-delay:.3s">
+        <li><span class="tick" aria-hidden="true">✓</span>Free plan, no card needed</li>
+        <li><span class="tick" aria-hidden="true">✓</span>7-day trial on paid plans</li>
+        <li><span class="tick" aria-hidden="true">✓</span>Cancel any time</li>
+      </ul>
     </div>
 
-    <div data-scene="1" style="position:absolute;top:50%;right:-6%;width:60%;height:112%;transform:translateY(-50%);perspective:1500px;pointer-events:none;z-index:2">
-      <div data-tilt="1" style="position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .12s linear">
-        <div data-depth=".2" style="position:absolute;left:50%;top:64%;width:150%;height:70%;transform:translate(-50%,0) rotateX(74deg) translateY(var(--py,0px));background-image:linear-gradient(rgba(168,198,240,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(168,198,240,.16) 1px,transparent 1px);background-size:46px 46px;-webkit-mask-image:radial-gradient(50% 50% at 50% 40%,#000,transparent 72%);mask-image:radial-gradient(50% 50% at 50% 40%,#000,transparent 72%)"></div>
-        <div style="position:absolute;left:14%;top:26%;width:56%;height:44%;border-radius:50%;background:radial-gradient(closest-side,rgba(168,198,240,.22),transparent);filter:blur(28px)"></div>
+    <div class="hero-demo" data-in="1" style="animation-delay:.2s">
+      <div class="hero-demo-glow" aria-hidden="true"></div>
+      <div class="float-chip fc-a" data-depth="1.2" aria-hidden="true">
+        <span class="ic is-blue">✦</span>
+        <span>Drop ready<small><span>MON</span> 09:00</small></span>
+      </div>
+      <div class="float-chip fc-b" data-depth="2" aria-hidden="true">
+        <span class="ic is-green">✓</span>
+        <span>Posted to Instagram<small><span>MON</span> 18:30</small></span>
+      </div>
+      <p class="hero-demo-label"><span class="pulse" aria-hidden="true"></span>Try it: this is your Monday</p>
+      <lb-swipe></lb-swipe>
+    </div>
+  </div>
+</section>
 
-        <div data-depth="1" style="position:absolute;left:6%;top:8%;width:60%;transform:translateZ(120px) translateY(var(--py,0px)) rotateY(-13deg) rotateX(6deg);border-radius:14px;border:1px solid rgba(255,255,255,.09);background:#0e0f12;box-shadow:0 40px 90px rgba(0,0,0,.6);overflow:hidden">
-          <img src="examples/pizza.jpg" alt="Example ad for a pizza place: No ideas for dinner?" width="307" height="316" style="display:block;width:100%;height:auto;aspect-ratio:307/316;background:#15171b">
-          <div style="padding:14px 16px 16px"><div style="font-size:15px;color:#fff;letter-spacing:-.015em">No ideas for dinner?</div><div style="margin-top:5px;font-size:13px;color:#8a8f98">Posted to Instagram and Facebook</div></div>
-        </div>
+<section id="operators" class="made" aria-label="Who it's for">
+  <p class="made-title" data-rv="made">Made for local businesses with no time for marketing.</p>
+  <div class="marquee" data-rv="made" style="transition-delay:.1s">
+    <div class="marquee-track">
+      <div class="marquee-set">
+        <sc-for list="{{ verticals }}" as="v" hint-placeholder-count="9"><span class="vchip">{{ v }}</span></sc-for>
+      </div>
+      <div class="marquee-set" aria-hidden="true">
+        <sc-for list="{{ verticals }}" as="v" hint-placeholder-count="9"><span class="vchip">{{ v }}</span></sc-for>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <div data-depth="1.7" style="position:absolute;right:0%;top:36%;width:52%;transform:translateZ(230px) translateY(var(--py,0px)) rotateY(11deg) rotateX(-4deg);border-radius:14px;border:1px solid rgba(255,255,255,.11);background:#0e0f12;box-shadow:0 50px 100px rgba(0,0,0,.7);overflow:hidden">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid #15171b"><span style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#8a8f98">THIS WEEK</span><span style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--acc)">3 POSTS</span></div>
-          <div style="padding:11px 13px;display:grid;gap:8px">
-            <div style="display:flex;align-items:center;gap:9px"><img src="examples/cafe.jpg" alt="" width="26" height="26" style="width:26px;height:26px;border-radius:6px;object-fit:cover;background:#1b1e22"><span style="font-size:12px;color:#d0d6e0">Mon 18:30 · Story</span></div>
-            <div style="display:flex;align-items:center;gap:9px"><img src="examples/bakery.jpg" alt="" width="26" height="26" style="width:26px;height:26px;border-radius:6px;object-fit:cover;background:#1b1e22"><span style="font-size:12px;color:#d0d6e0">Wed 12:00 · Feed</span></div>
-            <div style="display:flex;align-items:center;gap:9px"><img src="examples/fitness.jpg" alt="" width="26" height="26" style="width:26px;height:26px;border-radius:6px;object-fit:cover;background:#1b1e22"><span style="font-size:12px;color:#d0d6e0">Fri 17:15 · Reel</span></div>
+<section id="why" class="sec">
+  <div class="sec-in">
+    <div class="sec-head is-center" data-rv="why">
+      <h2>Posting every week is a second job.</h2>
+      <p class="lede">You know you should post more. But taking photos, writing, designing and scheduling every single week eats the hours your business needs. So we take the whole job off your plate.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-col" data-rv="why" style="transition-delay:.05s">
+        <h3>On your own</h3>
+        <div class="why-kind">Doing it all yourself</div>
+        <ul class="why-list">
+          <li><span class="x" aria-hidden="true">✕</span>Take and edit the photos</li>
+          <li><span class="x" aria-hidden="true">✕</span>Write every caption</li>
+          <li><span class="x" aria-hidden="true">✕</span>Design each post</li>
+          <li><span class="x" aria-hidden="true">✕</span>Remember to post, every week</li>
+        </ul>
+        <div class="why-foot">Costs you hours every week</div>
+      </div>
+      <div class="why-col" data-rv="why" style="transition-delay:.12s">
+        <h3>An agency</h3>
+        <div class="why-kind">Hiring someone to do it</div>
+        <ul class="why-list">
+          <li><span class="x" aria-hidden="true">✕</span>A monthly retainer</li>
+          <li><span class="x" aria-hidden="true">✕</span>Briefs, calls and revision rounds</li>
+          <li><span class="x" aria-hidden="true">✕</span>Usually a contract</li>
+        </ul>
+        <div class="why-foot">Built for bigger budgets</div>
+      </div>
+      <div class="why-col is-us" data-rv="why" style="transition-delay:.19s">
+        <h3 class="why-logo"><img src="logo-128.png" alt="">Adronis</h3>
+        <div class="why-kind">We do it, you approve it</div>
+        <ul class="why-list">
+          <li><span class="tick" aria-hidden="true">✓</span>Tell us about your business once</li>
+          <li><span class="tick" aria-hidden="true">✓</span>New ads ready every Monday</li>
+          <li><span class="tick" aria-hidden="true">✓</span>Approve them in about two minutes</li>
+          <li><span class="tick" aria-hidden="true">✓</span>No contract, cancel any time</li>
+        </ul>
+        <div class="why-foot">From €0 a month</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="drop" class="sec">
+  <div class="sec-in">
+    <div class="sec-head" data-rv="how">
+      <div class="eyebrow">How it works</div>
+      <h2>Your part takes about two minutes a week.</h2>
+      <p class="lede">You do two things: tell us about your business once, and approve the ads. We do the rest.</p>
+    </div>
+    <ol class="how-grid" style="list-style:none;padding:0">
+      <li class="step" data-rv="how" style="transition-delay:.05s">
+        <div class="step-vis" aria-hidden="true">
+          <div class="mk">
+            <div class="mk-row"><span class="mk-l">Business name</span><span class="mk-v">Marko Pizza</span></div>
+            <div class="mk-row"><span class="mk-l">What you sell</span><span class="mk-v is-focus">Pizza, pasta and salads<i class="caret"></i></span></div>
+            <div class="mk-row"><span class="mk-l">Brand vibe</span><span class="mk-chips"><span class="on">Warm &amp; cozy</span><span>Bold &amp; energetic</span></span></div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="operators" style="position:relative;padding:clamp(40px,5vw,72px) 24px">
-  <div style="max-width:1200px;margin:0 auto">
-    <h2 style="margin:0;max-width:30ch;font-size:clamp(22px,2.2vw,28px);line-height:1.2;letter-spacing:-.025em;font-weight:500;color:#fff">Made for local businesses with no time for marketing.</h2>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:22px">
-      <sc-for list="{{ verticals }}" as="v" hint-placeholder-count="9">
-        <span data-chip="1" style="display:inline-block;padding:9px 15px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02);font-size:14px;color:#d0d6e0;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease,color .35s ease" style-hover="transform:translateY(-3px);border-color:rgba(168,198,240,.6);color:#fff;box-shadow:0 14px 34px rgba(0,0,0,.5),0 0 0 1px rgba(168,198,240,.18),0 0 32px rgba(168,198,240,.22)">{{ v }}</span>
-      </sc-for>
-    </div>
-  </div>
-</section>
-
-<section id="drop" style="position:relative;padding:clamp(80px,9vw,130px) 24px;background:radial-gradient(60% 55% at 85% 45%,rgba(168,198,240,.06),rgba(7,8,10,0) 70%)">
-  <div style="max-width:1200px;margin:0 auto">
-    <h2 style="margin:0;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">How it works</h2>
-    <p style="margin:18px 0 0;max-width:52ch;font-size:17px;line-height:1.6;color:#a3a9b3">You do two things: tell us about your business once, and approve the ads. We do the rest.</p>
-    <ol style="list-style:none;margin:clamp(36px,4.5vw,56px) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:clamp(28px,3vw,48px)">
-      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
-        <li style="padding-top:22px;border-top:1px solid #23252a">
-          <div style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9999px;border:1px solid rgba(168,198,240,.45);color:var(--acc);font-size:15px;font-weight:500">{{ s.n }}</div>
-          <div style="margin-top:18px;font-size:20px;line-height:1.3;letter-spacing:-.02em;color:#fff">{{ s.t }}</div>
-          <div style="margin-top:10px;max-width:40ch;font-size:15px;line-height:1.6;color:#a3a9b3">{{ s.d }}</div>
-        </li>
-      </sc-for>
+        <div class="step-body">
+          <div class="step-n">01</div>
+          <h3>{{ steps.0.t }}</h3>
+          <p>{{ steps.0.d }}</p>
+        </div>
+      </li>
+      <li class="step" data-rv="how" style="transition-delay:.12s">
+        <div class="step-vis" aria-hidden="true">
+          <div class="mk-note">
+            <div class="mk-push">
+              <div class="mk-app"><img src="logo-128.png" alt="">Adronis<span class="mono"><span>MON</span> 09:00</span></div>
+              <div class="mk-t">Your drop is ready</div>
+              <div class="mk-d">12 new ads are waiting for your OK.</div>
+            </div>
+            <div class="mk-thumbs"><img src="examples/cafe.jpg" alt="" loading="lazy"><img src="examples/bakery.jpg" alt="" loading="lazy"><img src="examples/salon.jpg" alt="" loading="lazy"><img src="examples/carwash.jpg" alt="" loading="lazy"><span>+8</span></div>
+          </div>
+        </div>
+        <div class="step-body">
+          <div class="step-n">02</div>
+          <h3>{{ steps.1.t }}</h3>
+          <p>{{ steps.1.d }}</p>
+        </div>
+      </li>
+      <li class="step" data-rv="how" style="transition-delay:.19s">
+        <div class="step-vis" aria-hidden="true">
+          <div class="mk-sched">
+            <div class="ms-row"><img src="examples/pizza.jpg" alt="" loading="lazy"><div><b>Instagram · Story</b><small><span>MON</span> 18:30</small></div><span class="ms-chip is-live">PUBLISHED</span></div>
+            <div class="ms-row"><img src="examples/bakery.jpg" alt="" loading="lazy"><div><b>Facebook · Feed</b><small><span>WED</span> 12:00</small></div><span class="ms-chip is-slot">SCHEDULED</span></div>
+            <div class="ms-row"><img src="examples/fitness.jpg" alt="" loading="lazy"><div><b>TikTok · Reel</b><small><span>FRI</span> 17:15</small></div><span class="ms-chip is-slot">SCHEDULED</span></div>
+          </div>
+        </div>
+        <div class="step-body">
+          <div class="step-n">03</div>
+          <h3>{{ steps.2.t }}</h3>
+          <p>{{ steps.2.d }}</p>
+        </div>
+      </li>
     </ol>
   </div>
 </section>
 
-<section id="engine" style="position:relative;padding:clamp(40px,5vw,72px) 24px clamp(80px,9vw,130px);background:radial-gradient(70% 50% at 50% 40%,rgba(168,198,240,.05),rgba(7,8,10,0) 72%)">
-  <div style="max-width:1200px;margin:0 auto">
-    <h2 style="margin:0;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Examples of what you get</h2>
-    <p style="margin:18px 0 0;max-width:52ch;font-size:17px;line-height:1.6;color:#a3a9b3">Posts for a few local businesses, the way they show up on each network. Yours are made for your business.</p>
+<section id="engine" class="sec">
+  <div class="sec-in">
+    <div class="sec-head" data-rv="ex">
+      <div class="eyebrow">Examples</div>
+      <h2>This is what lands in your approvals.</h2>
+      <p class="lede">Posts for a few local businesses, the way they show up on each network. Yours are made for your business.</p>
+    </div>
 
-    <div data-showcase="1" style="max-width:1110px;margin-top:clamp(36px,4.5vw,56px);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);gap:16px">
-
+    <div class="showcase" data-rv="ex" style="transition-delay:.1s">
       <sc-for list="{{ stories }}" as="st" hint-placeholder-count="2">
-        <div data-storycard="1" style="grid-row:{{ st.row }};grid-column:1;position:relative;border-radius:18px;border:1px solid #23252a;background:#0e0f12;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.55);transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)">
-          <div style="position:absolute;inset:-40px;background:url({{ st.img }}) center/cover;filter:blur(34px) brightness(.55);transform:scale(1.1)"></div>
-          <div style="position:relative;display:flex;flex-direction:column;height:100%;min-height:inherit">
-            <div style="display:flex;gap:4px;padding:14px 14px 0">
-              <span style="flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.9)"></span><span style="flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.35)"></span><span style="flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.35)"></span>
+        <div class="story" style="grid-row:{{ st.row }};grid-column:1">
+          <div class="story-bg" style="background-image:url({{ st.img }})"></div>
+          <div class="story-in">
+            <div class="story-bars"><span></span><span></span><span></span></div>
+            <div class="story-top">
+              <span class="av" style="background:{{ st.tint }}">{{ st.initial }}</span>
+              <span class="nm">{{ st.name }}</span>
+              <span class="chn">Instagram story</span>
             </div>
-            <div style="display:flex;align-items:center;gap:9px;padding:12px 16px">
-              <span style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9999px;background:{{ st.tint }};color:#16130f;font-size:13px;font-weight:600">{{ st.initial }}</span>
-              <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#fff;font-weight:500">{{ st.name }}</span>
-              <span style="margin-left:auto;flex-shrink:0;padding:4px 10px;border-radius:9999px;background:rgba(0,0,0,.35);font-size:11px;color:#fff">Instagram story</span>
-            </div>
-            <div style="flex:1;display:flex;align-items:center;padding:4px 0">
-              <img src="{{ st.img }}" alt="{{ st.alt }}" width="307" height="316" loading="lazy" style="display:block;width:100%;height:auto;aspect-ratio:307/316">
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;padding:6px 16px 16px">
-              <span style="flex:1;padding:10px 16px;border-radius:9999px;border:1px solid rgba(255,255,255,.45);font-size:13px;color:rgba(255,255,255,.85)">Send message</span>
-              <span style="font-size:18px;color:#fff">&#9825;</span>
+            <div class="story-media"><img src="{{ st.img }}" alt="{{ st.alt }}" width="307" height="316" loading="lazy"></div>
+            <div class="story-bottom">
+              <span class="story-msg">Send message</span>
+              <span style="font-size:18px;color:#fff" aria-hidden="true">&#9825;</span>
             </div>
           </div>
         </div>
-  
       </sc-for>
-
       <sc-for list="{{ posts }}" as="p" hint-placeholder-count="4">
-        <div style="border-radius:18px;border:1px solid #1f2226;background:#0e0f12;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)" data-examplecard="1">
-          <div style="display:flex;align-items:center;gap:9px;padding:11px 14px">
-            <span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:9999px;background:{{ p.tint }};color:#16130f;font-size:12px;font-weight:600">{{ p.initial }}</span>
-            <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#fff;font-weight:500">{{ p.name }}</span>
-            <span style="margin-left:auto;flex-shrink:0;padding:3px 9px;border-radius:9999px;border:1px solid #2c2f35;font-size:11px;color:#a3a9b3">{{ p.channel }}</span>
+        <div class="post">
+          <div class="post-top">
+            <span class="av" style="background:{{ p.tint }}">{{ p.initial }}</span>
+            <span class="nm">{{ p.name }}</span>
+            <span class="chn">{{ p.channel }}</span>
           </div>
-          <img src="{{ p.img }}" alt="{{ p.alt }}" width="307" height="316" loading="lazy" style="display:block;width:100%;height:auto;aspect-ratio:307/316;background:#15171b">
-          <div style="padding:12px 14px 14px;font-size:13px;line-height:1.5;color:#a3a9b3">{{ p.caption }}</div>
+          <img src="{{ p.img }}" alt="{{ p.alt }}" width="307" height="316" loading="lazy">
+          <div class="post-cap">{{ p.caption }}</div>
         </div>
       </sc-for>
+    </div>
+    <p class="ex-note" data-rv="ex">Every image is AI-generated for the business it's made for — never a stock photo with a logo on top.</p>
+  </div>
+</section>
+
+<section id="control" class="sec">
+  <div class="sec-in">
+    <div class="sec-head is-center" data-rv="ctl">
+      <div class="eyebrow">You're in control</div>
+      <h2>You approve every single ad.</h2>
+      <p class="lede">Adronis does the work, but every ad waits for you first. Change anything before it posts, or turn it down and tell us why.</p>
+    </div>
+    <div class="bento">
+      <div class="tile" data-rv="ctl" style="transition-delay:.04s">
+        <div class="tile-vis" aria-hidden="true"><div class="tv-btns"><span class="y">✓ Approve</span><span class="n">✕ Reject</span></div></div>
+        <h3>Nothing posts without your OK</h3>
+        <p>Only what you approve is ever published. Everything else stays with you.</p>
+      </div>
+      <div class="tile" data-rv="ctl" style="transition-delay:.1s">
+        <div class="tile-vis" aria-hidden="true"><div class="tv-field"><small>CAPTION</small>Fresh out of the oven at 7am.<i class="caret"></i></div></div>
+        <h3>Edit the text first</h3>
+        <p>Change the headline or caption before it goes out. The image stays as it is.</p>
+      </div>
+      <div class="tile" data-rv="ctl" style="transition-delay:.16s">
+        <div class="tile-vis" aria-hidden="true"><div class="tv-time"><span>12:00</span><span class="on">17:15</span><span>19:30</span></div></div>
+        <h3>Choose when it posts</h3>
+        <p>Adronis picks the best time for each ad, or you set your own.</p>
+      </div>
+      <div class="tile" data-rv="ctl" style="transition-delay:.04s">
+        <div class="tile-vis" aria-hidden="true"><div class="tv-chips"><span class="on">Wrong tone</span><span>Wrong facts or price</span><span>Image doesn't fit</span></div></div>
+        <h3>Say why, and the next drop learns</h3>
+        <p>Turn an ad down with a reason and the engine takes it into your next drop.</p>
+      </div>
+      <div class="tile" data-rv="ctl" style="transition-delay:.1s">
+        <div class="tile-vis" aria-hidden="true"><div class="tv-dl"><img src="examples/carwash.jpg" alt="" loading="lazy">Download image<span class="mono">↓</span></div></div>
+        <h3>Download any approved ad</h3>
+        <p>Keep a copy of every ad you approved and use it anywhere you like.</p>
+      </div>
+      <div class="tile" data-rv="ctl" style="transition-delay:.16s">
+        <div class="tile-vis" aria-hidden="true"><div class="tv-toggle"><span class="tv-sw"></span>Cancel subscription</div></div>
+        <h3>Cancel any time</h3>
+        <p>One click from your account page. No calls, no notice period.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="faq" style="position:relative;z-index:1;padding:clamp(80px,9vw,120px) 24px">
-  <div data-grid2="1" style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,5vw,80px);align-items:start">
-    <div data-faqside="1" style="position:sticky;top:120px">
-      <h2 style="margin:0;max-width:16ch;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">What owners ask before they sign up.</h2>
-      <p style="margin:20px 0 0;max-width:38ch;font-size:15px;line-height:1.6;color:#a3a9b3">Didn't find yours? Write to us and we'll get back to you.</p>
-      <a href="message-us.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:22px;padding:12px 20px;border-radius:9999px;border:1px solid #23252a;color:#d0d6e0;font-size:14px;font-weight:500" style-hover="border-color:#4a4d54">Message us<span style="font-family:'Geist Mono',monospace;font-size:13px">&rarr;</span></a>
+<section id="pricing" class="sec">
+  <div class="sec-in" style="text-align:center">
+    <div class="sec-head is-center" data-rv="price">
+      <div class="eyebrow">Pricing</div>
+      <h2>Simple prices, no contract.</h2>
+      <p class="lede">Start free, or try any paid plan free for 7 days.</p>
     </div>
-    <div style="border-top:1px solid #1b1e22">
-      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="5">
-        <details data-faq="1" style="border-bottom:1px solid #1b1e22">
-          <summary style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 2px;cursor:pointer;font-size:clamp(16px,1.5vw,18px);line-height:1.4;letter-spacing:-.015em;color:#fff">{{ f.q }}<span data-faqicon="1" aria-hidden="true" style="flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9999px;border:1px solid #23252a;color:var(--acc);font-family:'Geist Mono',monospace;font-size:15px;line-height:1">+</span></summary>
-          <p style="margin:0;padding:0 48px 24px 2px;max-width:64ch;font-size:15px;line-height:1.65;color:#a3a9b3">{{ f.a }}</p>
+    <div data-rv="price" style="transition-delay:.06s">
+      <div class="tabswitch billing" role="group" aria-label="Billing">
+        <button type="button" class="{{ mCls }}" onClick="{{ setMonthly }}" aria-pressed="{{ mPressed }}">Monthly</button>
+        <button type="button" class="{{ aCls }}" onClick="{{ setAnnual }}" aria-pressed="{{ aPressed }}">Annual<span class="save-pill">−20%</span></button>
+      </div>
+      <div class="promo">
+        <span class="promo-tag">PROMO CODE</span>
+        <span class="promo-text">20% off any paid plan — enter it at checkout.</span>
+        <button type="button" class="promo-code" onClick="{{ copyPromo }}">{{ promoCode }}<span class="copy" aria-live="polite">{{ promoCopyLabel }}</span></button>
+      </div>
+      <sc-if value="{{ hasFreeNote }}" hint-placeholder-val="{{ false }}">
+        <div class="free-note" role="status"><span class="mono">{{ freeNoteTag }}</span>{{ freeNoteText }}</div>
+      </sc-if>
+    </div>
+
+    <div class="plans">
+      <sc-for list="{{ plans }}" as="pl" hint-placeholder-count="4">
+        <div class="{{ pl.cls }}" data-rv="price" style="transition-delay:{{ pl.delay }}">
+          <sc-if value="{{ pl.featured }}" hint-placeholder-val="{{ false }}"><span class="plan-flag">Recommended</span></sc-if>
+          <div class="plan-name">{{ pl.name }}</div>
+          <div class="plan-tag">{{ pl.tagline }}</div>
+          <div class="plan-price"><span class="amt">{{ pl.price }}</span><span class="per">{{ pl.per }}</span></div>
+          <div class="plan-meta">
+            <sc-if value="{{ pl.showPerAd }}" hint-placeholder-val="{{ false }}"><span class="perad"><b>≈ {{ pl.perAd }}</b> <span>per ad</span></span></sc-if>
+            <sc-if value="{{ pl.showYearly }}" hint-placeholder-val="{{ false }}"><span>{{ pl.yearly }} <span>billed yearly</span></span></sc-if>
+            <sc-if value="{{ pl.showSave }}" hint-placeholder-val="{{ false }}"><span class="save"><span>You save</span> <b>{{ pl.save }}</b> <span>a year</span></span></sc-if>
+          </div>
+          <div class="plan-line"></div>
+          <div class="plan-feats">
+            <sc-for list="{{ pl.features }}" as="f" hint-placeholder-count="3">
+              <div class="plan-feat"><span class="tick" aria-hidden="true">✓</span><span>{{ f }}</span></div>
+            </sc-for>
+          </div>
+          <a href="{{ pl.href }}" class="{{ pl.ctaCls }}">{{ pl.cta }}</a>
+          <div class="plan-after">{{ pl.after }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div class="promise" data-rv="price">
+      <span><span class="tick" aria-hidden="true">✓</span>Prices include VAT</span>
+      <span><span class="tick" aria-hidden="true">✓</span>Cancel any time, in one click</span>
+      <span><span class="tick" aria-hidden="true">✓</span>Secure payment by Paddle</span>
+      <span><span class="tick" aria-hidden="true">✓</span>Nothing posts without your OK</span>
+    </div>
+
+    <p class="vat-note">All prices are per month and <strong>include VAT</strong> — what you see here is what you pay, nothing is added at checkout. Paid plans start with a 7-day free trial, one per account: a card is required, nothing is charged during the trial, and the plan then renews automatically until you cancel. Cancelling takes effect at the end of the period you have paid for. Annual plans are billed 12 months upfront and unused months are not refunded.</p>
+  </div>
+</section>
+
+<section id="faq" class="sec">
+  <div class="sec-in faq-grid">
+    <div class="faq-side" data-rv="faq">
+      <div class="eyebrow">FAQ</div>
+      <h2 style="margin:0;max-width:14ch;font-size:clamp(34px,4vw,54px);line-height:1.04;letter-spacing:-.045em">What owners ask before they sign up.</h2>
+      <p>Didn't find yours? Write to us and we'll get back to you.</p>
+      <a href="message-us.html" class="btn-ghost" style="margin-top:24px">Message us<span class="mono" aria-hidden="true">→</span></a>
+    </div>
+    <div class="faq-list" data-rv="faq" style="transition-delay:.08s">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="8">
+        <details class="faq-item">
+          <summary>{{ f.q }}<span class="faq-icon" aria-hidden="true"></span></summary>
+          <p>{{ f.a }}</p>
         </details>
       </sc-for>
     </div>
   </div>
 </section>
 
-<section id="pricing" style="position:relative;padding:clamp(80px,9vw,130px) 24px;background:radial-gradient(70% 45% at 50% 55%,rgba(168,198,240,.07),rgba(7,8,10,0) 72%)">
-  <div style="max-width:1200px;margin:0 auto;text-align:center">
-    <h2 style="margin:0 auto;font-size:clamp(30px,3.6vw,46px);line-height:1.05;letter-spacing:-.03em;font-weight:500;color:#fff">Simple prices, no contract.</h2>
-    <p style="margin:16px auto 0;max-width:48ch;font-size:17px;line-height:1.6;color:#a3a9b3">Start free, or try any paid plan free for 7 days.</p>
-    <div data-billing="1" style="display:inline-flex;align-items:center;gap:4px;margin-top:28px;padding:4px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02)">
-      <button onClick="{{ setMonthly }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ mBg }};color:{{ mColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Monthly</button>
-      <button onClick="{{ setAnnual }}" style="padding:8px 18px;border-radius:9999px;border:none;background:{{ aBg }};color:{{ aColor }};font-size:13px;font-family:'Geist',sans-serif;cursor:pointer;transition:all .25s ease">Annual · −20%</button>
+<section id="finalcta" class="final">
+  <div class="final-card" data-rv="final">
+    <h2>Your first ads can be ready this week.</h2>
+    <p class="lede">Sign up in about ten minutes. No contract, no meeting, cancel any time.</p>
+    <div class="hero-ctas">
+      <a href="signup.html" class="btn btn-lg">Try it free<span class="mono" aria-hidden="true">→</span></a>
     </div>
-    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;width:fit-content;max-width:100%;margin:20px auto 0;padding:10px 10px 10px 18px;border-radius:14px;border:1px dashed rgba(159,215,176,.5);background:rgba(159,215,176,.07)">
-      <span style="font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#9fd7b0">PROMO CODE</span>
-      <span style="font-size:14px;line-height:1.5;color:#d0d6e0">20% off any paid plan — enter it at checkout.</span>
-      <button type="button" onClick="{{ copyPromo }}" style="display:inline-flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;border-radius:10px;border:1px solid rgba(159,215,176,.35);background:#0a0f0d;color:#fff;font-family:'Geist Mono',monospace;font-size:15px;letter-spacing:.14em;cursor:pointer;transition:border-color .2s ease" style-hover="border-color:rgba(159,215,176,.75)">{{ promoCode }}<span aria-live="polite" style="padding:5px 10px;border-radius:7px;background:#9fd7b0;color:#07080a;font-family:'Geist',sans-serif;font-size:12px;font-weight:600;letter-spacing:0">{{ promoCopyLabel }}</span></button>
-    </div>
-    <sc-if value="{{ hasFreeNote }}" hint-placeholder-val="{{ false }}">
-      <div role="status" style="max-width:680px;margin:26px auto 0;padding:14px 20px;border-radius:12px;border:1px solid rgba(168,198,240,.25);background:rgba(168,198,240,.06);font-size:14px;line-height:1.6;color:#d0d6e0;text-align:left"><span style="margin-right:10px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--acc)">{{ freeNoteTag }}</span>{{ freeNoteText }}</div>
-    </sc-if>
-  </div>
-
-  <div data-plans="1" style="max-width:1200px;margin:clamp(32px,4vw,48px) auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch">
-    <sc-for list="{{ plans }}" as="pl" hint-placeholder-count="4">
-      <div style="position:relative;display:flex;flex-direction:column;padding:clamp(22px,2.2vw,28px);border-radius:14px;border:1px solid {{ pl.border }};background:{{ pl.bg }};transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s ease,box-shadow .35s ease" style-hover="transform:translateY(-6px);border-color:rgba(168,198,240,.6);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(168,198,240,.18),0 0 60px rgba(168,198,240,.22)">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-          <div style="font-size:16px;color:#fff;letter-spacing:-.015em">{{ pl.name }}</div>
-          <sc-if value="{{ pl.featured }}" hint-placeholder-val="{{ false }}"><span style="padding:3px 9px;border-radius:4px;background:rgba(168,198,240,.14);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--acc)">RECOMMENDED</span></sc-if>
-        </div>
-        <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:7px;margin-top:18px">
-          <span style="font-size:clamp(36px,3.6vw,46px);letter-spacing:-.04em;color:#fff;font-weight:400">{{ pl.price }}</span>
-          <span style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#8a8f98">{{ pl.per }}</span>
-        </div>
-        <sc-if value="{{ pl.showYearly }}" hint-placeholder-val="{{ false }}">
-          <div style="margin-top:6px;font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.06em;color:#8a8f98">{{ pl.yearly }} billed yearly</div>
-        </sc-if>
-        <div style="height:1px;background:#1b1e22;margin:20px 0"></div>
-        <div style="display:grid;gap:11px;flex:1;align-content:start">
-          <sc-for list="{{ pl.features }}" as="f" hint-placeholder-count="3">
-            <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;font-size:14px;line-height:1.5;color:#a3a9b3;text-align:left"><span style="color:var(--acc);font-size:13px;line-height:1.5">✓</span>{{ f }}</div>
-          </sc-for>
-        </div>
-        <a href="{{ pl.href }}" style="display:block;margin-top:24px;padding:13px;border-radius:9999px;text-align:center;font-size:14px;font-weight:500;background:{{ pl.ctaBg }};color:{{ pl.ctaColor }};border:1px solid {{ pl.ctaBorder }}">{{ pl.cta }}</a>
-      </div>
-    </sc-for>
-  </div>
-
-  <p style="max-width:70ch;margin:28px auto 0;font-size:13px;line-height:1.6;color:#8a8f98;text-align:center">All prices are per month and <strong>include VAT</strong> — what you see here is what you pay, nothing is added at checkout. Paid plans start with a 7-day free trial, one per account: a card is required, nothing is charged during the trial, and the plan then renews automatically until you cancel. Cancelling takes effect at the end of the period you have paid for. Annual plans are billed 12 months upfront and unused months are not refunded.</p>
-</section>
-
-<section id="finalcta" style="position:relative;padding:clamp(90px,10vw,150px) 24px clamp(70px,8vw,110px);text-align:center;overflow:visible">
-  <div style="position:absolute;left:50%;bottom:-10%;transform:translateX(-50%);width:min(1200px,140%);height:70vh;background:radial-gradient(closest-side,rgba(168,198,240,.11),transparent 70%);pointer-events:none;z-index:0"></div>
-  <div style="position:relative;max-width:760px;margin:0 auto">
-    <h2 style="margin:0;font-size:clamp(32px,4.4vw,58px);line-height:1.05;letter-spacing:-.035em;font-weight:500;color:#fff;text-wrap:balance">Your first ads can be ready this week.</h2>
-    <p style="margin:22px auto 0;max-width:46ch;font-size:17px;line-height:1.6;color:#a3a9b3">Sign up in about ten minutes. No contract, no meeting, cancel any time.</p>
-    <a href="signup.html" style="display:inline-flex;align-items:center;gap:10px;margin-top:34px;padding:16px 28px;border-radius:9999px;background:var(--acc);color:#07080a;font-size:16px;font-weight:600;letter-spacing:-.01em;box-shadow:0 14px 50px rgba(168,198,240,.26)" style-hover="background:#cbdff9">Try it free</a>
-    <div style="margin-top:16px;font-size:13px;color:#8a8f98">The Free plan needs no card.</div>
+    <div class="final-alt"><a href="signup.html?plan=free">Or start on the Free plan</a> — <span>no card needed.</span></div>
   </div>
 </section>
 
-<footer style="position:relative;margin-top:-1px;padding:0 24px 44px;background:transparent">
-  <div style="position:relative;z-index:1;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:32px">
-    <a href="#top" style="text-decoration:none;display:block">
-      <div style="display:flex;align-items:center;gap:9px;color:#fff;font-size:15px;font-weight:500;letter-spacing:-.02em"><img src="logo-128.png" alt="" style="display:block;width:22px;height:22px;flex-shrink:0">Adronis</div>
-      <div style="margin-top:12px;font-size:13px;line-height:1.6;color:#8a8f98;max-width:26ch">Ready-made ads every week for businesses with no time for marketing.</div>
+</main>
+
+<footer>
+  <div class="foot-grid">
+    <a href="#top" style="display:block;color:inherit">
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
+      <div class="foot-desc">Ready-made ads every week for businesses with no time for marketing.</div>
     </a>
-    <div data-footcol="1" style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#7b8089;margin-bottom:4px">PRODUCT</div><a href="#drop" style="color:#8a8f98">How it works</a><a href="#engine" style="color:#8a8f98">Examples</a><a href="approvals.html" style="color:#8a8f98">Approvals</a><sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a href="control-room.html" style="color:#8a8f98">Control room</a></sc-if></div>
-    <div data-footcol="1" style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#7b8089;margin-bottom:4px">COMPANY</div><a href="about.html" style="color:#8a8f98">About</a><a href="#pricing" style="color:#8a8f98">Pricing</a><a href="#faq" style="color:#8a8f98">FAQ</a><a href="message-us.html" style="color:#8a8f98">Contact us</a></div>
-    <div data-footcol="1" style="display:grid;gap:9px;font-size:13px;color:#8a8f98"><div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.12em;color:#7b8089;margin-bottom:4px">LEGAL</div><a href="terms.html" style="color:#8a8f98">Terms</a><a href="privacy.html" style="color:#8a8f98">Privacy</a><a href="ai-disclosure.html" style="color:#8a8f98">AI disclosure</a><a href="terms.html#company" style="color:#8a8f98">Company details</a></div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="#drop">How it works</a><a href="#engine">Examples</a><a href="approvals.html">Approvals</a><sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a href="control-room.html">Control room</a></sc-if></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="message-us.html">Contact us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
   </div>
-  <div style="position:relative;z-index:1;max-width:1200px;margin:44px auto 0;padding-top:22px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.1em;color:#7b8089"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
+  <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#a8c6f0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#a8c6f0&quot;,&quot;#d8dbe0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;planetGlow&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:2,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;planetDensity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:5000,&quot;step&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#7cc6ff&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#7cc6ff&quot;,&quot;#a8c6f0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;planetGlow&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.8,&quot;min&quot;:0,&quot;max&quot;:2,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;planetDensity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:5000,&quot;step&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;}}">
 // The short version of the home page. The original, longer page lives on
 // unchanged in Adronis-full.html (served at /full).
 class Component extends DCLogic {
@@ -622,25 +982,17 @@ class Component extends DCLogic {
     const acc = this.props.accent;
     if (acc) {
       document.documentElement.style.setProperty("--acc", acc);
-      document.documentElement.style.setProperty("--acc-soft", "rgba(168,198,240,.14)");
+      document.documentElement.style.setProperty("--acc-soft", this.soft(acc, 0.12));
     }
-    this.mq = window.matchMedia("(max-width:820px)");
+    // Same breakpoint as the nav in adronis.css: crossing it closes the menu.
+    this.mq = window.matchMedia("(max-width:900px)");
     this.onMq = (e) => {
       document.body.style.overflow = "";
       this.setState({ navOpen: false });
     };
     if (this.mq.addEventListener) this.mq.addEventListener("change", this.onMq);
 
-    this.m = { x: 0, y: 0 };
-    this.cur = { rx: 0, ry: 0 };
-    this.onMove = (e) => {
-      this.m.x = (e.clientX / window.innerWidth - 0.5) * 2;
-      this.m.y = (e.clientY / window.innerHeight - 0.5) * 2;
-    };
-    window.addEventListener("mousemove", this.onMove, { passive: true });
-
     const r = this.root.current;
-    this.tilts = Array.from(r.querySelectorAll("[data-tilt]"));
     this.layers = Array.from(r.querySelectorAll("[data-depth]"));
 
     // The thin glowing line down the right edge fills as the page is read.
@@ -657,6 +1009,13 @@ class Component extends DCLogic {
     this.reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     this.loop = this.loop.bind(this);
     if (!this.reduce) this.rafId = requestAnimationFrame(this.loop);
+
+    this.setupReveal();
+
+    // Amounts and dates are formatted for the reader's language when the page
+    // renders, so render again when the language switch is used.
+    this.onLang = () => this.forceUpdate();
+    document.addEventListener("lb:langchange", this.onLang);
 
     if (location.hash) {
       const hash = location.hash;
@@ -680,6 +1039,37 @@ class Component extends DCLogic {
         if (LBAuth.isOnFreePlan()) this.loadFreeNote();
       });
     }
+  }
+
+  // "#7cc6ff" -> "rgba(124,198,255,.12)", for the accent's soft fill.
+  soft(hex, alpha) {
+    const h = String(hex).replace("#", "");
+    const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+    const n = parseInt(full, 16);
+    if (isNaN(n)) return "rgba(124,198,255," + alpha + ")";
+    return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + alpha + ")";
+  }
+
+  // Sections fade up the first time they scroll into view. The runtime owns
+  // every element's class and style attributes, so the switch is a class on
+  // <html> per section (see the rv- rules in the page's style).
+  setupReveal() {
+    const html = document.documentElement;
+    if (this.reduce || !("IntersectionObserver" in window)) return;
+    const seen = new Set();
+    this.rvIO = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        html.classList.add("rv-" + entry.target.getAttribute("data-rv"));
+        this.rvIO.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    this.root.current.querySelectorAll("[data-rv]").forEach((el) => {
+      if (seen.has(el)) return;
+      seen.add(el);
+      this.rvIO.observe(el);
+    });
+    html.classList.add("rv-on");
   }
 
   // The strip above the plan cards for a signed-in customer on the free plan:
@@ -706,10 +1096,11 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
-    window.removeEventListener("mousemove", this.onMove);
     window.removeEventListener("scroll", this.onScroll);
     window.removeEventListener("resize", this.onScroll);
+    document.removeEventListener("lb:langchange", this.onLang);
     if (this.mq && this.mq.removeEventListener) this.mq.removeEventListener("change", this.onMq);
+    if (this.rvIO) this.rvIO.disconnect();
     cancelAnimationFrame(this.rafId);
     clearTimeout(this.promoTimer);
   }
@@ -741,18 +1132,15 @@ class Component extends DCLogic {
     else fallback();
   }
 
-  // Gentle mouse tilt and scroll parallax on the two hero cards, nothing else.
+  // A little scroll parallax on the two glass chips around the hero deck.
   loop() {
-    this.cur.ry += (this.m.x * 9 - this.cur.ry) * 0.06;
-    this.cur.rx += (this.m.y * -6 - this.cur.rx) * 0.06;
-    this.tilts.forEach((el) => {
-      el.style.transform = "rotateX(" + this.cur.rx.toFixed(2) + "deg) rotateY(" + this.cur.ry.toFixed(2) + "deg)";
-    });
     const sy = document.documentElement.scrollTop;
-    this.layers.forEach((el) => {
-      const d = parseFloat(el.getAttribute("data-depth")) || 0;
-      el.style.setProperty("--py", (-sy * 0.05 * d).toFixed(1) + "px");
-    });
+    if (sy < window.innerHeight * 1.2) {
+      this.layers.forEach((el) => {
+        const d = parseFloat(el.getAttribute("data-depth")) || 0;
+        el.style.setProperty("--py", (-sy * 0.06 * d).toFixed(1) + "px");
+      });
+    }
     this.rafId = requestAnimationFrame(this.loop);
   }
 
@@ -779,47 +1167,64 @@ class Component extends DCLogic {
 
     const annual = this.state.billing === "annual";
     const loc = window.LBLang ? LBLang.locale() : "en-US";
+    const euro = (n) => "€" + Math.round(n).toLocaleString(loc);
+    const cents = (n) => "€" + n.toLocaleString(loc, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const WEEKS_PER_MONTH = 52 / 12;
     // Names, prices and links mirror the plans in Adronis-full.html,
     // checkout.js and account.js. Only the feature wording is plainer here.
+    // perWeek is only used for the price-per-ad line.
     const plans = [
       {
-        name: "Free", base: 0, featured: false,
+        name: "Free", base: 0, perWeek: 0, featured: false,
+        tagline: "See it work before you pay.",
         features: ["3 ads a month", "1 network", "No card needed"],
         cta: this.state.onFree ? "Open approvals" : "Start free",
-        href: this.state.onFree ? "approvals.html" : "signup.html?plan=free"
+        href: this.state.onFree ? "approvals.html" : "signup.html?plan=free",
+        after: "No card needed · upgrade any time"
       },
       {
-        name: "Counter", base: 59, featured: false,
+        name: "Counter", base: 59, perWeek: 4, featured: false,
+        tagline: "Enough to stay visible.",
         features: ["4 ads every Monday", "2 networks, for example Instagram and Facebook", "Posted for you at the best time"],
-        cta: "Choose Counter", href: "signup.html?plan=counter" + (annual ? "&cycle=annual" : "")
+        cta: "Try Counter free", href: "signup.html?plan=counter" + (annual ? "&cycle=annual" : "")
       },
       {
-        name: "Storefront", base: 149, featured: true,
+        name: "Storefront", base: 149, perWeek: 12, featured: true,
+        tagline: "The sweet spot for a single location.",
         features: ["12 ads every Monday", "Up to 4 networks", "Ads for holidays and local events", "Learns which ads work best for you"],
-        cta: "Choose Storefront", href: "signup.html?plan=storefront" + (annual ? "&cycle=annual" : "")
+        cta: "Try Storefront free", href: "signup.html?plan=storefront" + (annual ? "&cycle=annual" : "")
       },
       {
-        name: "Franchise", base: 490, featured: false,
+        name: "Franchise", base: 490, perWeek: 30, featured: false,
+        tagline: "Multi-location or multi-offer volume.",
         features: ["30 ads every Monday", "Any number of networks and locations", "Checked by a real designer", "Personal support"],
-        cta: "Talk to us", href: "contact.html?plan=franchise"
+        cta: "Talk to us", href: "contact.html?plan=franchise",
+        after: "We reply within one business day."
       }
-    ].map((p) => {
+    ].map((p, i) => {
       const monthly = annual ? p.base * 0.8 : p.base;
+      const paidTrial = p.base > 0 && p.name !== "Franchise";
       return {
         name: p.name,
         featured: p.featured,
+        tagline: p.tagline,
         features: p.features,
         cta: p.cta,
         href: p.href,
         price: "€" + Math.round(monthly),
-        per: p.base ? "/ MONTH · INCL. VAT" : "/ MONTH",
+        per: p.base ? "/ month, incl. VAT" : "/ month",
         showYearly: annual && p.base > 0,
-        yearly: "€" + Math.round(monthly * 12).toLocaleString(loc),
-        border: p.featured ? "rgba(168,198,240,.45)" : "#1b1e22",
-        bg: p.featured ? "#101215" : "#0a0b0d",
-        ctaBg: p.featured ? "var(--acc)" : "transparent",
-        ctaColor: p.featured ? "#07080a" : "#d0d6e0",
-        ctaBorder: p.featured ? "var(--acc)" : "#2c2f35"
+        yearly: euro(monthly * 12),
+        showPerAd: p.perWeek > 0,
+        perAd: p.perWeek ? cents(monthly / (p.perWeek * WEEKS_PER_MONTH)) : "",
+        showSave: annual && p.base > 0,
+        save: euro(p.base * 12 * 0.2),
+        after: paidTrial
+          ? "7 days free, then " + (annual ? euro(monthly * 12) + " a year" : euro(monthly) + " a month")
+          : p.after,
+        cls: "plan" + (p.featured ? " is-featured" : ""),
+        ctaCls: "plan-cta " + (p.featured ? "is-primary" : "is-quiet"),
+        delay: (0.05 + i * 0.06).toFixed(2) + "s"
       };
     });
 
@@ -827,12 +1232,11 @@ class Component extends DCLogic {
       steps, stories, posts, plans,
       verticals: ["Bakeries", "Barbershops", "Dental clinics", "Gyms & studios", "Wine bars", "Florists", "Auto detailers", "Physiotherapy", "Nail studios"],
       signedIn: this.state.signedIn,
-      navIcon: this.state.navOpen ? "✕" : "≡",
+      planetAccent: this.props.accent || "#7cc6ff",
+      planetGlow: this.props.planetGlow == null ? 0.8 : this.props.planetGlow,
+      planetCount: this.props.planetDensity || 0,
       navExpanded: this.state.navOpen ? "true" : "false",
-      navOp: this.state.navOpen ? "1" : "0",
-      navPe: this.state.navOpen ? "auto" : "none",
-      navVis: this.state.navOpen ? "visible" : "hidden",
-      navTf: this.state.navOpen ? "translateY(0)" : "translateY(-10px)",
+      navSheetCls: "nav-sheet" + (this.state.navOpen ? " open" : ""),
       toggleNav: () => this.setState((s) => {
         document.body.style.overflow = s.navOpen ? "" : "hidden";
         return { navOpen: !s.navOpen };
@@ -847,15 +1251,18 @@ class Component extends DCLogic {
         { q: "What exactly do I get each week?", a: "A drop of finished ads — image, headline and caption — already sized for every channel you picked. How many depends on your plan, from 4 a week on Counter to 30 on Franchise." },
         { q: "Do I need to take photos or write anything?", a: "No. You tell us about your business once when you sign up, which takes about ten minutes. The engine takes it from there. You can add more detail later in your control room, but none of it is required." },
         { q: "Does anything get posted without my approval?", a: "Never. Only ads you approve are scheduled and published. Anything you reject or leave waiting stays with you." },
+        { q: "What if I don't like an ad?", a: "Reject it and pick a reason — wrong tone, wrong facts or price, the image doesn't fit. The engine takes that into your next drop. You can also change the text of any ad before you approve it." },
+        { q: "Which networks can Adronis post to?", a: "Instagram, Facebook, TikTok, Google Business, LinkedIn and Pinterest. How many you connect at once depends on your plan: one on Free, two on Counter, up to four on Storefront and any number on Franchise." },
+        { q: "Are the ads made with AI?", a: "Yes. Every image is generated for your business rather than taken from a stock library, and nothing is published until you approve it. On the Franchise plan a real designer also checks your ads." },
         { q: "How does the free trial work?", a: "Paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." },
         { q: "Can I cancel any time?", a: "Yes, from your account page, in one click. Cancelling takes effect at the end of the period you have already paid for. Annual plans are billed 12 months upfront and unused months are not refunded." }
       ],
       setMonthly: () => this.setState({ billing: "monthly" }),
       setAnnual: () => this.setState({ billing: "annual" }),
-      mBg: annual ? "transparent" : "rgba(255,255,255,.07)",
-      mColor: annual ? "#8a8f98" : "#ffffff",
-      aBg: annual ? "rgba(168,198,240,.12)" : "transparent",
-      aColor: annual ? "var(--acc)" : "#8a8f98",
+      mCls: annual ? "" : "active",
+      aCls: annual ? "active" : "",
+      mPressed: annual ? "false" : "true",
+      aPressed: annual ? "true" : "false",
       promoCode: this.promoCode,
       promoCopyLabel: this.state.promoCopied ? "Copied" : "Copy",
       copyPromo: () => this.copyPromo(),

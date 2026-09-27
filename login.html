@@ -10,7 +10,7 @@
 <meta name="description" content="Sign in to see this week's drop, approve creatives and manage your account.">
 <link rel="canonical" href="https://adronis.app/login.html">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<meta name="theme-color" content="#07080a">
+<meta name="theme-color" content="#050608">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Adronis">
@@ -28,57 +28,71 @@
 <meta name="twitter:image" content="https://adronis.app/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
 <link rel="stylesheet" href="adronis.css">
 <style>
-.link-btn{background:none;border:none;padding:6px 0;color:#9aa0a8;font-size:13px;cursor:pointer;font-family:'Geist',sans-serif;transition:color .2s ease}
-.link-btn:hover{color:#fff}
+.page-hero{padding-bottom:40px}
+.page-hero h1{font-size:clamp(34px,4.4vw,56px)}
+.auth-wrap{max-width:460px;margin:0 auto}
+.auth-tabs{display:flex;justify-content:center;margin-bottom:26px}
+.auth-tabs .tabswitch{width:100%}
+.auth-tabs .tabswitch button{flex:1}
+.link-btn{background:none;border:none;padding:6px 0;color:var(--text-3);font-size:13.5px;cursor:pointer;font-family:var(--font);transition:color .2s ease}
+.link-btn:hover{color:var(--text)}
+.auth-meta{display:grid;gap:10px;font-size:14px;color:var(--text-3)}
+.auth-meta span{color:var(--text)}
+.auth-actions{margin-top:24px;display:flex;flex-wrap:wrap;gap:10px}
+.auth-actions .btn{flex:1 1 100%}
+.auth-alt{margin:26px 0 0;text-align:center;font-size:14.5px;color:var(--text-2)}
+#already-in .label{margin-bottom:10px}
+#already-in-name{font-size:24px;font-weight:600;letter-spacing:-.025em;color:var(--text)}
+/* The "new here?" line is for visitors, not for someone already signed in or mid-reset. */
+#already-in:not([hidden]) ~ .auth-alt,#reset-view:not([hidden]) ~ .auth-alt{display:none}
 </style>
 </head>
 <body>
 
-<nav class="nav">
+<nav class="nav" aria-label="Main">
   <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
   <div class="nav-links">
-    <a href="/#drop">The drop</a>
-    <a href="/#engine">Engine</a>
+    <a href="/#drop">How it works</a>
+    <a href="/#engine">Examples</a>
     <a href="control-room.html">Control room</a>
     <a href="approvals.html">Approvals</a>
     <a href="/#pricing">Pricing</a>
   </div>
-  <a href="signup.html" class="nav-cta">Start free drop</a>
+  <a href="signup.html" class="nav-cta">Try it free</a>
 </nav>
 
 <header class="page-hero">
-  <div class="page-hero-watermark" aria-hidden="true">LOG IN</div>
-  <div class="eyebrow">YOUR ACCOUNT</div>
+  <div class="eyebrow">Your account</div>
   <h1 id="page-title">Log in to Adronis.</h1>
   <p id="page-sub">Access your control room, or create a quick account to hold your spot.</p>
 </header>
 
 <section class="section-tight">
-  <div class="wrap form-narrow">
+  <div class="auth-wrap">
 
-    <div id="already-in" class="card" hidden>
-      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089">SIGNED IN AS</div>
-      <div id="already-in-name" style="margin-top:10px;font-size:19px;color:#fff;letter-spacing:-.015em">—</div>
-      <div style="height:1px;background:#1b1e22;margin:18px 0"></div>
-      <div style="display:grid;gap:10px;font-size:13.5px;color:#8a8f98">
-        <div>Email: <span id="trial-email" style="color:#d0d6e0">—</span></div>
-        <div>Free trial started: <span id="trial-start" style="color:#d0d6e0">—</span></div>
+    <div id="already-in" class="form-card" hidden>
+      <div class="label">SIGNED IN AS</div>
+      <div id="already-in-name">—</div>
+      <div style="height:1px;background:var(--line);margin:20px 0"></div>
+      <div class="auth-meta">
+        <div>Email: <span id="trial-email">—</span></div>
+        <div>Free trial started: <span id="trial-start">—</span></div>
         <div>Free trial ends: <span id="trial-end" style="color:var(--acc)">—</span></div>
       </div>
-      <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px">
-        <a href="approvals.html" id="already-in-primary" class="btn">Review this week's drop<span class="mono" style="font-size:13px">→</span></a>
+      <div class="auth-actions">
+        <a href="approvals.html" id="already-in-primary" class="btn btn-lg">Review this week's drop<span class="mono">→</span></a>
         <a href="control-room.html" class="btn-ghost">Control room</a>
         <a href="account.html" class="btn-ghost">Account settings</a>
         <button id="logout-btn" class="btn-ghost" type="button">Log out</button>
       </div>
     </div>
 
-    <div id="auth-forms">
-      <div style="display:flex;justify-content:center;margin-bottom:28px">
+    <div id="auth-forms" class="form-card">
+      <div class="auth-tabs">
         <div class="tabswitch" role="tablist" aria-label="Log in or sign up">
           <button id="tab-login" class="active" type="button" role="tab" aria-selected="true" aria-controls="login-form">Log in</button>
           <button id="tab-signup" type="button" role="tab" aria-selected="false" aria-controls="signup-form" tabindex="-1">Sign up</button>
@@ -87,39 +101,39 @@
 
       <form id="login-form" role="tabpanel" aria-labelledby="tab-login">
         <div class="field">
-          <label for="li-email">EMAIL</label>
+          <label for="li-email">Email</label>
           <input id="li-email" type="email" required autocomplete="email" placeholder="you@business.com">
         </div>
         <div class="field">
-          <label for="li-password">PASSWORD</label>
+          <label for="li-password">Password</label>
           <input id="li-password" type="password" required autocomplete="current-password" placeholder="Your password">
-          <button type="button" id="forgot-link" class="link-btn" style="justify-self:start;margin-top:4px">Forgot your password?</button>
+          <button type="button" id="forgot-link" class="link-btn" style="justify-self:start;margin-top:2px">Forgot your password?</button>
         </div>
-        <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Log in<span class="mono" style="font-size:13px">→</span></button>
+        <button type="submit" class="btn btn-lg btn-block">Log in<span class="mono" aria-hidden="true">→</span></button>
       </form>
 
       <form id="signup-form" role="tabpanel" aria-labelledby="tab-signup" hidden>
         <div class="field">
-          <label for="su-business">BUSINESS NAME</label>
+          <label for="su-business">Business name</label>
           <input id="su-business" type="text" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
         </div>
         <div class="field">
-          <label for="su-email">EMAIL</label>
+          <label for="su-email">Email</label>
           <input id="su-email" type="email" required autocomplete="email" placeholder="you@business.com">
         </div>
         <div class="field">
-          <label for="su-password">PASSWORD</label>
+          <label for="su-password">Password</label>
           <input id="su-password" type="password" required autocomplete="new-password" placeholder="Create a password">
         </div>
-        <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Create account<span class="mono" style="font-size:13px">→</span></button>
+        <button type="submit" class="btn btn-lg btn-block">Create account<span class="mono" aria-hidden="true">→</span></button>
       </form>
 
       <form id="forgot-form" hidden>
         <div class="field">
-          <label for="fp-email">EMAIL</label>
+          <label for="fp-email">Email</label>
           <input id="fp-email" type="email" required autocomplete="email" placeholder="you@business.com">
         </div>
-        <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Send reset link<span class="mono" style="font-size:13px">→</span></button>
+        <button type="submit" class="btn btn-lg btn-block">Send reset link<span class="mono" aria-hidden="true">→</span></button>
         <div style="margin-top:16px;text-align:center">
           <button type="button" id="forgot-back" class="link-btn">Back to log in</button>
         </div>
@@ -129,20 +143,22 @@
     </div>
 
     <!-- Opened from a password reset email: signed in, new password next -->
-    <div id="reset-view" hidden>
+    <div id="reset-view" class="form-card" hidden>
       <form id="reset-form">
         <div class="field">
-          <label for="rp-password">NEW PASSWORD</label>
+          <label for="rp-password">New password</label>
           <input id="rp-password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters">
         </div>
         <div class="field">
-          <label for="rp-confirm">CONFIRM PASSWORD</label>
+          <label for="rp-confirm">Confirm password</label>
           <input id="rp-confirm" type="password" required minlength="8" autocomplete="new-password" placeholder="Type it again">
         </div>
-        <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Save new password<span class="mono" style="font-size:13px">→</span></button>
+        <button type="submit" class="btn btn-lg btn-block">Save new password<span class="mono" aria-hidden="true">→</span></button>
       </form>
       <div id="reset-notice" class="notice" role="status" hidden></div>
     </div>
+
+    <p class="auth-alt">New to Adronis? <a href="signup.html?plan=free">Start on the Free plan</a> — no card needed.</p>
 
   </div>
 </section>
@@ -150,12 +166,12 @@
 <footer>
   <div class="foot-grid">
     <div>
-      <div class="foot-brand"><span class="dot"></span>Adronis</div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
       <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
     </div>
-    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="/#drop">The weekly drop</a><a href="/#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
-    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
-    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
   </div>
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>

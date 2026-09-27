@@ -5,7 +5,7 @@
 <style>
 #lb-boot{display:none}
 @media (display-mode:standalone){
-#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
+#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#050608}
 }
 #lb-boot img{width:56px;height:auto;animation:lbBootPulse 1.3s ease-in-out infinite}
 @keyframes lbBootPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
@@ -18,7 +18,7 @@
 <meta name="description" content="Onboard in ten minutes. Your first twelve photoreal ads are waiting for approval before the week is out. No contract, no retainer.">
 <link rel="canonical" href="https://adronis.app/signup.html">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<meta name="theme-color" content="#07080a">
+<meta name="theme-color" content="#050608">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Adronis">
@@ -36,29 +36,63 @@
 <meta name="twitter:image" content="https://adronis.app/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
 <link rel="stylesheet" href="adronis.css">
+<style>
+.page-hero{padding-bottom:48px}
+.page-hero h1{font-size:clamp(34px,4.6vw,60px)}
+.su-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(24px,4vw,48px);align-items:start}
+/* Numbered sections: the brief reads as a short list of steps, not one long form. */
+#signup-form{counter-reset:su}
+#signup-form .section-label{counter-increment:su}
+#signup-form .section-label::before{content:counter(su,decimal-leading-zero);display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:10px;border:1px solid var(--acc-line);background:var(--acc-soft);color:var(--acc);font-size:11px;letter-spacing:0}
+#plan-summary{position:sticky;top:96px;padding:28px}
+.su-plan-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:14px}
+#plan-name{font-size:24px;font-weight:600;letter-spacing:-.025em;color:var(--text)}
+#plan-price{font-size:34px;font-weight:600;letter-spacing:-.04em;color:var(--text)}
+.su-per{font-size:10.5px;color:var(--text-3)}
+#plan-rate{margin-top:8px;font-size:14px;color:var(--text-2)}
+#plan-vat{margin-top:6px;font-size:12.5px;color:var(--text-3)}
+.su-line{height:1px;background:var(--line);margin:22px 0}
+#plan-features{display:grid;gap:11px;margin:0;padding:0;list-style:none;font-size:14px}
+.su-progress{margin-top:24px;padding:16px;border-radius:var(--r);border:1px solid var(--line);background:rgba(255,255,255,.02)}
+.su-progress-top{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--text-2)}
+.su-progress-top b{font-family:var(--mono);font-size:12.5px;font-weight:500;color:var(--acc)}
+.su-bar{height:6px;margin-top:10px;border-radius:9999px;background:rgba(255,255,255,.07);overflow:hidden}
+.su-bar span{display:block;height:100%;width:0;border-radius:9999px;background:linear-gradient(90deg,#5cb6f7,#aadcff);box-shadow:0 0 12px rgba(124,198,255,.6);transition:width .5s var(--ease)}
+.su-trust{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:10px;font-size:13.5px;color:var(--text-2)}
+.su-trust li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px}
+.su-trust li::before{content:"✓";display:flex;align-items:center;justify-content:center;width:18px;height:18px;margin-top:1px;border-radius:9999px;background:rgba(159,215,176,.14);box-shadow:inset 0 0 0 1px rgba(159,215,176,.42);color:var(--ok);font-size:10px}
+.su-swap{display:inline-block;margin-top:20px;font-size:13.5px;color:var(--text-3)}
+.su-swap:hover{color:var(--text)}
+#activated-view .card{padding:36px 30px;text-align:center}
+.su-done-mark{display:flex;align-items:center;justify-content:center;width:56px;height:56px;margin:0 auto 20px;border-radius:18px;background:var(--acc-soft);border:1px solid var(--acc-line);color:var(--acc);font-size:24px}
+@media (max-width:860px){
+  .su-grid{grid-template-columns:minmax(0,1fr)}
+  #plan-summary{position:static;order:-1}
+}
+@media (prefers-reduced-motion:reduce){.su-bar span{transition:none}}
+</style>
 </head>
 <body>
 
 <div id="lb-boot"><img src="logo-128.png" alt=""></div>
 
-<nav class="nav">
+<nav class="nav" aria-label="Main">
   <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
   <div class="nav-links">
-    <a href="/#drop">The drop</a>
-    <a href="/#engine">Engine</a>
+    <a href="/#drop">How it works</a>
+    <a href="/#engine">Examples</a>
     <a href="control-room.html">Control room</a>
     <a href="approvals.html">Approvals</a>
     <a href="/#pricing">Pricing</a>
   </div>
-  <a href="login.html" id="nav-login" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px">Log in</a>
+  <a href="login.html" id="nav-login">Log in</a>
 </nav>
 
 <header class="page-hero">
-  <div class="page-hero-watermark" aria-hidden="true">SIGN UP</div>
-  <div class="eyebrow" id="page-eyebrow">7-DAY FREE TRIAL · CANCEL ANY TIME</div>
+  <div class="eyebrow is-mono" id="page-eyebrow">7-DAY FREE TRIAL · CANCEL ANY TIME</div>
   <h1 id="plan-headline">Set up your <em>Storefront</em> drop.</h1>
   <p id="page-sub">Onboard in ten minutes. Your first batch is waiting for approval before the week is out.</p>
 </header>
@@ -66,46 +100,47 @@
 <section class="section-tight">
 
   <div id="activated-view" class="wrap form-narrow" hidden>
-    <div class="card" style="text-align:center">
+    <div class="card">
+      <div class="su-done-mark" aria-hidden="true">✓</div>
       <div class="mono" style="font-size:11px;letter-spacing:.1em;color:var(--acc)">PLAN ACTIVE</div>
-      <div id="activated-text" style="margin-top:14px;font-size:19px;color:#fff;letter-spacing:-.015em">The Storefront plan is live on your account.</div>
-      <div style="margin-top:8px;font-size:14px;color:#8a8f98">Your next drop renders Monday at 09:00. Nothing else to do here.</div>
-      <a href="/#top" class="btn" style="margin-top:24px;justify-content:center">Back to home<span class="mono" style="font-size:13px">→</span></a>
+      <div id="activated-text" style="margin-top:14px;font-size:21px;font-weight:600;color:var(--text);letter-spacing:-.02em">The Storefront plan is live on your account.</div>
+      <div style="margin-top:10px;font-size:14.5px;color:var(--text-2)">Your next drop renders Monday at 09:00. Nothing else to do here.</div>
+      <a href="/#top" class="btn btn-lg" style="margin-top:26px">Back to home<span class="mono">→</span></a>
     </div>
   </div>
 
-  <div id="form-view" class="wrap-wide" style="max-width:960px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:40px;align-items:start">
+  <div id="form-view" class="su-grid">
 
-    <form id="signup-form">
+    <form id="signup-form" class="form-card">
 
       <div class="section-label" id="account-label">ACCOUNT</div>
       <div class="field">
-        <label for="business">BUSINESS NAME</label>
+        <label for="business">Business name</label>
         <input id="business" name="business" type="text" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
       </div>
       <div class="field" id="field-email">
-        <label for="email">EMAIL</label>
+        <label for="email">Email</label>
         <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@business.com">
       </div>
       <div class="field" id="field-password">
-        <label for="password">PASSWORD</label>
+        <label for="password">Password</label>
         <input id="password" name="password" type="password" required autocomplete="new-password" placeholder="Create a password">
       </div>
 
       <div class="section-label">ABOUT YOUR BUSINESS</div>
       <div class="field">
-        <label for="country">COUNTRY</label>
+        <label for="country">Country</label>
         <select id="country" name="country" required autocomplete="country-name">
           <option value="">Choose your country</option>
         </select>
       </div>
       <div class="field">
-        <label for="city">CITY</label>
+        <label for="city">City</label>
         <input id="city" name="city" type="text" required autocomplete="address-level2" list="city-options" placeholder="Where's the shop?">
         <datalist id="city-options"></datalist>
       </div>
       <div class="field">
-        <label for="vertical">BUSINESS TYPE</label>
+        <label for="vertical">Business type</label>
         <select id="vertical" name="vertical">
           <option>Bakery</option>
           <option>Barbershop</option>
@@ -120,33 +155,33 @@
         </select>
       </div>
       <div class="field" id="field-vertical-other" hidden>
-        <label for="vertical-other">WHAT KIND OF BUSINESS IS IT?</label>
+        <label for="vertical-other">What kind of business is it?</label>
         <input id="vertical-other" name="vertical_other" type="text" placeholder="e.g. Record shop, tailor, dog groomer">
       </div>
       <div class="field">
-        <label for="website">WEBSITE OR INSTAGRAM HANDLE (OPTIONAL)</label>
+        <label for="website">Website or Instagram handle (optional)</label>
         <input id="website" name="website" type="text" autocomplete="url" placeholder="@yourbusiness or yourbusiness.com">
       </div>
       <div class="field">
-        <label for="what">WHAT DO YOU SELL OR DO, IN ONE LINE?</label>
+        <label for="what">What do you sell or do, in one line?</label>
         <input id="what" name="what" type="text" required placeholder="e.g. Sourdough and pastries, baked fresh every morning">
       </div>
       <div class="field">
-        <label for="customer">WHO'S YOUR TYPICAL CUSTOMER?</label>
+        <label for="customer">Who's your typical customer?</label>
         <input id="customer" name="customer" type="text" required placeholder="e.g. Neighborhood regulars, 30-55, coffee-first crowd">
       </div>
       <div class="field">
-        <label for="different">WHAT MAKES YOU DIFFERENT FROM THE PLACE DOWN THE STREET?</label>
+        <label for="different">What makes you different from the place down the street?</label>
         <textarea id="different" name="different" placeholder="e.g. Everything's made from scratch, we source local, third generation family recipe..."></textarea>
       </div>
       <div class="field">
-        <label for="why">WHAT MADE YOU COME TO US?</label>
+        <label for="why">What made you come to us?</label>
         <textarea id="why" name="why" required placeholder="e.g. We post once a month and it goes nowhere, nobody here has time for marketing, foot traffic has dropped since spring..."></textarea>
       </div>
 
       <div class="section-label">BRAND &amp; VOICE</div>
       <div class="field">
-        <label for="vibe">BRAND VIBE</label>
+        <label for="vibe">Brand vibe</label>
         <select id="vibe" name="vibe">
           <option>Warm & cozy</option>
           <option>Bold & energetic</option>
@@ -157,11 +192,11 @@
         </select>
       </div>
       <div class="field">
-        <label for="colors">BRAND COLORS OR PALETTE (OPTIONAL)</label>
+        <label for="colors">Brand colors or palette (optional)</label>
         <input id="colors" name="colors" type="text" placeholder="e.g. Warm oak, matte black, morning light">
       </div>
       <div class="field">
-        <label for="avoid">ANYTHING THE ENGINE SHOULD AVOID? (OPTIONAL)</label>
+        <label for="avoid">Anything the engine should avoid? (optional)</label>
         <textarea id="avoid" name="avoid" placeholder="e.g. No humor about pricing, never show the back kitchen..."></textarea>
       </div>
 
@@ -179,26 +214,38 @@
       <div class="checkbox-group consent-group" role="group" aria-labelledby="consent-label">
         <label class="checkbox-row consent-row"><input type="checkbox" id="consent-terms" name="consent-terms" required><span>I have read and accept the <a href="terms.html" target="_blank" rel="noopener">Terms of Service</a>, the <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a> and the <a href="ai-disclosure.html" target="_blank" rel="noopener">AI Disclosure</a>, and I am opening this account for a business.</span></label>
       </div>
-      <p style="margin:14px 0 0;font-size:12.5px;line-height:1.6;color:#7b8089">
+      <p class="form-foot">
         We use what you enter here to render your drops, run your account and support you. We do not sell it and we do not use your brand material to train models for other customers.
         You can request a copy or deletion at any time at <a href="mailto:privacy@adronis.app">privacy@adronis.app</a>.
         Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.
       </p>
-      <button type="submit" class="btn" style="width:100%;justify-content:center;border:none;margin-top:32px">Claim your first drop<span class="mono" style="font-size:13px">→</span></button>
+      <button type="submit" class="btn btn-lg btn-block" style="margin-top:28px">Claim your first drop<span class="mono" style="font-size:13px">→</span></button>
       <div id="signup-notice" class="notice" role="status" style="margin-top:18px" hidden></div>
     </form>
 
-    <aside class="card" id="plan-summary" style="position:sticky;top:96px">
-      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089">YOUR PLAN</div>
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:14px">
-        <div id="plan-name" style="font-size:20px;color:#fff;letter-spacing:-.015em">Storefront</div>
-        <div><span id="plan-price" style="font-size:28px;color:var(--acc);letter-spacing:-.03em">€149</span><span class="mono" style="font-size:10px;color:#7b8089"> / MONTH</span></div>
+    <aside class="card" id="plan-summary">
+      <div class="label">YOUR PLAN</div>
+      <div class="su-plan-head">
+        <div id="plan-name">Storefront</div>
+        <div><span id="plan-price">€149</span><span class="mono su-per"> / MONTH</span></div>
       </div>
-      <div id="plan-rate" style="margin-top:6px;font-size:13px;color:#7b8089">12 ads / week · 4 channels</div>
-      <div id="plan-vat" style="margin-top:6px;font-size:12px;color:#7b8089">Incl. VAT. The price you see is the price you pay.</div>
-      <div style="height:1px;background:#1b1e22;margin:18px 0"></div>
+      <div id="plan-rate">12 ads / week · 4 channels</div>
+      <div id="plan-vat">Incl. VAT. The price you see is the price you pay.</div>
+      <div class="su-line"></div>
       <ul class="plain" id="plan-features" style="padding-left:0;list-style:none;display:grid;gap:10px;font-size:13.5px"></ul>
-      <div style="margin-top:18px"><a href="/#pricing" style="font-size:13px;color:#7b8089">Not the right plan? Compare plans →</a></div>
+
+      <div class="su-progress" aria-hidden="true">
+        <div class="su-progress-top"><span>Your brief</span><b id="su-progress-pct">0%</b></div>
+        <div class="su-bar"><span id="su-progress-fill"></span></div>
+      </div>
+
+      <ul class="su-trust">
+        <li>Takes about ten minutes, once</li>
+        <li>Nothing posts without your OK</li>
+        <li>Cancel any time, in one click</li>
+        <li>Your brand material never trains models for other customers</li>
+      </ul>
+      <a href="/#pricing" class="su-swap">Not the right plan? Compare plans →</a>
     </aside>
 
   </div>
@@ -207,12 +254,12 @@
 <footer>
   <div class="foot-grid">
     <div>
-      <div class="foot-brand"><span class="dot"></span>Adronis</div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
       <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
     </div>
-    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="/#drop">The weekly drop</a><a href="/#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
-    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
-    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
   </div>
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
@@ -481,6 +528,34 @@
     showBriefMode(profile);
     lbBootDone();
   }, lbBootDone);
+})();
+</script>
+<script>
+// How much of the brief is filled in, shown beside the form: every required
+// answer that is visible counts the same. Display only — it reads the form and
+// never writes to it, and the page script above owns what gets submitted.
+(function () {
+  var form = document.getElementById("signup-form");
+  var fill = document.getElementById("su-progress-fill");
+  var pct = document.getElementById("su-progress-pct");
+  if (!form || !fill || !pct) return;
+  function update() {
+    var fields = Array.prototype.filter.call(form.querySelectorAll("[required]"), function (el) {
+      return !el.closest("[hidden]");
+    });
+    if (!fields.length) return;
+    var done = fields.filter(function (el) {
+      return el.type === "checkbox" ? el.checked : String(el.value || "").trim() !== "";
+    }).length;
+    var value = Math.round(done / fields.length * 100);
+    fill.style.width = value + "%";
+    pct.textContent = value + "%";
+  }
+  form.addEventListener("input", update);
+  form.addEventListener("change", update);
+  // The brief can be prefilled from the account once auth loads.
+  if (window.LBAuth && LBAuth.ready) LBAuth.ready.then(function () { setTimeout(update, 0); }, function () {});
+  update();
 })();
 </script>
 

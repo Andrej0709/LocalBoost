@@ -1658,7 +1658,188 @@ window.LB_I18N_SR = {
       "Svaki oglas ovde čeka tvoje odobrenje. Odobri ga i dobija termin za objavu; odbaci ga i reci zašto, da sledeći drop bude pogođen. Tekst možeš i da izmeniš pre toga.",
     "Keep track of every ad": "Prati svaki oglas",
     "Switch between what's waiting, what you approved and what you rejected. Only approved ads are ever published.":
-      "Prebacuj između onoga što čeka, što si odobrio i što si odbacio. Objavljuju se samo odobreni oglasi."
+      "Prebacuj između onoga što čeka, što si odobrio i što si odbacio. Objavljuju se samo odobreni oglasi.",
+
+    /* --- 2026 redesign: shared chrome ----------------------------------- */
+    "Main": "Glavna navigacija",
+    "Product": "Proizvod",
+    "Company": "Kompanija",
+    "Legal": "Pravno",
+    "Past drops": "Prethodni dropovi",
+    "Your account": "Tvoj nalog",
+    "Say hello": "Javi se",
+    "About Adronis": "O Adronisu",
+
+    /* --- 2026 redesign: home page ---------------------------------------- */
+    "Weekly ads for local businesses": "Nedeljni oglasi za lokalne biznise",
+    // The headline ends on an emphasised "yes", which already has its entry.
+    "We make your ads. You just say": "Mi pravimo tvoje oglase. Ti samo kažeš",
+    "Every Monday you get ready-to-post ads made for your business and sized for Instagram, Facebook and more. Approve them in about two minutes and we publish them for you.":
+      "Svakog ponedeljka dobijaš oglase spremne za objavu, napravljene za tvoj biznis i prilagođene Instagramu, Facebooku i drugim mrežama. Odobriš ih za oko dva minuta, a mi ih objavimo umesto tebe.",
+    "Free plan, no card needed": "Besplatan plan, bez kartice",
+    "7-day trial on paid plans": "7 dana probe na plaćenim planovima",
+    "Cancel any time": "Otkaži kad god želiš",
+    "Drop ready": "Drop je spreman",
+    "Posted to Instagram": "Objavljeno na Instagramu",
+    "Try it: this is your Monday": "Probaj: ovako izgleda tvoj ponedeljak",
+    "Who it's for": "Za koga je",
+    "Posting every week is a second job.": "Objavljivanje svake nedelje je drugi posao.",
+    "You know you should post more. But taking photos, writing, designing and scheduling every single week eats the hours your business needs. So we take the whole job off your plate.":
+      "Znaš da bi trebalo češće da objavljuješ. Ali slikanje, pisanje, dizajn i zakazivanje svake nedelje pojedu sate koji su potrebni tvom biznisu. Zato mi preuzimamo ceo posao.",
+    "On your own": "U sopstvenoj režiji",
+    "Doing it all yourself": "Sve radiš lično",
+    "Take and edit the photos": "Slikaš i sređuješ fotografije",
+    "Write every caption": "Pišeš svaki opis",
+    "Design each post": "Dizajniraš svaku objavu",
+    "Remember to post, every week": "Pamtiš da objaviš, svake nedelje",
+    "Costs you hours every week": "Košta te sate svake nedelje",
+    "An agency": "Agencija",
+    "Hiring someone to do it": "Plaćaš nekog da to radi",
+    "A monthly retainer": "Mesečni paušal",
+    "Briefs, calls and revision rounds": "Brifovi, pozivi i krugovi izmena",
+    "Usually a contract": "Najčešće i ugovor",
+    "Built for bigger budgets": "Pravljeno za veće budžete",
+    "We do it, you approve it": "Mi radimo, ti odobravaš",
+    "Tell us about your business once": "Jednom nam opišeš svoj biznis",
+    "New ads ready every Monday": "Novi oglasi spremni svakog ponedeljka",
+    "Approve them in about two minutes": "Odobriš ih za oko dva minuta",
+    "No contract, cancel any time": "Bez ugovora, otkazuješ kad hoćeš",
+    "From €0 a month": "Od €0 mesečno",
+    "Your part takes about two minutes a week.": "Tvoj deo traje oko dva minuta nedeljno.",
+    "Pizza, pasta and salads": "Pica, pasta i salate",
+    "Your drop is ready": "Tvoj drop je spreman",
+    "12 new ads are waiting for your OK.": "12 novih oglasa čeka tvoje odobrenje.",
+    "This is what lands in your approvals.": "Ovo stiže u tvoja odobravanja.",
+    "Instagram story": "Instagram priča",
+    "Every image is AI-generated for the business it's made for — never a stock photo with a logo on top.":
+      "Svaka slika je AI-generisana za biznis za koji je napravljena — nikad stok fotografija sa logom preko.",
+    "You're in control": "Ti imaš kontrolu",
+    "You approve every single ad.": "Svaki oglas odobravaš ti.",
+    "Adronis does the work, but every ad waits for you first. Change anything before it posts, or turn it down and tell us why.":
+      "Adronis radi posao, ali svaki oglas prvo čeka tebe. Promeni šta god želiš pre objave, ili ga odbij i reci nam zašto.",
+    "✓ Approve": "✓ Odobri",
+    "✕ Reject": "✕ Odbaci",
+    "Nothing posts without your OK": "Ništa se ne objavljuje bez tvog odobrenja",
+    "Only what you approve is ever published. Everything else stays with you.":
+      "Objavljuje se samo ono što odobriš. Sve ostalo ostaje kod tebe.",
+    "Fresh out of the oven at 7am.": "Sveže iz rerne u 7h.",
+    "Edit the text first": "Prvo izmeni tekst",
+    "Change the headline or caption before it goes out. The image stays as it is.":
+      "Promeni naslov ili opis pre nego što izađe. Slika ostaje kakva jeste.",
+    "Choose when it posts": "Izaberi kada se objavljuje",
+    "Adronis picks the best time for each ad, or you set your own.":
+      "Adronis bira najbolje vreme za svaki oglas, ili ti postaviš svoje.",
+    "Say why, and the next drop learns": "Reci zašto, i sledeći drop uči",
+    "Turn an ad down with a reason and the engine takes it into your next drop.":
+      "Odbij oglas uz razlog i mašina to uzima u obzir u sledećem dropu.",
+    "Download any approved ad": "Preuzmi svaki odobreni oglas",
+    "Keep a copy of every ad you approved and use it anywhere you like.":
+      "Sačuvaj kopiju svakog odobrenog oglasa i koristi je gde god želiš.",
+    "One click from your account page. No calls, no notice period.":
+      "Jedan klik na stranici naloga. Bez poziva, bez otkaznog roka.",
+    "Billing": "Naplata",
+    "Recommended": "Preporučeno",
+    "See it work before you pay.": "Vidi kako radi pre nego što platiš.",
+    "/ month, incl. VAT": "/ mesečno, sa PDV-om",
+    "/ month": "/ mesečno",
+    // The price-per-ad line: the amount and these words are separate nodes.
+    "per ad": "po oglasu",
+    "You save": "Štediš",
+    "a year": "godišnje",
+    "Try Counter free": "Probaj Counter besplatno",
+    "Try Storefront free": "Probaj Storefront besplatno",
+    "No card needed · upgrade any time": "Bez kartice · pređi na veći plan kad hoćeš",
+    "We reply within one business day.": "Odgovaramo u roku od jednog radnog dana.",
+    "Prices include VAT": "Cene uključuju PDV",
+    "Cancel any time, in one click": "Otkaži kad hoćeš, jednim klikom",
+    "Secure payment by Paddle": "Sigurno plaćanje preko Paddle-a",
+    "What if I don't like an ad?": "Šta ako mi se neki oglas ne svidi?",
+    "Reject it and pick a reason — wrong tone, wrong facts or price, the image doesn't fit. The engine takes that into your next drop. You can also change the text of any ad before you approve it.":
+      "Odbaci ga i izaberi razlog — pogrešan ton, netačni podaci ili cena, slika ne odgovara. Mašina to uzima u obzir u sledećem dropu. Tekst svakog oglasa možeš i da izmeniš pre nego što ga odobriš.",
+    "Which networks can Adronis post to?": "Na koje mreže Adronis može da objavljuje?",
+    "Instagram, Facebook, TikTok, Google Business, LinkedIn and Pinterest. How many you connect at once depends on your plan: one on Free, two on Counter, up to four on Storefront and any number on Franchise.":
+      "Instagram, Facebook, TikTok, Google Business, LinkedIn i Pinterest. Koliko ih istovremeno povezuješ zavisi od plana: jednu na besplatnom planu, dve na Counter, do četiri na Storefront i neograničeno na Franchise planu.",
+    "Are the ads made with AI?": "Da li oglase pravi veštačka inteligencija?",
+    "Yes. Every image is generated for your business rather than taken from a stock library, and nothing is published until you approve it. On the Franchise plan a real designer also checks your ads.":
+      "Da. Svaka slika se generiše za tvoj biznis, a ne uzima iz stok biblioteke, i ništa se ne objavljuje dok ga ne odobriš. Na Franchise planu tvoje oglase proverava i pravi dizajner.",
+    "Or start on the Free plan": "Ili počni sa besplatnim planom",
+    "no card needed.": "bez kartice.",
+    "Example ad for a pizza place: No ideas for dinner?": "Primer oglasa za piceriju: Nemaš ideju za večeru?",
+    "Example story for a pizza place: No ideas for dinner?": "Primer priče za piceriju: Nemaš ideju za večeru?",
+    "Example story for a café: Hard Monday? Get your perfect coffee fix.": "Primer priče za kafić: Težak ponedeljak? Uzmi svoju savršenu kafu.",
+    "Example ad for a bakery: Good morning! Freshly baked donuts and pastry.": "Primer oglasa za pekaru: Dobro jutro! Sveže pečene krofne i peciva.",
+    "Example ad for a hair salon: Time for a change?": "Primer oglasa za frizerski salon: Vreme je za promenu?",
+    "Example ad for a gym: Time to work out!": "Primer oglasa za teretanu: Vreme je za trening!",
+    "Example ad for a car wash: Your car deserves better!": "Primer oglasa za perionicu automobila: Tvoj auto zaslužuje bolje!",
+
+    /* --- 2026 redesign: the "try it" deck in the hero (lb-swipe.js) ------- */
+    "Try it: approve or reject this week's sample ads": "Probaj: odobri ili odbaci ovonedeljne primere oglasa",
+    "Reject this ad": "Odbaci ovaj oglas",
+    "Approve this ad": "Odobri ovaj oglas",
+    "Swipe right to approve, left to reject.": "Prevuci udesno da odobriš, ulevo da odbaciš.",
+    "No ideas for dinner? Fresh pizza, hot from the oven tonight.": "Nemaš ideju za večeru? Sveža pica, večeras vruća iz peći.",
+    "Hard week? Your perfect coffee fix is two minutes away.": "Naporna nedelja? Tvoja savršena kafa je na dva minuta odavde.",
+    "APPROVE": "ODOBRI",
+    "REJECT": "ODBACI",
+    "That's your week, sorted.": "Tvoja nedelja je rešena.",
+    "Approved:": "Odobreno:",
+    "Rejected:": "Odbačeno:",
+    "That's the whole job. Every Monday, a fresh drop made for your business waits for you like this.":
+      "To je ceo posao. Svakog ponedeljka te ovako čeka nov drop napravljen za tvoj biznis.",
+    "Get ads like these": "Dobijaj ovakve oglase",
+    "↺ Try it again": "↺ Probaj ponovo",
+
+    /* --- 2026 redesign: about, contact, message us, log in -------------- */
+    "Drops per year": "Dropova godišnje",
+    "Channels supported": "Podržanih kanala",
+    "Briefs you write": "Brifova koje pišeš",
+    "What happens next": "Šta sledi",
+    "You send a few lines": "Pošalješ nam par rečenica",
+    "Number of locations, the channels you're on, anything we should know.":
+      "Broj lokacija, kanali na kojima si, sve što treba da znamo.",
+    "A real person reads it": "Pravi čovek to pročita",
+    "Every message here gets a reply within one business day.":
+      "Na svaku poruku odavde odgovaramo u roku od jednog radnog dana.",
+    "We come back with a plan": "Vraćamo ti se sa planom",
+    "For your locations and channels, before the engine renders a thing.":
+      "Za tvoje lokacije i kanale, pre nego što mašina išta renderuje.",
+    "Just want to see it work first?": "Želiš prvo da vidiš kako radi?",
+    "Start on the Free plan": "Počni sa besplatnim planom",
+    "— no card needed.": "— bez kartice.",
+    "New to Adronis?": "Prvi put na Adronisu?",
+
+    /* --- 2026 redesign: form labels, now in sentence case ---------------- */
+    "Name": "Ime",
+    "Message": "Poruka",
+    "Plan interest": "Plan koji te zanima",
+    "Country": "Država",
+    "City": "Grad",
+    "What kind of business is it?": "Koji je to tip biznisa?",
+    "Website or Instagram handle (optional)": "Sajt ili Instagram nalog (opciono)",
+    "What do you sell or do, in one line?": "Šta prodaješ ili radiš, u jednoj rečenici?",
+    "Who's your typical customer?": "Ko ti je tipična mušterija?",
+    "What makes you different from the place down the street?": "Po čemu se razlikuješ od radnje niz ulicu?",
+    "What made you come to us?": "Šta te je dovelo kod nas?",
+    "Brand colors or palette (optional)": "Boje ili paleta brenda (opciono)",
+    "Anything the engine should avoid? (optional)": "Ima li nečega što mašina treba da izbegava? (opciono)",
+    "Billing email": "Email za naplatu",
+    "Promo code": "Promo kod",
+    "Current password": "Trenutna lozinka",
+    "New password": "Nova lozinka",
+    "Confirm password": "Potvrdi lozinku",
+    "New plan": "Novi plan",
+    "Type your password to confirm": "Unesi lozinku za potvrdu",
+
+    /* --- 2026 redesign: sign-up and checkout sidebars -------------------- */
+    "Your brief": "Tvoj brif",
+    "Takes about ten minutes, once": "Traje oko deset minuta, samo jednom",
+    "Your brand material never trains models for other customers":
+      "Tvoj materijal nikad ne služi za treniranje modela za druge klijente",
+    // The checkout's terms paragraph gained the Paddle sentence after its
+    // entry above was written; this is the whole paragraph as it reads now.
+    ". You agree that the subscription renews automatically at the amount and date shown in the summary until you cancel, that cancelling takes effect at the end of the period you have paid for, and that part-periods are not refunded. Prices include VAT where it applies; nothing is added on top of the amount shown. Our order process is conducted by our online reseller Paddle.com, who is the Merchant of Record for all our orders and handles billing, tax and invoices. Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.":
+      ". Saglasan si da se pretplata automatski obnavlja po iznosu i datumu prikazanim u pregledu dok je ne otkažeš, da otkazivanje stupa na snagu na kraju perioda koji si platio i da se započeti periodi ne refundiraju. Cene uključuju PDV tamo gde se plaća; ništa se ne dodaje na prikazani iznos. Proces naručivanja vodi naš onlajn preprodavac Paddle.com, koji je Merchant of Record za sve naše porudžbine i brine o naplati, porezu i fakturama. Kreativi su AI-generisani i objavljuju se tek nakon tvog odobrenja — ti ostaješ oglašivač odgovoran za svaki oglas koji odobriš."
+
 
   },
 
@@ -1750,6 +1931,12 @@ window.LB_I18N_SR = {
     [/^You've used all (\d+) free ads for (.+?)\. The next (\d+) arrive from (.+?) — or get a full drop every week\.$/,
       "Iskoristio si sve besplatne oglase za $2 ($1). Sledeći ($3) stižu od $4 — ili uzmi pun drop svake nedelje."],
     [/^(\d+) of (\d+) free ads left this month — they land in Approvals as soon as they're rendered\. Want a full drop every week\?$/,
-      "Besplatni oglasi ovog meseca: ostalo $1 od $2 — stižu u Odobravanja čim se naprave. Želiš pun drop svake nedelje?"]
+      "Besplatni oglasi ovog meseca: ostalo $1 od $2 — stižu u Odobravanja čim se naprave. Želiš pun drop svake nedelje?"],
+    // 2026 redesign: the hero deck announces each decision, and the plan
+    // cards say what a paid plan costs once its trial ends.
+    [/^Approved: (.+)$/, "Odobreno: $1"],
+    [/^Rejected: (.+)$/, "Odbačeno: $1"],
+    [/^7 days free, then (\S+) a month$/, "7 dana besplatno, zatim $1 mesečno"],
+    [/^7 days free, then (\S+) a year$/, "7 dana besplatno, zatim $1 godišnje"]
   ]
 };

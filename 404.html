@@ -9,69 +9,73 @@
 <title>Page not found — Adronis</title>
 <meta name="description" content="This page doesn't exist. Head back to Adronis for weekly ad drops for local business.">
 <meta name="robots" content="noindex,follow">
-<meta name="theme-color" content="#07080a">
+<meta name="theme-color" content="#050608">
 <meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
 <link rel="stylesheet" href="adronis.css">
+<style>
+.nf-code{position:relative;z-index:1;margin:0 auto 8px;font-size:clamp(96px,16vw,190px);font-weight:700;line-height:.9;letter-spacing:-.06em;background:linear-gradient(180deg,rgba(233,246,255,.95) 0%,rgba(124,198,255,.55) 55%,rgba(124,198,255,0) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;user-select:none}
+.nf-links{max-width:1000px;margin:0 auto}
+.nf-links .card h3{margin:0 0 6px;display:flex;align-items:center;justify-content:space-between}
+.nf-links .card h3::after{content:"→";font-family:var(--mono);font-size:15px;color:var(--text-3);transition:transform .3s var(--ease),color .2s ease}
+.nf-links .card:hover h3::after{transform:translateX(4px);color:var(--acc)}
+.nf-links .card p{margin:0}
+</style>
 </head>
 <body>
 
-<nav class="nav">
+<nav class="nav" aria-label="Main">
   <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
   <div class="nav-links">
-    <a href="/#drop">The drop</a>
-    <a href="/#engine">Engine</a>
+    <a href="/#drop">How it works</a>
+    <a href="/#engine">Examples</a>
     <a href="control-room.html">Control room</a>
     <a href="approvals.html">Approvals</a>
     <a href="/#pricing">Pricing</a>
   </div>
-  <a href="login.html" id="nav-login" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px">Log in</a>
-  <a href="signup.html" class="nav-cta">Start free drop</a>
+  <a href="login.html" id="nav-login">Log in</a>
+  <a href="signup.html" class="nav-cta">Try it free</a>
 </nav>
 
 <header class="page-hero">
-  <div class="page-hero-watermark" aria-hidden="true">404</div>
-  <div class="eyebrow">404</div>
+  <div class="nf-code" aria-hidden="true">404</div>
   <h1>This page never made it into <em>the drop</em>.</h1>
   <p>Whatever you're looking for isn't here — might be a broken link, might be a page that moved. Everything that matters is still one click away.</p>
-  <div style="position:relative;z-index:1;margin-top:30px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
-    <a href="/#top" class="btn">Back to Adronis<span class="mono" style="font-size:13px">→</span></a>
-    <a href="contact.html" class="btn-ghost">Tell us it's broken</a>
+  <div class="hero-actions">
+    <a href="/#top" class="btn btn-lg">Back to Adronis<span class="mono" aria-hidden="true">→</span></a>
+    <a href="contact.html" class="btn-ghost btn-lg">Tell us it's broken</a>
   </div>
 </header>
 
 <section class="section-tight">
-  <div class="wrap">
-    <div class="divider" style="margin:0 auto 40px"></div>
-    <div class="card-grid">
-      <a href="/#pricing" class="card reveal" style="display:block">
-        <h3 style="margin:0 0 6px">Pricing</h3>
-        <p style="margin:0">Priced per drop, not per meeting.</p>
-      </a>
-      <a href="approvals.html" class="card reveal" style="display:block;transition-delay:.06s">
-        <h3 style="margin:0 0 6px">Approvals</h3>
-        <p style="margin:0">Approve this week's creatives.</p>
-      </a>
-      <a href="account.html" class="card reveal" style="display:block;transition-delay:.12s">
-        <h3 style="margin:0 0 6px">Account</h3>
-        <p style="margin:0">Login, channels and billing.</p>
-      </a>
-    </div>
+  <div class="nf-links card-grid">
+    <a href="/#pricing" class="card reveal">
+      <h3>Pricing</h3>
+      <p>Priced per drop, not per meeting.</p>
+    </a>
+    <a href="approvals.html" class="card reveal" style="transition-delay:.06s">
+      <h3>Approvals</h3>
+      <p>Approve this week's creatives.</p>
+    </a>
+    <a href="account.html" class="card reveal" style="transition-delay:.12s">
+      <h3>Account</h3>
+      <p>Login, channels and billing.</p>
+    </a>
   </div>
 </section>
 
 <footer>
   <div class="foot-grid">
     <div>
-      <div class="foot-brand"><span class="dot"></span>Adronis</div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
       <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
     </div>
-    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="/#drop">The weekly drop</a><a href="/#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
-    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
-    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
   </div>
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>

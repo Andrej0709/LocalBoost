@@ -65,7 +65,10 @@
     }
 
     connectedCallback() {
-      if (this._on) return;
+      // Skip the copy inside the page's raw <x-dc> template: the runtime reads
+      // that markup as the template, so a canvas added there would be rendered
+      // a second time, blank, inside the real planet.
+      if (this._on || this.closest("x-dc")) return;
       this._on = true;
 
       this.style.display = "block";

@@ -5,7 +5,7 @@
 <style>
 #lb-boot{display:none}
 @media (display-mode:standalone){
-#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#07080a}
+#lb-boot{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#050608}
 }
 #lb-boot img{width:56px;height:auto;animation:lbBootPulse 1.3s ease-in-out infinite}
 @keyframes lbBootPulse{0%,100%{opacity:.4;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
@@ -18,7 +18,7 @@
 <meta name="description" content="Approve or kill this week's creatives. Only what you approve gets published.">
 <link rel="canonical" href="https://adronis.app/approvals.html">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#07080a">
+<meta name="theme-color" content="#050608">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Adronis">
@@ -36,84 +36,100 @@
 <meta name="twitter:image" content="https://adronis.app/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
 <link rel="stylesheet" href="adronis.css">
 <style>
-.creative-card.kb-focus{outline:2px solid var(--acc);outline-offset:2px}
-.bulk-actions{display:flex;gap:8px}
-.bulk-actions button{padding:9px 14px;border-radius:9999px;font-size:13px;white-space:nowrap}
-#kb-hint{margin:-10px 0 20px}
-.approve-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(14,15,18,.95);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(0,0,0,.5);font-size:13.5px;color:#d0d6e0;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .2s ease,transform .2s ease,visibility .2s linear}
-.approve-toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);pointer-events:auto;visibility:visible}
-.approve-toast button{padding:6px 14px;border-radius:9999px;border:1px solid rgba(168,198,240,.4);background:var(--acc-soft);color:var(--acc);font-size:12.5px;font-family:'Geist',sans-serif;cursor:pointer;white-space:nowrap}
+.creative-card.kb-focus{outline:2px solid var(--acc);outline-offset:3px;box-shadow:0 0 0 6px rgba(124,198,255,.12),var(--shadow-float)}
+.board-panel{padding:26px;border-radius:var(--r-xl);border:1px solid var(--line);background:rgba(12,14,18,.7);margin-bottom:22px}
+.bulk-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.bulk-actions button{min-height:40px;padding:0 16px;border-radius:9999px;font-size:13.5px;white-space:nowrap}
+#bulk-approve{border-color:var(--ok-line);background:var(--ok-soft);color:var(--ok)}
+#bulk-approve:hover{background:rgba(159,215,176,.2)}
+#bulk-reject:hover{border-color:var(--bad-line);color:var(--bad);background:var(--bad-soft)}
+#filterbar{margin-bottom:10px}
+#kb-hint{margin:6px 0 22px;font-size:11px;letter-spacing:.08em;color:var(--text-3)}
+#drop-title{font-size:clamp(24px,2.4vw,32px)}
+.approve-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(10px) scale(.98);z-index:80;display:flex;align-items:center;gap:14px;padding:10px 10px 10px 20px;border-radius:9999px;border:1px solid rgba(255,255,255,.12);background:rgba(20,22,27,.84);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 24px 60px -12px rgba(0,0,0,.8);font-size:14px;color:var(--text);opacity:0;pointer-events:none;visibility:hidden;transition:opacity .2s ease,transform .4s var(--ease),visibility .2s linear}
+.approve-toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1);pointer-events:auto;visibility:visible}
+.approve-toast button{min-height:34px;padding:0 15px;border-radius:9999px;border:1px solid var(--acc-line);background:var(--acc-soft);color:var(--acc-2);font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;white-space:nowrap}
 .creative-card.is-rejected{opacity:1}
 .creative-card.is-rejected .creative-media,.creative-card.is-rejected .headline,.creative-card.is-rejected .caption{opacity:.5}
-.creative-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:2px}
+.creative-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin-top:4px}
 .edited-mark{font-size:10px;letter-spacing:.1em;color:var(--acc)}
-.dropbar-link{align-self:center;padding:9px 6px;font-size:13px;white-space:nowrap}
-.post-time{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:2px;font-size:13px;color:#d0d6e0}
-.post-time-label{font-size:10px;letter-spacing:.1em;color:#7b8089}
+.dropbar-link{align-self:center;padding:9px 6px;font-size:13.5px;font-weight:500;white-space:nowrap}
+.post-time{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:4px;padding:10px 12px;border-radius:12px;border:1px solid rgba(159,215,176,.2);background:rgba(159,215,176,.06);font-size:13.5px;color:var(--text)}
+.post-time-label{font-size:10px;letter-spacing:.1em;color:var(--ok)}
 .post-time-mine{text-transform:uppercase}
-.link-btn{background:none;border:none;padding:0;color:#9aa0a8;font-size:12.5px;font-family:'Geist',sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-.link-btn:hover{color:var(--acc)}
+.link-btn{background:none;border:none;padding:0;color:var(--text-3);font-size:13px;font-family:var(--font);cursor:pointer;text-decoration:underline;text-decoration-color:var(--line-3);text-underline-offset:3px;transition:color .2s ease}
+.link-btn:hover{color:var(--acc);text-decoration-color:var(--acc-line)}
 .creative-editor{display:flex;flex-direction:column;gap:12px}
-.creative-editor label{display:flex;flex-direction:column;gap:6px;font-size:10px;letter-spacing:.1em;color:#7b8089}
-.creative-editor input,.creative-editor textarea,.reason-note input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:8px;border:1px solid #23252a;background:#07080a;color:#fff;font-family:'Geist',sans-serif;font-size:14px;letter-spacing:0;line-height:1.5;resize:vertical}
-.creative-editor input:focus,.creative-editor textarea:focus,.reason-note input:focus{outline:none;border-color:rgba(168,198,240,.5)}
-.editor-hint{margin:0;font-size:12px;line-height:1.5;color:#7b8089}
+.creative-editor label{display:flex;flex-direction:column;gap:6px;font-size:10px;letter-spacing:.1em;color:var(--text-3)}
+.creative-editor input,.creative-editor textarea,.reason-note input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--field);color:var(--text);font-family:var(--font);font-size:14px;letter-spacing:0;line-height:1.5;resize:vertical}
+.creative-editor input:focus,.creative-editor textarea:focus,.reason-note input:focus{outline:none;border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(124,198,255,.14)}
+.editor-hint{margin:0;font-size:12.5px;line-height:1.5;color:var(--text-3)}
 .editor-row{display:flex;gap:8px}
-.editor-row button{flex:1;padding:10px 12px;border-radius:9999px;font-size:13.5px;font-weight:500;font-family:'Geist',sans-serif;cursor:pointer;border:1px solid transparent}
-.reason-panel{margin-top:6px;padding-top:12px;border-top:1px solid #1b1e22;display:flex;flex-direction:column;gap:10px}
-.reason-label{font-size:10px;letter-spacing:.1em;color:#7b8089}
+.editor-row button{flex:1;min-height:42px;padding:0 12px;border-radius:9999px;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;border:1px solid transparent}
+.reason-panel{margin-top:6px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.reason-label{font-size:10px;letter-spacing:.1em;color:var(--text-3)}
 .reason-chips{display:flex;flex-wrap:wrap;gap:6px}
-.reason-chips button{padding:6px 11px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02);color:#9aa0a8;font-size:12px;font-family:'Geist',sans-serif;cursor:pointer;white-space:nowrap}
-.reason-chips button:hover{border-color:#4a4d54;color:#d0d6e0}
-.reason-chips button.active{border-color:rgba(240,168,168,.4);background:rgba(240,168,168,.1);color:#f0a8a8}
+.reason-chips button{min-height:32px;padding:0 12px;border-radius:9999px;border:1px solid var(--line-2);background:rgba(255,255,255,.025);color:var(--text-2);font-size:12.5px;font-family:var(--font);cursor:pointer;white-space:nowrap;transition:border-color .2s ease,color .2s ease,background .2s ease}
+.reason-chips button:hover{border-color:var(--line-3);color:var(--text)}
+.reason-chips button.active{border-color:var(--bad-line);background:var(--bad-soft);color:var(--bad)}
 .reason-note{display:flex;gap:8px}
 .reason-note input{padding:8px 10px;font-size:13px}
-.reason-note button{padding:6px 12px;border-radius:9999px;border:1px solid #23252a;background:none;color:#9aa0a8;font-size:12.5px;font-family:'Geist',sans-serif;cursor:pointer;white-space:nowrap}
-.reason-toast{flex-wrap:wrap;justify-content:center;border-radius:16px;max-width:min(720px,calc(100vw - 32px))}
-.approve-toast .reason-chips button{padding:6px 12px;border:1px solid #23252a;background:rgba(255,255,255,.02);color:#d0d6e0}
-.approve-toast .reason-chips button:hover{border-color:rgba(240,168,168,.4);color:#f0a8a8}
-.reason-keys{font-size:10px;color:#7b8089;margin-left:6px}
-.approve-toast .reason-toast-close{border-color:#23252a;background:none;color:#7b8089}
+.reason-note button{padding:6px 13px;border-radius:9999px;border:1px solid var(--line-2);background:none;color:var(--text-2);font-size:12.5px;font-family:var(--font);cursor:pointer;white-space:nowrap}
+.reason-note button:hover{color:var(--text);border-color:var(--line-3)}
+.reason-toast{flex-wrap:wrap;justify-content:center;padding:14px 16px;border-radius:22px;max-width:min(760px,calc(100vw - 32px))}
+.approve-toast .reason-chips button{border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--text)}
+.approve-toast .reason-chips button:hover{border-color:var(--bad-line);color:var(--bad)}
+.reason-keys{font-size:10px;color:var(--text-3);margin-left:6px}
+.approve-toast .reason-toast-close{border-color:var(--line-2);background:none;color:var(--text-3)}
+.ap-note{font-size:13.5px;color:var(--text-3)}
 @media (max-width:860px){#kb-hint{display:none}.reason-keys{display:none}}
-@media (max-width:640px){.approve-toast{left:16px;right:16px;transform:translateY(0)}.approve-toast.show{transform:translateY(-6px)}}
+@media (max-width:640px){
+  .board-panel{padding:18px;border-radius:22px}
+  .bulk-actions{justify-content:flex-start}
+  .approve-toast{left:16px;right:16px;transform:translateY(10px)}
+  .approve-toast.show{transform:translateY(0)}
+}
+@media (prefers-reduced-motion:reduce){.approve-toast{transition:opacity .2s ease,visibility .2s linear}}
 </style>
 </head>
 <body>
 
 <div id="lb-boot"><img src="logo-128.png" alt=""></div>
 
-<nav class="nav">
+<nav class="nav" aria-label="Main">
   <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
   <div class="nav-links">
-    <a href="/#drop">The drop</a>
-    <a href="/#engine">Engine</a>
+    <a href="approvals.html" aria-current="page">Approvals</a>
+    <a href="control-room.html">Control room</a>
+    <a href="history.html">Past drops</a>
     <a href="/#pricing">Pricing</a>
   </div>
-  <a href="account.html" id="nav-account" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px">Account</a>
-  <a href="signup.html" class="nav-cta" id="nav-cta">Start free drop</a>
+  <a href="account.html" id="nav-account">Account</a>
+  <a href="signup.html" class="nav-cta" id="nav-cta">Try it free</a>
 </nav>
 
-<header class="page-hero">
-  <div class="page-hero-watermark" aria-hidden="true">APPROVALS</div>
-  <div class="eyebrow">APPROVALS</div>
-  <h1 id="page-title">This week's drop, waiting on your <em>yes</em>.</h1>
-  <p id="page-sub">Every creative the engine rendered for you. Keep what fits, kill what doesn't — only what you approve gets published.</p>
+<header class="page-hero is-app">
+  <div class="page-hero-inner">
+    <div class="eyebrow">Approvals</div>
+    <h1 id="page-title">This week's drop, waiting on your <em>yes</em>.</h1>
+    <p id="page-sub">Every creative the engine rendered for you. Keep what fits, kill what doesn't — only what you approve gets published.</p>
+  </div>
 </header>
 
 <section class="section-tight">
   <div class="wrap-wide">
 
     <!-- Signed out -->
-    <div id="signed-out" class="card" hidden style="max-width:440px;margin:0 auto;text-align:center">
-      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089">NOT SIGNED IN</div>
+    <div id="signed-out" class="form-card" hidden style="max-width:460px;margin:0 auto;text-align:center">
+      <div class="label">NOT SIGNED IN</div>
       <h3 style="margin:14px 0 8px">Log in to see your drop.</h3>
       <p style="margin:0">Your creatives are tied to your account — sign in and this week's batch loads here.</p>
-      <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
-        <a href="login.html" class="btn">Log in<span class="mono" style="font-size:13px">&rarr;</span></a>
+      <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <a href="login.html" class="btn">Log in<span class="mono">&rarr;</span></a>
         <a href="signup.html" class="btn-ghost">Create account</a>
       </div>
     </div>
@@ -124,37 +140,39 @@
     </div>
 
     <!-- Free plan: where the monthly allowance stands -->
-    <div id="free-strip" class="notice" role="status" hidden style="margin:0 0 28px;color:#d0d6e0">
+    <div id="free-strip" class="notice" role="status" hidden style="margin:0 0 24px;color:var(--text)">
       <span class="mono" style="margin-right:10px;font-size:10px;letter-spacing:.12em;color:var(--acc)">FREE PLAN</span><span id="free-strip-text"></span>
       <a href="/#pricing" style="margin-left:4px;white-space:nowrap">Get a full drop every week →</a>
     </div>
 
     <!-- Main board -->
     <div id="board" hidden>
-      <div class="approve-head">
-        <div>
-          <h2 id="drop-title">Your creatives</h2>
-          <div id="drop-meta" class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089;margin-top:8px">&mdash;</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
-          <div class="counts" id="counts"></div>
-          <div id="bulk-actions" class="bulk-actions" hidden>
-            <button type="button" id="bulk-approve" class="btn-ghost">Approve all waiting</button>
-            <button type="button" id="bulk-reject" class="btn-ghost">Reject all waiting</button>
+      <div class="board-panel">
+        <div class="approve-head">
+          <div>
+            <h2 id="drop-title">Your creatives</h2>
+            <div id="drop-meta" class="mono" style="font-size:11px;letter-spacing:.1em;color:var(--text-3);margin-top:10px">&mdash;</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px">
+            <div class="counts" id="counts"></div>
+            <div id="bulk-actions" class="bulk-actions" hidden>
+              <button type="button" id="bulk-approve" class="btn-ghost">Approve all waiting</button>
+              <button type="button" id="bulk-reject" class="btn-ghost">Reject all waiting</button>
+            </div>
           </div>
         </div>
+
+        <div class="dropbar" id="dropbar"></div>
+        <div class="dropbar" id="filterbar">
+          <button data-filter="pending" data-label="Waiting on you" class="active">Waiting on you</button>
+          <button data-filter="approved" data-label="Approved">Approved</button>
+          <button data-filter="rejected" data-label="Rejected">Rejected</button>
+          <button data-filter="all" data-label="Everything">Everything</button>
+        </div>
+        <div id="kb-hint" class="mono">Y approve &middot; N reject &middot; 1&ndash;5 say why &middot; &larr;&rarr; navigate</div>
       </div>
 
-      <div class="dropbar" id="dropbar"></div>
-      <div class="dropbar" id="filterbar">
-        <button data-filter="pending" data-label="Waiting on you" class="active">Waiting on you</button>
-        <button data-filter="approved" data-label="Approved">Approved</button>
-        <button data-filter="rejected" data-label="Rejected">Rejected</button>
-        <button data-filter="all" data-label="Everything">Everything</button>
-      </div>
-      <div id="kb-hint" class="mono" style="font-size:11px;letter-spacing:.08em;color:#7b8089">Y approve &middot; N reject &middot; 1&ndash;5 say why &middot; &larr;&rarr; navigate</div>
-
-      <div id="board-notice" class="notice" role="status" hidden style="margin-bottom:20px"></div>
+      <div id="board-notice" class="notice" role="status" hidden style="margin:0 0 20px"></div>
 
       <div class="creative-grid" id="grid"></div>
 
@@ -191,21 +209,20 @@
 </div>
 
 <section class="section-tight">
-  <div class="wrap">
-    <div class="divider" style="margin:16px auto 40px"></div>
-    <p style="font-size:13.5px;color:#7b8089">Every image on this page is AI-generated and published only after you approve it. Read the <a href="ai-disclosure.html">AI disclosure</a>.</p>
+  <div class="wrap-wide">
+    <p class="ap-note">Every image on this page is AI-generated and published only after you approve it. Read the <a href="ai-disclosure.html">AI disclosure</a>.</p>
   </div>
 </section>
 
 <footer>
   <div class="foot-grid">
     <div>
-      <div class="foot-brand"><span class="dot"></span>Adronis</div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
       <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
     </div>
-    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="/#drop">The weekly drop</a><a href="/#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
-    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
-    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
   </div>
   <div class="foot-bottom"><span>&copy; 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>

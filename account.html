@@ -10,57 +10,62 @@
 <meta name="description" content="Manage your business details, login, connected channels and billing for your Adronis account.">
 <link rel="canonical" href="https://adronis.app/account.html">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#07080a">
+<meta name="theme-color" content="#050608">
 <meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
 <link rel="stylesheet" href="adronis.css">
 <style>
 .acc-grid{display:grid;gap:20px}
-.acc-group{display:grid;gap:10px}
-.acc-group-label{font-size:11px;letter-spacing:.1em;color:#7b8089;padding-left:2px}
-.acc-logout{flex:none;padding:10px 8px;margin:-10px -8px;background:none;border:none;color:#9aa0a8;font-size:13px;cursor:pointer;font-family:'Geist',sans-serif;transition:color .2s ease}
-.acc-logout:hover{color:#fff}
+.acc-group{display:grid;gap:12px}
+.acc-group-label{font-size:11px;letter-spacing:.12em;color:var(--text-2);padding:12px 2px 0}
+.acc-logout{flex:none;padding:10px 8px;margin:-10px -8px;background:none;border:none;color:var(--text-3);font-size:14px;cursor:pointer;font-family:var(--font);transition:color .2s ease}
+.acc-logout:hover{color:var(--text)}
 .acc-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:6px}
-.acc-card-title{font-size:15.5px;color:#fff;letter-spacing:-.015em;margin:0}
-.acc-card-sub{margin:6px 0 20px;font-size:13px;color:#7b8089}
-.acc-row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid #1b1e22}
+.acc-card-title{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-.02em;margin:0}
+.acc-card-sub{margin:6px 0 22px;font-size:14px;color:var(--text-3)}
+.acc-row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;padding:13px 0;border-top:1px solid var(--line)}
 .acc-row:first-of-type{border-top:none;padding-top:0}
-.acc-row-label{font-size:13.5px;color:#8a8f98}
-.acc-row-value{font-size:14px;color:#d0d6e0;text-align:right}
-.acc-chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:9999px;font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;border:1px solid}
-.acc-chip.ok{border-color:rgba(159,215,176,.4);background:rgba(159,215,176,.14);color:#9fd7b0}
-.acc-chip.warn{border-color:rgba(240,168,168,.35);background:rgba(240,168,168,.12);color:#f0a8a8}
-.acc-chip.muted{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#8a8f98}
-.acc-chip.acc{border-color:rgba(168,198,240,.4);background:var(--acc-soft);color:var(--acc)}
-.acc-channels{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.acc-row-label{font-size:14px;color:var(--text-3)}
+.acc-row-value{font-size:14.5px;color:var(--text);text-align:right}
+.acc-chip{display:inline-flex;align-items:center;padding:5px 11px;border-radius:9999px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;border:1px solid}
+.acc-chip.ok{border-color:rgba(159,215,176,.4);background:rgba(159,215,176,.12);color:#9fd7b0}
+.acc-chip.warn{border-color:rgba(240,168,168,.35);background:rgba(240,168,168,.1);color:#f0a8a8}
+.acc-chip.muted{border-color:var(--line-3);background:rgba(255,255,255,.03);color:var(--text-2)}
+.acc-chip.acc{border-color:var(--acc-line);background:var(--acc-soft);color:var(--acc)}
+.acc-channels{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:20px}
 .acc-form-inline{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
 .acc-form-inline .field{flex:1;min-width:220px;margin-bottom:0}
-.acc-card-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0;border:none;background:none;cursor:pointer;font-family:'Geist',sans-serif;text-align:left}
-.acc-card-toggle-title{font-size:15.5px;color:#fff;letter-spacing:-.015em}
-.acc-card-arrow{font-size:13px;color:#7b8089;transition:transform .2s ease,color .2s ease}
+.acc-card-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0;border:none;background:none;cursor:pointer;font-family:var(--font);text-align:left}
+.acc-card-toggle-title{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-.02em}
+.acc-card-arrow{font-size:14px;color:var(--text-3);transition:transform .3s var(--ease),color .2s ease}
 .acc-card-toggle:hover .acc-card-arrow{color:var(--acc);transform:translateX(3px)}
 .acc-card-toggle[aria-expanded="true"] .acc-card-arrow{transform:rotate(90deg)}
 .acc-card-toggle[aria-expanded="true"]:hover .acc-card-arrow{transform:rotate(90deg) translateX(3px)}
-.acc-table{width:100%;border-collapse:collapse;font-size:13.5px}
-.acc-table th{text-align:left;padding:0 0 10px;font-family:'Geist Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:#7b8089;font-weight:400;border-bottom:1px solid #1b1e22}
-.acc-table td{padding:12px 0;border-top:1px solid #1b1e22;color:#d0d6e0;vertical-align:middle}
+.acc-table{width:100%;border-collapse:collapse;font-size:14px}
+.acc-table th{text-align:left;padding:0 0 10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--text-3);font-weight:400;border-bottom:1px solid var(--line)}
+.acc-table td{padding:13px 0;border-top:1px solid var(--line);color:var(--text);vertical-align:middle}
 .acc-table td:last-child,.acc-table th:last-child{text-align:right}
 .acc-table-wrap{overflow-x:auto}
-.acc-link-btn{background:none;border:none;padding:10px 8px;margin:-10px -8px;font-size:12.5px;color:#9aa0a8;cursor:pointer;font-family:'Geist',sans-serif;transition:color .2s ease}
-.acc-link-btn:hover{color:#fff}
+.acc-link-btn{background:none;border:none;padding:10px 8px;margin:-10px -8px;font-size:13.5px;font-weight:500;color:var(--acc);cursor:pointer;font-family:var(--font);transition:color .2s ease}
+.acc-link-btn:hover{color:var(--text)}
 #biz-rows .acc-row-value{max-width:60%;overflow-wrap:anywhere}
-.leave-q{display:grid;gap:10px;margin:0 0 18px;padding:14px;border-radius:10px;border:1px solid #1b1e22;background:#0b0c0e}
-.leave-q-label{font-size:10px;letter-spacing:.1em;color:#7b8089}
+.leave-q{display:grid;gap:10px;margin:0 0 18px;padding:16px;border-radius:var(--r);border:1px solid var(--line);background:#0a0c0f}
+.leave-q-label{font-size:10px;letter-spacing:.1em;color:var(--text-3)}
 .leave-chips{display:flex;flex-wrap:wrap;gap:6px}
-.leave-chips button{padding:6px 11px;border-radius:9999px;border:1px solid #23252a;background:rgba(255,255,255,.02);color:#9aa0a8;font-size:12.5px;font-family:'Geist',sans-serif;cursor:pointer}
-.leave-chips button:hover{border-color:#4a4d54;color:#d0d6e0}
-.leave-chips button[aria-pressed="true"]{border-color:rgba(168,198,240,.45);background:var(--acc-soft);color:var(--acc)}
-#leave-note{width:100%;box-sizing:border-box;padding:9px 12px;border-radius:8px;border:1px solid #23252a;background:#07080a;color:#fff;font-family:'Geist',sans-serif;font-size:13.5px}
-#leave-note:focus{outline:none;border-color:rgba(168,198,240,.5)}
+.leave-chips button{min-height:34px;padding:0 12px;border-radius:9999px;border:1px solid var(--line-2);background:rgba(255,255,255,.025);color:var(--text-2);font-size:13px;font-family:var(--font);cursor:pointer;transition:border-color .2s ease,color .2s ease,background .2s ease}
+.leave-chips button:hover{border-color:var(--line-3);color:var(--text)}
+.leave-chips button[aria-pressed="true"]{border-color:var(--acc-line);background:var(--acc-soft);color:var(--acc)}
+#leave-note{width:100%;box-sizing:border-box;min-height:44px;padding:10px 13px;border-radius:12px;border:1px solid var(--line-2);background:var(--field);color:var(--text);font-family:var(--font);font-size:14px}
+#leave-note:focus{outline:none;border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(124,198,255,.14)}
+/* Account cards: calmer and wider than marketing cards. */
+#account-content .card{padding:28px;border-radius:var(--r-xl)}
+#account-content .btn-ghost{min-height:44px;font-size:14px;padding:0 18px}
+.acc-danger{color:#f0a8a8 !important}
 @media (max-width:640px){
+  #account-content .card{padding:20px;border-radius:22px}
   #biz-rows .acc-row-value{max-width:none}
   #biz-form .field-pair{grid-template-columns:1fr !important}
   .acc-row{flex-direction:column;align-items:flex-start;gap:4px}
@@ -70,34 +75,35 @@
 </head>
 <body>
 
-<nav class="nav">
+<nav class="nav" aria-label="Main">
   <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
   <div class="nav-links">
-    <a href="/#drop">The drop</a>
-    <a href="control-room.html">Control room</a>
     <a href="approvals.html">Approvals</a>
+    <a href="control-room.html">Control room</a>
+    <a href="history.html">Past drops</a>
     <a href="/#pricing">Pricing</a>
   </div>
   <a href="login.html" class="nav-cta" id="nav-cta">Log in</a>
 </nav>
 
-<header class="page-hero">
-  <div class="page-hero-watermark" aria-hidden="true">ACCOUNT</div>
-  <div class="eyebrow">YOUR ACCOUNT</div>
-  <h1 id="page-title">Account settings.</h1>
-  <p id="page-sub">Your business details, your login, your connected channels, and every drop you've been billed for — all in one place.</p>
+<header class="page-hero is-app is-narrow">
+  <div class="page-hero-inner">
+    <div class="eyebrow">Your account</div>
+    <h1 id="page-title">Account settings.</h1>
+    <p id="page-sub">Your business details, your login, your connected channels, and every drop you've been billed for — all in one place.</p>
+  </div>
 </header>
 
 <section class="section-tight">
   <div class="wrap">
 
     <!-- Signed out -->
-    <div id="signed-out" class="card" hidden style="max-width:440px;margin:0 auto;text-align:center">
-      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089">NOT SIGNED IN</div>
+    <div id="signed-out" class="form-card" hidden style="max-width:460px;margin:0 auto;text-align:center">
+      <div class="label">NOT SIGNED IN</div>
       <h3 style="margin:14px 0 8px">Log in to manage your account.</h3>
       <p style="margin:0">Password, connected channels and billing all live behind your login.</p>
-      <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
-        <a href="login.html" class="btn">Log in<span class="mono" style="font-size:13px">&rarr;</span></a>
+      <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <a href="login.html" class="btn">Log in<span class="mono">&rarr;</span></a>
         <a href="signup.html" class="btn-ghost">Create account</a>
       </div>
     </div>
@@ -113,13 +119,13 @@
       <div class="card">
         <div class="acc-head">
           <div>
-            <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#7b8089">SIGNED IN AS</div>
-            <div id="acc-name" style="margin-top:8px;font-size:19px;color:#fff;letter-spacing:-.015em">—</div>
+            <div class="label">SIGNED IN AS</div>
+            <div id="acc-name" style="margin-top:8px;font-size:24px;font-weight:600;color:var(--text);letter-spacing:-.025em">—</div>
           </div>
           <div id="acc-status-chip" class="acc-chip muted">NO PLAN</div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-          <div class="acc-row-value" style="text-align:left;color:#8a8f98;font-size:13.5px" id="acc-email-display">—</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px">
+          <div class="acc-row-value" style="text-align:left;color:var(--text-3);font-size:14px" id="acc-email-display">—</div>
           <button type="button" id="logout-btn" class="acc-logout">Log out</button>
         </div>
       </div>
@@ -144,24 +150,24 @@
 
         <form id="biz-form" hidden>
           <div class="field">
-            <label for="biz-in-name">BUSINESS NAME</label>
+            <label for="biz-in-name">Business name</label>
             <input id="biz-in-name" type="text" required maxlength="200" autocomplete="organization" placeholder="e.g. Milena's Bakery">
           </div>
           <div class="field-pair" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
             <div class="field">
-              <label for="biz-in-country">COUNTRY</label>
+              <label for="biz-in-country">Country</label>
               <select id="biz-in-country" required autocomplete="country-name">
                 <option value="">Choose your country</option>
               </select>
             </div>
             <div class="field">
-              <label for="biz-in-city">CITY</label>
+              <label for="biz-in-city">City</label>
               <input id="biz-in-city" type="text" required maxlength="200" autocomplete="address-level2" list="biz-city-options" placeholder="Where's the shop?">
               <datalist id="biz-city-options"></datalist>
             </div>
           </div>
           <div class="field">
-            <label for="biz-in-vertical">BUSINESS TYPE</label>
+            <label for="biz-in-vertical">Business type</label>
             <select id="biz-in-vertical">
               <option>Bakery</option>
               <option>Barbershop</option>
@@ -176,23 +182,23 @@
             </select>
           </div>
           <div class="field" id="biz-field-vertical-other" hidden>
-            <label for="biz-in-vertical-other">WHAT KIND OF BUSINESS IS IT?</label>
+            <label for="biz-in-vertical-other">What kind of business is it?</label>
             <input id="biz-in-vertical-other" type="text" maxlength="200" placeholder="e.g. Record shop, tailor, dog groomer">
           </div>
           <div class="field">
-            <label for="biz-in-website">WEBSITE OR INSTAGRAM HANDLE (OPTIONAL)</label>
+            <label for="biz-in-website">Website or Instagram handle (optional)</label>
             <input id="biz-in-website" type="text" maxlength="300" autocomplete="url" placeholder="@yourbusiness or yourbusiness.com">
           </div>
           <div class="field">
-            <label for="biz-in-what">WHAT DO YOU SELL OR DO, IN ONE LINE?</label>
+            <label for="biz-in-what">What do you sell or do, in one line?</label>
             <input id="biz-in-what" type="text" required maxlength="500" placeholder="e.g. Sourdough and pastries, baked fresh every morning">
           </div>
           <div class="field">
-            <label for="biz-in-customer">WHO'S YOUR TYPICAL CUSTOMER?</label>
+            <label for="biz-in-customer">Who's your typical customer?</label>
             <input id="biz-in-customer" type="text" required maxlength="500" placeholder="e.g. Neighborhood regulars, 30-55, coffee-first crowd">
           </div>
           <div class="field">
-            <label for="biz-in-vibe">BRAND VIBE</label>
+            <label for="biz-in-vibe">Brand vibe</label>
             <select id="biz-in-vibe">
               <option>Warm & cozy</option>
               <option>Bold & energetic</option>
@@ -202,15 +208,15 @@
               <option>Local & authentic</option>
             </select>
           </div>
-          <div style="display:flex;gap:10px">
+          <div style="display:flex;gap:10px;align-items:center">
             <button type="submit" class="btn-ghost">Save changes</button>
-            <button type="button" id="biz-cancel" class="acc-link-btn" style="font-size:14px">Cancel</button>
+            <button type="button" id="biz-cancel" class="acc-link-btn" style="font-size:14px;color:var(--text-3)">Cancel</button>
           </div>
         </form>
 
         <div id="biz-notice" class="notice" role="status" hidden></div>
 
-        <p style="margin:18px 0 0;font-size:12.5px;line-height:1.6;color:#7b8089">
+        <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:var(--text-3)">
           Changes apply from the next drop that renders. Brand colors, what sets you apart and anything to avoid live in the <a href="control-room.html">control room</a>.
         </p>
       </div>
@@ -225,10 +231,10 @@
 
           <form id="email-form" class="acc-form-inline">
             <div class="field">
-              <label for="acc-new-email">EMAIL ADDRESS</label>
+              <label for="acc-new-email">Email address</label>
               <input id="acc-new-email" type="email" required placeholder="you@business.com" autocomplete="email">
             </div>
-            <button type="submit" class="btn-ghost">Update email</button>
+            <button type="submit" class="btn-ghost" style="min-height:50px">Update email</button>
           </form>
 
           <div id="email-notice" class="notice" role="status" hidden></div>
@@ -240,25 +246,25 @@
             <span class="mono acc-card-arrow">→</span>
           </button>
 
-          <form id="password-form" hidden style="margin-top:20px">
+          <form id="password-form" hidden style="margin-top:22px">
             <div class="field">
-              <label for="acc-current-password">CURRENT PASSWORD</label>
+              <label for="acc-current-password">Current password</label>
               <input id="acc-current-password" type="password" required placeholder="Your current password" autocomplete="current-password">
-              <button type="button" id="password-forgot" class="acc-link-btn" style="justify-self:start;margin:2px -8px -10px">Forgot it? Email me a reset link</button>
+              <button type="button" id="password-forgot" class="acc-link-btn" style="justify-self:start;margin:2px -8px -10px;font-weight:400;color:var(--text-3)">Forgot it? Email me a reset link</button>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px" class="field-pair">
               <div class="field" style="margin-bottom:0">
-                <label for="acc-new-password">NEW PASSWORD</label>
+                <label for="acc-new-password">New password</label>
                 <input id="acc-new-password" type="password" required minlength="8" placeholder="At least 8 characters" autocomplete="new-password">
               </div>
               <div class="field" style="margin-bottom:0">
-                <label for="acc-confirm-password">CONFIRM PASSWORD</label>
+                <label for="acc-confirm-password">Confirm password</label>
                 <input id="acc-confirm-password" type="password" required minlength="8" placeholder="Type it again" autocomplete="new-password">
               </div>
             </div>
-            <div style="display:flex;gap:10px;margin-top:16px">
+            <div style="display:flex;gap:10px;margin-top:18px;align-items:center">
               <button type="submit" class="btn-ghost">Update password</button>
-              <button type="button" id="password-cancel" style="background:none;border:none;padding:10px 8px;margin:-10px -8px;color:#9aa0a8;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Cancel</button>
+              <button type="button" id="password-cancel" style="background:none;border:none;padding:10px 8px;margin:-10px -8px;color:var(--text-3);font-size:14px;cursor:pointer;font-family:var(--font)">Cancel</button>
             </div>
           </form>
 
@@ -293,7 +299,7 @@
         <div class="card">
           <div class="acc-head">
             <h3 class="acc-card-title" style="margin-bottom:0">Plan</h3>
-            <button type="button" id="bill-plan-toggle" style="background:none;border:none;padding:10px 8px;margin:-10px -8px;font-size:12.5px;color:#9aa0a8;cursor:pointer;font-family:'Geist',sans-serif" hidden>Change plan →</button>
+            <button type="button" id="bill-plan-toggle" style="background:none;border:none;padding:10px 8px;margin:-10px -8px;font-size:13.5px;font-weight:500;color:var(--acc);cursor:pointer;font-family:var(--font)" hidden>Change plan →</button>
           </div>
           <p class="acc-card-sub">What you're on and how it's billed.</p>
 
@@ -301,7 +307,7 @@
             <div class="mono" id="billing-empty-tag">NO PLAN YET</div>
             <h3 id="billing-empty-title">You haven't picked a plan.</h3>
             <p id="billing-empty-text">Choose a plan to start your first drop — billing details show up here once you do.</p>
-            <a href="/#pricing" class="btn-ghost" style="margin-top:20px;display:inline-flex">See plans<span class="mono" style="font-size:13px">→</span></a>
+            <a href="/#pricing" class="btn" style="margin-top:22px;display:inline-flex">See plans<span class="mono">→</span></a>
           </div>
 
           <div id="billing-rows" hidden>
@@ -317,33 +323,33 @@
           <div id="plan-cancel-notice" class="notice" role="status" hidden></div>
           <div id="plan-notice" class="notice" role="status" hidden></div>
 
-          <div id="plan-change-panel" hidden style="margin-top:20px">
+          <div id="plan-change-panel" hidden style="margin-top:22px">
             <div class="field">
-              <label>NEW PLAN</label>
+              <label>New plan</label>
               <div class="tabswitch" id="pc-plan" style="display:flex;flex-wrap:wrap">
-                <button type="button" data-plan="counter">Counter</button>
-                <button type="button" data-plan="storefront">Storefront</button>
-                <button type="button" data-plan="franchise">Franchise</button>
+                <button type="button" data-plan="counter" style="flex:1">Counter</button>
+                <button type="button" data-plan="storefront" style="flex:1">Storefront</button>
+                <button type="button" data-plan="franchise" style="flex:1">Franchise</button>
               </div>
             </div>
             <div class="field">
-              <label>BILLING CYCLE</label>
+              <label>Billing cycle</label>
               <div class="tabswitch" id="pc-cycle" style="display:flex">
-                <button type="button" data-cycle="monthly">Monthly</button>
-                <button type="button" data-cycle="annual">Annual · −20%</button>
+                <button type="button" data-cycle="monthly" style="flex:1">Monthly</button>
+                <button type="button" data-cycle="annual" style="flex:1">Annual · −20%</button>
               </div>
             </div>
-            <p id="pc-note" style="font-size:12.5px;line-height:1.5;color:#7b8089;margin:0 0 16px">—</p>
-            <div style="display:flex;gap:10px">
+            <p id="pc-note" style="font-size:13px;line-height:1.55;color:var(--text-3);margin:0 0 16px">—</p>
+            <div style="display:flex;gap:10px;align-items:center">
               <button type="button" id="pc-confirm" class="btn-ghost">Confirm change</button>
-              <button type="button" id="pc-cancel" style="background:none;border:none;color:#7b8089;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Cancel</button>
+              <button type="button" id="pc-cancel" style="background:none;border:none;color:var(--text-3);font-size:14px;cursor:pointer;font-family:var(--font)">Cancel</button>
             </div>
           </div>
 
-          <div id="cancel-plan-row" style="margin-top:20px;padding-top:18px;border-top:1px solid #1b1e22" hidden>
-            <button type="button" id="cancel-sub-toggle" style="background:none;border:none;color:#f0a8a8;font-size:13.5px;cursor:pointer;font-family:'Geist',sans-serif">Cancel subscription</button>
+          <div id="cancel-plan-row" style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line)" hidden>
+            <button type="button" id="cancel-sub-toggle" style="background:none;border:none;padding:0;color:#f0a8a8;font-size:14px;cursor:pointer;font-family:var(--font)">Cancel subscription</button>
             <div id="cancel-sub-panel" hidden style="margin-top:14px">
-              <p style="font-size:13.5px;line-height:1.6;color:#8a8f98;margin:0 0 14px">You'll keep full access until <span id="cancel-sub-until">—</span>. After that your plan stops and nothing more is charged.</p>
+              <p style="font-size:14px;line-height:1.6;color:var(--text-2);margin:0 0 14px">You'll keep full access until <span id="cancel-sub-until">—</span>. After that your plan stops and nothing more is charged.</p>
               <div class="leave-q">
                 <div class="mono leave-q-label" id="leave-q-label">WHY ARE YOU LEAVING? (OPTIONAL)</div>
                 <div class="leave-chips" id="leave-chips" role="group" aria-labelledby="leave-q-label">
@@ -356,9 +362,9 @@
                 </div>
                 <input id="leave-note" type="text" maxlength="1000" placeholder="Anything else we should know?" aria-label="Anything else we should know?">
               </div>
-              <div style="display:flex;gap:10px">
+              <div style="display:flex;gap:10px;align-items:center">
                 <button type="button" id="cancel-sub-confirm" class="btn-ghost" style="border-color:rgba(240,168,168,.35);color:#f0a8a8">Yes, cancel</button>
-                <button type="button" id="cancel-sub-back" style="background:none;border:none;padding:10px 8px;margin:-10px -8px;color:#9aa0a8;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Never mind</button>
+                <button type="button" id="cancel-sub-back" style="background:none;border:none;padding:10px 8px;margin:-10px -8px;color:var(--text-3);font-size:14px;cursor:pointer;font-family:var(--font)">Never mind</button>
               </div>
             </div>
           </div>
@@ -381,7 +387,7 @@
             </table>
           </div>
 
-          <div style="margin-top:18px;font-size:12.5px;line-height:1.6;color:#7b8089">
+          <div style="margin-top:18px;font-size:13px;line-height:1.6;color:var(--text-3)">
             Paid amounts are what Paddle, our reseller and Merchant of Record, actually charged; Paddle emails the invoice for each one.
             All prices include VAT where it applies; the VAT share is shown on the invoice.
           </div>
@@ -400,23 +406,23 @@
           </div>
           <div id="export-notice" class="notice" role="status" hidden></div>
 
-          <div style="margin-top:18px;font-size:13px;line-height:1.6;color:#8a8f98">
+          <div style="margin-top:18px;font-size:13.5px;line-height:1.6;color:var(--text-2)">
             The download is one file with your account, brief and every creative. For a correction, or anything else, write to
             <a href="mailto:privacy@adronis.app">privacy@adronis.app</a> from the address on this account — we answer within one month.
             Full detail is in the <a href="privacy.html">Privacy Policy</a>.
           </div>
 
-          <div style="margin-top:20px;padding-top:18px;border-top:1px solid #1b1e22">
-            <button type="button" id="delete-toggle" style="background:none;border:none;padding:0;color:#f0a8a8;font-size:13.5px;cursor:pointer;font-family:'Geist',sans-serif">Delete my account</button>
+          <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--line)">
+            <button type="button" id="delete-toggle" style="background:none;border:none;padding:0;color:#f0a8a8;font-size:14px;cursor:pointer;font-family:var(--font)">Delete my account</button>
             <form id="delete-form" hidden style="margin-top:14px">
-              <p style="font-size:13.5px;line-height:1.6;color:#8a8f98;margin:0 0 14px">This removes your login, brief and every creative for good — it can't be undone. Anything already posted stays on your own channels. Download your data first if you want a copy.</p>
+              <p style="font-size:14px;line-height:1.6;color:var(--text-2);margin:0 0 14px">This removes your login, brief and every creative for good — it can't be undone. Anything already posted stays on your own channels. Download your data first if you want a copy.</p>
               <div class="field">
-                <label for="delete-password">TYPE YOUR PASSWORD TO CONFIRM</label>
+                <label for="delete-password">Type your password to confirm</label>
                 <input id="delete-password" type="password" required autocomplete="current-password" placeholder="Your current password">
               </div>
-              <div style="display:flex;gap:10px">
+              <div style="display:flex;gap:10px;align-items:center">
                 <button type="submit" class="btn-ghost" style="border-color:rgba(240,168,168,.35);color:#f0a8a8">Delete for good</button>
-                <button type="button" id="delete-cancel" style="background:none;border:none;padding:10px 8px;margin:-10px -8px;color:#9aa0a8;font-size:14px;cursor:pointer;font-family:'Geist',sans-serif">Never mind</button>
+                <button type="button" id="delete-cancel" style="background:none;border:none;padding:10px 8px;margin:-10px -8px;color:var(--text-3);font-size:14px;cursor:pointer;font-family:var(--font)">Never mind</button>
               </div>
             </form>
             <div id="delete-notice" class="notice" role="status" hidden></div>
@@ -432,12 +438,12 @@
 <footer>
   <div class="foot-grid">
     <div>
-      <div class="foot-brand"><span class="dot"></span>Adronis</div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
       <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
     </div>
-    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="/#drop">The weekly drop</a><a href="/#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
-    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
-    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
   </div>
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>

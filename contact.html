@@ -10,7 +10,7 @@
 <meta name="description" content="Multi-location, unlimited channels or a custom drop slot? Tell us about the business and we will come back with a plan.">
 <link rel="canonical" href="https://adronis.app/contact.html">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<meta name="theme-color" content="#07080a">
+<meta name="theme-color" content="#050608">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Adronis">
@@ -28,88 +28,116 @@
 <meta name="twitter:image" content="https://adronis.app/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
 <link rel="stylesheet" href="adronis.css">
+<style>
+.ct-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(28px,5vw,72px);align-items:start}
+.ct-side{position:sticky;top:112px}
+.ct-side h2{font-size:clamp(24px,2.4vw,30px);margin:0 0 22px}
+.ct-steps{list-style:none;margin:0;padding:0;display:grid;gap:18px;counter-reset:ct}
+.ct-steps li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;align-items:start;font-size:15.5px;line-height:1.55;color:var(--text-2);counter-increment:ct}
+.ct-steps li::before{content:counter(ct);display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:12px;border:1px solid var(--acc-line);background:var(--acc-soft);font-family:var(--mono);font-size:13px;color:var(--acc)}
+.ct-steps b{display:block;margin-bottom:2px;font-size:16px}
+.ct-alt{margin-top:30px;padding:18px 20px;border-radius:var(--r);border:1px solid var(--line);background:rgba(255,255,255,.02);font-size:14.5px;line-height:1.6;color:var(--text-2)}
+.ct-alt a{font-weight:500}
+#success-notice{margin-top:0;padding:22px;font-size:15.5px;border-radius:var(--r-lg)}
+@media (max-width:860px){.ct-grid{grid-template-columns:minmax(0,1fr)}.ct-side{position:static;order:2}}
+</style>
 </head>
 <body>
 
-<nav class="nav">
+<nav class="nav" aria-label="Main">
   <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
   <div class="nav-links">
-    <a href="/#drop">The drop</a>
-    <a href="/#engine">Engine</a>
+    <a href="/#drop">How it works</a>
+    <a href="/#engine">Examples</a>
     <a href="control-room.html">Control room</a>
     <a href="approvals.html">Approvals</a>
     <a href="/#pricing">Pricing</a>
   </div>
-  <a href="login.html" id="nav-login" style="padding:8px 12px;border-radius:9999px;color:#d0d6e0;font-size:13px">Log in</a>
-  <a href="signup.html" class="nav-cta">Start free drop</a>
+  <a href="login.html" id="nav-login">Log in</a>
+  <a href="signup.html" class="nav-cta">Try it free</a>
 </nav>
 
 <header class="page-hero">
-  <div class="page-hero-watermark" aria-hidden="true">CONTACT</div>
-  <div class="eyebrow">TALK TO US</div>
+  <div class="eyebrow">Talk to us</div>
   <h1>Tell us about the shop. We'll tell you what the first drop looks like.</h1>
   <p>Franchise and multi-location accounts get a human on the other end before the engine ever renders a frame.</p>
 </header>
 
 <section class="section-tight">
-  <div class="wrap" style="max-width:640px">
-    <div id="plan-notice" class="notice" role="status" hidden></div>
+  <div class="ct-grid">
 
-    <form id="contact-form">
-      <div class="field">
-        <label for="business">BUSINESS NAME</label>
-        <input id="business" name="business" type="text" maxlength="200" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
-      </div>
-      <div class="field">
-        <label for="name">YOUR NAME</label>
-        <input id="name" name="name" type="text" maxlength="200" required autocomplete="name" placeholder="Full name">
-      </div>
-      <div class="field">
-        <label for="email">EMAIL</label>
-        <input id="email" name="email" type="email" maxlength="320" required autocomplete="email" placeholder="you@business.com">
-      </div>
-      <div class="field">
-        <label for="plan">PLAN INTEREST</label>
-        <select id="plan" name="plan">
-          <option value="counter">Counter</option>
-          <option value="storefront">Storefront</option>
-          <option value="franchise">Franchise</option>
-          <option value="unsure">Not sure yet</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="message">MESSAGE</label>
-        <textarea id="message" name="message" maxlength="5000" placeholder="Number of locations, verticals, channels you're on today..."></textarea>
-      </div>
-      <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
-        <label for="c-company">Company (leave empty)</label>
-        <input id="c-company" name="c-company" type="text" tabindex="-1" autocomplete="off">
-      </div>
-      <button type="submit" class="btn" style="width:100%;justify-content:center;border:none">Send message<span class="mono" style="font-size:13px">→</span></button>
-      <p style="margin:16px 0 0;font-size:12.5px;line-height:1.6;color:#7b8089">
-        We use what you send here only to answer you, and we keep it for up to 24 months.
-        We do not sell it and we do not add you to a marketing list without your consent.
-        See the <a href="privacy.html">Privacy Policy</a>, or ask us to delete your message at <a href="mailto:privacy@adronis.app">privacy@adronis.app</a>.
-        Please do not send sensitive personal data through this form.
-      </p>
-    </form>
+    <aside class="ct-side">
+      <h2>What happens next</h2>
+      <ol class="ct-steps">
+        <li><span><b>You send a few lines</b>Number of locations, the channels you're on, anything we should know.</span></li>
+        <li><span><b>A real person reads it</b>Every message here gets a reply within one business day.</span></li>
+        <li><span><b>We come back with a plan</b>For your locations and channels, before the engine renders a thing.</span></li>
+      </ol>
+      <div class="ct-alt">Just want to see it work first? <a href="signup.html?plan=free">Start on the Free plan</a> — no card needed.</div>
+    </aside>
 
-    <div id="success-notice" class="notice" role="status" hidden>Thanks — a real person reads every message here and replies within one business day.</div>
+    <div>
+      <div class="form-card">
+        <div id="plan-notice" class="notice" role="status" style="margin:0 0 22px" hidden></div>
+
+        <form id="contact-form">
+          <div class="field">
+            <label for="business">Business name</label>
+            <input id="business" name="business" type="text" maxlength="200" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
+          </div>
+          <div class="field">
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" maxlength="200" required autocomplete="name" placeholder="Full name">
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" maxlength="320" required autocomplete="email" placeholder="you@business.com">
+          </div>
+          <div class="field">
+            <label for="plan">Plan interest</label>
+            <select id="plan" name="plan">
+              <option value="counter">Counter</option>
+              <option value="storefront">Storefront</option>
+              <option value="franchise">Franchise</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" maxlength="5000" placeholder="Number of locations, verticals, channels you're on today..."></textarea>
+          </div>
+          <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+            <label for="c-company">Company (leave empty)</label>
+            <input id="c-company" name="c-company" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <button type="submit" class="btn btn-lg btn-block">Send message<span class="mono" aria-hidden="true">→</span></button>
+          <p class="form-foot">
+            We use what you send here only to answer you, and we keep it for up to 24 months.
+            We do not sell it and we do not add you to a marketing list without your consent.
+            See the <a href="privacy.html">Privacy Policy</a>, or ask us to delete your message at <a href="mailto:privacy@adronis.app">privacy@adronis.app</a>.
+            Please do not send sensitive personal data through this form.
+          </p>
+        </form>
+
+        <div id="success-notice" class="notice" role="status" hidden>Thanks — a real person reads every message here and replies within one business day.</div>
+      </div>
+    </div>
+
   </div>
 </section>
 
 <footer>
   <div class="foot-grid">
     <div>
-      <div class="foot-brand"><span class="dot"></span>Adronis</div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
       <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
     </div>
-    <div class="foot-col"><div class="foot-col-title">PRODUCT</div><a href="/#drop">The weekly drop</a><a href="/#engine">Engine</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
-    <div class="foot-col"><div class="foot-col-title">COMPANY</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
-    <div class="foot-col"><div class="foot-col-title">LEGAL</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
   </div>
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED</span></div>
 </footer>
