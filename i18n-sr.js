@@ -1417,6 +1417,7 @@ window.LB_I18N_SR = {
     "Your free ads are on the way.": "Tvoji besplatni oglasi su na putu.",
     "As soon as the engine renders them, they show up here for approval.":
       "Čim ih mašina napravi, pojavljuju se ovde na odobravanje.",
+    "An earlier drop": "Raniji drop",
     "Brief the engine first.": "Prvo napravi brif za mašinu.",
     "Tell us about your business and your free ads start rendering.":
       "Reci nam nešto o svom biznisu i tvoji besplatni oglasi počinju da se renderuju.",

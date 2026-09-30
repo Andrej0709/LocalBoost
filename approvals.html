@@ -335,6 +335,22 @@
     }
   }
 
+  // The page opens on "Waiting on you", so it opens on the week that has
+  // something waiting — or every week, when more than one does. Otherwise a
+  // creative left over from last week would sit out of sight behind the
+  // newest drop while the control room counts it as waiting.
+  function defaultDrop() {
+    if (!drops.length) return "all";
+    var waitingIn = {};
+    creatives.forEach(function (creative) {
+      if (creative.status === "pending") waitingIn[creative.drop_id] = true;
+    });
+    var ids = Object.keys(waitingIn);
+    if (ids.length > 1) return "all";
+    if (ids.length === 1 && drops.some(function (d) { return d.id === ids[0]; })) return ids[0];
+    return drops[0].id;
+  }
+
   // history.html opens a given week: ?drop=<id>&filter=all.
   function applyLinkedView() {
     var params = new URLSearchParams(location.search);
@@ -360,6 +376,7 @@
       demoMode ? "Sample drop"
         : drop && drop.theme ? drop.theme
         : currentDrop === "all" ? "Every creative"
+        : drop && drops[0] && drop.id !== drops[0].id ? "An earlier drop"
         : "This week's drop";
 
     var meta = [];
@@ -1302,7 +1319,7 @@
     if (!creatives.length) {
       noDrops.hidden = false;
     } else {
-      currentDrop = drops.length ? drops[0].id : "all";
+      currentDrop = defaultDrop();
       applyLinkedView();
       board.hidden = false;
       renderAll();
