@@ -278,7 +278,7 @@
         <p class="acc-card-sub">The channels your weekly drop publishes to. Untick anything you don't want creatives rendered for.</p>
 
         <form id="channels-form">
-          <div class="acc-channels">
+          <div class="acc-channels" role="group" aria-label="Channels" aria-describedby="channels-hint">
             <label class="checkbox-row"><input type="checkbox" name="channels" value="Instagram">Instagram</label>
             <label class="checkbox-row"><input type="checkbox" name="channels" value="Facebook">Facebook</label>
             <label class="checkbox-row"><input type="checkbox" name="channels" value="TikTok">TikTok</label>
@@ -286,6 +286,7 @@
             <label class="checkbox-row"><input type="checkbox" name="channels" value="LinkedIn">LinkedIn</label>
             <label class="checkbox-row"><input type="checkbox" name="channels" value="Pinterest">Pinterest</label>
           </div>
+          <p class="channel-hint" id="channels-hint" aria-live="polite" style="margin:-6px 0 16px"></p>
           <button type="submit" class="btn-ghost">Save channels</button>
         </form>
 

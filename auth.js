@@ -225,6 +225,17 @@
       return null;
     },
 
+    // The plan whose channel allowance applies (see channelsField in
+    // brief-fields.js): the one running, a failed charge included, the paid
+    // plan a signup stopped short of checkout on, or Free. Mirrors
+    // channel_plan() in supabase/schema.sql.
+    channelPlan: function () {
+      var p = profile || {};
+      if (["trialing", "active", "past_due"].indexOf(p.subscription_status) > -1) return p.plan;
+      if (!p.subscription_status && p.plan) return p.plan;
+      return "free";
+    },
+
     // How many creatives are waiting on this account's approval.
     pendingCount: async function () {
       if (!session) return 0;

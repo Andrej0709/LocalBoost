@@ -143,9 +143,70 @@
     };
   }
 
+  /* CHANNELS: each plan publishes to a set number of channels — one on Free,
+     two on Counter, four on Storefront, every one on Franchise (null). Mirrors
+     channel_limit() in supabase/schema.sql and the pricing section; keep them
+     in sync. Once the plan's number is ticked the other boxes lock. An account
+     already over it (its plan just got smaller) is told how many to untick and
+     can't save until it has. */
+  var CHANNEL_LIMITS = { free: 1, counter: 2, storefront: 4, franchise: null };
+  var PLAN_NAMES = { free: "Free", counter: "Counter", storefront: "Storefront", franchise: "Franchise" };
+
+  function channelsField(group, hint, submit) {
+    var plan = "free";
+
+    function boxes() {
+      return Array.prototype.slice.call(group.querySelectorAll('input[name="channels"]'));
+    }
+    function limit() { return CHANNEL_LIMITS[plan]; }
+
+    function sync() {
+      var max = limit();
+      var list = boxes();
+      var on = list.filter(function (box) { return box.checked; }).length;
+      list.forEach(function (box) {
+        box.disabled = max !== null && !box.checked && on >= max;
+      });
+      var over = max !== null && on > max;
+      if (submit) submit.disabled = over;
+      // Each case is a whole sentence of its own, so the Serbian copy can
+      // match it.
+      var name = PLAN_NAMES[plan];
+      hint.textContent = max === null
+        ? "Your " + name + " plan publishes to every channel."
+        : over
+          ? "Your " + name + " plan includes " + max + (max === 1 ? " channel" : " channels") +
+            " — untick " + (on - max) + " to save."
+          : "Your " + name + " plan includes " + max + (max === 1 ? " channel." : " channels.");
+      hint.classList.toggle("is-over", over);
+    }
+
+    group.addEventListener("change", sync);
+
+    return {
+      // The plan whose number applies; anything unknown counts as Free.
+      setPlan: function (key) {
+        plan = CHANNEL_LIMITS.hasOwnProperty(key) ? key : "free";
+        sync();
+      },
+      // Ticks the given channels, keeping only as many as the plan allows —
+      // for defaults, never for what an account already saved.
+      preselect: function (names) {
+        var max = limit();
+        var left = max === null ? Infinity : max;
+        boxes().forEach(function (box) {
+          box.checked = names.indexOf(box.value) > -1 && left-- > 0;
+        });
+        sync();
+      },
+      sync: sync
+    };
+  }
+
   window.LBBriefFields = {
     countryField: countryField,
     verticalField: verticalField,
+    channelsField: channelsField,
     countryLabel: countryLabel,
     guessCountry: guessCountry
   };

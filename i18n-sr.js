@@ -1947,6 +1947,15 @@ window.LB_I18N_SR = {
       "Iskoristio si sve besplatne oglase za ovaj mesec ($1) — sledeći stižu od $2."],
     [/^(\d+) of (\d+) free ads used this month\.$/,
       "Besplatni oglasi ovog meseca: iskorišćeno $1 od $2."],
+    // How many channels the plan allows (brief-fields.js), and the database's
+    // own refusal if a save gets past that.
+    [/^Your (.+?) plan publishes to every channel\.$/, "Plan $1 objavljuje na svim kanalima."],
+    [/^Your (.+?) plan includes 1 channel\.$/, "Plan $1 uključuje 1 kanal."],
+    [/^Your (.+?) plan includes (\d+) channels\.$/, "Plan $1 uključuje $2 kanala."],
+    [/^Your (.+?) plan includes (\d+) channels? — untick (\d+) to save\.$/,
+      "Plan $1 uključuje najviše $2 — isključi još $3 da bi sačuvao."],
+    [/^Your plan publishes to (\d+) channel\(s\) - untick some before saving\.$/,
+      "Tvoj plan objavljuje na najviše $1 — isključi neke kanale pre čuvanja."],
     [/^Your (.+?) plan hasn't started yet — add a card to start it\.$/,
       "Tvoj plan $1 još nije počeo — dodaj karticu da ga pokreneš."],
     [/^You've used all (\d+) free ads for (.+?)\. The next (\d+) arrive from (.+?) — or get a full drop every week\.$/,

@@ -201,14 +201,15 @@
       </div>
 
       <div class="section-label" id="channels-label">WHERE SHOULD WE PUBLISH?</div>
-      <div class="checkbox-group" role="group" aria-labelledby="channels-label">
-        <label class="checkbox-row"><input type="checkbox" name="channels" value="Instagram" checked>Instagram</label>
-        <label class="checkbox-row"><input type="checkbox" name="channels" value="Facebook" checked>Facebook</label>
+      <div class="checkbox-group" id="channels-group" role="group" aria-labelledby="channels-label" aria-describedby="channel-hint">
+        <label class="checkbox-row"><input type="checkbox" name="channels" value="Instagram">Instagram</label>
+        <label class="checkbox-row"><input type="checkbox" name="channels" value="Facebook">Facebook</label>
         <label class="checkbox-row"><input type="checkbox" name="channels" value="TikTok">TikTok</label>
         <label class="checkbox-row"><input type="checkbox" name="channels" value="Google Business">Google Business</label>
         <label class="checkbox-row"><input type="checkbox" name="channels" value="LinkedIn">LinkedIn</label>
         <label class="checkbox-row"><input type="checkbox" name="channels" value="Pinterest">Pinterest</label>
       </div>
+      <p class="channel-hint" id="channel-hint" aria-live="polite"></p>
 
       <div class="section-label" id="consent-label">BEFORE YOU START</div>
       <div class="checkbox-group consent-group" role="group" aria-labelledby="consent-label">
@@ -409,6 +410,7 @@
         form.querySelectorAll('input[name="channels"]'),
         function(box){ box.checked = profile.channels.indexOf(box.value) > -1; }
       );
+      channelsField.sync();
     }
   }
 
@@ -433,6 +435,15 @@
 
   // Start on the country the browser says the reader is in, if it says.
   setCountry(LBBriefFields.guessCountry());
+
+  // As many channels as the plan publishes to, Instagram and Facebook first.
+  var channelsField = LBBriefFields.channelsField(
+    document.getElementById("channels-group"),
+    document.getElementById("channel-hint"),
+    submitButton
+  );
+  channelsField.setPlan(planKey);
+  channelsField.preselect(["Instagram", "Facebook"]);
 
   function checkedChannels(){
     return Array.prototype.map.call(

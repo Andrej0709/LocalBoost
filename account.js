@@ -221,16 +221,25 @@
   }
 
   // -------------------------------------------------------------- channels
+  // How many can be ticked follows the plan (brief-fields.js).
+  var channelsField = null;
+
   function renderChannels(profile) {
     var form = $("channels-form");
     var selected = Array.isArray(profile.channels) ? profile.channels : [];
     Array.prototype.forEach.call(form.querySelectorAll('input[name="channels"]'), function (box) {
       box.checked = selected.indexOf(box.value) > -1;
     });
+    channelsField.setPlan(LBAuth.channelPlan());
   }
 
   function wireChannels() {
     var notice = $("channels-notice");
+    channelsField = LBBriefFields.channelsField(
+      $("channels-form").querySelector(".acc-channels"),
+      $("channels-hint"),
+      $("channels-form").querySelector("button[type=submit]")
+    );
     $("channels-form").addEventListener("submit", async function (e) {
       e.preventDefault();
       var button = e.target.querySelector("button[type=submit]");
@@ -245,7 +254,7 @@
       } catch (err) {
         say(notice, err.message, true);
       } finally {
-        button.disabled = false;
+        channelsField.sync();
       }
     });
   }

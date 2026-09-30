@@ -198,6 +198,11 @@ input,select,textarea{color-scheme:dark}
 .checkbox-row:hover{border-color:var(--line-3)}
 .checkbox-row:has(input:checked){border-color:var(--acc-line);background:rgba(124,198,255,.07)}
 .checkbox-row input[type=checkbox]{flex:none;width:18px;height:18px;margin:0;accent-color:var(--acc);cursor:pointer}
+.checkbox-row:has(input:disabled){opacity:.45;cursor:not-allowed}
+.checkbox-row:has(input:disabled):hover{border-color:var(--line-2)}
+.checkbox-row input[type=checkbox]:disabled{cursor:not-allowed}
+.channel-hint{margin:12px 0 0;font-size:13px;line-height:1.55;color:var(--text-3)}
+.channel-hint.is-over{color:#f0a8a8}
 /* A consent line is a sentence, not a chip: the text wraps as one block beside the box. */
 .consent-group{grid-template-columns:1fr}
 .consent-row{align-items:flex-start;gap:12px;padding:16px;line-height:1.6;color:var(--text-2);font-size:14px}

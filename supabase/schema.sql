@@ -369,6 +369,39 @@ create trigger creatives_set_updated_at
   for each row execute function public.set_updated_at();
 
 /* ------------------------------------------------------------ */
+/* 7b. channel_limit - how many channels a plan publishes to: one on Free,  */
+/*     two on Counter, four on Storefront, every one (null) on Franchise.   */
+/*     Mirrors CHANNEL_LIMITS in brief-fields.js and the pricing section.   */
+/* ------------------------------------------------------------ */
+create or replace function public.channel_limit(p_plan public.plan_tier)
+returns int
+language sql
+immutable
+as $$
+  select case p_plan
+    when 'counter'    then 2
+    when 'storefront' then 4
+    when 'franchise'  then null
+    else 1
+  end
+$$;
+
+/* The plan whose channel allowance applies to an account: the one running (a
+   failed charge included - it is still their plan), the one picked at signup
+   while no plan has ever run, and Free once a plan has ended. */
+create or replace function public.channel_plan(p public.profiles)
+returns public.plan_tier
+language sql
+immutable
+as $$
+  select case
+    when p.subscription_status in ('trialing', 'active', 'past_due') then p.plan
+    when p.subscription_status is null then p.plan
+    else 'free'::public.plan_tier
+  end
+$$;
+
+/* ------------------------------------------------------------ */
 /* 8. Auto-create a profile whenever a user signs up. */
 /*    Reads the metadata passed in supabase.auth.signUp({ options: { data: ... } }). */
 /* ------------------------------------------------------------ */
@@ -378,6 +411,8 @@ language plpgsql
 security definer
 set search_path = public, pg_temp
 as $$
+declare
+  picked public.plan_tier := (nullif(new.raw_user_meta_data ->> 'plan', ''))::public.plan_tier;
 begin
   insert into public.profiles (
     id, email, business_name, country, city, vertical, website,
@@ -400,16 +435,19 @@ begin
     nullif(new.raw_user_meta_data ->> 'brand_vibe', ''),
     nullif(new.raw_user_meta_data ->> 'brand_colors', ''),
     nullif(new.raw_user_meta_data ->> 'avoid_notes', ''),
+    /* No more channels than the picked plan publishes to (limit null = all). */
     coalesce(
       (select array_agg(value #>> '{}')
-         from jsonb_array_elements(
-           case jsonb_typeof(new.raw_user_meta_data -> 'channels')
-             when 'array' then new.raw_user_meta_data -> 'channels'
-             else '[]'::jsonb
-           end)),
+         from (select value
+                 from jsonb_array_elements(
+                   case jsonb_typeof(new.raw_user_meta_data -> 'channels')
+                     when 'array' then new.raw_user_meta_data -> 'channels'
+                     else '[]'::jsonb
+                   end)
+                limit public.channel_limit(picked)) picked_channels),
       '{}'
     ),
-    (nullif(new.raw_user_meta_data ->> 'plan', ''))::public.plan_tier,
+    picked,
     /* The server clock, not the browser's: the signup request is the moment the
        box was ticked, and a timestamp the browser sends could say anything. */
     case when nullif(new.raw_user_meta_data ->> 'terms_version', '') is not null then now() end,
@@ -921,6 +959,16 @@ begin
   if new.plan is distinct from old.plan
      and old.subscription_status in ('trialing', 'active', 'past_due') then
     raise exception 'Change your plan from the account page - it switches at your next billing date.';
+  end if;
+
+  /* No more channels than the plan publishes to. Checked only when the
+     channels change, so an account left over its number by a smaller plan
+     can still save everything else while it picks which ones to keep. */
+  if new.channels is distinct from old.channels
+     and public.channel_limit(public.channel_plan(new)) is not null
+     and cardinality(new.channels) > public.channel_limit(public.channel_plan(new)) then
+    raise exception 'Your plan publishes to % channel(s) - untick some before saving.',
+      public.channel_limit(public.channel_plan(new));
   end if;
 
   if new.next_week_note is distinct from old.next_week_note then
