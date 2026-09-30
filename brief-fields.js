@@ -207,6 +207,7 @@
     countryField: countryField,
     verticalField: verticalField,
     channelsField: channelsField,
+    countryCode: codeOf,
     countryLabel: countryLabel,
     guessCountry: guessCountry
   };

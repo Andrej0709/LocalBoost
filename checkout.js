@@ -243,6 +243,22 @@
     renderSummary();
   });
 
+  // The country from the business brief, so checkout doesn't ask twice. One
+  // that isn't on the short list joins it without a VAT estimate, the same as
+  // "Somewhere else" — Paddle works out the real tax either way.
+  function prefillCountry(englishName) {
+    var select = $("co-country");
+    var code = englishName && window.LBBriefFields ? LBBriefFields.countryCode(englishName) : "";
+    if (!code) return;
+    if (!select.querySelector('option[value="' + code + '"]')) {
+      var opt = new Option(LBBriefFields.countryLabel(englishName), code);
+      opt.setAttribute("data-vat", "0");
+      select.insertBefore(opt, select.querySelector('option[value="OTHER"]'));
+    }
+    select.value = code;
+    state.country = code;
+  }
+
   $("co-promo-apply").addEventListener("click", function () {
     var code = $("co-promo").value.trim().toUpperCase();
     var note = $("co-promo-note");
@@ -319,6 +335,7 @@
         if (LBAuth.hasActivePlan()) { showActive(); return; }
 
         state.paidNow = LBAuth.hadTrial();
+        prefillCountry((LBAuth.getProfile() || {}).country);
         renderSummary();
         $("co-free").hidden = false;
         var user = LBAuth.getUser();
