@@ -307,6 +307,15 @@
     $("plan-pastdue-notice").hidden =
       !(profile.subscription_status === "past_due" && profile.paddle_subscription_id);
 
+    // A plan that ended: straight back to checkout for it (checkout knows the
+    // trial was already used and bills from today).
+    var ended = !!plan && profile.subscription_status === "canceled";
+    $("restart-plan-row").hidden = !ended;
+    if (ended) {
+      $("restart-plan-link").href = "checkout.html?plan=" + profile.plan +
+        "&cycle=" + (profile.billing_cycle === "annual" ? "annual" : "monthly");
+    }
+
     if (!plan || !profile.subscription_status) {
       $("billing-rows").hidden = true;
       $("billing-empty").hidden = false;

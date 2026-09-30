@@ -1191,6 +1191,10 @@ window.LB_I18N_SR = {
     "Free trial": "Besplatna proba",
     "Active": "Aktivno",
     "Past due — update your card": "Dospelo — ažuriraj karticu",
+    "Your weekly drops stopped when the plan ended. Your brief and every past drop are still here — start again and the next drop picks up from them.":
+      "Nedeljni dropovi su stali kad je plan istekao. Tvoj brif i svi prošli dropovi su i dalje ovde — pokreni ga ponovo i sledeći drop nastavlja od njih.",
+    "Restart my plan": "Ponovo pokreni plan",
+    "Compare plans": "Uporedi planove",
     "PAYMENT FAILED": "PLAĆANJE NIJE PROŠLO",
     "Your last payment didn't go through — update your card to keep your weekly drop.":
       "Poslednja uplata nije prošla — promeni karticu da zadržiš nedeljni drop.",
