@@ -436,6 +436,33 @@
     }
   });
 
+  // Paddle's webhook is what starts the plan, and it can land a few seconds
+  // after the overlay closes. Until it has, every other page still shows the
+  // Free plan, so the way into the app waits until the account says the plan
+  // is on — at most half a minute, then it lets them through anyway.
+  var PLAN_WAIT_MS = 30000;
+
+  function waitForPlan() {
+    var go = $("co-success-go");
+    var wait = $("co-success-wait");
+    if (!window.LBAuth) return;
+    go.hidden = true;
+    wait.hidden = false;
+    var started = Date.now();
+
+    function done(slow) {
+      if (slow) wait.textContent = "Your plan can take a minute to show up everywhere.";
+      else wait.hidden = true;
+      go.hidden = false;
+    }
+    function check() {
+      if (!LBAuth.isLoggedIn() || LBAuth.hasActivePlan()) { done(false); return; }
+      if (Date.now() - started > PLAN_WAIT_MS) { done(true); return; }
+      setTimeout(function () { LBAuth.refreshProfile().then(check, check); }, 2000);
+    }
+    LBAuth.ready.then(check, function () { done(false); });
+  }
+
   // --------------------------------------------------------- returning views
   var view = params.get("state");
   if (view === "success" || view === "cancelled") {
@@ -458,6 +485,7 @@
           "First invoice on " + trialEndsOn() + ", and you can cancel before then.";
       }
       $("co-success-text").textContent = "Your " + plan.name + " drop is live.";
+      waitForPlan();
     } else {
       $("co-cancelled").hidden = false;
       $("co-eyebrow").textContent = "CHECKOUT CANCELLED";

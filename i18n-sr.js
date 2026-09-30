@@ -1194,6 +1194,8 @@ window.LB_I18N_SR = {
     "Your weekly drops stopped when the plan ended. Your brief and every past drop are still here — start again and the next drop picks up from them.":
       "Nedeljni dropovi su stali kad je plan istekao. Tvoj brif i svi prošli dropovi su i dalje ovde — pokreni ga ponovo i sledeći drop nastavlja od njih.",
     "Restart my plan": "Ponovo pokreni plan",
+    "SETTING UP YOUR PLAN…": "PODEŠAVAMO TVOJ PLAN…",
+    "Your plan can take a minute to show up everywhere.": "Može da potraje minut dok se plan ne pojavi svuda.",
     "Compare plans": "Uporedi planove",
     "PAYMENT FAILED": "PLAĆANJE NIJE PROŠLO",
     "Your last payment didn't go through — update your card to keep your weekly drop.":
