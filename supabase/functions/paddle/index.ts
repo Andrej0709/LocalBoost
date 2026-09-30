@@ -45,6 +45,10 @@ const PAID_PLANS = ["counter", "storefront", "franchise"];
 const CYCLES = ["monthly", "annual"];
 const RUNNING = ["trialing", "active", "past_due"];
 
+// Franchise is never bought here: it's agreed with Adronis first (the contact
+// page) and then set on the account from the Adronis Portal (handleAdmin).
+const FRANCHISE_BY_TALK = "Franchise is set up with us directly - talk to us from the contact page.";
+
 // ------------------------------------------------------------------ helpers
 
 function json(body: unknown, status = 200) {
@@ -382,6 +386,7 @@ async function handleAction(req: Request) {
       case "checkout": {
         if (!profile.onboarded_at) throw new UserError("Finish the business brief before checking out.");
         if (!PAID_PLANS.includes(body.plan)) throw new UserError("Pick a paid plan.");
+        if (body.plan === "franchise") throw new UserError(FRANCHISE_BY_TALK);
         if (!CYCLES.includes(body.cycle)) throw new UserError("Pick monthly or annual billing.");
         if (running) throw new UserError("Your plan is already running.");
 
@@ -421,6 +426,9 @@ async function handleAction(req: Request) {
         const cycle = body.action === "undo_change" ? profile.billing_cycle : (body.cycle || profile.billing_cycle);
         if (plan === "free") throw new UserError("To move to Free, cancel your plan - it drops to Free when this period ends.");
         if (!PAID_PLANS.includes(plan) || !CYCLES.includes(cycle)) throw new UserError("Pick a paid plan.");
+        // Moving onto Franchise goes through a conversation; a Franchise
+        // account may still change its cycle or undo a switch away from it.
+        if (plan === "franchise" && profile.plan !== "franchise") throw new UserError(FRANCHISE_BY_TALK);
 
         const sub = await paddle("PATCH", `/subscriptions/${subId}`, {
           items: [{ price_id: await findPrice(plan, cycle, false), quantity: 1 }],

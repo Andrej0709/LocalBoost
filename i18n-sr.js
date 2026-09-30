@@ -100,6 +100,11 @@ window.LB_I18N_SR = {
     "Adronis is built by a small team of engineers and former agency creative directors who got tired of watching good local businesses lose to silence, not competition. We'd rather ship a better engine than a bigger sales team.":
       "Adronis gradi mali tim inženjera i bivših kreativnih direktora iz agencija, kojima je dosadilo da gledaju kako dobri lokalni biznisi gube od tišine, a ne od konkurencije. Radije ćemo isporučiti bolju mašinu nego veći prodajni tim.",
     "Talk to us": "Razgovarajmo",
+    "Talk to us →": "Razgovarajmo →",
+    "Several locations? Franchise is set up with us directly.":
+      "Više lokacija? Franchise dogovaramo direktno sa tobom.",
+    "Franchise is set up with us directly - talk to us from the contact page.":
+      "Franchise dogovaramo direktno — javi nam se preko stranice za kontakt.",
 
     /* --- Contact --------------------------------------------------------- */
     "Contact Adronis — Talk to Sales": "Kontakt — razgovor sa prodajom",

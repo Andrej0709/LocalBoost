@@ -28,19 +28,15 @@
         "Performance feedback into next drop",
         "Caption variants and A/B slotting"
       ]
-    },
-    franchise: {
-      key: "franchise", name: "Franchise", base: 490,
-      rate: "30 ads / week · unlimited",
-      features: [
-        "30 creatives, multi-location aware",
-        "Unlimited channels and locations",
-        "Human creative director review",
-        "Brand-safety approvals workflow",
-        "Dedicated drop slot and support"
-      ]
     }
   };
+
+  // Franchise isn't sold here: it's set up with Adronis after a conversation
+  // (contact.html), then given to the account from the portal.
+  if (new URLSearchParams(location.search).get("plan") === "franchise") {
+    location.replace("contact.html?plan=franchise");
+    return;
+  }
 
   var ANNUAL_DISCOUNT = 0.2;   // 20% off, matches the pricing section
   var TRIAL_DAYS = 7;          // "first drop free"

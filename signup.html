@@ -290,6 +290,8 @@
       features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", "Performance feedback into next drop", "Caption variants and A/B slotting"] }
   };
   var params = new URLSearchParams(location.search);
+  // Franchise is agreed with Adronis first, never signed up for here.
+  if (params.get("plan") === "franchise") { location.replace("contact.html?plan=franchise"); return; }
   var planKey = plans[params.get("plan")] ? params.get("plan") : "storefront";
   var plan = plans[planKey];
   var cycle = params.get("cycle") === "annual" ? "annual" : "monthly";
