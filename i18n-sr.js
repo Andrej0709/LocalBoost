@@ -1191,6 +1191,13 @@ window.LB_I18N_SR = {
     "Free trial": "Besplatna proba",
     "Active": "Aktivno",
     "Past due — update your card": "Dospelo — ažuriraj karticu",
+    "PAYMENT FAILED": "PLAĆANJE NIJE PROŠLO",
+    "Your last payment didn't go through — update your card to keep your weekly drop.":
+      "Poslednja uplata nije prošla — promeni karticu da zadržiš nedeljni drop.",
+    "Update card →": "Promeni karticu →",
+    "Invoices & receipts →": "Računi i potvrde →",
+    "There's no billing account yet - it starts with your first checkout.":
+      "Još nemaš nalog za naplatu — otvara se sa prvim plaćanjem.",
     "Canceled — you're on the Free plan": "Otkazano — na besplatnom si planu",
     "No active plan": "Nema aktivnog plana",
     "Started": "Počelo",

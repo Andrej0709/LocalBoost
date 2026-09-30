@@ -294,6 +294,10 @@
     // checkout ever runs. subscription_status only becomes non-null once
     // start_trial() fires (checkout.js, after a card is on file), so that's
     // the real signal for "has a plan running", not the plan column alone.
+    // A failed charge: the customer changes the card on Paddle's own page.
+    $("plan-pastdue-notice").hidden =
+      !(profile.subscription_status === "past_due" && profile.paddle_subscription_id);
+
     if (!plan || !profile.subscription_status) {
       $("billing-rows").hidden = true;
       $("billing-empty").hidden = false;
@@ -624,6 +628,10 @@
   }
 
   function renderPayments(profile) {
+    // Paddle keeps every invoice and receipt; anyone who has checked out once
+    // has a Paddle customer to open them under.
+    $("invoices-btn").hidden = !profile.paddle_customer_id;
+
     var rows = buildPaymentRows(profile);
     var tableWrap = $("payments-table-wrap");
     var empty = $("payments-empty");
@@ -646,6 +654,23 @@
           (r.note ? ' <span style="color:#8a8f98;font-size:12.5px">' + r.note + "</span>" : "") + "</td>" +
         "</tr>";
     }).join("");
+  }
+
+  // Paddle hosts the card change and the invoices. Its links work once, so
+  // every click asks for a fresh one and goes straight there.
+  function wirePortal() {
+    function open(target, button, notice) {
+      button.disabled = true;
+      notice.hidden = true;
+      LBAuth.billingPortalUrl(target).then(function (url) {
+        location.href = url;
+      }, function (err) {
+        say(notice, err.message, true);
+        button.disabled = false;
+      });
+    }
+    $("update-card-btn").addEventListener("click", function () { open("payment", this, $("plan-notice")); });
+    $("invoices-btn").addEventListener("click", function () { open("overview", this, $("invoices-notice")); });
   }
 
   // ---------------------------------------------------------------- nav
@@ -798,6 +823,7 @@
     renderPayments(profile);
     wirePlanChange(function () { return currentProfile; });
     wireCancelSubscription(function () { return currentProfile; });
+    wirePortal();
     wireExport();
     wireDelete();
 

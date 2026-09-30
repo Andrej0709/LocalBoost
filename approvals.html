@@ -141,7 +141,7 @@
 
     <!-- Free plan: where the monthly allowance stands -->
     <div id="free-strip" class="notice" role="status" hidden style="margin:0 0 24px;color:var(--text)">
-      <span class="mono" style="margin-right:10px;font-size:10px;letter-spacing:.12em;color:var(--acc)">FREE PLAN</span><span id="free-strip-unpaid" hidden style="margin-right:6px"></span><span id="free-strip-text"></span>
+      <span class="mono" id="free-strip-tag" style="margin-right:10px;font-size:10px;letter-spacing:.12em;color:var(--acc)">FREE PLAN</span><span id="free-strip-unpaid" hidden style="margin-right:6px"></span><span id="free-strip-text"></span>
       <a href="/#pricing" id="free-strip-link" style="margin-left:4px;white-space:nowrap">Get a full drop every week →</a>
     </div>
 
@@ -1189,6 +1189,18 @@
 
   // Free plan: no weekly drop, just a monthly allowance — say where it
   // stands instead of promising a Monday batch that isn't coming.
+  function showPastDueStrip() {
+    var tag = document.getElementById("free-strip-tag");
+    tag.textContent = "PAYMENT FAILED";
+    tag.style.color = "#f0a8a8";
+    document.getElementById("free-strip-text").textContent =
+      "Your last payment didn't go through — update your card to keep your weekly drop.";
+    var link = document.getElementById("free-strip-link");
+    link.href = "account.html#billing";
+    link.textContent = "Update card →";
+    document.getElementById("free-strip").hidden = false;
+  }
+
   // A paid plan the customer picked at signup but never added a card for.
   // Until checkout runs they're on the free allowance, so the strip says both.
   var PAID_PLAN_NAMES = { counter: "Counter", storefront: "Storefront", franchise: "Franchise" };
@@ -1252,7 +1264,10 @@
     cta.textContent = "Control room";
     cta.href = "control-room.html";
 
-    if (LBAuth.isOnFreePlan()) showFreeStrip();
+    // A failed charge isn't the Free plan, even though the free allowance is
+    // what renders until it's paid — say what's wrong and where to fix it.
+    if ((LBAuth.getProfile() || {}).subscription_status === "past_due") showPastDueStrip();
+    else if (LBAuth.isOnFreePlan()) showFreeStrip();
 
     // The two queries don't depend on each other — run them together rather
     // than paying for two round trips one after the other.

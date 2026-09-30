@@ -5,7 +5,8 @@
 //      every subscription event is mirrored onto the customer's profiles row.
 //
 //   2. Billing actions for the signed-in customer (checkout, cancel, resume,
-//      plan change). The browser never talks to the Paddle API directly and
+//      plan change, a link into Paddle's customer portal to change the card
+//      or get invoices). The browser never talks to the Paddle API directly and
 //      never picks a price itself - this function decides which price applies
 //      (trial or not, from the database) so a customer can't hand themselves a
 //      second free trial from the browser console.
@@ -426,6 +427,26 @@ async function handleAction(req: Request) {
           proration_billing_mode: "do_not_bill",
         });
         return json({ profile: await syncSubscription(sub, profile.id) });
+      }
+
+      // A one-time link into Paddle's own customer portal: straight to
+      // changing the card on the subscription ("payment"), or the overview
+      // with every invoice and receipt. The customer is the signed-in
+      // account's, never one named in the request, and a fresh link is made
+      // on every click - they work once and run out.
+      case "portal": {
+        if (!profile.paddle_customer_id) {
+          throw new UserError("There's no billing account yet - it starts with your first checkout.");
+        }
+        const session = await paddle("POST", `/customers/${profile.paddle_customer_id}/portal-sessions`, {
+          subscription_ids: subId ? [subId] : [],
+        });
+        const forSub = (session?.urls?.subscriptions || []).find((s: any) => s.id === subId);
+        const url = body.target === "payment" && forSub?.update_subscription_payment_method
+          ? forSub.update_subscription_payment_method
+          : session?.urls?.general?.overview;
+        if (!url) throw new Error("Portal session came back without a URL");
+        return json({ url });
       }
 
       // Account deletion: stop billing on the spot before the login is removed.

@@ -450,6 +450,14 @@
     // Undoes a scheduled plan switch before it takes effect.
     cancelPlanChange: async function () {
       return (await billing("undo_change")).profile;
+    },
+
+    // A link into Paddle's own billing page for this customer: "payment" goes
+    // straight to changing the card, anything else to the overview with every
+    // invoice and receipt. Each link works once and runs out, so ask for a
+    // fresh one on every click.
+    billingPortalUrl: async function (target) {
+      return (await billing("portal", { target: target || "overview" })).url;
     }
   };
 })();

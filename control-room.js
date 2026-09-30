@@ -701,7 +701,17 @@
     // Signed in but signup stopped halfway — say what's missing and link
     // straight to it, instead of leaving an empty control room to guess at.
     var step = LBAuth.unfinishedStep();
-    if (step) {
+    if ((LBAuth.getProfile() || {}).subscription_status === "past_due") {
+      var tag = document.getElementById("finish-notice-tag");
+      tag.textContent = "PAYMENT FAILED";
+      tag.style.color = "#f0a8a8";
+      document.getElementById("finish-notice-text").textContent =
+        "Your last payment didn't go through — update your card to keep your weekly drop.";
+      var fix = document.getElementById("finish-notice-link");
+      fix.href = "account.html#billing";
+      fix.textContent = "Update card →";
+      document.getElementById("finish-notice").hidden = false;
+    } else if (step) {
       var planName = { counter: "Counter", storefront: "Storefront", franchise: "Franchise" }[(LBAuth.getProfile() || {}).plan];
       document.getElementById("finish-notice-text").textContent = LBAuth.hasBrief() && planName
         ? "Your " + planName + " plan hasn't started yet — add a card to start it."
