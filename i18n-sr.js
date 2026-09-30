@@ -158,6 +158,8 @@ window.LB_I18N_SR = {
     "Those two passwords don't match.": "Te dve lozinke se ne poklapaju.",
     "Password changed — taking you to your control room...":
       "Lozinka je promenjena — vodim te u kontrolnu sobu...",
+    "Password changed — let's finish signing you up...":
+      "Lozinka je promenjena — idemo da završimo registraciju...",
     "This reset link has run out. Ask for a new one.":
       "Ovaj link za novu lozinku više ne važi. Zatraži novi.",
     "Access your control room, or create a quick account to hold your spot.":
@@ -1408,6 +1410,9 @@ window.LB_I18N_SR = {
     "Tell us about your business and your free ads start rendering.":
       "Reci nam nešto o svom biznisu i tvoji besplatni oglasi počinju da se renderuju.",
     "Fill in the brief →": "Popuni brif →",
+    "Tell us about your business, then start your free trial at checkout.":
+      "Reci nam nešto o svom biznisu, pa pokreni besplatnu probu na plaćanju.",
+    "Finish checkout →": "Završi plaćanje →",
     "Couldn't load your drop.": "Nismo uspeli da učitamo tvoj drop.",
     "WAITING": "NA ČEKANJU",
     "REJECTED": "ODBAČENO",
@@ -1444,6 +1449,11 @@ window.LB_I18N_SR = {
     "You're on the Free plan — pick a paid plan to start one":
       "Koristiš besplatni plan — izaberi plaćeni plan da ga pokreneš",
     "Finish your business brief to start it": "Završi brif o biznisu da ga pokreneš",
+    "Add a card at checkout to start it": "Dodaj karticu na plaćanju da ga pokreneš",
+    "Logged in — let's finish signing you up...": "Prijavljen si — idemo da završimo registraciju...",
+    "Your business brief isn't done yet — the engine needs it before it can make your ads.":
+      "Tvoj brif o biznisu još nije gotov — mašini treba pre nego što napravi tvoje oglase.",
+    "Finish signing up →": "Završi registraciju →",
     "Onboard in ten minutes. Your free ads land in Approvals as soon as the engine renders them.":
       "Podešavanje traje deset minuta. Tvoji besplatni oglasi stižu u Odobravanja čim ih mašina napravi.",
     "No need to sign up again — your account already has this covered.":
@@ -1930,6 +1940,8 @@ window.LB_I18N_SR = {
       "Iskoristio si sve besplatne oglase za ovaj mesec ($1) — sledeći stižu od $2."],
     [/^(\d+) of (\d+) free ads used this month\.$/,
       "Besplatni oglasi ovog meseca: iskorišćeno $1 od $2."],
+    [/^Your (.+?) plan hasn't started yet — add a card to start it\.$/,
+      "Tvoj plan $1 još nije počeo — dodaj karticu da ga pokreneš."],
     [/^You've used all (\d+) free ads for (.+?)\. The next (\d+) arrive from (.+?) — or get a full drop every week\.$/,
       "Iskoristio si sve besplatne oglase za $2 ($1). Sledeći ($3) stižu od $4 — ili uzmi pun drop svake nedelje."],
     [/^(\d+) of (\d+) free ads left this month — they land in Approvals as soon as they're rendered\. Want a full drop every week\?$/,

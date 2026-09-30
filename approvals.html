@@ -141,8 +141,8 @@
 
     <!-- Free plan: where the monthly allowance stands -->
     <div id="free-strip" class="notice" role="status" hidden style="margin:0 0 24px;color:var(--text)">
-      <span class="mono" style="margin-right:10px;font-size:10px;letter-spacing:.12em;color:var(--acc)">FREE PLAN</span><span id="free-strip-text"></span>
-      <a href="/#pricing" style="margin-left:4px;white-space:nowrap">Get a full drop every week →</a>
+      <span class="mono" style="margin-right:10px;font-size:10px;letter-spacing:.12em;color:var(--acc)">FREE PLAN</span><span id="free-strip-unpaid" hidden style="margin-right:6px"></span><span id="free-strip-text"></span>
+      <a href="/#pricing" id="free-strip-link" style="margin-left:4px;white-space:nowrap">Get a full drop every week →</a>
     </div>
 
     <!-- Main board -->
@@ -1189,16 +1189,42 @@
 
   // Free plan: no weekly drop, just a monthly allowance — say where it
   // stands instead of promising a Monday batch that isn't coming.
+  // A paid plan the customer picked at signup but never added a card for.
+  // Until checkout runs they're on the free allowance, so the strip says both.
+  var PAID_PLAN_NAMES = { counter: "Counter", storefront: "Storefront", franchise: "Franchise" };
+
   async function showFreeStrip() {
     EMPTY_COPY.pending[1] = "Nothing is waiting on you here. New free ads show up the moment they're rendered.";
+    // Where a signup that stopped halfway picks up — the brief, then checkout
+    // for the plan they picked — so nobody who chose a paid plan gets sent
+    // down the free one.
+    var step = LBAuth.unfinishedStep();
+    var pickedPlan = PAID_PLAN_NAMES[(LBAuth.getProfile() || {}).plan];
     if (LBAuth.hasBrief()) {
       noDrops.querySelector("h3").textContent = "Your free ads are on the way.";
       noDrops.querySelector("p").textContent =
         "As soon as the engine renders them, they show up here for approval.";
     } else {
       noDrops.querySelector("h3").textContent = "Brief the engine first.";
-      noDrops.querySelector("p").innerHTML =
-        'Tell us about your business and your free ads start rendering. <a href="signup.html?plan=free">Fill in the brief →</a>';
+      var p = noDrops.querySelector("p");
+      p.textContent = "";
+      p.appendChild(document.createTextNode(pickedPlan
+        ? "Tell us about your business, then start your free trial at checkout."
+        : "Tell us about your business and your free ads start rendering."));
+      p.appendChild(document.createTextNode(" "));
+      var briefLink = document.createElement("a");
+      briefLink.href = step || "signup.html?plan=free";
+      briefLink.textContent = "Fill in the brief →";
+      p.appendChild(briefLink);
+    }
+
+    if (step && pickedPlan && LBAuth.hasBrief()) {
+      var unpaid = document.getElementById("free-strip-unpaid");
+      unpaid.textContent = "Your " + pickedPlan + " plan hasn't started yet — add a card to start it.";
+      unpaid.hidden = false;
+      var stripLink = document.getElementById("free-strip-link");
+      stripLink.href = step;
+      stripLink.textContent = "Finish checkout →";
     }
 
     var text = "";

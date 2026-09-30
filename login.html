@@ -266,7 +266,11 @@
         document.getElementById("li-email").value,
         document.getElementById("li-password").value
       );
-      redirect("control-room.html", "Logged in — taking you to your control room...");
+      // A signup that stopped halfway (email confirmed, brief or card still
+      // missing) goes back to where it stopped, not into an empty app.
+      var step = LBAuth.unfinishedStep();
+      if (step) redirect(step, "Logged in — let's finish signing you up...");
+      else redirect("control-room.html", "Logged in — taking you to your control room...");
     } catch (err) {
       button.disabled = false;
       say(err.message === "Email not confirmed"
@@ -316,8 +320,9 @@
     button.disabled = true;
     try {
       await LBAuth.finishRecovery(document.getElementById("rp-password").value);
-      tell("Password changed — taking you to your control room...");
-      setTimeout(function(){ location.href = "control-room.html"; }, 900);
+      var step = LBAuth.unfinishedStep();
+      tell(step ? "Password changed — let's finish signing you up..." : "Password changed — taking you to your control room...");
+      setTimeout(function(){ location.href = step || "control-room.html"; }, 900);
     } catch (err) {
       button.disabled = false;
       tell(err.message);
@@ -378,18 +383,22 @@
     }
 
     // No plan running — the trial only starts after the brief and checkout.
-    // With the brief done they're on the free plan, and Approvals is where
-    // their free ads land. Without it, the brief is the one step missing.
+    // A signup that stopped halfway picks up where it stopped: the brief, or
+    // checkout for the paid plan they picked. Otherwise they're on the free
+    // plan, and Approvals is where their free ads land.
+    var step = LBAuth.unfinishedStep();
     document.getElementById("trial-start").textContent = "Not started";
     document.getElementById("trial-end").textContent =
-      LBAuth.hasBrief() ? "You're on the Free plan — pick a paid plan to start one" : "Finish your business brief to start it";
+      !LBAuth.hasBrief() ? "Finish your business brief to start it"
+        : step ? "Add a card at checkout to start it"
+        : "You're on the Free plan — pick a paid plan to start one";
 
     var primary = document.getElementById("already-in-primary");
-    if (LBAuth.hasBrief()) {
-      primary.textContent = "Open approvals";
-    } else {
-      primary.href = LBAuth.nextStep(profile.plan);
+    if (step) {
+      primary.href = step;
       primary.textContent = "Finish signing up";
+    } else {
+      primary.textContent = "Open approvals";
     }
     primary.appendChild((function(){
       var span = document.createElement("span");

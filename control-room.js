@@ -698,6 +698,18 @@
     cta.textContent = "Approvals";
     cta.href = "approvals.html";
 
+    // Signed in but signup stopped halfway — say what's missing and link
+    // straight to it, instead of leaving an empty control room to guess at.
+    var step = LBAuth.unfinishedStep();
+    if (step) {
+      var planName = { counter: "Counter", storefront: "Storefront", franchise: "Franchise" }[(LBAuth.getProfile() || {}).plan];
+      document.getElementById("finish-notice-text").textContent = LBAuth.hasBrief() && planName
+        ? "Your " + planName + " plan hasn't started yet — add a card to start it."
+        : "Your business brief isn't done yet — the engine needs it before it can make your ads.";
+      document.getElementById("finish-notice-link").href = step;
+      document.getElementById("finish-notice").hidden = false;
+    }
+
     document.getElementById("engine-help").hidden = false;
     renderExtras();
 

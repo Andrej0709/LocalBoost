@@ -212,6 +212,19 @@
       return "checkout.html" + q;
     },
 
+    // Where a signup that stopped halfway picks up again: the brief if it was
+    // never filled in, then checkout if a paid plan was picked but never
+    // started. null when nothing is left to do - a plan running, the free plan
+    // chosen, or a plan that already ran and ended (that account is on Free,
+    // not halfway through signing up).
+    unfinishedStep: function () {
+      if (!session) return null;
+      var plan = profile && profile.plan;
+      if (!this.hasBrief()) return "signup.html" + (plan ? "?plan=" + plan : "");
+      if (plan && plan !== "free" && !profile.subscription_status) return "checkout.html?plan=" + plan;
+      return null;
+    },
+
     // How many creatives are waiting on this account's approval.
     pendingCount: async function () {
       if (!session) return 0;
