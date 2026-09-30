@@ -424,7 +424,7 @@
         },
         body: "Four quick stops: what's going out, what's already live, what's waiting on you, and how to make every ad more yours." },
       { target: ".cr-stats",
-        title: "Your week at a glance",
+        title: "Your ads at a glance",
         body: "How many ads are scheduled to post, how many are already out, and how many are waiting for your yes." },
       { target: function () { return document.querySelectorAll(".cr-stat")[2]; },
         title: "Nothing goes out without you",

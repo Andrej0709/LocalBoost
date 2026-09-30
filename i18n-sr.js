@@ -1665,7 +1665,7 @@ window.LB_I18N_SR = {
     "Done": "Gotovo",
     "Four quick stops: what's going out, what's already live, what's waiting on you, and how to make every ad more yours.":
       "Četiri kratka koraka: šta izlazi, šta je već objavljeno, šta čeka tebe i kako da svaki oglas bude više tvoj.",
-    "Your week at a glance": "Tvoja nedelja na prvi pogled",
+    "Your ads at a glance": "Tvoji oglasi na prvi pogled",
     "How many ads are scheduled to post, how many are already out, and how many are waiting for your yes.":
       "Koliko oglasa je zakazano za objavu, koliko ih je već izašlo i koliko čeka tvoje odobrenje.",
     "Nothing goes out without you": "Ništa ne izlazi bez tebe",
