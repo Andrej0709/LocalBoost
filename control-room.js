@@ -434,7 +434,7 @@
         body: "Each ad sits on the day and time it posts — blue is scheduled, green is already live. Click a blue one to change when it posts." },
       { target: "#engine-help",
         title: "Make every ad look like you",
-        body: "All optional, but everything you add here goes straight into your next drop — your colors, your offers, what sets you apart. Start with the step worth the most." }
+        body: "All optional, but everything you add here goes straight into your next drop — your photos, your colors, your offers, what sets you apart. Start with the step worth the most." }
     ]
   };
 
@@ -443,32 +443,54 @@
   // edit; the database stamps next_week_note_at whenever that note changes.
   // Weights add up to 100 and follow how much each answer changes the ads.
   // Channels are edited on the account page, so that row links there instead
-  // of opening a form.
+  // of opening a form. The rows with an asset are files the customer uploads
+  // (brand-assets.js) rather than a profile column.
   var EXTRAS = [
-    { key: "differentiator", weight: 25, title: "What makes you different", max: 1000, multiline: true,
+    { key: "differentiator", weight: 20, title: "What makes you different", max: 1000, multiline: true,
       why: "Gives every ad a reason to pick you over the place down the street.",
       placeholder: "e.g. Everything's made from scratch, third-generation family recipes, open from 6am" },
-    { key: "next_week_note", weight: 20, title: "What's happening next week?", max: 1000, multiline: true,
+    { key: "photos", asset: "photos", weight: 20, title: "Photos of your place and what you sell",
+      why: "Ads built from your real food, shelves and team, so customers find what they saw when they walk in.",
+      hint: "Phone photos are fine. Only upload photos you own, and ask before showing a customer's face." },
+    { key: "next_week_note", weight: 15, title: "What's happening next week?", max: 1000, multiline: true,
       why: "A sale, a new product, holiday hours, an event — the engine builds next week's ads around it.",
       placeholder: "e.g. 20% off all coffee Mon–Wed, closed Friday for the holiday, new pumpkin pastry from Tuesday" },
-    { key: "brand_colors", weight: 15, title: "Your brand colors", max: 200,
+    { key: "logo", asset: "logo", weight: 10, title: "Your logo",
+      why: "Goes on your ads, so people know straight away who they're from.",
+      hint: "A PNG with a transparent background works best." },
+    { key: "brand_colors", weight: 10, title: "Your brand colors", max: 200,
       why: "Keeps the images in your colors, so people recognise you before they read a word.",
       placeholder: "e.g. Deep green and cream, with gold accents" },
-    { key: "avoid_notes", weight: 15, title: "Anything to avoid", max: 1000, multiline: true,
+    { key: "avoid_notes", weight: 10, title: "Anything to avoid", max: 1000, multiline: true,
       why: "Things that should never show up in your ads — the engine steers clear of them.",
       placeholder: "e.g. No jokes about prices, never show the back kitchen" },
-    { key: "website", weight: 15, title: "Website or Instagram", max: 300,
+    { key: "website", weight: 5, title: "Website or Instagram", max: 300,
       why: "Shows the engine how you already present yourself, so new ads match it.",
       placeholder: "e.g. @milenasbakery or milenas.rs" },
-    { key: "channels", weight: 10, title: "Where your ads go", link: "account.html",
+    { key: "menu", asset: "menu", weight: 5, title: "Your menu or price list",
+      why: "Real products and prices, so an ad never offers something you don't sell.",
+      hint: "A photo of the menu or a PDF, up to three pages." },
+    { key: "channels", weight: 5, title: "Where your ads go", link: "account.html",
       why: "Pick at least one channel so every drop has somewhere to publish." }
   ];
+  // Uploaded files by kind, filled in at boot. Until then (or if Storage can't
+  // be reached) every kind reads as empty.
+  var assets = { logo: [], photos: [], menu: [] };
+  var thumbUrls = {};
+  // A message to show in an upload form once it re-renders: { key, text, bad }.
+  var assetMessage = null;
   // A weekly note only counts while it is about the week ahead.
   var NOTE_FRESH_MS = 7 * 24 * 60 * 60 * 1000;
   var openExtra = null;
   var completeOpen = false;
 
   function extraValue(x, profile) {
+    if (x.asset) {
+      var files = assets[x.asset];
+      if (!files.length) return "";
+      if (x.asset === "photos") return files.length === 1 ? "1 photo" : files.length + " photos";
+      return files.map(function (f) { return f.name; }).join(", ");
+    }
     var v = profile[x.key];
     if (Array.isArray(v)) return v.join(", ");
     return v || "";
@@ -608,7 +630,7 @@
       }
       item.appendChild(toggle);
 
-      if (open) item.appendChild(buildExtraForm(x, value, profile));
+      if (open) item.appendChild(x.asset ? buildAssetForm(x) : buildExtraForm(x, value, profile));
       list.appendChild(item);
     });
   }
@@ -686,6 +708,178 @@
     }
   }
 
+  // The open row for an upload: what's there already, with a way to remove
+  // each one, and a button to add more up to the kind's limit.
+  function buildAssetForm(x) {
+    var spec = LBBrand.KINDS[x.asset];
+    var files = assets[x.asset];
+    var box = document.createElement("div");
+    box.className = "eh-form";
+
+    if (files.length) {
+      var grid = document.createElement("div");
+      grid.className = "eh-thumbs";
+      files.forEach(function (f) {
+        var tile = document.createElement("div");
+        tile.className = "eh-thumb" + (f.isPdf ? " is-doc" : "");
+        if (f.isPdf) {
+          var doc = document.createElement("span");
+          doc.className = "eh-doc";
+          var tag = document.createElement("b");
+          tag.textContent = "PDF";
+          var name = document.createElement("span");
+          name.textContent = f.name;
+          doc.appendChild(tag);
+          doc.appendChild(name);
+          tile.appendChild(doc);
+        } else {
+          var img = document.createElement("img");
+          img.alt = f.name;
+          img.dataset.path = f.path;
+          if (thumbUrls[f.path]) img.src = thumbUrls[f.path];
+          tile.appendChild(img);
+        }
+        var rm = document.createElement("button");
+        rm.type = "button";
+        rm.className = "eh-thumb-rm";
+        rm.textContent = "✕";
+        rm.title = "Remove";
+        rm.setAttribute("aria-label", "Remove " + f.name);
+        rm.addEventListener("click", function () { removeAsset(x, f, box); });
+        tile.appendChild(rm);
+        grid.appendChild(tile);
+      });
+      box.appendChild(grid);
+      loadThumbs(grid, files);
+    }
+
+    var row = document.createElement("div");
+    row.className = "eh-form-row";
+    var input = document.createElement("input");
+    input.type = "file";
+    input.accept = LBBrand.accept(x.asset);
+    input.multiple = spec.max > 1;
+    input.hidden = true;
+    input.addEventListener("change", function () {
+      var picked = Array.prototype.slice.call(input.files || []);
+      input.value = "";
+      if (picked.length) uploadAssets(x, picked, box);
+    });
+    row.appendChild(input);
+
+    // A full logo slot is swapped rather than added to.
+    var replacing = spec.max === 1 && files.length === 1;
+    if (files.length < spec.max || replacing) {
+      var pick = document.createElement("button");
+      pick.type = "button";
+      pick.className = "btn-ghost";
+      pick.textContent = replacing ? "Replace" : files.length ? "Add more" : "Upload";
+      pick.addEventListener("click", function () { input.click(); });
+      row.appendChild(pick);
+      setTimeout(function () { pick.focus(); }, 0);
+    }
+    if (spec.max > 1) {
+      var meta = document.createElement("span");
+      meta.className = "eh-meta";
+      meta.textContent = files.length + " of " + spec.max;
+      row.appendChild(meta);
+    }
+    box.appendChild(row);
+
+    var hint = document.createElement("p");
+    hint.className = "eh-hint";
+    hint.textContent = x.hint;
+    box.appendChild(hint);
+
+    var notice = document.createElement("div");
+    notice.className = "notice";
+    notice.setAttribute("role", "status");
+    notice.hidden = true;
+    if (assetMessage && assetMessage.key === x.key) {
+      notice.hidden = false;
+      notice.textContent = assetMessage.text;
+      notice.style.color = assetMessage.bad ? "#f0a8a8" : "";
+      assetMessage = null;
+    }
+    box.appendChild(notice);
+
+    box.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") { openExtra = null; renderExtras(); }
+    });
+    return box;
+  }
+
+  // Private files need signed links; fetch the ones not seen yet, then fill
+  // in every thumbnail still waiting for its picture.
+  async function loadThumbs(grid, files) {
+    var missing = files.filter(function (f) { return !f.isPdf && !thumbUrls[f.path]; })
+      .map(function (f) { return f.path; });
+    if (missing.length) {
+      try {
+        var urls = await LBBrand.signedUrls(missing);
+        Object.keys(urls).forEach(function (p) { thumbUrls[p] = urls[p]; });
+      } catch (e) { return; }
+    }
+    Array.prototype.forEach.call(grid.querySelectorAll("img[data-path]"), function (img) {
+      if (!img.src && thumbUrls[img.dataset.path]) img.src = thumbUrls[img.dataset.path];
+    });
+  }
+
+  function setBusy(box, text) {
+    Array.prototype.forEach.call(box.querySelectorAll("button"), function (b) { b.disabled = true; });
+    var notice = box.querySelector(".notice");
+    notice.hidden = false;
+    notice.style.color = "";
+    notice.textContent = text;
+  }
+
+  async function refreshAssets(kind) {
+    try { assets[kind] = await LBBrand.list(kind); } catch (e) {}
+  }
+
+  async function uploadAssets(x, picked, box) {
+    var spec = LBBrand.KINDS[x.asset];
+    var replacing = spec.max === 1 ? assets[x.asset].slice() : [];
+    var held = assets[x.asset].length - replacing.length;
+    // More than fit: send what fits and say what was left out.
+    var toSend = picked.slice(0, spec.max - held);
+    var skipped = picked.length - toSend.length;
+    var done = 0;
+    var failure = null;
+    setBusy(box, "Uploading…");
+    try {
+      toSend.forEach(function (file, i) { LBBrand.check(x.asset, file, held + i); });
+      // The old logo goes first: the bucket only ever holds one.
+      if (replacing.length) await LBBrand.remove(replacing.map(function (f) { return f.path; }));
+      for (var i = 0; i < toSend.length; i++) {
+        await LBBrand.upload(x.asset, toSend[i]);
+        done++;
+      }
+    } catch (err) {
+      failure = done ? "Uploaded " + done + " of " + toSend.length + ". " + err.message : err.message;
+    }
+    if (!failure && skipped) {
+      failure = "You can keep up to " + spec.max + " here, so " + skipped + " weren't uploaded.";
+    }
+    await refreshAssets(x.asset);
+    openExtra = x.key;
+    assetMessage = failure ? { key: x.key, bad: true, text: failure } : null;
+    renderExtras();
+  }
+
+  async function removeAsset(x, file, box) {
+    setBusy(box, "Removing…");
+    try {
+      await LBBrand.remove([file.path]);
+    } catch (err) {
+      assetMessage = { key: x.key, bad: true, text: err.message };
+    }
+    delete thumbUrls[file.path];
+    await refreshAssets(x.asset);
+    openExtra = x.key;
+    renderExtras();
+  }
+
   LBAuth.ready.then(async function () {
     if (!LBAuth.isLoggedIn()) {
       loading.hidden = true;
@@ -722,6 +916,15 @@
 
     document.getElementById("engine-help").hidden = false;
     renderExtras();
+
+    // Uploaded files only add to the score, so the board doesn't wait on them.
+    // Rebuilding the list would wipe an answer someone is typing, so with a
+    // row open only the score catches up.
+    LBBrand.listAll().then(function (all) {
+      assets = all;
+      if (openExtra) renderScore(LBAuth.getProfile() || {});
+      else renderExtras();
+    }, function () {});
 
     var res = await LBAuth.db
       .from("creatives")

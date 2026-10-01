@@ -728,12 +728,22 @@
         ]);
         loaded.forEach(function (res) { if (res.error) throw res.error; });
 
+        // The uploaded files themselves stay in Storage; the export names them.
+        var brand = await LBBrand.listAll();
+        var brandFiles = [];
+        Object.keys(brand).forEach(function (kind) {
+          brand[kind].forEach(function (f) {
+            brandFiles.push({ kind: kind, name: f.name, path: f.path, size: f.size });
+          });
+        });
+
         var data = {
           exported_at: new Date().toISOString(),
           login_email: user.email,
           account: loaded[0].data,
           drops: loaded[1].data || [],
-          creatives: loaded[2].data || []
+          creatives: loaded[2].data || [],
+          brand_files: brandFiles
         };
         var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
         var link = document.createElement("a");

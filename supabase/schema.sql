@@ -1195,3 +1195,67 @@ do $$ begin
     and char_length(message) <= 5000
   ) not valid;
 exception when duplicate_object then null; end $$;
+
+/* ------------------------------------------------------------ */
+/* 10. Brand material - the logo, photos and menu a customer uploads */
+/*     in the control room (brand-assets.js). Files live in the private */
+/*     "brand-assets" Storage bucket at <user id>/<kind>/<file>, where kind */
+/*     is logo, photos or menu. Each account reads, adds and deletes only */
+/*     its own folder; nobody can overwrite a file in place. The engine and */
+/*     the admin portal read the bucket with the service role. */
+/*     Deleting the account doesn't reach Storage, so LBAuth.deleteAccount */
+/*     removes the files first (LBBrand.removeAll). */
+/* ------------------------------------------------------------ */
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('brand-assets', 'brand-assets', false, 10485760,
+        array['image/jpeg', 'image/png', 'image/webp', 'application/pdf'])
+on conflict (id) do update
+  set public             = false,
+      file_size_limit    = excluded.file_size_limit,
+      allowed_mime_types = excluded.allowed_mime_types;
+
+/* How many files of each kind an account may keep: one logo, twelve photos,
+   three pages of menu. Keep in step with KINDS in brand-assets.js. */
+create or replace function public.brand_asset_has_room(kind text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select count(*) < case kind when 'logo' then 1 when 'photos' then 12 when 'menu' then 3 else 0 end
+    from storage.objects o
+   where o.bucket_id = 'brand-assets'
+     and (storage.foldername(o.name))[1] = auth.uid()::text
+     and (storage.foldername(o.name))[2] = kind;
+$$;
+
+revoke execute on function public.brand_asset_has_room(text) from public, anon;
+grant execute on function public.brand_asset_has_room(text) to authenticated;
+
+drop policy if exists "brand assets select own" on storage.objects;
+create policy "brand assets select own" on storage.objects
+  for select to authenticated using (
+    bucket_id = 'brand-assets'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+/* A PDF is only a menu; the logo and photos are pictures. */
+drop policy if exists "brand assets insert own" on storage.objects;
+create policy "brand assets insert own" on storage.objects
+  for insert to authenticated with check (
+    bucket_id = 'brand-assets'
+    and (storage.foldername(name))[1] = auth.uid()::text
+    and (storage.foldername(name))[2] in ('logo', 'photos', 'menu')
+    and array_length(storage.foldername(name), 1) = 2
+    and (lower(storage.extension(name)) in ('jpg', 'png', 'webp')
+         or ((storage.foldername(name))[2] = 'menu' and lower(storage.extension(name)) = 'pdf'))
+    and public.brand_asset_has_room((storage.foldername(name))[2])
+  );
+
+drop policy if exists "brand assets delete own" on storage.objects;
+create policy "brand assets delete own" on storage.objects
+  for delete to authenticated using (
+    bucket_id = 'brand-assets'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );

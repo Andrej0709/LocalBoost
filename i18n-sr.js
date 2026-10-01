@@ -1553,8 +1553,8 @@ window.LB_I18N_SR = {
     "Make every ad look like": "Neka svaki oglas izgleda kao",
     "your": "tvoj",
     "business.": "posao.",
-    "None of this is required — your ads render either way. But the engine only knows what you tell it, and everything you add here goes straight into your next drop: your colors, your offers, what sets you apart. The more it knows, the less your ads look like anyone else's.":
-      "Ništa od ovoga nije obavezno — oglasi se prave i bez toga. Ali mašina zna samo ono što joj kažeš, a sve što ovde dodaš ide pravo u tvoj sledeći drop: tvoje boje, tvoje ponude, ono po čemu se razlikuješ. Što više zna, to manje tvoji oglasi liče na tuđe.",
+    "None of this is required — your ads render either way. But the engine only knows what you tell it, and everything you add here goes straight into your next drop: your photos, your colors, your offers, what sets you apart. The more it knows, the less your ads look like anyone else's.":
+      "Ništa od ovoga nije obavezno — oglasi se prave i bez toga. Ali mašina zna samo ono što joj kažeš, a sve što ovde dodaš ide pravo u tvoj sledeći drop: tvoje fotografije, tvoje boje, tvoje ponude, ono po čemu se razlikuješ. Što više zna, to manje tvoji oglasi liče na tuđe.",
     "What's happening next week?": "Šta se dešava sledeće nedelje?",
     "A sale, a new product, holiday hours, an event — the engine builds next week's ads around it.":
       "Akcija, novi proizvod, praznično radno vreme, događaj — mašina pravi oglase za sledeću nedelju oko toga.",
@@ -1583,6 +1583,32 @@ window.LB_I18N_SR = {
     "Close": "Zatvori",
     "Save": "Sačuvaj",
     "Clear": "Obriši",
+    // Uploaded logo, photos and menu (control-room.js, brand-assets.js).
+    "Photos of your place and what you sell": "Fotografije radnje i onoga što prodaješ",
+    "Ads built from your real food, shelves and team, so customers find what they saw when they walk in.":
+      "Oglasi od tvoje prave hrane, polica i ekipe, da mušterije u radnji nađu baš ono što su videle.",
+    "Phone photos are fine. Only upload photos you own, and ask before showing a customer's face.":
+      "Slike telefonom su sasvim u redu. Otpremi samo svoje fotografije i pitaj mušteriju pre nego što pokažeš njeno lice.",
+    "Your logo": "Tvoj logo",
+    "Goes on your ads, so people know straight away who they're from.":
+      "Ide na tvoje oglase, da ljudi odmah znaju od koga su.",
+    "A PNG with a transparent background works best.": "Najbolje radi PNG sa providnom pozadinom.",
+    "Your menu or price list": "Tvoj meni ili cenovnik",
+    "Real products and prices, so an ad never offers something you don't sell.":
+      "Pravi proizvodi i cene, da oglas nikad ne ponudi nešto što ne prodaješ.",
+    "A photo of the menu or a PDF, up to three pages.": "Fotografija menija ili PDF, do tri strane.",
+    "1 photo": "1 fotografija",
+    "Upload": "Otpremi",
+    "Add more": "Dodaj još",
+    "Replace": "Zameni",
+    "Remove": "Ukloni",
+    "Uploading…": "Otpremam…",
+    "Removing…": "Uklanjam…",
+    "That's the most you can keep here — remove one first.": "Više ne može da stane — prvo ukloni jedan fajl.",
+    "Use a JPEG, PNG, WebP or PDF file.": "Koristi JPEG, PNG, WebP ili PDF fajl.",
+    "Use a JPEG, PNG or WebP image.": "Koristi JPEG, PNG ili WebP sliku.",
+    "That file is over 10 MB.": "Taj fajl je veći od 10 MB.",
+    "Couldn't read that image.": "Nismo uspeli da pročitamo tu sliku.",
 
     /* --- Short home page (Adronis.dc.html) ---------------------------------
        The long original lives on in Adronis-full.html and keeps using the
@@ -1682,8 +1708,8 @@ window.LB_I18N_SR = {
     "Each ad sits on the day and time it posts — blue is scheduled, green is already live. Click a blue one to change when it posts.":
       "Svaki oglas stoji na danu i u vreme kada se objavljuje — plavo je zakazano, zeleno je već objavljeno. Klikni na plavi da mu promeniš vreme objave.",
     "Make every ad look like you": "Neka svaki oglas liči na tebe",
-    "All optional, but everything you add here goes straight into your next drop — your colors, your offers, what sets you apart. Start with the step worth the most.":
-      "Ništa nije obavezno, ali sve što ovde dodaš ide pravo u tvoj sledeći drop — tvoje boje, tvoje ponude, ono što te izdvaja. Kreni od koraka koji najviše vredi.",
+    "All optional, but everything you add here goes straight into your next drop — your photos, your colors, your offers, what sets you apart. Start with the step worth the most.":
+      "Ništa nije obavezno, ali sve što ovde dodaš ide pravo u tvoj sledeći drop — tvoje fotografije, tvoje boje, tvoje ponude, ono što te izdvaja. Kreni od koraka koji najviše vredi.",
     "Approve or reject": "Odobri ili odbaci",
     "Every ad waits here for your yes. Approve it and it gets a posting slot; reject it and say why, so next week's drop gets it right. You can also edit the text first.":
       "Svaki oglas ovde čeka tvoje odobrenje. Odobri ga i dobija termin za objavu; odbaci ga i reci zašto, da sledeći drop bude pogođen. Tekst možeš i da izmeniš pre toga.",
@@ -1981,6 +2007,13 @@ window.LB_I18N_SR = {
     [/^Approved: (.+)$/, "Odobreno: $1"],
     [/^Rejected: (.+)$/, "Odbačeno: $1"],
     [/^7 days free, then (\S+) a month$/, "7 dana besplatno, zatim $1 mesečno"],
-    [/^7 days free, then (\S+) a year$/, "7 dana besplatno, zatim $1 godišnje"]
+    [/^7 days free, then (\S+) a year$/, "7 dana besplatno, zatim $1 godišnje"],
+    // Uploaded logo, photos and menu (control-room.js).
+    [/^(\d+) photos$/, "Fotografija: $1"],
+    [/^(\d+) of (\d+)$/, "$1 od $2"],
+    [/^Remove (.+)$/, "Ukloni $1"],
+    [/^Uploaded (\d+) of (\d+)\. (.+)$/, "Otpremljeno $1 od $2. $3"],
+    [/^You can keep up to (\d+) here, so (\d+) weren't uploaded\.$/,
+      "Ovde može da stane najviše $1, pa $2 nije otpremljeno."]
   ]
 };

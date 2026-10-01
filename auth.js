@@ -432,6 +432,9 @@
       if (!session) throw new Error("Not signed in.");
       // Stop Paddle billing first - a deleted account must never be charged.
       if (profile && profile.paddle_subscription_id) await billing("cancel_now");
+      // Uploaded logo, photos and menu live in Storage, which the cascade
+      // doesn't reach (brand-assets.js, loaded on the account page).
+      if (window.LBBrand) await LBBrand.removeAll();
       var res = await db.rpc("delete_my_account");
       if (res.error) throw res.error;
       // The session's user no longer exists — drop it locally, ignore the
