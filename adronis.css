@@ -263,6 +263,8 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
 .foot-col a{color:var(--text-3);width:fit-content}
 .foot-col a:hover{color:var(--text)}
 .foot-bottom{position:relative;z-index:1;max-width:1200px;margin:48px auto 0;padding-top:22px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-4)}
+.foot-bottom a{color:var(--text-2)}
+.foot-bottom a:hover{color:var(--acc)}
 @media (max-width:860px){.foot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.foot-grid>:first-child{grid-column:1/-1}}
 
 /* ---------------------------------------------------------- empty/load --- */

@@ -49,6 +49,7 @@ window.LB_I18N_SR = {
     "Company details": "Podaci o firmi",
     "ALL CREATIVES AI-GENERATED AND HUMAN-APPROVED":
       "SVI KREATIVI SU AI-GENERISANI I LJUDSKI ODOBRENI",
+    "MADE BY": "NAPRAVIO",
     "EMAIL": "EMAIL",
     "BUSINESS NAME": "NAZIV BIZNISA",
     "NAME": "IME",
