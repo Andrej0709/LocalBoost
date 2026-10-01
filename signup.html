@@ -281,13 +281,15 @@
   // Bump this whenever terms.html / privacy.html change materially, so the
   // stored acceptance points at the wording the customer actually saw.
   var TERMS_VERSION = "2026-09-23";
+  // A feature marked soon needs the network connections, which aren't built
+  // yet, so it carries a "Soon" tag until it works.
   var plans = {
     free: { name: "Free", price: "€0", rate: "3 ads / month · 1 channel",
       features: ["3 photoreal creatives every month", "One connected channel", "Swipe approval in the app", "No card needed — upgrade whenever you like"] },
     counter: { name: "Counter", price: "€59", rate: "4 ads / week · 2 channels",
-      features: ["4 photoreal creatives every Monday", "Two connected channels", "Best-time auto-publishing", "Swipe approval in the app"] },
+      features: ["4 photoreal creatives every Monday", "Two connected channels", { text: "Best-time auto-publishing", soon: true }, "Swipe approval in the app"] },
     storefront: { name: "Storefront", price: "€149", rate: "12 ads / week · 4 channels",
-      features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", "Performance feedback into next drop", "Caption variants and A/B slotting"] }
+      features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", { text: "Performance feedback into next drop", soon: true }, { text: "Caption variants and A/B slotting", soon: true }] }
   };
   var params = new URLSearchParams(location.search);
   // Franchise is agreed with Adronis first, never signed up for here.
@@ -335,7 +337,8 @@
     li.style.gridTemplateColumns = "auto minmax(0,1fr)";
     li.style.gap = "10px";
     li.style.color = "#8a8f98";
-    li.innerHTML = '<span style="color:var(--acc);font-family:\'Geist Mono\',monospace;font-size:11px">▪</span>' + f;
+    li.innerHTML = '<span style="color:var(--acc);font-family:\'Geist Mono\',monospace;font-size:11px">▪</span>' +
+      '<span>' + (f.text || f) + (f.soon ? '<span class="feat-soon">Soon</span>' : '') + '</span>';
     list.appendChild(li);
   });
 

@@ -7,6 +7,8 @@
 
   // ---------------------------------------------------------------- plan data
   // Mirrors the `plans` array in Adronis.dc.html — keep the two in sync.
+  // A feature marked soon needs the network connections, which aren't built
+  // yet, so it carries a "Soon" tag until it works.
   var PLANS = {
     counter: {
       key: "counter", name: "Counter", base: 59,
@@ -14,7 +16,7 @@
       features: [
         "4 photoreal creatives every Monday",
         "Two connected channels",
-        "Best-time auto-publishing",
+        { text: "Best-time auto-publishing", soon: true },
         "Swipe approval in the app"
       ]
     },
@@ -25,8 +27,8 @@
         "12 creatives across all native formats",
         "Four connected channels",
         "Seasonal & local hook engine",
-        "Performance feedback into next drop",
-        "Caption variants and A/B slotting"
+        { text: "Performance feedback into next drop", soon: true },
+        { text: "Caption variants and A/B slotting", soon: true }
       ]
     }
   };
@@ -201,7 +203,8 @@
 
     $("co-features").innerHTML = plan.features.map(function (f) {
       return '<li style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;color:#8a8f98">' +
-        '<span style="color:var(--acc);font-family:\'Geist Mono\',monospace;font-size:11px">▪</span>' + f + '</li>';
+        '<span style="color:var(--acc);font-family:\'Geist Mono\',monospace;font-size:11px">▪</span>' +
+        '<span>' + (f.text || f) + (f.soon ? '<span class="feat-soon">Soon</span>' : '') + '</span></li>';
     }).join("");
 
     $("co-headline").innerHTML = 'Confirm your <em>' + plan.name + '</em> drop.';

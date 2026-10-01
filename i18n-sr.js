@@ -1645,6 +1645,8 @@ window.LB_I18N_SR = {
     "Up to 4 networks": "Do 4 mreže",
     "Ads for holidays and local events": "Oglasi za praznike i lokalne događaje",
     "Learns which ads work best for you": "Uči koji oglasi ti najbolje prolaze",
+    // Tag on a plan feature that isn't built yet (home, signup, checkout).
+    "Soon": "Uskoro",
     "Choose Storefront": "Izaberi Storefront",
     "30 ads every Monday": "30 oglasa svakog ponedeljka",
     "Any number of networks and locations": "Neograničen broj mreža i lokacija",

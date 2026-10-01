@@ -857,7 +857,7 @@ input[type=range]{height:30px !important}
         <div style="height:1px;background:#1b1e22;margin:22px 0"></div>
         <div style="display:grid;gap:11px">
           <sc-for list="{{ pl.features }}" as="f" hint-placeholder-count="4">
-            <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;font-size:14px;line-height:1.5;color:#8a8f98"><span style="color:var(--acc);font-family:'Geist Mono',monospace;font-size:11px;padding-top:3px">▪</span>{{ f }}</div>
+            <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;font-size:14px;line-height:1.5;color:#8a8f98"><span style="color:var(--acc);font-family:'Geist Mono',monospace;font-size:11px;padding-top:3px">▪</span><span>{{ f.text }}<sc-if value="{{ f.soon }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;margin-left:8px;padding:2px 7px;border-radius:9999px;border:1px solid rgba(255,255,255,.16);font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#7b8089;vertical-align:1px;white-space:nowrap">Soon</span></sc-if></span></div>
           </sc-for>
         </div>
         <a href="{{ pl.href }}" style="display:block;margin-top:26px;padding:13px;border-radius:9999px;text-align:center;font-size:14px;font-weight:500;background:{{ pl.ctaBg }};color:{{ pl.ctaColor }};border:1px solid {{ pl.ctaBorder }}">{{ pl.cta }}</a>
@@ -1273,15 +1273,17 @@ class Component extends DCLogic {
 
     const annual = this.state.billing === "annual";
     const mk = (n) => "€" + Math.round(annual ? n * 0.8 : n);
+    // A feature marked soon needs the network connections, which aren't built
+    // yet, so it carries a "Soon" tag until it works.
     const plans = [
       {
         name: "Counter", base: 59, rate: "4 ads / week · 2 channels", featured: false,
-        features: ["4 photoreal creatives every Monday", "Two connected channels", "Best-time auto-publishing", "Swipe approval in the app"],
+        features: ["4 photoreal creatives every Monday", "Two connected channels", { text: "Best-time auto-publishing", soon: true }, "Swipe approval in the app"],
         cta: "Start with Counter", href: "signup.html?plan=counter" + (annual ? "&cycle=annual" : "")
       },
       {
         name: "Storefront", base: 149, rate: "12 ads / week · 4 channels", featured: true,
-        features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", "Performance feedback into next drop", "Caption variants and A/B slotting"],
+        features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", { text: "Performance feedback into next drop", soon: true }, { text: "Caption variants and A/B slotting", soon: true }],
         cta: "Start with Storefront", href: "signup.html?plan=storefront" + (annual ? "&cycle=annual" : "")
       },
       {
@@ -1293,7 +1295,7 @@ class Component extends DCLogic {
       name: p.name,
       rate: p.rate,
       featured: p.featured,
-      features: p.features,
+      features: p.features.map((f) => typeof f === "string" ? { text: f, soon: false } : f),
       cta: p.cta,
       href: p.href,
       price: mk(p.base),

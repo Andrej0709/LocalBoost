@@ -898,7 +898,7 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
           <div class="plan-line"></div>
           <div class="plan-feats">
             <sc-for list="{{ pl.features }}" as="f" hint-placeholder-count="3">
-              <div class="plan-feat"><span class="tick" aria-hidden="true">✓</span><span>{{ f }}</span></div>
+              <div class="plan-feat"><span class="tick" aria-hidden="true">✓</span><span>{{ f.text }}<sc-if value="{{ f.soon }}" hint-placeholder-val="{{ false }}"><span class="feat-soon">Soon</span></sc-if></span></div>
             </sc-for>
           </div>
           <a href="{{ pl.href }}" class="{{ pl.ctaCls }}">{{ pl.cta }}</a>
@@ -1169,7 +1169,9 @@ class Component extends DCLogic {
     const WEEKS_PER_MONTH = 52 / 12;
     // Names, prices and links mirror the plans in Adronis-full.html,
     // checkout.js and account.js. Only the feature wording is plainer here.
-    // perWeek is only used for the price-per-ad line.
+    // perWeek is only used for the price-per-ad line. A feature marked soon
+    // needs the network connections, which aren't built yet, so it carries a
+    // "Soon" tag until it works.
     const plans = [
       {
         name: "Free", base: 0, perWeek: 0, featured: false,
@@ -1182,13 +1184,13 @@ class Component extends DCLogic {
       {
         name: "Counter", base: 59, perWeek: 4, featured: false,
         tagline: "Enough to stay visible.",
-        features: ["4 ads every Monday", "2 networks, for example Instagram and Facebook", "Posted for you at the best time"],
+        features: ["4 ads every Monday", "2 networks, for example Instagram and Facebook", { text: "Posted for you at the best time", soon: true }],
         cta: "Try Counter free", href: "signup.html?plan=counter" + (annual ? "&cycle=annual" : "")
       },
       {
         name: "Storefront", base: 149, perWeek: 12, featured: true,
         tagline: "The sweet spot for a single location.",
-        features: ["12 ads every Monday", "Up to 4 networks", "Ads for holidays and local events", "Learns which ads work best for you"],
+        features: ["12 ads every Monday", "Up to 4 networks", "Ads for holidays and local events", { text: "Learns which ads work best for you", soon: true }],
         cta: "Try Storefront free", href: "signup.html?plan=storefront" + (annual ? "&cycle=annual" : "")
       },
       {
@@ -1205,7 +1207,7 @@ class Component extends DCLogic {
         name: p.name,
         featured: p.featured,
         tagline: p.tagline,
-        features: p.features,
+        features: p.features.map((f) => typeof f === "string" ? { text: f, soon: false } : f),
         cta: p.cta,
         href: p.href,
         price: "€" + Math.round(monthly),
