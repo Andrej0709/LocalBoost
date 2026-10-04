@@ -96,8 +96,8 @@ window.LB_I18N_SR = {
       "Adronis počiva na jednoj pretpostavci: nikad nećeš pouzdano imati vremena da sam praviš oglase. Zato proizvod to od tebe nikad i ne traži. Bez reda brifova, bez poziva za korekcije, bez mesečnog sastanka o strategiji — samo drop koji stiže bez obzira na to kakvu si nedelju imao.",
     "DROPS PER YEAR": "DROPOVA GODIŠNJE",
     "Who's behind it": "Ko stoji iza toga",
-    "Adronis is built by a small team of engineers and former agency creative directors who got tired of watching good local businesses lose to silence, not competition. We'd rather ship a better engine than a bigger sales team.":
-      "Adronis gradi mali tim inženjera i bivših kreativnih direktora iz agencija, kojima je dosadilo da gledaju kako dobri lokalni biznisi gube od tišine, a ne od konkurencije. Radije ćemo isporučiti bolju mašinu nego veći prodajni tim.",
+    "Adronis is built by two young founders who got tired of watching good local businesses lose to silence, not competition. We build and run every part of it ourselves, and we'd rather ship a better engine than a bigger sales team.":
+      "Adronis grade dvojica mladih osnivača kojima je dosadilo da gledaju kako dobri lokalni biznisi gube od tišine, a ne od konkurencije. Svaki deo pravimo i vodimo sami, i radije ćemo isporučiti bolju mašinu nego veći prodajni tim.",
     "Talk to us": "Razgovarajmo",
     "Talk to us →": "Razgovarajmo →",
     "Several locations? Franchise is set up with us directly.":
