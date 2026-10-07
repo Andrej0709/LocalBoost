@@ -1416,8 +1416,9 @@ window.LB_I18N_SR = {
       "Šaljemo ti link da napraviš nalog i uključujemo ti plan. Bez kartice, bez plaćanja.",
     "Already a beta tester?": "Već si beta tester?",
     "to your account.": "na svoj nalog.",
-    "Your account is set up, but it isn't switched on for the beta. If your business is picked, we switch your plan on and let you know.":
-      "Tvoj nalog je napravljen, ali još nije uključen za beta testiranje. Ako tvoj biznis bude izabran, uključićemo ti plan i javiti ti.",
+    "Your account isn't in the beta yet.": "Tvoj nalog još nije u beta testiranju.",
+    "It's set up, but only businesses picked for the beta can use Adronis. Apply below — if yours is picked, we switch your plan on and let you know.":
+      "Nalog je napravljen, ali Adronis mogu da koriste samo biznisi izabrani za beta testiranje. Prijavi se ispod — ako tvoj bude izabran, uključićemo ti plan i javiti ti.",
     "City and country": "Grad i država",
     "e.g. Novi Sad, Serbia": "npr. Novi Sad, Srbija",
     "Website or Instagram": "Sajt ili Instagram",

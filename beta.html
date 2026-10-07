@@ -41,7 +41,8 @@
 .bt-steps b{display:block;margin-bottom:2px;font-size:16px}
 .bt-alt{margin-top:30px;padding:18px 20px;border-radius:var(--r);border:1px solid var(--line);background:rgba(255,255,255,.02);font-size:14.5px;line-height:1.6;color:var(--text-2)}
 .bt-alt a{font-weight:500}
-#bt-account{margin:0 0 22px}
+#bt-account{margin:0 0 22px;padding:16px 18px;color:var(--text-2)}
+#bt-account b{display:block;margin-bottom:4px;font-size:15px;font-weight:600;color:var(--text)}
 .link-btn{margin-left:4px;padding:0;background:none;border:none;color:var(--acc);font-size:inherit;font-weight:500;font-family:var(--font);cursor:pointer}
 #bt-done{margin-top:0;padding:22px;font-size:15.5px;border-radius:var(--r-lg)}
 @media (max-width:860px){.bt-grid{grid-template-columns:minmax(0,1fr)}.bt-side{position:static;order:2}}
@@ -84,7 +85,8 @@
       <div class="form-card">
         <!-- Signed in, but the account isn't a beta tester (yet). -->
         <div id="bt-account" class="notice" role="status" hidden>
-          Your account is set up, but it isn't switched on for the beta. If your business is picked, we switch your plan on and let you know.
+          <b>Your account isn't in the beta yet.</b>
+          It's set up, but only businesses picked for the beta can use Adronis. Apply below — if yours is picked, we switch your plan on and let you know.
           <button type="button" id="bt-logout" class="link-btn">Log out</button>
         </div>
 
