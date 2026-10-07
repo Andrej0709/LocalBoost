@@ -1459,6 +1459,11 @@ window.LB_I18N_SR = {
     "None — free during the beta": "Nema — besplatno tokom bete",
     "Beta tester — nothing to pay until launch": "Beta tester — nema plaćanja do lansiranja",
     "Free until": "Besplatno do",
+    "Free until:": "Besplatno do:",
+    "NOT IN THE BETA YET": "JOŠ NISI U BETI",
+    "Only businesses picked for the beta can use Adronis until the public launch in Q1 2027. If yours is picked, we switch your Beta plan on and let you know.":
+      "Do javnog lansiranja u Q1 2027 Adronis koriste samo biznisi izabrani za betu. Ako tvoj bude izabran, uključićemo ti Beta plan i javiti ti.",
+    "About the beta": "O beti",
     "Public launch, Q1 2027": "Javnog lansiranja, Q1 2027",
     "WHAT YOUR BETA PLAN INCLUDES": "ŠTA UKLJUČUJE TVOJ BETA PLAN",
     "Nothing to pay until the public launch in Q1 2027 — no card on file":

@@ -80,8 +80,11 @@
       <div style="height:1px;background:var(--line);margin:20px 0"></div>
       <div class="auth-meta">
         <div>Email: <span id="trial-email">—</span></div>
-        <div>Free trial started: <span id="trial-start">—</span></div>
-        <div>Free trial ends: <span id="trial-end" style="color:var(--acc)">—</span></div>
+        <div id="trial-start-row">Free trial started: <span id="trial-start">—</span></div>
+        <div id="trial-end-row">Free trial ends: <span id="trial-end" style="color:var(--acc)">—</span></div>
+        <!-- A beta tester has no trial: the Beta plan is free until launch. -->
+        <div id="beta-plan-row" hidden>Plan: <span>Beta</span></div>
+        <div id="beta-until-row" hidden>Free until: <span style="color:var(--acc)">Public launch, Q1 2027</span></div>
       </div>
       <div class="auth-actions">
         <a href="approvals.html" id="already-in-primary" class="btn btn-lg">Review this week's drop<span class="mono">→</span></a>
@@ -388,6 +391,11 @@
     title.textContent = "Welcome back.";
     sub.textContent = "You're already signed in.";
 
+    if (LBAuth.hasActivePlan() && profile.plan === "beta") {
+      ["trial-start-row", "trial-end-row"].forEach(function(id){ document.getElementById(id).hidden = true; });
+      ["beta-plan-row", "beta-until-row"].forEach(function(id){ document.getElementById(id).hidden = false; });
+      return;
+    }
     if (LBAuth.hasActivePlan()) {
       document.getElementById("trial-start").textContent = profile.trial_started_at ? fmt(profile.trial_started_at) : "—";
       document.getElementById("trial-end").textContent = profile.trial_ends_at ? fmt(profile.trial_ends_at) : "—";

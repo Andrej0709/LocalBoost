@@ -59,6 +59,8 @@
     else if (status === "trialing") { chip.className = "acc-chip acc"; chip.textContent = "TRIAL"; }
     else if (status === "active") { chip.className = "acc-chip ok"; chip.textContent = "ACTIVE"; }
     else if (status === "past_due") { chip.className = "acc-chip warn"; chip.textContent = "PAST DUE"; }
+    // During the beta an account without a plan on is waiting for a beta place.
+    else if (LBAuth.beta) { chip.className = "acc-chip muted"; chip.textContent = "NOT IN THE BETA YET"; }
     else if (status === "canceled") { chip.className = "acc-chip muted"; chip.textContent = "CANCELED"; }
     else if (profile.onboarded_at) { chip.className = "acc-chip muted"; chip.textContent = "FREE"; }
     else { chip.className = "acc-chip muted"; chip.textContent = "NO PLAN"; }
@@ -345,7 +347,7 @@
       $("plan-pending-notice").hidden = true;
       $("plan-cancel-notice").hidden = true;
       $("cancel-plan-row").hidden = true;
-      if (profile.onboarded_at) renderFreePlan();
+      if (profile.onboarded_at || LBAuth.beta) renderFreePlan();
       return;
     }
     $("billing-rows").hidden = false;
@@ -465,6 +467,17 @@
 
   // Brief done, no plan running: the account is on the free monthly allowance.
   async function renderFreePlan() {
+    // There is no Free plan during the beta: an account with no plan on is
+    // waiting for a beta place (see BETA in auth.js).
+    if (LBAuth.beta) {
+      $("billing-empty-tag").textContent = "BETA";
+      $("billing-empty-title").textContent = "Your account isn't in the beta yet.";
+      $("billing-empty-text").textContent = "Only businesses picked for the beta can use Adronis until the public launch in Q1 2027. If yours is picked, we switch your Beta plan on and let you know.";
+      var link = $("billing-empty").querySelector("a.btn");
+      link.href = "beta.html";
+      link.firstChild.textContent = "About the beta";
+      return;
+    }
     $("billing-empty-tag").textContent = "FREE PLAN";
     $("billing-empty-title").textContent = "You're on the Free plan.";
     $("billing-empty-text").textContent = "A few free ads every month, no card on file. Pick a plan for a full drop every week.";
