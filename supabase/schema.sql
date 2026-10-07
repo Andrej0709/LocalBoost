@@ -798,11 +798,14 @@ revoke execute on function public.cancel_plan_change() from public, anon, authen
 /*     through free_quota(), and the trigger below refuses to insert past it,  */
 /*     so the engine can't over-deliver to a free account by mistake. */
 /* ------------------------------------------------------------ */
+/* Beta (until the public launch in Q1 2027): 0, so no account gets a creative
+   unless its plan was switched on from the portal - only beta testers use
+   Adronis. Back to 3 at launch, with BETA in auth.js. */
 create or replace function public.free_images_per_month()
 returns int
 language sql
 immutable
-as $$ select 3 $$;
+as $$ select 0 $$;
 
 create or replace function public.free_quota()
 returns json

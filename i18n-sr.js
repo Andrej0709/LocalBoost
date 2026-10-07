@@ -1396,27 +1396,55 @@ window.LB_I18N_SR = {
     "Start over →": "Kreni ispočetka →",
     "Sign up or log in →": "Registruj se ili se prijavi →",
     "Go to the brief →": "Idi na brif →",
-    // Checkout during the beta (BETA in checkout.js).
+    // The beta (BETA in auth.js): beta.html, and the beta wording on signup,
+    // login and contact.
+    "Join the beta — Adronis": "Beta prijava — Adronis",
     "BETA · NO PAYMENTS YET": "BETA · JOŠ NEMA PLAĆANJA",
-    "We're in beta — there's nothing to pay yet.": "U beta fazi smo — trenutno nema plaćanja.",
-    "Payments open when Adronis launches for everyone in Q1 2027. Until then it runs with a small group of beta testers.":
-      "Plaćanje se otvara kad Adronis krene za sve, u prvom kvartalu 2027. Do tada radi sa malom grupom beta testera.",
-    "Already on the beta tester list? Then you use Adronis free — we switch your plan on from our side, no card needed.":
-      "Već si na listi beta testera? Onda Adronis koristiš besplatno — mi ti uključujemo plan sa naše strane, bez kartice.",
-    "Want to join? Places are limited, so we review every application. If your business is picked, we'll get in touch and switch your plan on.":
-      "Želiš da se priključiš? Broj mesta je ograničen, pa pregledamo svaku prijavu. Ako tvoj biznis bude izabran, javićemo ti se i uključiti plan.",
-    "Apply for the beta →": "Prijavi se za beta testiranje →",
     "Adronis is in": "Adronis je u",
     "beta": "beta fazi",
-    "Checkout is closed during the beta. The public launch is in Q1 2027 — beta testers use Adronis free until then.":
-      "Tokom beta faze nema naplate. Pravi launch je u prvom kvartalu 2027 — beta testeri do tada koriste Adronis besplatno.",
-    "Nothing is charged during the beta. These prices apply from the launch in Q1 2027 — you'll be asked before anything is billed.":
-      "Tokom beta faze ništa se ne naplaćuje. Ove cene važe od launcha u prvom kvartalu 2027 — pitaćemo te pre bilo kakve naplate.",
-    "BETA TESTER · FREE UNTIL LAUNCH": "BETA TESTER · BESPLATNO DO LAUNCHA",
-    "You're on the beta list — your plan is on and there's nothing to pay until the launch in Q1 2027.":
-      "Na listi si beta testera — plan ti je uključen i nemaš šta da plaćaš do launcha u prvom kvartalu 2027.",
-    "You're applying for the Adronis beta. Places are limited — we review every application and get in touch if your business is picked.":
-      "Prijavljuješ se za Adronis beta testiranje. Broj mesta je ograničen — pregledamo svaku prijavu i javljamo se ako tvoj biznis bude izabran.",
+    "Until the public launch in Q1 2027, Adronis runs with a small group of businesses, free of charge. Places are limited, so we review every application.":
+      "Do pravog launcha u prvom kvartalu 2027, Adronis radi sa malom grupom biznisa, besplatno. Broj mesta je ograničen, pa pregledamo svaku prijavu.",
+    "How the beta works": "Kako beta funkcioniše",
+    "You apply": "Prijaviš se",
+    "A few lines about the business — what you sell, where, and the channels you're on.":
+      "Par rečenica o biznisu — šta prodaješ, gde, i na kojim si kanalima.",
+    "We review every application": "Pregledamo svaku prijavu",
+    "Places are limited, so not every business gets one. If yours is picked, we get in touch.":
+      "Broj mesta je ograničen, pa ne dobija svaki biznis mesto. Ako tvoj bude izabran, javljamo ti se.",
+    "You use Adronis free until launch": "Koristiš Adronis besplatno do launcha",
+    "We send you a link to set up your account and switch your plan on. No card, nothing to pay.":
+      "Šaljemo ti link da napraviš nalog i uključujemo ti plan. Bez kartice, bez plaćanja.",
+    "Already a beta tester?": "Već si beta tester?",
+    "to your account.": "na svoj nalog.",
+    "Your account is set up, but it isn't switched on for the beta. If your business is picked, we switch your plan on and let you know.":
+      "Tvoj nalog je napravljen, ali još nije uključen za beta testiranje. Ako tvoj biznis bude izabran, uključićemo ti plan i javiti ti.",
+    "City and country": "Grad i država",
+    "e.g. Novi Sad, Serbia": "npr. Novi Sad, Srbija",
+    "Website or Instagram": "Sajt ili Instagram",
+    "(optional)": "(nije obavezno)",
+    "e.g. instagram.com/milenasbakery": "npr. instagram.com/mileninapekara",
+    "About the business": "O biznisu",
+    "What you sell, who buys it, and where you advertise today...":
+      "Šta prodaješ, ko to kupuje i gde se trenutno oglašavaš...",
+    "Apply for the beta": "Prijavi se za beta testiranje",
+    "We use what you send here only to review your application and answer you, and we keep it for up to 24 months. We do not sell it and we do not add you to a marketing list without your consent. See the":
+      "Ono što pošalješ ovde koristimo samo da pregledamo tvoju prijavu i odgovorimo ti, i čuvamo do 24 meseca. Ne prodajemo te podatke i ne dodajemo te na marketinšku listu bez tvoje saglasnosti. Pogledaj",
+    ", or ask us to delete it at": ", ili nam piši da ih obrišemo na",
+    "Thanks — your application is in. We review every one, and if your business is picked we'll get in touch.":
+      "Hvala — tvoja prijava je stigla. Pregledamo svaku, i ako tvoj biznis bude izabran, javićemo ti se.",
+    "Not a beta tester yet?": "Još nisi beta tester?",
+    "Want to try Adronis?": "Želiš da probaš Adronis?",
+    "— places are limited.": "— broj mesta je ograničen.",
+    "Logged in — your account isn't switched on for the beta yet...":
+      "Prijavljen si — tvoj nalog još nije uključen za beta testiranje...",
+    "BETA · NOTHING TO PAY": "BETA · BEZ PLAĆANJA",
+    "Welcome to the": "Dobro došao u",
+    "beta.": "beta testiranje.",
+    "Your business was picked for the beta. Set up your account and tell us about the business — we switch your plan on from our side, with nothing to pay until launch.":
+      "Tvoj biznis je izabran za beta testiranje. Napravi nalog i reci nam nešto o biznisu — mi ti uključujemo plan sa naše strane, bez plaćanja do launcha.",
+    "Create my account": "Napravi moj nalog",
+    "Finish setup": "Završi podešavanje",
+    "Brief saved.": "Brif sačuvan.",
 
     /* --- Account: what the script writes --------------------------------- */
     "Active — nothing to pay": "Aktivan — nema plaćanja",

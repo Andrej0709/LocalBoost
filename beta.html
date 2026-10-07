@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Join the beta — Adronis</title>
+<meta name="description" content="Adronis is in beta until the public launch in Q1 2027. Places are limited — apply and we review every application.">
+<link rel="canonical" href="https://adronis.app/beta.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Adronis">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Join the Adronis beta">
+<meta property="og:description" content="Adronis is in beta until the public launch in Q1 2027. Places are limited — apply and we review every application.">
+<meta property="og:url" content="https://adronis.app/beta.html">
+<meta property="og:image" content="https://adronis.app/logo.png">
+<meta property="og:image:width" content="623">
+<meta property="og:image:height" content="591">
+<meta property="og:image:alt" content="Adronis — weekly ad drops for local business">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Join the Adronis beta">
+<meta name="twitter:description" content="Adronis is in beta until the public launch in Q1 2027. Places are limited — apply and we review every application.">
+<meta name="twitter:image" content="https://adronis.app/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
+<link rel="stylesheet" href="adronis.css">
+<style>
+.bt-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(28px,5vw,72px);align-items:start}
+.bt-side{position:sticky;top:112px}
+.bt-side h2{font-size:clamp(24px,2.4vw,30px);margin:0 0 22px}
+.bt-steps{list-style:none;margin:0;padding:0;display:grid;gap:18px;counter-reset:bt}
+.bt-steps li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;align-items:start;font-size:15.5px;line-height:1.55;color:var(--text-2);counter-increment:bt}
+.bt-steps li::before{content:counter(bt);display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:12px;border:1px solid var(--acc-line);background:var(--acc-soft);font-family:var(--mono);font-size:13px;color:var(--acc)}
+.bt-steps b{display:block;margin-bottom:2px;font-size:16px}
+.bt-alt{margin-top:30px;padding:18px 20px;border-radius:var(--r);border:1px solid var(--line);background:rgba(255,255,255,.02);font-size:14.5px;line-height:1.6;color:var(--text-2)}
+.bt-alt a{font-weight:500}
+#bt-account{margin:0 0 22px}
+.link-btn{margin-left:4px;padding:0;background:none;border:none;color:var(--acc);font-size:inherit;font-weight:500;font-family:var(--font);cursor:pointer}
+#bt-done{margin-top:0;padding:22px;font-size:15.5px;border-radius:var(--r-lg)}
+@media (max-width:860px){.bt-grid{grid-template-columns:minmax(0,1fr)}.bt-side{position:static;order:2}}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
+  <div class="nav-links">
+    <a href="/#drop">How it works</a>
+    <a href="/#engine">Examples</a>
+    <a href="control-room.html">Control room</a>
+    <a href="approvals.html">Approvals</a>
+    <a href="/#pricing">Pricing</a>
+  </div>
+  <a href="login.html" id="nav-login">Log in</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow is-mono">BETA · NO PAYMENTS YET</div>
+  <h1>Adronis is in <em>beta</em>.</h1>
+  <p>Until the public launch in Q1 2027, Adronis runs with a small group of businesses, free of charge. Places are limited, so we review every application.</p>
+</header>
+
+<section class="section-tight">
+  <div class="bt-grid">
+
+    <aside class="bt-side">
+      <h2>How the beta works</h2>
+      <ol class="bt-steps">
+        <li><span><b>You apply</b>A few lines about the business — what you sell, where, and the channels you're on.</span></li>
+        <li><span><b>We review every application</b>Places are limited, so not every business gets one. If yours is picked, we get in touch.</span></li>
+        <li><span><b>You use Adronis free until launch</b>We send you a link to set up your account and switch your plan on. No card, nothing to pay.</span></li>
+      </ol>
+      <div class="bt-alt">Already a beta tester? <a href="login.html">Log in</a> to your account.</div>
+    </aside>
+
+    <div>
+      <div class="form-card">
+        <!-- Signed in, but the account isn't a beta tester (yet). -->
+        <div id="bt-account" class="notice" role="status" hidden>
+          Your account is set up, but it isn't switched on for the beta. If your business is picked, we switch your plan on and let you know.
+          <button type="button" id="bt-logout" class="link-btn">Log out</button>
+        </div>
+
+        <form id="beta-form">
+          <div class="field">
+            <label for="business">Business name</label>
+            <input id="business" name="business" type="text" maxlength="200" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
+          </div>
+          <div class="field">
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" maxlength="200" required autocomplete="name" placeholder="Full name">
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" maxlength="320" required autocomplete="email" placeholder="you@business.com">
+          </div>
+          <div class="field">
+            <label for="where">City and country</label>
+            <input id="where" name="where" type="text" maxlength="200" required placeholder="e.g. Novi Sad, Serbia">
+          </div>
+          <div class="field">
+            <label for="site">Website or Instagram <span style="color:var(--text-3)">(optional)</span></label>
+            <input id="site" name="site" type="text" maxlength="300" placeholder="e.g. instagram.com/milenasbakery">
+          </div>
+          <div class="field">
+            <label for="message">About the business</label>
+            <textarea id="message" name="message" maxlength="4000" required placeholder="What you sell, who buys it, and where you advertise today..."></textarea>
+          </div>
+          <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+            <label for="b-company">Company (leave empty)</label>
+            <input id="b-company" name="b-company" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <button type="submit" class="btn btn-lg btn-block">Apply for the beta<span class="mono" aria-hidden="true">→</span></button>
+          <p class="form-foot">
+            We use what you send here only to review your application and answer you, and we keep it for up to 24 months.
+            We do not sell it and we do not add you to a marketing list without your consent.
+            See the <a href="privacy.html">Privacy Policy</a>, or ask us to delete it at <a href="mailto:privacy@adronis.app">privacy@adronis.app</a>.
+          </p>
+        </form>
+
+        <div id="bt-done" class="notice" role="status" hidden>Thanks — your application is in. We review every one, and if your business is picked we'll get in touch.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>MADE BY <a href="https://creativesbyandrej.vercel.app" target="_blank" rel="noopener">CREATIVESBYANDREJ</a></span></div>
+</footer>
+
+<!-- The translation loads first so scripts that format a date on load already
+     know the reader's language. nav.js comes before it: its menu copies the nav
+     links, and must copy them before they are translated. -->
+<script src="nav.js"></script>
+<script src="cookies.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+/* Where everyone who isn't a beta tester ends up during the beta (BETA in
+   auth.js): visitors apply here, and a signed-in account with no plan on
+   waits here. Applications land in contact_requests with plan_interest
+   "beta", next to the contact form's messages. */
+(function(){
+  // After launch this page has nothing to do: plans are bought at checkout.
+  if (!LBAuth.beta) { location.replace("/#pricing"); return; }
+
+  var form = document.getElementById("beta-form");
+
+  LBAuth.ready.then(function(){
+    if (!LBAuth.isLoggedIn()) return;
+    // A beta tester whose plan is on belongs in the app.
+    if (LBAuth.hasActivePlan()) { location.replace("approvals.html"); return; }
+    if (!LBAuth.hasBrief()) { location.replace(LBAuth.unfinishedStep()); return; }
+
+    document.getElementById("bt-account").hidden = false;
+    var profile = LBAuth.getProfile() || {};
+    var user = LBAuth.getUser() || {};
+    if (profile.business_name) document.getElementById("business").value = profile.business_name;
+    if (user.email) document.getElementById("email").value = user.email;
+    var where = [profile.city, profile.country].filter(Boolean).join(", ");
+    if (where) document.getElementById("where").value = where;
+    if (profile.website) document.getElementById("site").value = profile.website;
+  });
+
+  document.getElementById("bt-logout").addEventListener("click", async function(){
+    var btn = this;
+    btn.disabled = true;
+    try {
+      await LBAuth.logOut();
+      location.reload();
+    } catch (err) {
+      btn.disabled = false;
+      alert(err.message || (window.LBLang ? LBLang.t("Log out failed — try again.") : "Log out failed — try again."));
+    }
+  });
+
+  form.addEventListener("submit", async function(e){
+    e.preventDefault();
+    var button = form.querySelector("button[type=submit]");
+    button.disabled = true;
+
+    function done(){
+      form.hidden = true;
+      document.getElementById("bt-done").hidden = false;
+    }
+
+    // Honeypot: a real person never sees this field, so anything in it is a bot.
+    // Show the same success state and write nothing.
+    if (document.getElementById("b-company").value) { done(); return; }
+
+    var site = document.getElementById("site").value.trim();
+    var res = await LBAuth.db.from("contact_requests").insert({
+      business_name: document.getElementById("business").value,
+      full_name:     document.getElementById("name").value,
+      email:         document.getElementById("email").value,
+      plan_interest: "beta",
+      message:
+        "Beta application\n" +
+        "Where: " + document.getElementById("where").value.trim() + "\n" +
+        (site ? "Website / Instagram: " + site + "\n" : "") +
+        "\n" + document.getElementById("message").value
+    });
+
+    if (res.error) {
+      button.disabled = false;
+      alert((window.LBLang ? LBLang.t("Could not send:") : "Could not send:") + " " + res.error.message);
+      return;
+    }
+    done();
+  });
+})();
+</script>
+
+</body>
+</html>

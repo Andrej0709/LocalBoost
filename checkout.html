@@ -78,15 +78,6 @@
 .co-result-mark.ok{background:rgba(159,215,176,.12);border:1px solid rgba(159,215,176,.34);color:#9fd7b0;box-shadow:0 0 40px -6px rgba(159,215,176,.35)}
 .co-result-mark.stop{background:rgba(240,168,168,.1);border:1px solid rgba(240,168,168,.3);color:#f0a8a8}
 
-.co-beta{margin-bottom:30px;padding:20px 20px 22px;border-radius:var(--r);border:1px solid var(--acc-line);background:rgba(124,198,255,.06)}
-.co-beta-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--acc)}
-.co-beta-title{margin-top:10px;font-size:19px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
-.co-beta p{margin:10px 0 0;font-size:14px;line-height:1.6;color:var(--text-2)}
-.co-beta .btn{margin-top:16px}
-/* During the beta the page is just the beta card, centred. */
-.co-grid.is-beta{grid-template-columns:minmax(0,1fr);max-width:620px}
-.co-grid.is-beta .co-beta{margin:0;padding:0;border:0;background:none}
-
 .co-trust{list-style:none;margin:22px 0 0;padding:18px 0 0;border-top:1px solid var(--line);display:grid;gap:10px;font-size:13.5px;color:var(--text-2)}
 .co-trust li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px}
 .co-trust li::before{content:"✓";display:flex;align-items:center;justify-content:center;width:18px;height:18px;margin-top:1px;border-radius:9999px;background:rgba(159,215,176,.14);box-shadow:inset 0 0 0 1px rgba(159,215,176,.42);color:var(--ok);font-size:10px}
@@ -130,17 +121,6 @@
   <div id="co-view" class="wrap-wide co-grid">
 
     <div class="form-card">
-      <!-- Shown while checkout.js has BETA on: no payments until launch. -->
-      <div id="co-beta" class="co-beta" hidden>
-        <div class="co-beta-tag">BETA · NO PAYMENTS YET</div>
-        <div class="co-beta-title">We're in beta — there's nothing to pay yet.</div>
-        <p>Payments open when Adronis launches for everyone in Q1 2027. Until then it runs with a small group of beta testers.</p>
-        <p>Already on the beta tester list? Then you use Adronis free — we switch your plan on from our side, no card needed.</p>
-        <p>Want to join? Places are limited, so we review every application. If your business is picked, we'll get in touch and switch your plan on.</p>
-        <a id="co-beta-join" href="contact.html?beta=1" class="btn">Apply for the beta →</a>
-      </div>
-
-      <div id="co-plan-steps">
       <div class="co-step">
         <div class="co-step-num">1</div>
         <div class="co-step-title">Your plan</div>
@@ -159,9 +139,7 @@
         <button type="button" data-cycle="annual" style="flex:1">Annual<span class="co-save">SAVE 20%</span></button>
       </div>
       <p id="co-cycle-note" style="margin:12px 0 0;font-size:13px;line-height:1.6;color:var(--text-3)">Billed every month and renews automatically. Cancel any time — access runs to the end of the paid month, with no notice period.</p>
-      </div>
 
-      <div id="co-pay">
       <div class="co-step" style="margin-top:36px">
         <div class="co-step-num">3</div>
         <div class="co-step-title">Billing details</div>
@@ -202,15 +180,14 @@
         <span class="co-secure-dot"></span>
         <span>PAYMENT HANDLED BY PADDLE · CARD DETAILS NEVER TOUCH OUR SERVERS</span>
       </div>
-      </div>
 
       <div id="co-free" style="margin-top:16px;text-align:center;font-size:13.5px;color:var(--text-3)" hidden>
-        <span id="co-free-lead">Not ready to add a card?</span>
+        Not ready to add a card?
         <button type="button" id="co-free-btn" style="background:none;border:none;padding:0;color:var(--acc);font-size:13.5px;font-weight:500;font-family:var(--font);cursor:pointer">Start on the Free plan instead →</button>
-        <div id="co-free-sub" style="margin-top:4px;font-size:12.5px;color:var(--text-3)">3 ads a month, no card. Upgrade whenever you like.</div>
+        <div style="margin-top:4px;font-size:12.5px;color:var(--text-3)">3 ads a month, no card. Upgrade whenever you like.</div>
       </div>
 
-      <div class="co-terms" id="co-terms">
+      <div class="co-terms">
         By continuing you confirm you are subscribing for business purposes and you accept the
         <a href="terms.html">Terms of Service</a>, the <a href="privacy.html">Privacy Policy</a> and the
         <a href="ai-disclosure.html">AI Disclosure</a>.

@@ -54,6 +54,36 @@
     else location.replace(siteOrigin() + "login.html#reset");
   }
 
+  // Beta: until the public launch in Q1 2027 only beta testers use Adronis -
+  // accounts whose plan was switched on from the portal. Everyone else is
+  // sent to beta.html to apply. Nobody reaches checkout, and signing up needs
+  // the invite link a picked business gets from us (signup.html?invite=beta).
+  // Set to false at launch.
+  var BETA = true;
+  var PAGE = location.pathname.split("/").pop();
+  var INVITED = new URLSearchParams(location.search).has("invite");
+  var APP_PAGES = ["approvals.html", "control-room.html", "history.html"];
+
+  // Whether this page is closed to the visitor during the beta. Needs the
+  // session and profile, so it runs once they're loaded.
+  function closedInBeta() {
+    if (!BETA) return false;
+    var tester = isTester();
+    if (PAGE === "checkout.html") return true;
+    if (APP_PAGES.indexOf(PAGE) > -1) return !!session && !tester;
+    if (PAGE === "signup.html") {
+      if (!session) return !INVITED;
+      // Brief done and no plan on: nothing left here but checkout.
+      return !tester && !!(profile && profile.onboarded_at);
+    }
+    return false;
+  }
+
+  function isTester() {
+    return !!(profile &&
+      (profile.subscription_status === "trialing" || profile.subscription_status === "active"));
+  }
+
   var db = window.supabase.createClient(
     window.LB_SUPABASE_URL,
     window.LB_SUPABASE_ANON_KEY
@@ -139,6 +169,7 @@
     if (cameFromResetLink && session) { startRecovery(); if (!onLoginPage()) return leaving(); }
 
     await loadProfile();
+    if (closedInBeta()) { location.replace(siteOrigin() + "beta.html"); return leaving(); }
     ready_ = true;
   })();
 
@@ -157,6 +188,10 @@
   window.LBAuth = {
     db: db,
     ready: ready,
+
+    // See BETA above.
+    beta: BETA,
+    invited: INVITED,
 
     isLoggedIn: function () {
       return !!session;
@@ -181,13 +216,8 @@
 
     // A trial or a paid subscription is actually running. Nothing on the site
     // may claim a plan is live unless this is true.
-    hasActivePlan: function () {
-      return !!(
-        profile &&
-        (profile.subscription_status === "trialing" ||
-          profile.subscription_status === "active")
-      );
-    },
+    // During the beta this is also what makes an account a beta tester.
+    hasActivePlan: isTester,
 
     // One trial per account: once a trial has ever started, checkout for this
     // account is paid from day one (start_trial enforces the same rule).
@@ -208,7 +238,9 @@
       var key = planKey || (profile && profile.plan) || "";
       var q = key ? "?plan=" + key : "";
       if (!this.hasBrief()) return "signup.html" + q;
-      if (this.hasActivePlan() || key === "free") return null; // nothing owed
+      if (this.hasActivePlan()) return null; // nothing owed
+      if (BETA) return "beta.html";          // waits for a beta place
+      if (key === "free") return null;
       return "checkout.html" + q;
     },
 
@@ -221,6 +253,7 @@
       if (!session) return null;
       var plan = profile && profile.plan;
       if (!this.hasBrief()) return "signup.html" + (plan ? "?plan=" + plan : "");
+      if (BETA) return this.hasActivePlan() ? null : "beta.html";
       if (plan && plan !== "free" && !profile.subscription_status) return "checkout.html?plan=" + plan;
       return null;
     },
@@ -259,10 +292,12 @@
     //   "approvals" — a paid plan is running, or they're on the free plan
     //                 with a creative waiting on their approval
     //   "pricing"   — free plan with nothing waiting
+    //   "beta"      — during the beta, any account that isn't a beta tester
     // null when signed out (they stay on the landing page).
     homeRoute: async function () {
       if (!session) return null;
       if (this.hasActivePlan()) return "approvals";
+      if (BETA) return "beta";
       return (await this.pendingCount()) > 0 ? "approvals" : "pricing";
     },
 

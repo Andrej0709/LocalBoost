@@ -52,6 +52,7 @@ html.lb-booted #lb-boot{display:none}
 //   - paid plan (trial or active)             -> approvals.html
 //   - free plan, a creative waiting on them   -> approvals.html
 //   - free plan, nothing waiting              -> this page, at #pricing
+//   - during the beta, not a beta tester      -> beta.html
 //   - signed out                              -> this page, as is
 // Until that's decided, #lb-boot (a full-screen logo) covers the page so the
 // landing content never flashes before a redirect fires. In a browser tab it
@@ -134,8 +135,8 @@ if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHa
     if (!LBAuth.isLoggedIn()) { lbReveal(); return; }
     try { sessionStorage.setItem("lbBooted", "1"); } catch (e) {}
     return LBAuth.homeRoute().then(function (route) {
-      if (route === "approvals") {
-        lbAfterMinBoot(function () { location.replace("approvals.html"); });
+      if (route === "approvals" || route === "beta") {
+        lbAfterMinBoot(function () { location.replace(route + ".html"); });
         return; // overlay stays up — the page is about to navigate away
       }
       lbAfterMinBoot(function () {

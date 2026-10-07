@@ -210,6 +210,8 @@
     notice.hidden = true;
   }
   function showSignup(){
+    // During the beta only a business we picked signs up, with its invite link.
+    if (LBAuth.beta && !LBAuth.invited) { location.href = "beta.html"; return; }
     selectTab(tabSignup, tabLogin);
     loginForm.hidden = true; signupForm.hidden = false; forgotForm.hidden = true;
     title.textContent = "Create your account.";
@@ -248,6 +250,12 @@
 
   var notice = document.getElementById("redirect-notice");
 
+  // No Free plan during the beta: the way in is applying for a beta place.
+  if (LBAuth.beta) {
+    document.querySelector(".auth-alt").innerHTML =
+      'Not a beta tester yet? <a href="beta.html">Apply for the beta</a> — places are limited.';
+  }
+
   function say(message){
     notice.hidden = false;
     notice.textContent = message;
@@ -269,7 +277,8 @@
       // A signup that stopped halfway (email confirmed, brief or card still
       // missing) goes back to where it stopped, not into an empty app.
       var step = LBAuth.unfinishedStep();
-      if (step) redirect(step, "Logged in — let's finish signing you up...");
+      if (step === "beta.html") redirect(step, "Logged in — your account isn't switched on for the beta yet...");
+      else if (step) redirect(step, "Logged in — let's finish signing you up...");
       else redirect("control-room.html", "Logged in — taking you to your control room...");
     } catch (err) {
       button.disabled = false;
@@ -365,6 +374,9 @@
     }
 
     if (!LBAuth.isLoggedIn()) return;
+
+    // Signed in but not a beta tester: beta.html says where the account stands.
+    if (LBAuth.unfinishedStep() === "beta.html") { location.replace("beta.html"); return; }
 
     var user = LBAuth.getUser();
     var profile = LBAuth.getProfile() || {};
