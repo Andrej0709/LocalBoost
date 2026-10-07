@@ -1404,21 +1404,11 @@ window.LB_I18N_SR = {
     "beta": "beta fazi",
     "Until the public launch in Q1 2027, Adronis runs with a small group of businesses, free of charge. Places are limited, so we review every application.":
       "Do pravog launcha u prvom kvartalu 2027, Adronis radi sa malom grupom biznisa, besplatno. Broj mesta je ograničen, pa pregledamo svaku prijavu.",
-    "How the beta works": "Kako beta funkcioniše",
-    "You apply": "Prijaviš se",
-    "A few lines about the business — what you sell, where, and the channels you're on.":
-      "Par rečenica o biznisu — šta prodaješ, gde, i na kojim si kanalima.",
-    "We review every application": "Pregledamo svaku prijavu",
-    "Places are limited, so not every business gets one. If yours is picked, we get in touch.":
-      "Broj mesta je ograničen, pa ne dobija svaki biznis mesto. Ako tvoj bude izabran, javljamo ti se.",
-    "You use Adronis free until launch": "Koristiš Adronis besplatno do launcha",
-    "We send you a link to set up your account and switch your plan on. No card, nothing to pay.":
-      "Šaljemo ti link da napraviš nalog i uključujemo ti plan. Bez kartice, bez plaćanja.",
     "Already a beta tester?": "Već si beta tester?",
     "to your account.": "na svoj nalog.",
     "Your account isn't in the beta yet.": "Tvoj nalog još nije u beta testiranju.",
-    "It's set up, but only businesses picked for the beta can use Adronis. Apply below — if yours is picked, we switch your plan on and let you know.":
-      "Nalog je napravljen, ali Adronis mogu da koriste samo biznisi izabrani za beta testiranje. Prijavi se ispod — ako tvoj bude izabran, uključićemo ti plan i javiti ti.",
+    "It's set up, but only businesses picked for the beta can use Adronis. If yours is picked, we switch your plan on and let you know.":
+      "Nalog je napravljen, ali Adronis mogu da koriste samo biznisi izabrani za beta testiranje. Ako tvoj bude izabran, uključićemo ti plan i javiti ti.",
     "City and country": "Grad i država",
     "e.g. Novi Sad, Serbia": "npr. Novi Sad, Srbija",
     "Website or Instagram": "Sajt ili Instagram",
@@ -1444,6 +1434,22 @@ window.LB_I18N_SR = {
     "Your business was picked for the beta. Set up your account and tell us about the business — we switch your plan on from our side, with nothing to pay until launch.":
       "Tvoj biznis je izabran za beta testiranje. Napravi nalog i reci nam nešto o biznisu — mi ti uključujemo plan sa naše strane, bez plaćanja do launcha.",
     "Create my account": "Napravi moj nalog",
+    "Your account is set up and your brief is saved.": "Tvoj nalog je napravljen i brif je sačuvan.",
+    "ACCOUNT READY": "NALOG SPREMAN",
+    "We're switching your plan on.": "Uključujemo ti plan.",
+    "We'll let you know when it's on — then log in and your first drop is waiting in Approvals.":
+      "Javićemo ti kad bude uključen — onda se prijavi i tvoj prvi drop te čeka u Odobravanjima.",
+    "Check your inbox — confirm your email to finish setting up your beta account.":
+      "Proveri sanduče — potvrdi email da završiš podešavanje svog beta naloga.",
+    "We're in beta — there's nothing to pay yet.": "U beta fazi smo — trenutno nema plaćanja.",
+    "Payments open when Adronis launches for everyone in Q1 2027. Until then it runs with a small group of beta testers.":
+      "Plaćanje se otvara kad Adronis krene za sve, u prvom kvartalu 2027. Do tada radi sa malom grupom beta testera.",
+    "Already on the beta tester list? Then you use Adronis free — we switch your plan on from our side, no card needed.":
+      "Već si na listi beta testera? Onda Adronis koristiš besplatno — mi ti uključujemo plan sa naše strane, bez kartice.",
+    "Want to join? Places are limited, so we review every application. If your business is picked, we'll get in touch and switch your plan on.":
+      "Želiš da se priključiš? Broj mesta je ograničen, pa pregledamo svaku prijavu. Ako tvoj biznis bude izabran, javićemo ti se i uključiti plan.",
+    "Apply for the beta →": "Prijavi se za beta testiranje →",
+    "← Back": "← Nazad",
     "Finish setup": "Završi podešavanje",
     "Brief saved.": "Brif sačuvan.",
 

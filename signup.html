@@ -106,8 +106,8 @@
       <div class="su-done-mark" aria-hidden="true">✓</div>
       <div class="mono" style="font-size:11px;letter-spacing:.1em;color:var(--acc)">PLAN ACTIVE</div>
       <div id="activated-text" style="margin-top:14px;font-size:21px;font-weight:600;color:var(--text);letter-spacing:-.02em">The Storefront plan is live on your account.</div>
-      <div style="margin-top:10px;font-size:14.5px;color:var(--text-2)">Your next drop renders Monday at 09:00. Nothing else to do here.</div>
-      <a href="/#top" class="btn btn-lg" style="margin-top:26px">Back to home<span class="mono">→</span></a>
+      <div id="activated-sub" style="margin-top:10px;font-size:14.5px;color:var(--text-2)">Your next drop renders Monday at 09:00. Nothing else to do here.</div>
+      <a href="/#top" id="activated-go" class="btn btn-lg" style="margin-top:26px">Back to home<span class="mono">→</span></a>
     </div>
   </div>
 
@@ -390,9 +390,26 @@
   // Where the brief leads: checkout for a paid plan, straight into the app
   // for the free one.
   function afterBriefUrl(){
-    // beta.html sends a beta tester whose plan is already on into the app.
-    if (BETA) return "beta.html";
     return isFree ? "approvals.html" : checkoutUrl();
+  }
+
+  // During the beta the brief is the end of signing up: the plan is switched
+  // on from the portal, so a picked business whose plan isn't on yet is told
+  // it's coming, and one whose plan already is goes straight into the app.
+  async function afterBrief(){
+    if (!BETA) { location.href = afterBriefUrl(); return; }
+    await LBAuth.refreshProfile().catch(function(){});
+    if (LBAuth.hasActivePlan()) { location.href = "approvals.html"; return; }
+    document.getElementById("form-view").hidden = true;
+    document.getElementById("activated-view").hidden = false;
+    document.getElementById("page-eyebrow").textContent = BETA_EYEBROW;
+    document.getElementById("plan-headline").innerHTML = 'Welcome to the <em>Adronis</em> beta.';
+    document.getElementById("page-sub").textContent = "Your account is set up and your brief is saved.";
+    document.querySelector("#activated-view .mono").textContent = "ACCOUNT READY";
+    document.getElementById("activated-text").textContent = "We're switching your plan on.";
+    document.getElementById("activated-sub").textContent =
+      "We'll let you know when it's on — then log in and your first drop is waiting in Approvals.";
+    window.scrollTo(0, 0);
   }
 
   function showBriefMode(profile){
@@ -515,8 +532,8 @@
       if (briefOnly) {
         // Save the brief only. The trial starts at checkout, not here.
         await LBAuth.saveBrief(brief());
-        say(BETA ? "Brief saved." : isFree ? "Brief saved — taking you to your approvals..." : "Brief saved — taking you to checkout...");
-        location.href = afterBriefUrl();
+        if (!BETA) say(isFree ? "Brief saved — taking you to your approvals..." : "Brief saved — taking you to checkout...");
+        await afterBrief();
         return;
       }
 
@@ -533,12 +550,13 @@
         document.getElementById("page-sub").textContent =
           "Confirm your email, then log back in — your answers are still here, so it's one click to finish.";
         document.querySelector("#activated-view .mono").textContent = "ALMOST THERE";
-        document.getElementById("activated-text").textContent =
-          "Check your inbox — confirm your email to carry on with the " + plan.name + " plan.";
+        document.getElementById("activated-text").textContent = BETA
+          ? "Check your inbox — confirm your email to finish setting up your beta account."
+          : "Check your inbox — confirm your email to carry on with the " + plan.name + " plan.";
       } else {
         // Session already live: mark the brief done and move on.
         await LBAuth.saveBrief(brief());
-        location.href = afterBriefUrl();
+        await afterBrief();
       }
     } catch (err) {
       submitButton.disabled = false;
@@ -552,7 +570,11 @@
     var profile = LBAuth.getProfile() || {};
 
     // A plan is only "active" once checkout has run.
-    if (LBAuth.hasActivePlan()) { showActivated(profile); lbBootDone(); return; }
+    if (LBAuth.hasActivePlan()) {
+      // Nothing left to fill in during the beta: straight into the app.
+      if (BETA) { location.replace("approvals.html"); return; }
+      showActivated(profile); lbBootDone(); return;
+    }
 
     if (LBAuth.hasBrief()) {
       // #lb-boot stays up through either branch — the page is about to navigate away.

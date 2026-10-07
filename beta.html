@@ -32,20 +32,18 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
 <link rel="stylesheet" href="adronis.css">
 <style>
-.bt-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(28px,5vw,72px);align-items:start}
-.bt-side{position:sticky;top:112px}
-.bt-side h2{font-size:clamp(24px,2.4vw,30px);margin:0 0 22px}
-.bt-steps{list-style:none;margin:0;padding:0;display:grid;gap:18px;counter-reset:bt}
-.bt-steps li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;align-items:start;font-size:15.5px;line-height:1.55;color:var(--text-2);counter-increment:bt}
-.bt-steps li::before{content:counter(bt);display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:12px;border:1px solid var(--acc-line);background:var(--acc-soft);font-family:var(--mono);font-size:13px;color:var(--acc)}
-.bt-steps b{display:block;margin-bottom:2px;font-size:16px}
-.bt-alt{margin-top:30px;padding:18px 20px;border-radius:var(--r);border:1px solid var(--line);background:rgba(255,255,255,.02);font-size:14.5px;line-height:1.6;color:var(--text-2)}
+.bt-wrap{max-width:620px;margin:0 auto}
+.bt-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--acc)}
+.bt-title{margin-top:10px;font-size:19px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+#bt-intro p{margin:10px 0 0;font-size:14px;line-height:1.6;color:var(--text-2)}
+#bt-intro .btn{margin-top:18px}
+.bt-alt{margin-top:18px;font-size:13.5px;color:var(--text-3)}
 .bt-alt a{font-weight:500}
+.bt-form-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:20px}
 #bt-account{margin:0 0 22px;padding:16px 18px;color:var(--text-2)}
 #bt-account b{display:block;margin-bottom:4px;font-size:15px;font-weight:600;color:var(--text)}
 .link-btn{margin-left:4px;padding:0;background:none;border:none;color:var(--acc);font-size:inherit;font-weight:500;font-family:var(--font);cursor:pointer}
 #bt-done{margin-top:0;padding:22px;font-size:15.5px;border-radius:var(--r-lg)}
-@media (max-width:860px){.bt-grid{grid-template-columns:minmax(0,1fr)}.bt-side{position:static;order:2}}
 </style>
 </head>
 <body>
@@ -69,28 +67,31 @@
 </header>
 
 <section class="section-tight">
-  <div class="bt-grid">
-
-    <aside class="bt-side">
-      <h2>How the beta works</h2>
-      <ol class="bt-steps">
-        <li><span><b>You apply</b>A few lines about the business — what you sell, where, and the channels you're on.</span></li>
-        <li><span><b>We review every application</b>Places are limited, so not every business gets one. If yours is picked, we get in touch.</span></li>
-        <li><span><b>You use Adronis free until launch</b>We send you a link to set up your account and switch your plan on. No card, nothing to pay.</span></li>
-      </ol>
-      <div class="bt-alt">Already a beta tester? <a href="login.html">Log in</a> to your account.</div>
-    </aside>
-
-    <div>
+  <div class="bt-wrap">
       <div class="form-card">
         <!-- Signed in, but the account isn't a beta tester (yet). -->
         <div id="bt-account" class="notice" role="status" hidden>
           <b>Your account isn't in the beta yet.</b>
-          It's set up, but only businesses picked for the beta can use Adronis. Apply below — if yours is picked, we switch your plan on and let you know.
+          It's set up, but only businesses picked for the beta can use Adronis. If yours is picked, we switch your plan on and let you know.
           <button type="button" id="bt-logout" class="link-btn">Log out</button>
         </div>
 
-        <form id="beta-form">
+        <!-- What everyone sees first. The form only opens when they ask for it. -->
+        <div id="bt-intro">
+          <div class="bt-tag">BETA · NO PAYMENTS YET</div>
+          <div class="bt-title">We're in beta — there's nothing to pay yet.</div>
+          <p>Payments open when Adronis launches for everyone in Q1 2027. Until then it runs with a small group of beta testers.</p>
+          <p>Already on the beta tester list? Then you use Adronis free — we switch your plan on from our side, no card needed.</p>
+          <p>Want to join? Places are limited, so we review every application. If your business is picked, we'll get in touch and switch your plan on.</p>
+          <button type="button" id="bt-apply" class="btn">Apply for the beta →</button>
+          <div class="bt-alt" id="bt-login">Already a beta tester? <a href="login.html">Log in</a> to your account.</div>
+        </div>
+
+        <form id="beta-form" hidden>
+          <div class="bt-form-head">
+            <div class="bt-title" style="margin:0">Apply for the beta</div>
+            <button type="button" id="bt-back" class="link-btn">← Back</button>
+          </div>
           <div class="field">
             <label for="business">Business name</label>
             <input id="business" name="business" type="text" maxlength="200" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
@@ -129,7 +130,6 @@
 
         <div id="bt-done" class="notice" role="status" hidden>Thanks — your application is in. We review every one, and if your business is picked we'll get in touch.</div>
       </div>
-    </div>
 
   </div>
 </section>
@@ -167,6 +167,23 @@
   if (!LBAuth.beta) { location.replace("/#pricing"); return; }
 
   var form = document.getElementById("beta-form");
+  var intro = document.getElementById("bt-intro");
+
+  // The beta panel comes first; the application form only when asked for.
+  // beta.html#apply (the "Apply for the beta" links elsewhere) opens it
+  // straight away.
+  function showForm(){
+    intro.hidden = true;
+    form.hidden = false;
+    document.getElementById("business").focus();
+  }
+  function showIntro(){
+    form.hidden = true;
+    intro.hidden = false;
+  }
+  document.getElementById("bt-apply").addEventListener("click", showForm);
+  document.getElementById("bt-back").addEventListener("click", showIntro);
+  if (location.hash === "#apply") showForm();
 
   LBAuth.ready.then(function(){
     if (!LBAuth.isLoggedIn()) return;
@@ -175,6 +192,8 @@
     if (!LBAuth.hasBrief()) { location.replace(LBAuth.unfinishedStep()); return; }
 
     document.getElementById("bt-account").hidden = false;
+    // Signed in already, so "log in" means nothing to them.
+    document.getElementById("bt-login").hidden = true;
     var profile = LBAuth.getProfile() || {};
     var user = LBAuth.getUser() || {};
     if (profile.business_name) document.getElementById("business").value = profile.business_name;
