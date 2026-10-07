@@ -83,6 +83,9 @@
 .co-beta-title{margin-top:10px;font-size:19px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
 .co-beta p{margin:10px 0 0;font-size:14px;line-height:1.6;color:var(--text-2)}
 .co-beta .btn{margin-top:16px}
+/* During the beta the page is just the beta card, centred. */
+.co-grid.is-beta{grid-template-columns:minmax(0,1fr);max-width:620px}
+.co-grid.is-beta .co-beta{margin:0;padding:0;border:0;background:none}
 
 .co-trust{list-style:none;margin:22px 0 0;padding:18px 0 0;border-top:1px solid var(--line);display:grid;gap:10px;font-size:13.5px;color:var(--text-2)}
 .co-trust li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px}
@@ -136,6 +139,7 @@
         <a id="co-beta-join" href="contact.html?beta=1" class="btn">Ask to join the beta →</a>
       </div>
 
+      <div id="co-plan-steps">
       <div class="co-step">
         <div class="co-step-num">1</div>
         <div class="co-step-title">Your plan</div>
@@ -154,6 +158,7 @@
         <button type="button" data-cycle="annual" style="flex:1">Annual<span class="co-save">SAVE 20%</span></button>
       </div>
       <p id="co-cycle-note" style="margin:12px 0 0;font-size:13px;line-height:1.6;color:var(--text-3)">Billed every month and renews automatically. Cancel any time — access runs to the end of the paid month, with no notice period.</p>
+      </div>
 
       <div id="co-pay">
       <div class="co-step" style="margin-top:36px">

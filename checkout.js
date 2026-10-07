@@ -226,9 +226,13 @@
     }
   }
 
-  // The checkout view during the beta: the notice up top, no payment step.
+  // The checkout view during the beta: only the beta card. Plans, prices and
+  // the payment step stay in the page, hidden, and come back with BETA off.
   function showBeta() {
+    $("co-view").classList.add("is-beta");
     $("co-beta").hidden = false;
+    $("co-plan-steps").hidden = true;
+    $("co-summary").hidden = true;
     $("co-pay").hidden = true;
     $("co-terms").hidden = true;
     $("co-eyebrow").textContent = "BETA · NO PAYMENTS YET";
@@ -369,6 +373,8 @@
   // A blocked visitor gets told why, with a link. Never a silent bounce back to
   // signup — that reads as "the checkout button does nothing".
   function block(message, linkText) {
+    // Nothing to check out during the beta, so nothing to be blocked from.
+    if (BETA) return;
     var notice = $("co-notice");
     var button = $("co-submit");
     button.disabled = true;
