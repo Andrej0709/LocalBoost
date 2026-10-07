@@ -1233,6 +1233,9 @@ window.LB_I18N_SR = {
       "Treba nam email za naplatu pre nego što te prosledimo Paddle-u.",
     "That code isn't valid — check it and try again.":
       "Taj kod nije važeći — proveri ga i pokušaj ponovo.",
+    "That code has already been used up.": "Taj kod je već potrošen.",
+    "That code doesn't work on this plan or billing cycle.":
+      "Taj kod ne važi za ovaj plan ili ovaj način plaćanja.",
     "ALREADY RUNNING": "VEĆ TEČE",
     "Nothing to pay here — your plan is already on the account.":
       "Ovde nema šta da se plati — tvoj plan je već na nalogu.",
@@ -1383,6 +1386,8 @@ window.LB_I18N_SR = {
     "PLAN ACTIVE": "PLAN AKTIVAN",
     "20% off every drop, for as long as you stay.": "20% popusta na svaki drop, dok god si sa nama.",
     "10% off every drop, for as long as you stay.": "10% popusta na svaki drop, dok god si sa nama.",
+    // The founder code for the beta venues (FOUNDER30 in Paddle).
+    "30% off your first 12 monthly charges.": "30% popusta na prvih 12 mesečnih naplata.",
     "25% off your first year.": "25% popusta na prvu godinu.",
     "Couldn't load your account system. Refresh the page and try again.":
       "Nismo uspeli da učitamo sistem naloga. Osveži stranicu i pokušaj ponovo.",
@@ -1962,6 +1967,9 @@ window.LB_I18N_SR = {
     [/^Incl\. VAT \((\d+)%\)$/, "Uključen PDV ($1%)"],
     [/^First drop \((\d+)-day trial\)$/, "Prvi drop ($1 dana probe)"],
     [/^(\S+) applied — (.+)$/, "$1 primenjen — $2"],
+    [/^After (\d+) charges?$/, "Posle $1. naplate"],
+    [/^Your (\S+) discount doesn't cover that plan or billing cycle, so the switch would end it - talk to us from the contact page first\.$/,
+      "Tvoj popust $1 ne važi za taj plan ili način plaćanja, pa bi ga ova promena ukinula — prvo nam se javi preko stranice za kontakt."],
     [/^Couldn't load your account: (.+)$/, "Nismo uspeli da učitamo tvoj nalog: $1"],
     [/^Your free trial was already used on this account, so billing starts today\. Then (.+?) (per month|per year) including tax, renewing automatically, next charged (.+?)\. Cancel any time from your account — access runs to the end of the period you paid for\.$/,
       "Besplatna proba je već iskorišćena na ovom nalogu, pa naplata počinje danas. Zatim $1 $2 sa porezom, uz automatsku obnovu, sledeća naplata $3 Otkazati možeš bilo kad sa svog naloga — pristup traje do kraja plaćenog perioda."],

@@ -293,6 +293,13 @@
       return billing("checkout", { plan: planKey, cycle: cycle, promo_code: promoCode || null });
     },
 
+    // { code, percent, charges } for a promo code on this plan and cycle, or
+    // a thrown Error with the reason it doesn't apply. charges is null when
+    // the code takes its percent off every charge.
+    checkPromo: async function (code, planKey, cycle) {
+      return (await billing("check_promo", { code: code, plan: planKey, cycle: cycle })).promo;
+    },
+
 
     // meta: business_name, country, city, vertical, website, what_you_sell,
     // typical_customer, differentiator, why_us, brand_vibe, brand_colors,

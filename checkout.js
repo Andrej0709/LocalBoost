@@ -43,13 +43,11 @@
   var ANNUAL_DISCOUNT = 0.2;   // 20% off, matches the pricing section
   var TRIAL_DAYS = 7;          // "first drop free"
 
-  // Codes the summary can price. Each one must also exist as a discount in
-  // Paddle (Catalog > Discounts) — Paddle checks it again at payment.
-  // ADRONIS20 is the public one, shown to everyone in the pricing section of
-  // Adronis.dc.html and Adronis-full.html — keep the three in sync.
-  var PROMO_CODES = {
-    ADRONIS20: { label: "ADRONIS20", percent: 20, note: "20% off every drop, for as long as you stay." }
-  };
+  // Promo codes live only in Paddle (Catalog > Discounts) and are checked by
+  // the paddle Edge Function, so a private one never sits in this file.
+  // ADRONIS20 is the public one, shown in the pricing section of
+  // Adronis.dc.html and Adronis-full.html. FOUNDER30 is for the beta venues
+  // only: monthly Counter or Storefront, first 12 charges, 8 uses.
 
   // ------------------------------------------------------------------- state
   var params = new URLSearchParams(location.search);
@@ -170,6 +168,10 @@
     }
     if (state.promo) {
       lines.push({ label: "Promo " + state.promo.label + " (" + state.promo.percent + "%)", value: "−" + euro(discount), credit: true });
+      // A code that runs out says what the price goes back to.
+      if (state.promo.charges) {
+        lines.push({ label: "After " + state.promo.charges + (state.promo.charges === 1 ? " charge" : " charges"), value: euro(subtotal), note: true });
+      }
     }
     if (vat > 0) {
       lines.push({ label: "Incl. VAT (" + Math.round(vatRate() * 100) + "%)", value: euroCents(vat), note: true });
@@ -227,6 +229,10 @@
     renderSummary();
     var url = "?plan=" + state.plan + "&cycle=" + state.cycle;
     history.replaceState(null, "", url);
+    // A code is only good for the plan and cycle it was checked on.
+    if (state.promo && (state.promo.plan !== state.plan || state.promo.cycle !== state.cycle)) {
+      applyPromo(state.promo.label);
+    }
   }
 
   // ------------------------------------------------------------------ events
@@ -258,28 +264,52 @@
     state.country = code;
   }
 
-  $("co-promo-apply").addEventListener("click", function () {
-    var code = $("co-promo").value.trim().toUpperCase();
+  // What a code gives, in one line under the field.
+  function promoNote(p) {
+    if (p.charges == null) return p.percent + "% off every drop, for as long as you stay.";
+    if (p.charges === 1) return p.percent + "% off your first charge.";
+    return p.percent + "% off your first " + p.charges + " " + (p.cycle === "annual" ? "yearly" : "monthly") + " charges.";
+  }
+
+  function showPromoNote(ok, text) {
     var note = $("co-promo-note");
+    note.hidden = false;
+    note.style.borderColor = ok ? "rgba(159,215,176,.3)" : "rgba(240,168,168,.3)";
+    note.style.background = ok ? "rgba(159,215,176,.08)" : "rgba(240,168,168,.08)";
+    note.style.color = ok ? "#9fd7b0" : "#f0a8a8";
+    note.textContent = text;
+  }
 
-    if (!code) { state.promo = null; note.hidden = true; renderSummary(); return; }
-
-    if (PROMO_CODES[code]) {
-      state.promo = PROMO_CODES[code];
-      note.hidden = false;
-      note.style.borderColor = "rgba(159,215,176,.3)";
-      note.style.background = "rgba(159,215,176,.08)";
-      note.style.color = "#9fd7b0";
-      note.textContent = code + " applied — " + PROMO_CODES[code].note;
-    } else {
+  // Checks a code with Paddle for the plan and cycle on screen. Only the
+  // latest check counts, so a slow answer can't overwrite a newer one.
+  var promoCheck = 0;
+  async function applyPromo(code) {
+    var mine = ++promoCheck;
+    var btn = $("co-promo-apply");
+    if (!code) {
       state.promo = null;
-      note.hidden = false;
-      note.style.borderColor = "rgba(240,168,168,.3)";
-      note.style.background = "rgba(240,168,168,.08)";
-      note.style.color = "#f0a8a8";
-      note.textContent = "That code isn't valid — check it and try again.";
+      $("co-promo-note").hidden = true;
+      renderSummary();
+      return;
+    }
+    btn.disabled = true;
+    try {
+      var p = await LBAuth.checkPromo(code, state.plan, state.cycle);
+      if (mine !== promoCheck) return;
+      state.promo = { label: p.code, percent: p.percent, charges: p.charges, plan: state.plan, cycle: state.cycle };
+      showPromoNote(true, p.code + " applied — " + promoNote(state.promo));
+    } catch (e) {
+      if (mine !== promoCheck) return;
+      state.promo = null;
+      showPromoNote(false, e.message);
+    } finally {
+      if (mine === promoCheck) btn.disabled = false;
     }
     renderSummary();
+  }
+
+  $("co-promo-apply").addEventListener("click", function () {
+    applyPromo($("co-promo").value.trim().toUpperCase());
   });
 
   // ------------------------------------------------------- access gate

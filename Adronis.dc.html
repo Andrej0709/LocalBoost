@@ -971,8 +971,8 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 class Component extends DCLogic {
   state = { billing: "monthly", navOpen: false, freeNote: null, onFree: false, promoCopied: false, signedIn: false };
   root = React.createRef();
-  // The public promo code shown in the pricing section. checkout.js holds the
-  // same code in PROMO_CODES — keep the two in sync.
+  // The public promo code shown in the pricing section. Paddle holds the same
+  // code as a discount, and checkout checks it there.
   promoCode = "ADRONIS20";
 
   componentDidMount() {

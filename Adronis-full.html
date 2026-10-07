@@ -917,8 +917,8 @@ input[type=range]{height:30px !important}
 <script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#a8c6f0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#a8c6f0&quot;,&quot;#d8dbe0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;planetGlow&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:2,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;planetDensity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:5000,&quot;step&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;drumCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:5,&quot;max&quot;:9,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Engine&quot;}}">
 class Component extends DCLogic {
   state = { step: 0, tab: 0, billing: "monthly", ads: 12, angle: 0, creatives: {}, isMobile: false, navOpen: false, freeNote: null, onFree: false, promoCopied: false };
-  // The public promo code shown in the pricing section. checkout.js holds the
-  // same code in PROMO_CODES — keep the two in sync.
+  // The public promo code shown in the pricing section. Paddle holds the same
+  // code as a discount, and checkout checks it there.
   promoCode = "ADRONIS20";
   root = React.createRef();
 

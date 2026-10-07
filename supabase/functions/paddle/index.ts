@@ -92,13 +92,48 @@ async function findPrice(plan: string, cycle: string, trial: boolean) {
   return hit.id as string;
 }
 
-async function findDiscount(code: string) {
+// A promo code the customer typed, checked against the price it would go on.
+// Codes live only in Paddle, never in the page, so a private one (the founder
+// code for the beta venues) can't be read out of the site's JavaScript. A
+// code limited to some prices (restrict_to) or to a number of uses is held to
+// that here, so the customer hears why before Paddle refuses it at payment.
+async function findDiscount(code: string, priceId: string) {
   const list = await paddle("GET", "/discounts?status=active&code=" + encodeURIComponent(code));
   const hit = (list || []).find((d: any) =>
-    d.enabled_for_checkout && String(d.code).toUpperCase() === code.toUpperCase()
+    d.enabled_for_checkout && d.type === "percentage" &&
+    String(d.code).toUpperCase() === code.toUpperCase() &&
+    (!d.expires_at || new Date(d.expires_at) > new Date())
   );
   if (!hit) throw new UserError("That code isn't valid — check it and try again.");
-  return hit.id as string;
+  if (hit.usage_limit != null && hit.times_used >= hit.usage_limit) {
+    throw new UserError("That code has already been used up.");
+  }
+  if (hit.restrict_to && !hit.restrict_to.includes(priceId)) throw new UserError(NOT_FOR_THIS_PRICE);
+  return hit;
+}
+
+const NOT_FOR_THIS_PRICE = "That code doesn't work on this plan or billing cycle.";
+
+// A plan switch may not carry a running discount onto a price it isn't for:
+// the founder code counts monthly charges, so on annual billing its 12
+// charges would turn into 12 years. Such a switch goes through Adronis.
+async function keepsDiscount(profile: any, priceId: string) {
+  const d = profile.paddle_discount;
+  if (!d?.id || (d.ends_at && new Date(d.ends_at) <= new Date())) return;
+  const full = await paddle("GET", `/discounts/${d.id}`);
+  if (full.restrict_to && !full.restrict_to.includes(priceId)) {
+    throw new UserError(`Your ${full.code || "discount"} discount doesn't cover that plan or billing cycle, so the switch would end it - talk to us from the contact page first.`);
+  }
+}
+
+// What the checkout summary needs to price a code: how much it takes off and
+// for how many charges (null: every charge, for as long as the plan runs).
+function promoSummary(d: any) {
+  return {
+    code: String(d.code).toUpperCase(),
+    percent: Number(d.amount),
+    charges: d.recur ? (d.maximum_recurring_intervals ?? null) : 1,
+  };
 }
 
 async function profileById(id: string) {
@@ -391,16 +426,28 @@ async function handleAction(req: Request) {
         if (running) throw new UserError("Your plan is already running.");
 
         const trial = !profile.trial_started_at;
+        const priceId = await findPrice(body.plan, body.cycle, trial);
         const tx: Record<string, unknown> = {
-          items: [{ price_id: await findPrice(body.plan, body.cycle, trial), quantity: 1 }],
+          items: [{ price_id: priceId, quantity: 1 }],
           custom_data: { user_id: profile.id },
           collection_mode: "automatic",
         };
-        if (body.promo_code) tx.discount_id = await findDiscount(String(body.promo_code).trim());
+        if (body.promo_code) tx.discount_id = (await findDiscount(String(body.promo_code).trim(), priceId)).id;
         if (profile.paddle_customer_id) tx.customer_id = profile.paddle_customer_id;
 
         const created = await paddle("POST", "/transactions", tx);
         return json({ transaction_id: created.id, trial, has_customer: !!profile.paddle_customer_id });
+      }
+
+      // The checkout page's Apply button: is this code good for this plan and
+      // cycle, and what does it take off. Checked against the same price the
+      // checkout action would pick.
+      case "check_promo": {
+        const code = String(body.code || "").trim();
+        if (!code) throw new UserError("That code isn't valid — check it and try again.");
+        if (!PAID_PLANS.includes(body.plan) || !CYCLES.includes(body.cycle)) throw new UserError("Pick a paid plan.");
+        const priceId = await findPrice(body.plan, body.cycle, !profile.trial_started_at);
+        return json({ promo: promoSummary(await findDiscount(code, priceId)) });
       }
 
       case "cancel": {
@@ -430,8 +477,10 @@ async function handleAction(req: Request) {
         // account may still change its cycle or undo a switch away from it.
         if (plan === "franchise" && profile.plan !== "franchise") throw new UserError(FRANCHISE_BY_TALK);
 
+        const priceId = await findPrice(plan, cycle, false);
+        await keepsDiscount(profile, priceId);
         const sub = await paddle("PATCH", `/subscriptions/${subId}`, {
-          items: [{ price_id: await findPrice(plan, cycle, false), quantity: 1 }],
+          items: [{ price_id: priceId, quantity: 1 }],
           proration_billing_mode: "do_not_bill",
         });
         return json({ profile: await syncSubscription(sub, profile.id) });
