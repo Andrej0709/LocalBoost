@@ -239,8 +239,6 @@
     $("co-headline").innerHTML = 'Adronis is in <em>beta</em>.';
     $("co-sub").textContent =
       "Checkout is closed during the beta. The public launch is in Q1 2027 — beta testers use Adronis free until then.";
-    $("co-free-lead").textContent = "Not on the beta list?";
-    $("co-free-sub").textContent = "3 ads a month, no card.";
   }
 
   function renderCycle() {
@@ -407,7 +405,8 @@
         state.paidNow = LBAuth.hadTrial();
         prefillCountry((LBAuth.getProfile() || {}).country);
         renderSummary();
-        $("co-free").hidden = false;
+        // No Free plan during the beta: only beta testers get in.
+        $("co-free").hidden = BETA;
         var user = LBAuth.getUser();
         if (user && user.email && !$("co-email").value) $("co-email").value = user.email;
       }).catch(function (err) {

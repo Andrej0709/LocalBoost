@@ -164,10 +164,11 @@
     notice.hidden = false;
     notice.textContent = "You're reaching out about the " + names[plan] + " plan.";
   }
-  // From checkout during the beta: asking to be put on the beta tester list.
+  // From checkout during the beta: applying for a place on the beta tester
+  // list. Places are limited, so it says the application gets reviewed.
   if (params.get("beta") === "1") {
     notice.hidden = false;
-    notice.textContent = "You're asking to join the Adronis beta.";
+    notice.textContent = "You're applying for the Adronis beta. Places are limited — we review every application and get in touch if your business is picked.";
   }
 
   document.getElementById("contact-form").addEventListener("submit", async function(e){

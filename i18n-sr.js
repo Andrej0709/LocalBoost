@@ -1401,21 +1401,22 @@ window.LB_I18N_SR = {
     "We're in beta — there's nothing to pay yet.": "U beta fazi smo — trenutno nema plaćanja.",
     "Payments open when Adronis launches for everyone in Q1 2027. Until then it runs with a small group of beta testers.":
       "Plaćanje se otvara kad Adronis krene za sve, u prvom kvartalu 2027. Do tada radi sa malom grupom beta testera.",
-    "On the beta tester list? Then you use Adronis free — we switch your plan on from our side, no card needed. If it isn't on yet, message us and we'll sort it.":
-      "Na listi si beta testera? Onda Adronis koristiš besplatno — mi ti uključujemo plan sa naše strane, bez kartice. Ako još nije uključen, javi nam se i sredićemo.",
-    "Ask to join the beta →": "Prijavi se za beta testiranje →",
+    "Already on the beta tester list? Then you use Adronis free — we switch your plan on from our side, no card needed.":
+      "Već si na listi beta testera? Onda Adronis koristiš besplatno — mi ti uključujemo plan sa naše strane, bez kartice.",
+    "Want to join? Places are limited, so we review every application. If your business is picked, we'll get in touch and switch your plan on.":
+      "Želiš da se priključiš? Broj mesta je ograničen, pa pregledamo svaku prijavu. Ako tvoj biznis bude izabran, javićemo ti se i uključiti plan.",
+    "Apply for the beta →": "Prijavi se za beta testiranje →",
     "Adronis is in": "Adronis je u",
     "beta": "beta fazi",
     "Checkout is closed during the beta. The public launch is in Q1 2027 — beta testers use Adronis free until then.":
       "Tokom beta faze nema naplate. Pravi launch je u prvom kvartalu 2027 — beta testeri do tada koriste Adronis besplatno.",
     "Nothing is charged during the beta. These prices apply from the launch in Q1 2027 — you'll be asked before anything is billed.":
       "Tokom beta faze ništa se ne naplaćuje. Ove cene važe od launcha u prvom kvartalu 2027 — pitaćemo te pre bilo kakve naplate.",
-    "Not on the beta list?": "Nisi na listi beta testera?",
-    "3 ads a month, no card.": "3 oglasa mesečno, bez kartice.",
     "BETA TESTER · FREE UNTIL LAUNCH": "BETA TESTER · BESPLATNO DO LAUNCHA",
     "You're on the beta list — your plan is on and there's nothing to pay until the launch in Q1 2027.":
       "Na listi si beta testera — plan ti je uključen i nemaš šta da plaćaš do launcha u prvom kvartalu 2027.",
-    "You're asking to join the Adronis beta.": "Prijavljuješ se za Adronis beta testiranje.",
+    "You're applying for the Adronis beta. Places are limited — we review every application and get in touch if your business is picked.":
+      "Prijavljuješ se za Adronis beta testiranje. Broj mesta je ograničen — pregledamo svaku prijavu i javljamo se ako tvoj biznis bude izabran.",
 
     /* --- Account: what the script writes --------------------------------- */
     "Active — nothing to pay": "Aktivan — nema plaćanja",
