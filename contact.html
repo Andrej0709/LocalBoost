@@ -164,6 +164,11 @@
     notice.hidden = false;
     notice.textContent = "You're reaching out about the " + names[plan] + " plan.";
   }
+  // From checkout during the beta: asking to be put on the beta tester list.
+  if (params.get("beta") === "1") {
+    notice.hidden = false;
+    notice.textContent = "You're asking to join the Adronis beta.";
+  }
 
   document.getElementById("contact-form").addEventListener("submit", async function(e){
     e.preventDefault();

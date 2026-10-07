@@ -43,6 +43,12 @@
   var ANNUAL_DISCOUNT = 0.2;   // 20% off, matches the pricing section
   var TRIAL_DAYS = 7;          // "first drop free"
 
+  // Beta: nobody pays until the public launch in Q1 2027. The page still shows
+  // the plans and prices, but the payment step is hidden and the visitor is
+  // told why. Beta testers get their plan switched on from the portal, so they
+  // land on the "already running" view instead. Set to false at launch.
+  var BETA = true;
+
   // Promo codes live only in Paddle (Catalog > Discounts) and are checked by
   // the paddle Edge Function, so a private one never sits in this file.
   // ADRONIS20 is the public one, shown in the pricing section of
@@ -176,7 +182,7 @@
     if (vat > 0) {
       lines.push({ label: "Incl. VAT (" + Math.round(vatRate() * 100) + "%)", value: euroCents(vat), note: true });
     }
-    if (!state.paidNow) {
+    if (!state.paidNow && !BETA) {
       lines.push({ label: "First drop (" + TRIAL_DAYS + "-day trial)", value: "Free", credit: true });
     }
 
@@ -186,7 +192,11 @@
     }).join("");
 
     var per = state.cycle === "annual" ? "per year" : "per month";
-    if (state.paidNow) {
+    if (BETA) {
+      $("co-due").textContent = "€0";
+      $("co-then").textContent =
+        "Nothing is charged during the beta. These prices apply from the launch in Q1 2027 — you'll be asked before anything is billed.";
+    } else if (state.paidNow) {
       $("co-due").textContent = euro(recurring);
       $("co-then").textContent =
         "Your free trial was already used on this account, so billing starts today. Then " +
@@ -209,7 +219,24 @@
         '<span>' + (f.text || f) + (f.soon ? '<span class="feat-soon">Soon</span>' : '') + '</span></li>';
     }).join("");
 
-    $("co-headline").innerHTML = 'Confirm your <em>' + plan.name + '</em> drop.';
+    if (BETA) {
+      $("co-beta-join").href = "contact.html?beta=1&plan=" + state.plan;
+    } else {
+      $("co-headline").innerHTML = 'Confirm your <em>' + plan.name + '</em> drop.';
+    }
+  }
+
+  // The checkout view during the beta: the notice up top, no payment step.
+  function showBeta() {
+    $("co-beta").hidden = false;
+    $("co-pay").hidden = true;
+    $("co-terms").hidden = true;
+    $("co-eyebrow").textContent = "BETA · NO PAYMENTS YET";
+    $("co-headline").innerHTML = 'Adronis is in <em>beta</em>.';
+    $("co-sub").textContent =
+      "Checkout is closed during the beta. The public launch is in Q1 2027 — beta testers use Adronis free until then.";
+    $("co-free-lead").textContent = "Not on the beta list?";
+    $("co-free-sub").textContent = "3 ads a month, no card.";
   }
 
   function renderCycle() {
@@ -329,6 +356,14 @@
     $("co-success-tag").textContent = "PLAN ACTIVE";
     $("co-success-text").textContent = "The " + plan.name + " plan is live on your account.";
     $("co-success-foot").hidden = true;
+    // A plan switched on from the portal, with no Paddle subscription behind
+    // it, is a beta tester's.
+    if (BETA && !(LBAuth.getProfile() || {}).paddle_subscription_id) {
+      $("co-eyebrow").textContent = "BETA TESTER · FREE UNTIL LAUNCH";
+      $("co-sub").textContent =
+        "You're on the beta list — your plan is on and there's nothing to pay until the launch in Q1 2027.";
+      $("co-success-tag").textContent = "BETA TESTER · FREE UNTIL LAUNCH";
+    }
   }
 
   // A blocked visitor gets told why, with a link. Never a silent bounce back to
@@ -376,6 +411,7 @@
   }
 
   $("co-submit").addEventListener("click", async function () {
+    if (BETA) return;
     var email = $("co-email").value.trim();
     var notice = $("co-notice");
     var button = $("co-submit");
@@ -540,6 +576,7 @@
       $("co-retry").href = "checkout.html?plan=" + state.plan + "&cycle=" + state.cycle;
     }
   } else {
+    if (BETA) showBeta();
     render();
   }
 
