@@ -64,6 +64,12 @@
 #account-content .card{padding:28px;border-radius:var(--r-xl)}
 #account-content .btn-ghost{min-height:44px;font-size:14px;padding:0 18px}
 .acc-danger{color:#f0a8a8 !important}
+/* What a beta tester's Beta plan includes. */
+#bill-beta{margin-top:18px;padding:16px 18px;border-radius:var(--r);border:1px solid var(--acc-line);background:var(--acc-soft)}
+#bill-beta .mono{font-size:10.5px;letter-spacing:.1em;color:var(--acc)}
+#bill-beta-perks{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:8px;font-size:14px;line-height:1.5;color:var(--text-2)}
+#bill-beta-perks li{position:relative;padding-left:18px}
+#bill-beta-perks li::before{content:"▪";position:absolute;left:0;top:0;color:var(--acc);font-family:var(--mono);font-size:11px}
 @media (max-width:640px){
   #account-content .card{padding:20px;border-radius:22px}
   #biz-rows .acc-row-value{max-width:none}
@@ -318,6 +324,12 @@
             <div class="acc-row"><div class="acc-row-label">Status</div><div class="acc-row-value" id="bill-status">—</div></div>
             <div class="acc-row" id="bill-discount-row" hidden><div class="acc-row-label">Discount</div><div class="acc-row-value" id="bill-discount">—</div></div>
             <div class="acc-row"><div class="acc-row-label" id="bill-date-label">Trial ends</div><div class="acc-row-value" id="bill-date">—</div></div>
+          </div>
+
+          <!-- Beta testers only: the Beta plan is given from our side, never bought -->
+          <div id="bill-beta" hidden>
+            <div class="mono">WHAT YOUR BETA PLAN INCLUDES</div>
+            <ul id="bill-beta-perks"></ul>
           </div>
 
           <!-- The last charge failed: Paddle hosts the card change -->

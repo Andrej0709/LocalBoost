@@ -338,7 +338,8 @@
 
     // meta: business_name, country, city, vertical, website, what_you_sell,
     // typical_customer, differentiator, why_us, brand_vibe, brand_colors,
-    // avoid_notes, channels (array), plan ('counter'|'storefront'|'franchise'|'free').
+    // avoid_notes, channels (array), plan ('counter'|'storefront'|'franchise'|'free',
+    // or 'beta' during the beta - only the portal switches a Beta plan on).
     // The on_auth_user_created trigger copies these into public.profiles.
     signUp: async function (email, password, meta) {
       var res = await db.auth.signUp({

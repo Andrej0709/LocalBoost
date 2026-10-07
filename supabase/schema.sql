@@ -17,6 +17,17 @@ exception when duplicate_object then null; end $$;
    without a running trial or subscription is on the free allowance. */
 alter type public.plan_tier add value if not exists 'free';
 
+/* 'beta' is the plan of the businesses picked for the beta, until the public
+   launch in Q1 2027. It has no price and is never sold: it is not in the
+   pricing section or at checkout, Paddle has no price for it, and only the
+   Adronis Portal gives it to an account (admin_set_plan_state, mode 'beta'),
+   as a plan with no renewal date that is never charged. It includes what the
+   beta plan promises: 4 ads a week on up to 4 channels (channel_limit below,
+   PLANS.beta in account.js). A new enum value can't be used in the same
+   transaction that adds it, so the SQL functions below compare plan::text
+   with 'beta' instead of the enum itself. */
+alter type public.plan_tier add value if not exists 'beta';
+
 do $$ begin
   create type public.subscription_status as enum ('trialing', 'active', 'past_due', 'canceled');
 exception when duplicate_object then null; end $$;
@@ -370,17 +381,19 @@ create trigger creatives_set_updated_at
 
 /* ------------------------------------------------------------ */
 /* 7b. channel_limit - how many channels a plan publishes to: one on Free,  */
-/*     two on Counter, four on Storefront, every one (null) on Franchise.   */
-/*     Mirrors CHANNEL_LIMITS in brief-fields.js and the pricing section.   */
+/*     two on Counter, four on Storefront and Beta, every one (null) on     */
+/*     Franchise. Mirrors CHANNEL_LIMITS in brief-fields.js and the pricing */
+/*     section.                                                             */
 /* ------------------------------------------------------------ */
 create or replace function public.channel_limit(p_plan public.plan_tier)
 returns int
 language sql
 immutable
 as $$
-  select case p_plan
+  select case p_plan::text
     when 'counter'    then 2
     when 'storefront' then 4
+    when 'beta'       then 4
     when 'franchise'  then null
     else 1
   end

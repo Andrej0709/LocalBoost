@@ -144,13 +144,13 @@
   }
 
   /* CHANNELS: each plan publishes to a set number of channels — one on Free,
-     two on Counter, four on Storefront, every one on Franchise (null). Mirrors
+     two on Counter, four on Storefront and Beta, every one on Franchise (null). Mirrors
      channel_limit() in supabase/schema.sql and the pricing section; keep them
      in sync. Once the plan's number is ticked the other boxes lock. An account
      already over it (its plan just got smaller) is told how many to untick and
      can't save until it has. */
-  var CHANNEL_LIMITS = { free: 1, counter: 2, storefront: 4, franchise: null };
-  var PLAN_NAMES = { free: "Free", counter: "Counter", storefront: "Storefront", franchise: "Franchise" };
+  var CHANNEL_LIMITS = { free: 1, counter: 2, storefront: 4, beta: 4, franchise: null };
+  var PLAN_NAMES = { free: "Free", counter: "Counter", storefront: "Storefront", beta: "Beta", franchise: "Franchise" };
 
   function channelsField(group, hint, submit) {
     var plan = "free";

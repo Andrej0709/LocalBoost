@@ -291,17 +291,20 @@
     counter: { name: "Counter", price: "€59", rate: "4 ads / week · 2 channels",
       features: ["4 photoreal creatives every Monday", "Two connected channels", { text: "Best-time auto-publishing", soon: true }, "Swipe approval in the app"] },
     storefront: { name: "Storefront", price: "€149", rate: "12 ads / week · 4 channels",
-      features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", { text: "Performance feedback into next drop", soon: true }, { text: "Caption variants and A/B slotting", soon: true }] }
+      features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", { text: "Performance feedback into next drop", soon: true }, { text: "Caption variants and A/B slotting", soon: true }] },
+    // Only ever reached through the beta invite, never from a link: see below.
+    beta: { name: "Beta", price: "€0", rate: "4 ads / week · 4 channels", features: [] }
   };
   var params = new URLSearchParams(location.search);
   // Franchise is agreed with Adronis first, never signed up for here.
   if (params.get("plan") === "franchise") { location.replace("contact.html?plan=franchise"); return; }
   // During the beta (see BETA in auth.js) only a business we picked gets this
-  // far. It signs up with no plan price shown and no checkout after, and its
-  // plan is switched on from the portal. There's no Free plan in the beta.
+  // far. It signs up with no plan price shown and no checkout after, and the
+  // portal switches its Beta plan on. There's no Free plan in the beta, and
+  // Beta is never picked from a link: it has no price and no checkout.
   var BETA = LBAuth.beta;
-  var planKey = plans[params.get("plan")] ? params.get("plan") : "storefront";
-  if (BETA && planKey === "free") planKey = "storefront";
+  var planKey = plans[params.get("plan")] && params.get("plan") !== "beta" ? params.get("plan") : "storefront";
+  if (BETA) planKey = "beta";
   var plan = plans[planKey];
   var cycle = params.get("cycle") === "annual" ? "annual" : "monthly";
 

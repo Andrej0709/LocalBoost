@@ -1455,6 +1455,24 @@ window.LB_I18N_SR = {
 
     /* --- Account: what the script writes --------------------------------- */
     "Active — nothing to pay": "Aktivan — nema plaćanja",
+    "4 ads / week · 4 channels": "4 oglasa / nedeljno · 4 kanala",
+    "None — free during the beta": "Nema — besplatno tokom bete",
+    "Beta tester — nothing to pay until launch": "Beta tester — nema plaćanja do lansiranja",
+    "Free until": "Besplatno do",
+    "Public launch, Q1 2027": "Javnog lansiranja, Q1 2027",
+    "WHAT YOUR BETA PLAN INCLUDES": "ŠTA UKLJUČUJE TVOJ BETA PLAN",
+    "Nothing to pay until the public launch in Q1 2027 — no card on file":
+      "Ništa ne plaćaš do javnog lansiranja u Q1 2027 — bez kartice",
+    "4 ads every Monday, each in two versions to swipe between":
+      "4 oglasa svakog ponedeljka, svaki u dve verzije koje biraš prevlačenjem",
+    "Every image checked before it reaches you, and a new one made if you turn both down":
+      "Svaka slika se proveri pre nego što stigne do tebe, a ako odbiješ obe verzije, pravimo novu",
+    "We post the ads you approve to your channels for you":
+      "Oglase koje odobriš objavljujemo umesto tebe na tvojim kanalima",
+    "Holiday drops included": "Praznični dropovi uključeni",
+    "Reels made from the ads you approve": "Rilsovi napravljeni od oglasa koje odobriš",
+    "After the beta: 30% off a monthly plan for your first 12 months":
+      "Posle bete: 30% popusta na mesečni plan prvih 12 meseci",
     "PAID": "PLAĆENO",
     "UPCOMING": "PREDSTOJI",
 

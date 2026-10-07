@@ -7,8 +7,23 @@
   var PLANS = {
     counter:    { name: "Counter",    base: 59,  rate: "4 ads / week · 2 channels" },
     storefront: { name: "Storefront", base: 149, rate: "12 ads / week · 4 channels" },
-    franchise:  { name: "Franchise",  base: 490, rate: "30 ads / week · unlimited" }
+    franchise:  { name: "Franchise",  base: 490, rate: "30 ads / week · unlimited" },
+    // The beta testers' plan. No price and never sold: only the Adronis Portal
+    // gives it, with no renewal date, so it is never charged.
+    beta:       { name: "Beta",       base: 0,   rate: "4 ads / week · 4 channels", beta: true }
   };
+
+  // What the Beta plan includes, as the beta plan promises it. A feature
+  // marked soon isn't built yet, the same as on the pricing cards.
+  var BETA_PERKS = [
+    "Nothing to pay until the public launch in Q1 2027 — no card on file",
+    "4 ads every Monday, each in two versions to swipe between",
+    "Every image checked before it reaches you, and a new one made if you turn both down",
+    "We post the ads you approve to your channels for you",
+    "Holiday drops included",
+    { text: "Reels made from the ads you approve", soon: true },
+    "After the beta: 30% off a monthly plan for your first 12 months"
+  ];
   var ANNUAL_DISCOUNT = 0.2;
 
   // Kept in sync on every renderBilling() call so the plan-change and
@@ -40,7 +55,8 @@
 
     var chip = $("acc-status-chip");
     var status = profile.subscription_status;
-    if (status === "trialing") { chip.className = "acc-chip acc"; chip.textContent = "TRIAL"; }
+    if (status === "active" && profile.plan === "beta") { chip.className = "acc-chip acc"; chip.textContent = "BETA"; }
+    else if (status === "trialing") { chip.className = "acc-chip acc"; chip.textContent = "TRIAL"; }
     else if (status === "active") { chip.className = "acc-chip ok"; chip.textContent = "ACTIVE"; }
     else if (status === "past_due") { chip.className = "acc-chip warn"; chip.textContent = "PAST DUE"; }
     else if (status === "canceled") { chip.className = "acc-chip muted"; chip.textContent = "CANCELED"; }
@@ -309,14 +325,19 @@
 
     // A plan that ended: straight back to checkout for it (checkout knows the
     // trial was already used and bills from today).
-    var ended = !!plan && profile.subscription_status === "canceled";
+    // Beta has no checkout to go back to.
+    var ended = !!plan && !plan.beta && profile.subscription_status === "canceled";
     $("restart-plan-row").hidden = !ended;
     if (ended) {
       $("restart-plan-link").href = "checkout.html?plan=" + profile.plan +
         "&cycle=" + (profile.billing_cycle === "annual" ? "annual" : "monthly");
     }
 
-    if (!plan || !profile.subscription_status) {
+    var isBeta = !!plan && plan.beta && profile.subscription_status === "active";
+    $("bill-beta").hidden = !isBeta;
+    if (isBeta) renderBetaPerks();
+
+    if (!plan || !profile.subscription_status || (plan.beta && !isBeta)) {
       $("billing-rows").hidden = true;
       $("billing-empty").hidden = false;
       $("bill-plan-toggle").hidden = true;
@@ -333,7 +354,8 @@
     var cycle = profile.billing_cycle || "monthly";
     $("bill-plan").textContent = plan.name;
     $("bill-rate").textContent = plan.rate;
-    $("bill-cycle").textContent = cycle === "annual" ? "Annual" : "Monthly";
+    $("bill-cycle").textContent = isBeta ? "None — free during the beta"
+      : cycle === "annual" ? "Annual" : "Monthly";
 
     // A plan with no period end on it never renews and is never charged — it
     // was granted outright. There is no date to show and nothing to cancel,
@@ -342,7 +364,8 @@
 
     var statusText = {
       trialing: "Free trial",
-      active: openEnded ? "Active — nothing to pay" : "Active",
+      active: isBeta ? "Beta tester — nothing to pay until launch"
+        : openEnded ? "Active — nothing to pay" : "Active",
       past_due: "Past due — update your card",
       canceled: "Canceled — you're on the Free plan"
     }[profile.subscription_status] || "No active plan";
@@ -368,6 +391,9 @@
     if (profile.subscription_status === "trialing") {
       dateLabel.textContent = "Trial ends";
       dateValue.textContent = profile.trial_ends_at ? fmtDate(profile.trial_ends_at) : "—";
+    } else if (isBeta) {
+      dateLabel.textContent = "Free until";
+      dateValue.textContent = "Public launch, Q1 2027";
     } else if (profile.subscription_status === "active") {
       dateLabel.textContent = "Started";
       dateValue.textContent = profile.trial_started_at ? fmtDate(profile.trial_started_at) : "—";
@@ -449,6 +475,24 @@
     $("billing-empty-text").textContent =
       q.used + " of " + q.limit + " free ads used this month, resets " + reset +
       ". No card on file. Pick a plan for a full drop every week.";
+  }
+
+  // A beta tester's plan card lists what the Beta plan includes. Each line is
+  // its own text node, so the Serbian copy can match it whole.
+  function renderBetaPerks() {
+    var list = $("bill-beta-perks");
+    if (list.childNodes.length) return;
+    BETA_PERKS.forEach(function (f) {
+      var li = document.createElement("li");
+      li.appendChild(document.createTextNode(f.text || f));
+      if (f.soon) {
+        var soon = document.createElement("span");
+        soon.className = "feat-soon";
+        soon.textContent = "Soon";
+        li.appendChild(soon);
+      }
+      list.appendChild(li);
+    });
   }
 
   // ----------------------------------------------------- plan change / cancel
