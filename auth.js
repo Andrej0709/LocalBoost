@@ -235,6 +235,11 @@
     // See BETA above.
     beta: BETA,
 
+    // Bump this whenever terms.html / privacy.html change materially, so the
+    // stored acceptance points at the wording the customer actually saw.
+    // Every form with the terms box (signup, login's sign-up tab) sends it.
+    termsVersion: "2026-10-08",
+
     isLoggedIn: function () {
       return !!session;
     },

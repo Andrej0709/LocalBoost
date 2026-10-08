@@ -70,11 +70,6 @@
 .su-done-mark{display:flex;align-items:center;justify-content:center;width:56px;height:56px;margin:0 auto 20px;border-radius:18px;background:var(--acc-soft);border:1px solid var(--acc-line);color:var(--acc);font-size:24px}
 /* During the beta there's no plan summary beside the form. */
 .su-grid.is-beta{grid-template-columns:minmax(0,1fr);max-width:720px}
-/* Until the consent box is ticked the button is plainly switched off, not just
-   a shade darker like a button that's busy sending. */
-#signup-form .btn.is-locked{opacity:.38;filter:grayscale(.7);box-shadow:none;cursor:not-allowed}
-#signup-form .btn.is-locked .mono{transform:none}
-.su-lock-hint{margin-top:12px;text-align:center;font-size:13px;color:var(--text-3)}
 @media (max-width:860px){
   .su-grid{grid-template-columns:minmax(0,1fr)}
   #plan-summary{position:static;order:-1}
@@ -228,7 +223,7 @@
         Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.
       </p>
       <button type="submit" class="btn btn-lg btn-block" style="margin-top:28px">Claim your first drop<span class="mono" style="font-size:13px">→</span></button>
-      <p class="su-lock-hint" id="su-lock-hint">Tick the box above to accept the terms and continue.</p>
+      <p class="lock-hint" id="su-lock-hint">Tick the box above to accept the terms and continue.</p>
       <div id="signup-notice" class="notice" role="status" style="margin-top:18px" hidden></div>
     </form>
 
@@ -286,9 +281,8 @@
 <script src="brief-fields.js"></script>
 <script>
 (function(){
-  // Bump this whenever terms.html / privacy.html change materially, so the
-  // stored acceptance points at the wording the customer actually saw.
-  var TERMS_VERSION = "2026-10-08";
+  // See termsVersion in auth.js.
+  var TERMS_VERSION = LBAuth.termsVersion;
   // A feature marked soon needs the network connections, which aren't built
   // yet, so it carries a "Soon" tag until it works.
   var plans = {
@@ -549,8 +543,8 @@
       channels:         checkedChannels(),
       plan:             planKey,
       // Evidence of the contract: stamped from the consent checkbox on this
-      // form. TERMS_VERSION must be bumped whenever the terms change materially,
-      // so an account's row says which wording it actually accepted.
+      // form. LBAuth.termsVersion must be bumped whenever the terms change
+      // materially, so an account's row says which wording it actually accepted.
       terms_accepted_at: new Date().toISOString(),
       terms_version:     TERMS_VERSION
     };

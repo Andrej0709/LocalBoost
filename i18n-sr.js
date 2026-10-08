@@ -550,6 +550,10 @@ window.LB_I18N_SR = {
       "3 oglasa mesečno, bez kartice. Nadogradi kad god poželiš.",
     "By continuing you confirm you are subscribing for business purposes and you accept the":
       "Nastavkom potvrđuješ da se pretplaćuješ za potrebe biznisa i prihvataš dokumente:",
+    "I am subscribing for business purposes and I accept the":
+      "Pretplaćujem se za potrebe biznisa i prihvatam dokumente:",
+    ", and I agree that the subscription renews automatically until I cancel.":
+      ", i saglasan sam da se pretplata automatski obnavlja dok je ne otkažem.",
     "Terms of Service": "Uslovi korišćenja",
     ", the": ", ",
     "and the": "i",

@@ -382,10 +382,27 @@
     }
   }
 
+  // Paying is accepting the terms: the button looks switched off and does
+  // nothing until the box is ticked. A class rather than `disabled`, because
+  // the button's disabled state already belongs to blocking and sending.
+  function gateConsent() {
+    var locked = !$("co-consent").checked;
+    $("co-submit").classList.toggle("is-locked", locked);
+    $("co-submit").setAttribute("aria-disabled", locked ? "true" : "false");
+    $("co-lock-hint").hidden = !locked;
+  }
+  $("co-consent").addEventListener("change", gateConsent);
+  gateConsent();
+
   $("co-submit").addEventListener("click", async function () {
     var email = $("co-email").value.trim();
     var notice = $("co-notice");
     var button = $("co-submit");
+
+    if (!$("co-consent").checked) {
+      $("co-consent").focus();
+      return;
+    }
 
     if (!email || email.indexOf("@") < 1) {
       notice.hidden = false;

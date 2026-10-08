@@ -128,7 +128,11 @@
           <label for="su-password">Password</label>
           <input id="su-password" type="password" required autocomplete="new-password" placeholder="Create a password">
         </div>
-        <button type="submit" class="btn btn-lg btn-block">Create account<span class="mono" aria-hidden="true">→</span></button>
+        <div class="checkbox-group consent-group" style="margin-top:6px">
+          <label class="checkbox-row consent-row"><input type="checkbox" id="su-consent" required><span>I have read and accept the <a href="terms.html" target="_blank" rel="noopener">Terms of Service</a>, the <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a> and the <a href="ai-disclosure.html" target="_blank" rel="noopener">AI Disclosure</a>, and I am opening this account for a business.</span></label>
+        </div>
+        <button type="submit" class="btn btn-lg btn-block" style="margin-top:22px">Create account<span class="mono" aria-hidden="true">→</span></button>
+        <p class="lock-hint" id="su-lock-hint">Tick the box above to accept the terms and continue.</p>
       </form>
 
       <form id="forgot-form" hidden>
@@ -344,15 +348,30 @@
     }
   });
 
+  // Creating an account is accepting the terms: the button stays switched off
+  // until the box is ticked.
+  var signupButton = signupForm.querySelector("button[type=submit]");
+  var signupConsent = document.getElementById("su-consent");
+  function gateSignup(){
+    var locked = !signupConsent.checked;
+    signupButton.classList.toggle("is-locked", locked);
+    signupButton.disabled = locked;
+    document.getElementById("su-lock-hint").hidden = !locked;
+  }
+  signupConsent.addEventListener("change", gateSignup);
+  gateSignup();
+
   signupForm.addEventListener("submit", async function(e){
     e.preventDefault();
-    var button = signupForm.querySelector("button[type=submit]");
+    if (!signupConsent.checked) return;
+    var button = signupButton;
     button.disabled = true;
     try {
       var result = await LBAuth.signUp(
         document.getElementById("su-email").value,
         document.getElementById("su-password").value,
-        { business_name: document.getElementById("su-business").value }
+        // terms_version stamps the acceptance on the new account (schema.sql).
+        { business_name: document.getElementById("su-business").value, terms_version: LBAuth.termsVersion }
       );
       if (result.needsEmailConfirmation) {
         signupForm.hidden = true;
@@ -361,7 +380,7 @@
         redirect(LBAuth.nextStep(), "Account created — let's brief the engine...");
       }
     } catch (err) {
-      button.disabled = false;
+      gateSignup();
       say(err.message);
     }
   });

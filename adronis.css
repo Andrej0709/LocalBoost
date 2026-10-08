@@ -172,6 +172,12 @@ a.card:active{transform:translateY(-1px) scale(.99);transition-duration:.1s}
 .btn:disabled,.btn[disabled]{cursor:default;filter:saturate(.6) brightness(.8)}
 .btn .mono{font-size:14px;transition:transform .25s var(--ease)}
 .btn:hover .mono{transform:translateX(3px)}
+/* Switched off until the terms box above it is ticked (signup, login, checkout):
+   plainly off, not just a shade darker like a button that's busy sending. */
+.btn.is-locked,.btn.is-locked:hover{opacity:.38;filter:grayscale(.7);box-shadow:none;cursor:not-allowed}
+.btn.is-locked .mono,.btn.is-locked:hover .mono{transform:none}
+.btn.is-locked:active{transform:none}
+.lock-hint{margin-top:12px;text-align:center;font-size:13px;color:var(--text-3)}
 .btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:0 22px;border-radius:9999px;border:1px solid var(--line-3);background:rgba(255,255,255,.04);color:var(--text);font-family:var(--font);font-size:15px;font-weight:500;letter-spacing:-.01em;cursor:pointer;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);transition:background .2s ease,border-color .2s ease,color .2s ease,transform .12s ease}
 .btn-ghost:hover{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:var(--text)}
 .btn-ghost:active{transform:scale(.97)}
