@@ -199,6 +199,20 @@ a.card:active{transform:translateY(-1px) scale(.99);transition-duration:.1s}
 .pw-rules li::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;border:1px solid var(--line-3);transition:background .2s ease,border-color .2s ease}
 .pw-rules li.met{color:var(--ok)}
 .pw-rules li.met::before{background:var(--ok);border-color:var(--ok)}
+/* Beta testers' feedback button (feedback.js), opposite the language switch */
+.fb-btn{position:fixed;left:18px;bottom:18px;z-index:45;padding:8px 14px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(16,18,23,.72);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 30px rgba(0,0,0,.5);color:var(--text-2);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:color .18s ease,border-color .18s ease}
+.fb-btn:hover,.fb-btn[aria-expanded="true"]{color:var(--text);border-color:var(--acc-line)}
+.fb-panel{position:fixed;left:18px;bottom:66px;z-index:46;display:grid;gap:12px;width:min(360px,calc(100% - 36px));padding:18px;border-radius:var(--r);border:1px solid rgba(255,255,255,.1);background:rgba(14,16,20,.92);-webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 30px 70px -10px rgba(0,0,0,.8);animation:notice-in .3s var(--ease)}
+.fb-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:15px;color:var(--text)}
+.fb-head b{font-weight:600}
+.fb-close{border:none;background:none;padding:6px;margin:-6px;color:var(--text-3);font-size:14px;cursor:pointer}
+.fb-close:hover{color:var(--text)}
+.fb-label{font-size:13px;line-height:1.5;color:var(--text-3)}
+.fb-panel textarea{width:100%;min-height:110px;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--field);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;resize:vertical;outline:none}
+.fb-panel textarea:focus{border-color:var(--acc-line);box-shadow:0 0 0 4px rgba(124,198,255,.14)}
+.fb-note{margin:0;font-size:13px;line-height:1.5;color:var(--text-2)}
+@media (max-width:640px){.fb-panel textarea{font-size:16px}}
+@media print{.fb-btn,.fb-panel{display:none}}
 input,select,textarea{color-scheme:dark}
 
 .checkbox-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:10px}

@@ -797,8 +797,25 @@ window.LB_I18N_SR = {
        convenience, so this copy is a reading aid and not a second contract. */
     "Terms of Service — Adronis": "Uslovi korišćenja — Adronis",
     "TERMS": "USLOVI",
-    "Last updated September 23, 2026. These terms form a binding agreement between you and Adronis. Headings are for readability — the wording of each clause governs.":
-      "Poslednja izmena 23. septembra 2026. Ovi uslovi čine obavezujući ugovor između tebe i Adronisa. Naslovi služe radi preglednosti — merodavan je tekst svake klauzule.",
+    "Last updated October 8, 2026. These terms form a binding agreement between you and Adronis. Headings are for readability — the wording of each clause governs.":
+      "Poslednja izmena 8. oktobra 2026. Ovi uslovi čine obavezujući ugovor između tebe i Adronisa. Naslovi služe radi preglednosti — merodavan je tekst svake klauzule.",
+    "6A. The beta": "6A. Beta",
+    "Until the public launch, planned for the first quarter of 2027, Adronis runs as a closed beta. This clause applies to every account on the Beta plan and, for as long as the beta lasts, takes precedence over any other clause it conflicts with.":
+      "Do javnog lansiranja, planiranog za prvi kvartal 2027, Adronis radi kao zatvorena beta. Ova klauzula važi za svaki nalog na Beta planu i, dok beta traje, ima prednost nad svakom drugom klauzulom sa kojom je u suprotnosti.",
+    "Places are limited and given by invitation. We choose beta testers at our discretion, and applying does not guarantee a place.":
+      "Broj mesta je ograničen i daju se na poziv. Beta testere biramo po sopstvenoj proceni, a prijava ne garantuje mesto.",
+    "The Beta plan is free. No payment method is needed and nothing is charged during the beta, so clauses 5, 6 and 7 do not apply to it. What the plan includes is shown on your account page; we may adjust it during the beta.":
+      "Beta plan je besplatan. Kartica nije potrebna i tokom bete se ništa ne naplaćuje, pa se klauzule 5, 6 i 7 na njega ne primenjuju. Šta plan uključuje piše na stranici tvog naloga; to možemo da prilagodimo tokom bete.",
+    "The beta is a test version of the service. It may contain errors, be unavailable at times, deliver a drop late or not at all, or publish a creative later than planned. Features may be added, changed or removed during the beta without the 30-day notice in clause 13. Clauses 14 and 15 apply to the beta in full.":
+      "Beta je probna verzija usluge. Može da sadrži greške, da povremeno ne radi, da drop stigne kasnije ili da ne stigne, ili da kreativ bude objavljen kasnije nego što je planirano. Funkcije mogu da se dodaju, menjaju ili uklanjaju tokom bete bez najave od 30 dana iz klauzule 13. Klauzule 14 i 15 u potpunosti važe i za betu.",
+    "During the beta, you may give us access to a channel by adding Adronis as a partner, manager or page role in that platform's own settings, instead of connecting it in the control room. Clause 12 applies to that access in the same way, and you can remove it in the platform at any time. We never ask for your passwords.":
+      "Tokom bete nam pristup kanalu možeš da daš tako što Adronis dodaš kao partnera, menadžera ili ulogu na stranici u podešavanjima same platforme, umesto povezivanja u kontrolnoj sobi. Klauzula 12 važi i za taj pristup, a možeš da ga ukloniš na platformi kad god hoćeš. Tvoje lozinke nikada ne tražimo.",
+    "We may ask you for feedback by email. You may share as much or as little as you like; anything you send us we may use freely to improve Adronis, with no obligation to you.":
+      "Možemo da te pitamo za utiske mejlom. Podeli koliko god želiš; sve što nam pošalješ možemo slobodno da koristimo za unapređenje Adronisa, bez ikakve obaveze prema tebi.",
+    "The beta ends at the public launch, or earlier if we decide to end it, and we tell you by email at least 14 days before it ends. Your account then stays open, but nothing is charged automatically: to keep receiving drops you choose a paid plan at checkout. Beta testers are offered 30% off a monthly plan for their first 12 months, on the terms we send you when the beta ends.":
+      "Beta se završava javnim lansiranjem, ili ranije ako odlučimo da je završimo, i o tome te obaveštavamo mejlom najmanje 14 dana unapred. Nalog ti posle toga ostaje otvoren, ali se ništa ne naplaćuje automatski: da bi i dalje dobijao dropove, biraš plaćeni plan na plaćanju. Beta testeri dobijaju 30% popusta na mesečni plan za prvih 12 meseci, pod uslovima koje ti pošaljemo kad se beta završi.",
+    "We may end an individual account's beta access at any time, with notice by email where practical, for example if the account stays unused or if a breach of clause 11 occurs.":
+      "Pristup beti za pojedinačni nalog možemo da ukinemo u bilo kom trenutku, uz obaveštenje mejlom kad je to moguće, na primer ako se nalog ne koristi ili ako dođe do kršenja klauzule 11.",
     "1. Who you are contracting with": "1. Sa kim zaključuješ ugovor",
     "Adronis (\"Adronis\", \"we\", \"us\") is a software service operated by":
       "Adronis („Adronis“, „mi“, „nas“) je softverska usluga koju pruža",
@@ -1219,6 +1236,13 @@ window.LB_I18N_SR = {
     "Check both your old and new inbox — confirm the change to finish.":
       "Proveri i staro i novo sanduče — potvrdi promenu da završiš.",
     "Those two new passwords don't match.": "Te dve nove lozinke se ne poklapaju.",
+    // Beta testers' feedback button (feedback.js).
+    "Feedback": "Utisak",
+    "Send": "Pošalji",
+    "Tell us what you think": "Reci nam šta misliš",
+    "What works, what doesn't, what's missing — anything helps.":
+      "Šta radi, šta ne radi, šta fali — sve pomaže.",
+    "Thanks — it's with us. We read every one.": "Hvala — stiglo je. Čitamo svaki utisak.",
     // Password rules under every new-password field (auth.js). "At least 8
     // characters" is already above.
     "An uppercase letter (A-Z)": "Veliko slovo (A-Z)",
