@@ -55,13 +55,12 @@
   }
 
   // Beta: until the public launch in Q1 2027 only beta testers use Adronis -
-  // accounts whose plan was switched on from the portal. Everyone else is
-  // sent to beta.html to apply. Nobody reaches checkout, and signing up needs
-  // the invite link a picked business gets from us (signup.html?invite=beta).
-  // Set to false at launch.
+  // accounts whose plan was switched on from the portal. Applying is signing
+  // up: the account and the business brief first (signup.html), then
+  // applyForBeta() turns them into an application. Everyone without a plan on
+  // waits on beta.html, and nobody reaches checkout. Set to false at launch.
   var BETA = true;
   var PAGE = location.pathname.split("/").pop();
-  var INVITED = new URLSearchParams(location.search).has("invite");
   var APP_PAGES = ["approvals.html", "control-room.html", "history.html"];
 
   // Whether this page is closed to the visitor during the beta. Needs the
@@ -72,8 +71,8 @@
     if (PAGE === "checkout.html") return true;
     if (APP_PAGES.indexOf(PAGE) > -1) return !!session && !tester;
     if (PAGE === "signup.html") {
-      if (!session) return !INVITED;
-      // Brief done and no plan on: nothing left here but checkout.
+      if (!session) return false;
+      // Brief done and no plan on: nothing left here - they wait on beta.html.
       return !tester && !!(profile && profile.onboarded_at);
     }
     return false;
@@ -235,7 +234,6 @@
 
     // See BETA above.
     beta: BETA,
-    invited: INVITED,
 
     isLoggedIn: function () {
       return !!session;
@@ -343,6 +341,22 @@
       if (this.hasActivePlan()) return "approvals";
       if (BETA) return "beta";
       return (await this.pendingCount()) > 0 ? "approvals" : "pricing";
+    },
+
+    // During the beta: true once this account has applied for a place.
+    betaApplied: function () {
+      return !!(profile && profile.beta_applied_at);
+    },
+
+    // Applies this account for a beta place (apply_for_beta in schema.sql):
+    // the brief must be done. Sent once - applying again changes nothing.
+    // note is an optional line from the customer, added to the application.
+    applyForBeta: async function (note) {
+      if (!session) throw new Error("Not signed in.");
+      var res = await db.rpc("apply_for_beta", { p_note: note || null });
+      if (res.error) throw res.error;
+      await loadProfile();
+      return res.data;
     },
 
     // Marks the brief as done. Does NOT start the trial.

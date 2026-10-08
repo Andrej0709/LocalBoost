@@ -1483,6 +1483,42 @@ window.LB_I18N_SR = {
     "Apply for the beta →": "Prijavi se za beta testiranje →",
     "← Back": "← Nazad",
     "Finish setup": "Završi podešavanje",
+    // Applying for the beta is signing up (signup.html, beta.html).
+    "Apply for the": "Prijavi se za",
+    "Create your account and tell us about the business — that's your application. Places are limited: if your business is picked, we switch your plan on and email you. Nothing to pay until launch.":
+      "Napravi nalog i reci nam nešto o biznisu — to je tvoja prijava. Broj mesta je ograničen: ako tvoj biznis bude izabran, uključujemo ti plan i javljamo mejlom. Bez plaćanja do lansiranja.",
+    "Your account is ready. Tell us about the business — that's your application. If your business is picked, we switch your plan on and email you.":
+      "Nalog ti je spreman. Reci nam nešto o biznisu — to je tvoja prijava. Ako tvoj biznis bude izabran, uključujemo ti plan i javljamo mejlom.",
+    "Your application is in.": "Tvoja prijava je stigla.",
+    "Want to join? Create your account and tell us about the business — that's your application. Places are limited, so we review every one, and if your business is picked we switch your plan on and email you.":
+      "Želiš da se priključiš? Napravi nalog i reci nam nešto o biznisu — to je tvoja prijava. Broj mesta je ograničen, pa pregledamo svaku, i ako tvoj biznis bude izabran, uključujemo ti plan i javljamo mejlom.",
+    "Already have an account?": "Već imaš nalog?",
+    "Your account already tells us about the business, so this takes one click.":
+      "Tvoj nalog nam već govori o biznisu, pa ovo ide jednim klikom.",
+    "Business": "Biznis",
+    "Where": "Gde",
+    "Sells": "Prodaje",
+    "Customers": "Mušterije",
+    "Channels": "Kanali",
+    "Something out of date?": "Nešto nije ažurno?",
+    "Edit your details": "Izmeni podatke",
+    "first.": "pre slanja.",
+    "A FEW THINGS WE STILL NEED": "JOŠ NAM TREBA",
+    "Anything else you'd like us to know?": "Još nešto što bi voleo da znamo?",
+    "e.g. We open a second location in spring": "npr. Na proleće otvaramo drugi lokal",
+    "e.g. We post once a month and it goes nowhere, nobody here has time for marketing...":
+      "npr. Objavljujemo jednom mesečno i ništa se ne dešava, niko ovde nema vremena za marketing...",
+    "Not you?": "Nisi ti?",
+    "Sent on": "Poslata",
+    "We review every application. If your business is picked, we switch your plan on and email you — then log in and your first drop is waiting in Approvals.":
+      "Pregledamo svaku prijavu. Ako tvoj biznis bude izabran, uključujemo ti plan i javljamo mejlom — onda se prijavi i tvoj prvi drop te čeka u Odobravanjima.",
+    "Keep your details current in the meantime:": "U međuvremenu drži podatke ažurnim:",
+    "APPLICATION RECEIVED": "PRIJAVA PRIMLJENA",
+    "We review every application.": "Pregledamo svaku prijavu.",
+    "If your business is picked, we switch your plan on and email you — then log in and your first drop is waiting in Approvals.":
+      "Ako tvoj biznis bude izabran, uključujemo ti plan i javljamo mejlom — onda se prijavi i tvoj prvi drop te čeka u Odobravanjima.",
+    "Check your inbox — confirm your email, then log in and send your application in one click.":
+      "Proveri sanduče — potvrdi email, pa se prijavi i pošalji prijavu jednim klikom.",
     "Brief saved.": "Brif sačuvan.",
 
     /* --- Account: what the script writes --------------------------------- */
@@ -1496,6 +1532,7 @@ window.LB_I18N_SR = {
     "Only businesses picked for the beta can use Adronis until the public launch in Q1 2027. If yours is picked, we switch your Beta plan on and let you know.":
       "Do javnog lansiranja u Q1 2027 Adronis koriste samo biznisi izabrani za betu. Ako tvoj bude izabran, uključićemo ti Beta plan i javiti ti.",
     "About the beta": "O beti",
+    "See your application": "Pogledaj svoju prijavu",
     "Public launch, Q1 2027": "Javnog lansiranja, Q1 2027",
     "WHAT YOUR BETA PLAN INCLUDES": "ŠTA UKLJUČUJE TVOJ BETA PLAN",
     "Nothing to pay until the public launch in Q1 2027 — no card on file":

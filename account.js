@@ -482,7 +482,7 @@
       $("billing-empty-text").textContent = "Only businesses picked for the beta can use Adronis until the public launch in Q1 2027. If yours is picked, we switch your Beta plan on and let you know.";
       var link = $("billing-empty").querySelector("a.btn");
       link.href = "beta.html";
-      link.firstChild.textContent = "About the beta";
+      link.firstChild.textContent = LBAuth.betaApplied() ? "See your application" : "Apply for the beta";
       return;
     }
     $("billing-empty-tag").textContent = "FREE PLAN";

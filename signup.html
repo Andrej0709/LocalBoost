@@ -292,16 +292,18 @@
       features: ["4 photoreal creatives every Monday", "Two connected channels", { text: "Best-time auto-publishing", soon: true }, "Swipe approval in the app"] },
     storefront: { name: "Storefront", price: "€149", rate: "12 ads / week · 4 channels",
       features: ["12 creatives across all native formats", "Four connected channels", "Seasonal & local hook engine", { text: "Performance feedback into next drop", soon: true }, { text: "Caption variants and A/B slotting", soon: true }] },
-    // Only ever reached through the beta invite, never from a link: see below.
+    // Only during the beta, never picked from a link: see below.
     beta: { name: "Beta", price: "€0", rate: "4 ads / week · 4 channels", features: [] }
   };
   var params = new URLSearchParams(location.search);
   // Franchise is agreed with Adronis first, never signed up for here.
   if (params.get("plan") === "franchise") { location.replace("contact.html?plan=franchise"); return; }
-  // During the beta (see BETA in auth.js) only a business we picked gets this
-  // far. It signs up with no plan price shown and no checkout after, and the
-  // portal switches its Beta plan on. There's no Free plan in the beta, and
-  // Beta is never picked from a link: it has no price and no checkout.
+  // During the beta (see BETA in auth.js) signing up is applying for a place:
+  // the account and the brief here, with no plan price shown and no checkout
+  // after. Saving the brief sends the application (LBAuth.applyForBeta), and
+  // if the business is picked the portal switches its Beta plan on. There's
+  // no Free plan in the beta, and Beta is never picked from a link: it has no
+  // price and no checkout.
   var BETA = LBAuth.beta;
   var planKey = plans[params.get("plan")] && params.get("plan") !== "beta" ? params.get("plan") : "storefront";
   if (BETA) planKey = "beta";
@@ -353,15 +355,15 @@
   });
 
   var BETA_EYEBROW = "BETA · NOTHING TO PAY";
-  var BETA_SUB = "Your business was picked for the beta. Set up your account and tell us about the business — we switch your plan on from our side, with nothing to pay until launch.";
+  var BETA_SUB = "Create your account and tell us about the business — that's your application. Places are limited: if your business is picked, we switch your plan on and email you. Nothing to pay until launch.";
+  var BETA_BUTTON = 'Apply for the beta<span class="mono" style="font-size:13px">→</span>';
   if (BETA) {
     document.getElementById("form-view").classList.add("is-beta");
     document.getElementById("plan-summary").hidden = true;
     document.getElementById("page-eyebrow").textContent = BETA_EYEBROW;
-    document.getElementById("plan-headline").innerHTML = 'Welcome to the <em>Adronis</em> beta.';
+    document.getElementById("plan-headline").innerHTML = 'Apply for the <em>Adronis</em> beta.';
     document.getElementById("page-sub").textContent = BETA_SUB;
-    document.querySelector('#signup-form button[type=submit]').innerHTML =
-      'Create my account<span class="mono" style="font-size:13px">→</span>';
+    document.querySelector('#signup-form button[type=submit]').innerHTML = BETA_BUTTON;
   }
 
   // Named after the plan actually running on the account, not the one in the
@@ -397,22 +399,23 @@
     return isFree ? "approvals.html" : checkoutUrl();
   }
 
-  // During the beta the brief is the end of signing up: the plan is switched
-  // on from the portal, so a picked business whose plan isn't on yet is told
-  // it's coming, and one whose plan already is goes straight into the app.
+  // During the beta the brief is the application: saving it sends one
+  // (LBAuth.applyForBeta) and the page says it's in. An account whose plan
+  // is already on goes straight into the app.
   async function afterBrief(){
     if (!BETA) { location.href = afterBriefUrl(); return; }
     await LBAuth.refreshProfile().catch(function(){});
     if (LBAuth.hasActivePlan()) { location.href = "approvals.html"; return; }
+    await LBAuth.applyForBeta();
     document.getElementById("form-view").hidden = true;
     document.getElementById("activated-view").hidden = false;
     document.getElementById("page-eyebrow").textContent = BETA_EYEBROW;
-    document.getElementById("plan-headline").innerHTML = 'Welcome to the <em>Adronis</em> beta.';
+    document.getElementById("plan-headline").textContent = "Your application is in.";
     document.getElementById("page-sub").textContent = "Your account is set up and your brief is saved.";
-    document.querySelector("#activated-view .mono").textContent = "ACCOUNT READY";
-    document.getElementById("activated-text").textContent = "We're switching your plan on.";
+    document.querySelector("#activated-view .mono").textContent = "APPLICATION RECEIVED";
+    document.getElementById("activated-text").textContent = "We review every application.";
     document.getElementById("activated-sub").textContent =
-      "We'll let you know when it's on — then log in and your first drop is waiting in Approvals.";
+      "If your business is picked, we switch your plan on and email you — then log in and your first drop is waiting in Approvals.";
     window.scrollTo(0, 0);
   }
 
@@ -440,9 +443,10 @@
     }
     if (BETA) {
       document.getElementById("page-eyebrow").textContent = BETA_EYEBROW;
-      document.getElementById("plan-headline").innerHTML = 'Welcome to the <em>Adronis</em> beta.';
-      document.getElementById("page-sub").textContent = BETA_SUB;
-      submitButton.innerHTML = 'Finish setup<span class="mono" style="font-size:13px">→</span>';
+      document.getElementById("plan-headline").innerHTML = 'Apply for the <em>Adronis</em> beta.';
+      document.getElementById("page-sub").textContent =
+        "Your account is ready. Tell us about the business — that's your application. If your business is picked, we switch your plan on and email you.";
+      submitButton.innerHTML = BETA_BUTTON;
     }
 
     // Prefill anything the account already knows.
@@ -555,7 +559,7 @@
           "Confirm your email, then log back in — your answers are still here, so it's one click to finish.";
         document.querySelector("#activated-view .mono").textContent = "ALMOST THERE";
         document.getElementById("activated-text").textContent = BETA
-          ? "Check your inbox — confirm your email to finish setting up your beta account."
+          ? "Check your inbox — confirm your email, then log in and send your application in one click."
           : "Check your inbox — confirm your email to carry on with the " + plan.name + " plan.";
       } else {
         // Session already live: mark the brief done and move on.

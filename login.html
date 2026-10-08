@@ -213,8 +213,9 @@
     notice.hidden = true;
   }
   function showSignup(){
-    // During the beta only a business we picked signs up, with its invite link.
-    if (LBAuth.beta && !LBAuth.invited) { location.href = "beta.html"; return; }
+    // During the beta, signing up is applying: the account and the whole
+    // business brief on one page.
+    if (LBAuth.beta) { location.href = "signup.html"; return; }
     selectTab(tabSignup, tabLogin);
     loginForm.hidden = true; signupForm.hidden = false; forgotForm.hidden = true;
     title.textContent = "Create your account.";
@@ -256,7 +257,7 @@
   // No Free plan during the beta: the way in is applying for a beta place.
   if (LBAuth.beta) {
     document.querySelector(".auth-alt").innerHTML =
-      'Not a beta tester yet? <a href="beta.html#apply">Apply for the beta</a> — places are limited.';
+      'Not a beta tester yet? <a href="signup.html">Apply for the beta</a> — places are limited.';
   }
 
   function say(message){

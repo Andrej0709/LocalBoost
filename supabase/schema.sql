@@ -532,6 +532,68 @@ revoke execute on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;
 
 /* ------------------------------------------------------------ */
+/* 8a-beta. apply_for_beta - a signed-in account applies for a beta place. */
+/*     During the beta, applying IS signing up: the account and the business */
+/*     brief come first, so whoever is picked can log straight in. This turns */
+/*     the account into an application: one contact_requests row with       */
+/*     plan_interest 'beta' (the portal's inbox, and the email notify.sql    */
+/*     sends), built here from the profile so the browser can't put words in */
+/*     it, and profiles.beta_applied_at stamped so it is only sent once.     */
+/*     The customer can't set beta_applied_at themselves: it isn't among the */
+/*     fields protect_profile_billing lets them change. */
+/* ------------------------------------------------------------ */
+alter table public.profiles add column if not exists beta_applied_at timestamptz;
+
+create or replace function public.apply_for_beta(p_note text default null)
+returns timestamptz
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  p    public.profiles;
+  note text := nullif(btrim(coalesce(p_note, '')), '');
+begin
+  select * into p from public.profiles where id = auth.uid();
+  if not found then
+    raise exception 'Not signed in.';
+  end if;
+  if p.onboarded_at is null then
+    raise exception 'Tell us about your business first.';
+  end if;
+  if p.beta_applied_at is not null then
+    return p.beta_applied_at;
+  end if;
+
+  insert into public.contact_requests (business_name, email, plan_interest, message)
+  values (
+    left(p.business_name, 200),
+    p.email,
+    'beta',
+    left(concat_ws(E'\n',
+      'Beta application',
+      'Where: '         || nullif(concat_ws(', ', p.city, p.country), ''),
+      'Business type: ' || p.vertical,
+      'Website / Instagram: ' || nullif(p.website, ''),
+      'Channels: '      || nullif(array_to_string(p.channels, ', '), ''),
+      '',
+      'What they sell: '    || p.what_you_sell,
+      'Typical customer: '  || p.typical_customer,
+      'What makes them different: ' || nullif(p.differentiator, ''),
+      'Why they came to us: '       || p.why_us,
+      case when note is not null then E'\nNote: ' || left(note, 1000) end
+    ), 5000)
+  );
+
+  update public.profiles set beta_applied_at = now() where id = p.id;
+  return now();
+end;
+$$;
+
+revoke execute on function public.apply_for_beta(text) from public, anon;
+grant execute on function public.apply_for_beta(text) to authenticated;
+
+/* ------------------------------------------------------------ */
 /* 8b. start_trial - the only way a trial ever begins. */
 /*     Called from checkout.js once the card has been captured. Refuses to run  */
 /*     while the business brief is missing, so the trial can never start        */

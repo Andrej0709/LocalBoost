@@ -39,11 +39,16 @@
 #bt-intro .btn{margin-top:18px}
 .bt-alt{margin-top:18px;font-size:13.5px;color:var(--text-3)}
 .bt-alt a{font-weight:500}
-.bt-form-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:20px}
-#bt-account{margin:0 0 22px;padding:16px 18px;color:var(--text-2)}
-#bt-account b{display:block;margin-bottom:4px;font-size:15px;font-weight:600;color:var(--text)}
+.bt-lead{margin:10px 0 0;font-size:14px;line-height:1.6;color:var(--text-2)}
+.bt-summary{display:grid;margin:18px 0 0;border:1px solid var(--line-2);border-radius:var(--r-sm);overflow:hidden}
+.bt-summary div{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;padding:10px 14px;border-bottom:1px solid var(--line-2);font-size:14px;line-height:1.5}
+.bt-summary div:last-child{border-bottom:none}
+.bt-summary .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);align-self:center}
+.bt-summary .v{color:var(--text);overflow-wrap:anywhere}
+.bt-edit{margin:10px 0 22px;font-size:13px;color:var(--text-3)}
+#bt-done .bt-edit{margin:14px 0 0}
+@media (max-width:520px){.bt-summary div{grid-template-columns:1fr;gap:2px}}
 .link-btn{margin-left:4px;padding:0;background:none;border:none;color:var(--acc);font-size:inherit;font-weight:500;font-family:var(--font);cursor:pointer}
-#bt-done{margin-top:0;padding:22px;font-size:15.5px;border-radius:var(--r-lg)}
 </style>
 </head>
 <body>
@@ -69,66 +74,72 @@
 <section class="section-tight">
   <div class="bt-wrap">
       <div class="form-card">
-        <!-- Signed in, but the account isn't a beta tester (yet). -->
-        <div id="bt-account" class="notice" role="status" hidden>
-          <b>Your account isn't in the beta yet.</b>
-          It's set up, but only businesses picked for the beta can use Adronis. If yours is picked, we switch your plan on and let you know.
-          <button type="button" id="bt-logout" class="link-btn">Log out</button>
-        </div>
-
-        <!-- What everyone sees first. The form only opens when they ask for it. -->
+        <!-- What a visitor who isn't signed in sees. Applying is signing up:
+             the button opens signup.html, account and business brief together. -->
         <div id="bt-intro">
           <div class="bt-tag">BETA · NO PAYMENTS YET</div>
           <div class="bt-title">We're in beta — there's nothing to pay yet.</div>
           <p>Payments open when Adronis launches for everyone in Q1 2027. Until then it runs with a small group of beta testers.</p>
           <p>Already on the beta tester list? Then you use Adronis free — we switch your plan on from our side, no card needed.</p>
-          <p>Want to join? Places are limited, so we review every application. If your business is picked, we'll get in touch and switch your plan on.</p>
-          <button type="button" id="bt-apply" class="btn">Apply for the beta →</button>
-          <div class="bt-alt" id="bt-login">Already a beta tester? <a href="login.html">Log in</a> to your account.</div>
+          <p>Want to join? Create your account and tell us about the business — that's your application. Places are limited, so we review every one, and if your business is picked we switch your plan on and email you.</p>
+          <a href="signup.html" id="bt-apply" class="btn">Apply for the beta →</a>
+          <div class="bt-alt" id="bt-login">Already have an account? <a href="login.html">Log in</a></div>
         </div>
 
+        <!-- Signed in, brief done, not applied yet: the account already says
+             everything, so only what's missing is asked for. -->
         <form id="beta-form" hidden>
-          <div class="bt-form-head">
-            <div class="bt-title" style="margin:0">Apply for the beta</div>
-            <button type="button" id="bt-back" class="link-btn">← Back</button>
+          <div class="bt-title" style="margin:0 0 6px">Apply for the beta</div>
+          <p class="bt-lead">Your account already tells us about the business, so this takes one click.</p>
+          <div class="bt-summary" id="bt-summary"></div>
+          <p class="bt-edit">Something out of date? <a href="account.html">Edit your details</a> first.</p>
+
+          <div id="bt-missing" hidden>
+            <div class="section-label">A FEW THINGS WE STILL NEED</div>
+            <div class="field" data-need="business_name" hidden>
+              <label for="bt-business">Business name</label>
+              <input id="bt-business" type="text" maxlength="200" autocomplete="organization" placeholder="e.g. Milena's Bakery">
+            </div>
+            <div class="field" data-need="country" hidden>
+              <label for="bt-country">Country</label>
+              <select id="bt-country" autocomplete="country-name"><option value="">Choose your country</option></select>
+            </div>
+            <div class="field" data-need="city" hidden>
+              <label for="bt-city">City</label>
+              <input id="bt-city" type="text" maxlength="200" autocomplete="address-level2" list="bt-city-options" placeholder="Where's the shop?">
+              <datalist id="bt-city-options"></datalist>
+            </div>
+            <div class="field" data-need="what_you_sell" hidden>
+              <label for="bt-what">What do you sell or do, in one line?</label>
+              <input id="bt-what" type="text" maxlength="500" placeholder="e.g. Sourdough and pastries, baked fresh every morning">
+            </div>
+            <div class="field" data-need="typical_customer" hidden>
+              <label for="bt-customer">Who's your typical customer?</label>
+              <input id="bt-customer" type="text" maxlength="500" placeholder="e.g. Neighborhood regulars, 30-55, coffee-first crowd">
+            </div>
+            <div class="field" data-need="why_us" hidden>
+              <label for="bt-why">What made you come to us?</label>
+              <textarea id="bt-why" maxlength="2000" placeholder="e.g. We post once a month and it goes nowhere, nobody here has time for marketing..."></textarea>
+            </div>
           </div>
+
           <div class="field">
-            <label for="business">Business name</label>
-            <input id="business" name="business" type="text" maxlength="200" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
-          </div>
-          <div class="field">
-            <label for="name">Your name</label>
-            <input id="name" name="name" type="text" maxlength="200" required autocomplete="name" placeholder="Full name">
-          </div>
-          <div class="field">
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" maxlength="320" required autocomplete="email" placeholder="you@business.com">
-          </div>
-          <div class="field">
-            <label for="where">City and country</label>
-            <input id="where" name="where" type="text" maxlength="200" required placeholder="e.g. Novi Sad, Serbia">
-          </div>
-          <div class="field">
-            <label for="site">Website or Instagram <span style="color:var(--text-3)">(optional)</span></label>
-            <input id="site" name="site" type="text" maxlength="300" placeholder="e.g. instagram.com/milenasbakery">
-          </div>
-          <div class="field">
-            <label for="message">About the business</label>
-            <textarea id="message" name="message" maxlength="4000" required placeholder="What you sell, who buys it, and where you advertise today..."></textarea>
-          </div>
-          <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
-            <label for="b-company">Company (leave empty)</label>
-            <input id="b-company" name="b-company" type="text" tabindex="-1" autocomplete="off">
+            <label for="bt-note">Anything else you'd like us to know? <span style="color:var(--text-3)">(optional)</span></label>
+            <textarea id="bt-note" maxlength="1000" placeholder="e.g. We open a second location in spring"></textarea>
           </div>
           <button type="submit" class="btn btn-lg btn-block">Apply for the beta<span class="mono" aria-hidden="true">→</span></button>
-          <p class="form-foot">
-            We use what you send here only to review your application and answer you, and we keep it for up to 24 months.
-            We do not sell it and we do not add you to a marketing list without your consent.
-            See the <a href="privacy.html">Privacy Policy</a>, or ask us to delete it at <a href="mailto:privacy@adronis.app">privacy@adronis.app</a>.
-          </p>
+          <div class="bt-alt">Not you? <button type="button" class="link-btn bt-logout">Log out</button></div>
         </form>
 
-        <div id="bt-done" class="notice" role="status" hidden>Thanks — your application is in. We review every one, and if your business is picked we'll get in touch.</div>
+        <!-- Signed in and applied: waiting to be picked. -->
+        <div id="bt-done" hidden>
+          <div class="bt-tag">APPLICATION RECEIVED</div>
+          <div class="bt-title">Your application is in.</div>
+          <p class="bt-lead" id="bt-done-when"></p>
+          <p class="bt-lead">We review every application. If your business is picked, we switch your plan on and email you — then log in and your first drop is waiting in Approvals.</p>
+          <p class="bt-edit">Keep your details current in the meantime: <a href="account.html">Account</a></p>
+          <div class="bt-alt"><button type="button" class="link-btn bt-logout" style="margin:0">Log out</button></div>
+        </div>
       </div>
 
   </div>
@@ -157,97 +168,132 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
+<script src="brief-fields.js"></script>
 <script>
 /* Where everyone who isn't a beta tester ends up during the beta (BETA in
-   auth.js): visitors apply here, and a signed-in account with no plan on
-   waits here. Applications land in contact_requests with plan_interest
-   "beta", next to the contact form's messages. */
+   auth.js). Applying is signing up: a visitor creates the account and the
+   business brief on signup.html, which sends the application. A signed-in
+   account that never applied applies here in one click, asked only for what
+   its brief is missing; one that applied waits here. Applications land in
+   contact_requests with plan_interest "beta" (apply_for_beta in schema.sql). */
 (function(){
   // After launch this page has nothing to do: plans are bought at checkout.
   if (!LBAuth.beta) { location.replace("/#pricing"); return; }
 
   var form = document.getElementById("beta-form");
   var intro = document.getElementById("bt-intro");
+  var done = document.getElementById("bt-done");
 
-  // The beta panel comes first; the application form only when asked for.
-  // beta.html#apply (the "Apply for the beta" links elsewhere) opens it
-  // straight away.
-  function showForm(){
+  function t(text){ return window.LBLang ? LBLang.t(text) : text; }
+
+  // Shown on the summary card, in this order.
+  var SUMMARY = [
+    ["Business", function(p){ return p.business_name; }],
+    ["Where", function(p){ return [p.city, p.country].filter(Boolean).join(", "); }],
+    ["Business type", function(p){ return p.vertical; }],
+    ["Sells", function(p){ return p.what_you_sell; }],
+    ["Customers", function(p){ return p.typical_customer; }],
+    ["Channels", function(p){ return (p.channels || []).join(", "); }]
+  ];
+
+  // What an application can't go without: the brief's required answers.
+  var NEEDED = {
+    business_name: "bt-business", country: "bt-country", city: "bt-city",
+    what_you_sell: "bt-what", typical_customer: "bt-customer", why_us: "bt-why"
+  };
+
+  function showForm(profile){
     intro.hidden = true;
     form.hidden = false;
-    document.getElementById("business").focus();
+
+    var summary = document.getElementById("bt-summary");
+    summary.innerHTML = "";
+    SUMMARY.forEach(function(row){
+      var value = row[1](profile);
+      if (!value) return;
+      var line = document.createElement("div");
+      var k = document.createElement("span");
+      k.className = "k";
+      k.textContent = row[0];
+      var v = document.createElement("span");
+      v.className = "v";
+      v.textContent = value;
+      line.appendChild(k);
+      line.appendChild(v);
+      summary.appendChild(line);
+    });
+
+    var missing = Object.keys(NEEDED).filter(function(key){
+      return !String(profile[key] || "").trim();
+    });
+    document.getElementById("bt-missing").hidden = !missing.length;
+    missing.forEach(function(key){
+      form.querySelector('[data-need="' + key + '"]').hidden = false;
+      document.getElementById(NEEDED[key]).required = true;
+    });
+    if (missing.indexOf("country") > -1 || missing.indexOf("city") > -1) {
+      var countryField = LBBriefFields.countryField(
+        document.getElementById("bt-country"), document.getElementById("bt-city-options"));
+      countryField.set(profile.country || LBBriefFields.guessCountry());
+    }
   }
-  function showIntro(){
+
+  function showDone(profile){
+    intro.hidden = true;
     form.hidden = true;
-    intro.hidden = false;
+    done.hidden = false;
+    var when = new Date(profile.beta_applied_at).toLocaleDateString(
+      window.LBLang ? LBLang.locale() : "en-US", { day: "numeric", month: "long", year: "numeric" });
+    // Some locales end the date with a dot already ("8. oktobar 2026.").
+    document.getElementById("bt-done-when").textContent = t("Sent on") + " " + when.replace(/\.?$/, ".");
   }
-  document.getElementById("bt-apply").addEventListener("click", showForm);
-  document.getElementById("bt-back").addEventListener("click", showIntro);
-  if (location.hash === "#apply") showForm();
 
   LBAuth.ready.then(function(){
     if (!LBAuth.isLoggedIn()) return;
     // A beta tester whose plan is on belongs in the app.
     if (LBAuth.hasActivePlan()) { location.replace("approvals.html"); return; }
+    // Applying needs the brief: signup.html asks for it, prefilled.
     if (!LBAuth.hasBrief()) { location.replace(LBAuth.unfinishedStep()); return; }
 
-    document.getElementById("bt-account").hidden = false;
-    // Signed in already, so "log in" means nothing to them.
-    document.getElementById("bt-login").hidden = true;
     var profile = LBAuth.getProfile() || {};
-    var user = LBAuth.getUser() || {};
-    if (profile.business_name) document.getElementById("business").value = profile.business_name;
-    if (user.email) document.getElementById("email").value = user.email;
-    var where = [profile.city, profile.country].filter(Boolean).join(", ");
-    if (where) document.getElementById("where").value = where;
-    if (profile.website) document.getElementById("site").value = profile.website;
+    if (LBAuth.betaApplied()) showDone(profile);
+    else showForm(profile);
   });
 
-  document.getElementById("bt-logout").addEventListener("click", async function(){
-    var btn = this;
-    btn.disabled = true;
-    try {
-      await LBAuth.logOut();
-      location.reload();
-    } catch (err) {
-      btn.disabled = false;
-      alert(err.message || (window.LBLang ? LBLang.t("Log out failed — try again.") : "Log out failed — try again."));
-    }
+  Array.prototype.forEach.call(document.querySelectorAll(".bt-logout"), function(button){
+    button.addEventListener("click", async function(){
+      button.disabled = true;
+      try {
+        await LBAuth.logOut();
+        location.reload();
+      } catch (err) {
+        button.disabled = false;
+        alert(err.message || t("Log out failed — try again."));
+      }
+    });
   });
 
   form.addEventListener("submit", async function(e){
     e.preventDefault();
     var button = form.querySelector("button[type=submit]");
     button.disabled = true;
+    try {
+      // Fill in what the brief was missing before the application is built
+      // from it.
+      var patch = {};
+      Object.keys(NEEDED).forEach(function(key){
+        if (form.querySelector('[data-need="' + key + '"]').hidden) return;
+        patch[key] = document.getElementById(NEEDED[key]).value.trim();
+      });
+      if (Object.keys(patch).length) await LBAuth.updateProfile(patch);
 
-    function done(){
-      form.hidden = true;
-      document.getElementById("bt-done").hidden = false;
-    }
-
-    // Honeypot: a real person never sees this field, so anything in it is a bot.
-    // Show the same success state and write nothing.
-    if (document.getElementById("b-company").value) { done(); return; }
-
-    var site = document.getElementById("site").value.trim();
-    var res = await LBAuth.db.from("contact_requests").insert({
-      business_name: document.getElementById("business").value,
-      full_name:     document.getElementById("name").value,
-      email:         document.getElementById("email").value,
-      plan_interest: "beta",
-      message:
-        "Beta application\n" +
-        "Where: " + document.getElementById("where").value.trim() + "\n" +
-        (site ? "Website / Instagram: " + site + "\n" : "") +
-        "\n" + document.getElementById("message").value
-    });
-
-    if (res.error) {
+      await LBAuth.applyForBeta(document.getElementById("bt-note").value);
+      showDone(LBAuth.getProfile() || {});
+      window.scrollTo(0, 0);
+    } catch (err) {
       button.disabled = false;
-      alert((window.LBLang ? LBLang.t("Could not send:") : "Could not send:") + " " + res.error.message);
-      return;
+      alert(t("Could not send:") + " " + err.message);
     }
-    done();
   });
 })();
 </script>
