@@ -70,6 +70,11 @@
 .su-done-mark{display:flex;align-items:center;justify-content:center;width:56px;height:56px;margin:0 auto 20px;border-radius:18px;background:var(--acc-soft);border:1px solid var(--acc-line);color:var(--acc);font-size:24px}
 /* During the beta there's no plan summary beside the form. */
 .su-grid.is-beta{grid-template-columns:minmax(0,1fr);max-width:720px}
+/* Until the consent box is ticked the button is plainly switched off, not just
+   a shade darker like a button that's busy sending. */
+#signup-form .btn.is-locked{opacity:.38;filter:grayscale(.7);box-shadow:none;cursor:not-allowed}
+#signup-form .btn.is-locked .mono{transform:none}
+.su-lock-hint{margin-top:12px;text-align:center;font-size:13px;color:var(--text-3)}
 @media (max-width:860px){
   .su-grid{grid-template-columns:minmax(0,1fr)}
   #plan-summary{position:static;order:-1}
@@ -223,6 +228,7 @@
         Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.
       </p>
       <button type="submit" class="btn btn-lg btn-block" style="margin-top:28px">Claim your first drop<span class="mono" style="font-size:13px">→</span></button>
+      <p class="su-lock-hint" id="su-lock-hint">Tick the box above to accept the terms and continue.</p>
       <div id="signup-notice" class="notice" role="status" style="margin-top:18px" hidden></div>
     </form>
 
@@ -468,6 +474,7 @@
         function(box){ box.checked = profile.channels.indexOf(box.value) > -1; }
       );
       channelsField.sync();
+      gateSubmit();
     }
   }
 
@@ -502,6 +509,22 @@
   channelsField.setPlan(planKey);
   channelsField.preselect(["Instagram", "Facebook"]);
 
+  // The button stays switched off until the terms box is ticked. Runs after
+  // the channels field (its listener sits on the group, this one on the form),
+  // which also switches the button off when too many channels are ticked.
+  var consentBox = document.getElementById("consent-terms");
+  var lockHint = document.getElementById("su-lock-hint");
+  var sending = false;
+  function gateSubmit(){
+    var locked = !consentBox.checked;
+    submitButton.classList.toggle("is-locked", locked);
+    lockHint.hidden = !locked;
+    if (locked) submitButton.disabled = true;
+    else if (!sending) submitButton.disabled = document.getElementById("channel-hint").classList.contains("is-over");
+  }
+  form.addEventListener("change", gateSubmit);
+  gateSubmit();
+
   function checkedChannels(){
     return Array.prototype.map.call(
       form.querySelectorAll('input[name="channels"]:checked'),
@@ -535,6 +558,8 @@
 
   form.addEventListener("submit", async function(e){
     e.preventDefault();
+    if (!consentBox.checked) return;
+    sending = true;
     submitButton.disabled = true;
     try {
       if (briefOnly) {
@@ -567,7 +592,8 @@
         await afterBrief();
       }
     } catch (err) {
-      submitButton.disabled = false;
+      sending = false;
+      gateSubmit();
       say(err.message);
     }
   });

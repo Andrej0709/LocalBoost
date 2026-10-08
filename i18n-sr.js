@@ -479,6 +479,8 @@ window.LB_I18N_SR = {
     "I have read and accept the": "Pročitao sam i prihvatam dokumente:",
     ", and I am opening this account for a business.":
       ", i ovaj nalog otvaram za potrebe biznisa.",
+    "Tick the box above to accept the terms and continue.":
+      "Označi polje iznad da prihvatiš uslove i nastaviš.",
     "We use what you enter here to render your drops, run your account and support you. We do not sell it and we do not use your brand material to train models for other customers. You can request a copy or deletion at any time at":
       "Ono što ovde uneseš koristimo da renderujemo tvoje dropove, vodimo tvoj nalog i pružimo ti podršku. Te podatke ne prodajemo i ne koristimo materijal tvog brenda za treniranje modela za druge klijente. Kopiju ili brisanje možeš tražiti u svakom trenutku na",
     ". Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.":
