@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script src="boot-gate.js"></script>
 <link rel="icon" type="image/png" sizes="256x256" href="icon-256.png">
 <link rel="apple-touch-icon" href="icon-512.png">
 <link rel="manifest" href="site.webmanifest">
@@ -251,9 +252,9 @@
   LBAuth.ready.then(function(){
     if (!LBAuth.isLoggedIn()) return;
     // A beta tester whose plan is on belongs in the app.
-    if (LBAuth.hasActivePlan()) { location.replace("approvals.html"); return; }
+    if (LBAuth.hasActivePlan()) { LBGate.go("approvals.html"); return; }
     // Applying needs the brief: signup.html asks for it, prefilled.
-    if (!LBAuth.hasBrief()) { location.replace(LBAuth.unfinishedStep()); return; }
+    if (!LBAuth.hasBrief()) { LBGate.go(LBAuth.unfinishedStep()); return; }
 
     var profile = LBAuth.getProfile() || {};
     if (LBAuth.betaApplied()) showDone(profile);

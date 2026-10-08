@@ -51,15 +51,16 @@
   function startRecovery() {
     remember(RECOVERY_KEY, true);
     if (onLoginPage()) document.dispatchEvent(new Event("lb:recovery"));
-    else location.replace(siteOrigin() + "login.html#reset");
+    else leave(siteOrigin() + "login.html#reset");
   }
 
   // Beta: until the public launch in Q1 2027 only beta testers use Adronis -
   // accounts whose plan was switched on from the portal. Applying is signing
   // up: the account and the business brief first (signup.html), then
   // applyForBeta() turns them into an application. Everyone without a plan on
-  // waits on beta.html, and nobody reaches checkout. Set to false at launch.
-  var BETA = true;
+  // waits on beta.html, and nobody reaches checkout. The switch itself lives
+  // in boot-gate.js, which runs before this; without it, assume the beta.
+  var BETA = window.LBGate ? LBGate.beta : true;
   var PAGE = location.pathname.split("/").pop();
   var APP_PAGES = ["approvals.html", "control-room.html", "history.html"];
 
@@ -92,6 +93,18 @@
   var profile = null;
   var ready_ = false;
 
+  // Leaves for url without the page showing itself first (boot-gate.js).
+  function leave(url) {
+    if (window.LBGate) LBGate.go(url);
+    else location.replace(url);
+  }
+  // What the account looks like, so the next page knows whether to hide
+  // itself while it checks (boot-gate.js).
+  function rememberRoute() {
+    if (!window.LBGate) return;
+    LBGate.remember(session && session.user.id, isTester(), !!(profile && profile.onboarded_at));
+  }
+
   function siteOrigin() {
     return location.origin + location.pathname.replace(/[^/]*$/, "");
   }
@@ -99,6 +112,7 @@
   async function loadProfile() {
     if (!session) {
       profile = null;
+      rememberRoute();
       return null;
     }
     var res = await db
@@ -122,6 +136,7 @@
       if (!fin.error && fin.data) profile = fin.data;
     }
 
+    rememberRoute();
     return profile;
   }
 
@@ -149,6 +164,10 @@
   // itself for the split second before it goes.
   function leaving() { return new Promise(function () {}); }
 
+  // The page stays hidden (boot-gate.js) until this has decided whether it
+  // stays: released once ready resolves, never when the page is leaving.
+  var releaseGate = window.LBGate ? LBGate.hold() : function () {};
+
   var ready = (async function () {
     var res = await db.auth.getSession();
     session = res.data.session;
@@ -163,14 +182,17 @@
     // fresh one.
     if (linkError || (cameWithAuthCode && !session)) {
       remember(LINK_ERROR_KEY, true);
-      if (!onLoginPage()) { location.replace(siteOrigin() + "login.html"); return leaving(); }
+      if (!onLoginPage()) { leave(siteOrigin() + "login.html"); return leaving(); }
     }
     if (cameFromResetLink && session) { startRecovery(); if (!onLoginPage()) return leaving(); }
 
     await loadProfile();
-    if (closedInBeta()) { location.replace(siteOrigin() + "beta.html"); return leaving(); }
+    if (closedInBeta()) { leave(siteOrigin() + "beta.html"); return leaving(); }
     ready_ = true;
   })();
+  // Registered before any page's own ready.then, so a page that redirects
+  // from there gets to say so before the page is shown.
+  ready.then(releaseGate, releaseGate);
 
   db.auth.onAuthStateChange(function (_event, newSession) {
     var hadSession = !!session;

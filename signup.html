@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script src="boot-gate.js"></script>
 <style>
 #lb-boot{display:none}
 @media (display-mode:standalone){
@@ -600,7 +601,7 @@
     // A plan is only "active" once checkout has run.
     if (LBAuth.hasActivePlan()) {
       // Nothing left to fill in during the beta: straight into the app.
-      if (BETA) { location.replace("approvals.html"); return; }
+      if (BETA) { LBGate.go("approvals.html"); return; }
       showActivated(profile); lbBootDone(); return;
     }
 
@@ -609,13 +610,14 @@
       if (isFree) {
         // Already free in practice (no plan running) — record the choice so
         // nothing keeps nudging them to checkout, then into the app.
+        LBGate.hold(); // never released: the page leaves once this is saved
         LBAuth.updateProfile({ plan: "free" })
           .catch(function(){})
-          .then(function(){ location.href = afterBriefUrl(); });
+          .then(function(){ LBGate.go(afterBriefUrl()); });
         return;
       }
       // Brief already done, payment isn't — skip straight to checkout.
-      location.href = checkoutUrl();
+      LBGate.go(checkoutUrl());
       return;
     }
     showBriefMode(profile);
