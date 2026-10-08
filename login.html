@@ -310,6 +310,8 @@
   var resetView = document.getElementById("reset-view");
   var resetForm = document.getElementById("reset-form");
   var resetNotice = document.getElementById("reset-notice");
+  LBAuth.watchPassword(document.getElementById("rp-password"));
+  LBAuth.watchPassword(document.getElementById("su-password"));
 
   function showReset(){
     document.getElementById("already-in").hidden = true;

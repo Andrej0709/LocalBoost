@@ -381,6 +381,7 @@
   var form = document.getElementById("signup-form");
   var notice = document.getElementById("signup-notice");
   var submitButton = form.querySelector("button[type=submit]");
+  LBAuth.watchPassword(document.getElementById("password"));
 
   // Signed in with no plan running: this page is the business brief, nothing
   // more. Account fields come off, and the button leads to checkout.

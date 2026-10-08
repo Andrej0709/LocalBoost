@@ -90,6 +90,7 @@
     var passwordForm = $("password-form");
     var passwordToggle = $("password-toggle");
     var passwordCancel = $("password-cancel");
+    LBAuth.watchPassword($("acc-new-password"), passwordForm.querySelector(".field-pair"));
 
     function setPasswordOpen(open) {
       passwordForm.hidden = !open;
@@ -128,6 +129,12 @@
       var confirm = $("acc-confirm-password").value;
       if (pass !== confirm) {
         say(passwordNotice, "Those two new passwords don't match.", true);
+        return;
+      }
+      try {
+        LBAuth.checkPassword(pass);
+      } catch (err) {
+        say(passwordNotice, err.message, true);
         return;
       }
       button.disabled = true;

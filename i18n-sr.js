@@ -1219,6 +1219,14 @@ window.LB_I18N_SR = {
     "Check both your old and new inbox — confirm the change to finish.":
       "Proveri i staro i novo sanduče — potvrdi promenu da završiš.",
     "Those two new passwords don't match.": "Te dve nove lozinke se ne poklapaju.",
+    // Password rules under every new-password field (auth.js). "At least 8
+    // characters" is already above.
+    "An uppercase letter (A-Z)": "Veliko slovo (A-Z)",
+    "A lowercase letter (a-z)": "Malo slovo (a-z)",
+    "A number (0-9)": "Broj (0-9)",
+    "A symbol, like ! ? # or @": "Znak, npr. ! ? # ili @",
+    "Your password doesn't meet all the rules under it yet.":
+      "Lozinka još ne ispunjava sva pravila ispod nje.",
     "Current password is incorrect.": "Trenutna lozinka nije tačna.",
     "Password updated.": "Lozinka je promenjena.",
     "Channels saved — next week's drop renders for these only.":

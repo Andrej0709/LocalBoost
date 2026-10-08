@@ -185,9 +185,53 @@
     if (ready_ && hadSession && !session) location.reload();
   });
 
+  // Rules every new password must meet: signup, reset and change. The
+  // letters and symbols match what Supabase's "lowercase, uppercase letters,
+  // digits and symbols" setting accepts, so a password passes here only if
+  // the server would take it too.
+  var PASSWORD_RULES = [
+    { text: "At least 8 characters", test: function (p) { return p.length >= 8; } },
+    { text: "An uppercase letter (A-Z)", test: function (p) { return /[A-Z]/.test(p); } },
+    { text: "A lowercase letter (a-z)", test: function (p) { return /[a-z]/.test(p); } },
+    { text: "A number (0-9)", test: function (p) { return /[0-9]/.test(p); } },
+    { text: "A symbol, like ! ? # or @", test: function (p) { return /[!@#$%^&*()_+\-=\[\]{};'\\:"|<>?,.\/`~]/.test(p); } }
+  ];
+  var WEAK_PASSWORD = "Your password doesn't meet all the rules under it yet.";
+
+  function checkPassword(p) {
+    var weak = PASSWORD_RULES.some(function (rule) { return !rule.test(p || ""); });
+    if (weak) throw new Error(WEAK_PASSWORD);
+  }
+
   window.LBAuth = {
     db: db,
     ready: ready,
+
+    // Throws if the password breaks any of the rules above.
+    checkPassword: checkPassword,
+
+    // Shows the rules under a new-password input, each one ticking off as
+    // it is met. The list goes right after `after` (default: the input).
+    watchPassword: function (input, after) {
+      var list = document.createElement("ul");
+      list.className = "pw-rules";
+      var items = PASSWORD_RULES.map(function (rule) {
+        var li = document.createElement("li");
+        li.textContent = rule.text;
+        list.appendChild(li);
+        return li;
+      });
+      function update() {
+        PASSWORD_RULES.forEach(function (rule, i) {
+          items[i].classList.toggle("met", rule.test(input.value));
+        });
+      }
+      input.addEventListener("input", update);
+      // A form reset clears the input without an input event.
+      if (input.form) input.form.addEventListener("reset", function () { setTimeout(update, 0); });
+      (after || input).insertAdjacentElement("afterend", list);
+      update();
+    },
 
     // See BETA above.
     beta: BETA,
@@ -342,6 +386,7 @@
     // or 'beta' during the beta - only the portal switches a Beta plan on).
     // The on_auth_user_created trigger copies these into public.profiles.
     signUp: async function (email, password, meta) {
+      checkPassword(password);
       var res = await db.auth.signUp({
         email: email,
         password: password,
@@ -423,6 +468,7 @@
     // check - opening the emailed link is the proof.
     finishRecovery: async function (newPassword) {
       if (!this.isRecovering()) throw new Error("This reset link has run out. Ask for a new one.");
+      checkPassword(newPassword);
       var res = await db.auth.updateUser({ password: newPassword });
       if (res.error) throw res.error;
       remember(RECOVERY_KEY, false);
@@ -464,6 +510,7 @@
     // one needs confirming; Supabase's updateUser itself doesn't ask for it.
     updatePassword: async function (newPassword) {
       if (!session) throw new Error("Not signed in.");
+      checkPassword(newPassword);
       var res = await db.auth.updateUser({ password: newPassword });
       if (res.error) throw res.error;
       return res.data.user;
