@@ -64,30 +64,30 @@ begin
 
   if tg_table_name = 'contact_requests' then
     subject := case when new.plan_interest = 'beta'
-                    then 'Nova prijava za betu: '
-                    else 'Novi upit sa kontakt forme: ' end
+                    then 'New beta application: '
+                    else 'New contact request: ' end
                || coalesce(nullif(new.business_name, ''), new.email);
     body := concat_ws(E'\n',
-      'Biznis: '  || coalesce(nullif(new.business_name, ''), '—'),
-      'Ime: '     || coalesce(nullif(new.full_name, ''), '—'),
-      'Email: '   || new.email,
+      'Business: ' || coalesce(nullif(new.business_name, ''), '—'),
+      'Name: '     || coalesce(nullif(new.full_name, ''), '—'),
+      'Email: '    || new.email,
       case when coalesce(new.plan_interest, '') not in ('', 'beta') then 'Plan: ' || new.plan_interest end,
       '',
       coalesce(new.message, ''),
       '',
-      'Odgovori direktno na ovaj mejl, ili otvori Inbox u portalu.');
+      'Reply to this email to answer them directly, or open the Inbox in the portal.');
   else
     subject := case when new.message like 'Beta feedback%'
-                    then 'Utisak beta testera: '
-                    else 'Nova poruka: ' end
+                    then 'Beta tester feedback: '
+                    else 'New message: ' end
                || coalesce(nullif(new.full_name, ''), new.email);
     body := concat_ws(E'\n',
-      'Od: '    || coalesce(nullif(new.full_name, ''), '—'),
+      'From: '  || coalesce(nullif(new.full_name, ''), '—'),
       'Email: ' || new.email,
       '',
       new.message,
       '',
-      'Odgovori direktno na ovaj mejl, ili otvori Inbox u portalu.');
+      'Reply to this email to answer them directly, or open the Inbox in the portal.');
   end if;
 
   perform net.http_post(
