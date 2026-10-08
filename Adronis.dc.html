@@ -119,15 +119,21 @@ function lbShowPricing(done) {
   var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
   fontsReady.then(attempt, attempt);
 }
-// Only route once per tab/app session — otherwise a signed-in customer who
-// comes back to "/" from approvals/checkout/signup gets bounced away again
-// every time, unable to ever reach the landing page. (document.referrer is not
-// a reliable signal here — standalone iOS web apps often omit it even for
-// in-app link clicks, not just real launches, so it can't tell the two apart.)
+// A signed-in customer who clicked their way here from another page of the
+// site asked for this page, so they stay — otherwise they could never reach
+// the landing page at all. Opening the site from the address bar, a bookmark,
+// an email or another site routes them every time.
+// In a browser tab document.referrer tells the two apart. The installed app
+// can't use it — standalone iOS web apps often omit it even for in-app link
+// clicks — so there it routes once per app session instead.
 // A link to a specific section ("/#drop", "/#top" from the nav logo) is also
 // left alone: the visitor asked for this page.
 var lbAlreadyBooted = false;
-try { lbAlreadyBooted = sessionStorage.getItem("lbBooted") === "1"; } catch (e) {}
+if (lbStandalone) {
+  try { lbAlreadyBooted = sessionStorage.getItem("lbBooted") === "1"; } catch (e) {}
+} else {
+  try { lbAlreadyBooted = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {}
+}
 if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHasStoredSession())) {
   document.documentElement.classList.add("lb-boot-on");
   // Safety net: never leave a customer stuck behind the boot screen if
