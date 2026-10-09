@@ -420,15 +420,20 @@
     window.scrollTo(0, 0);
   }
 
-  function showBriefMode(profile){
+  // The account exists from here on, so the email and password fields go:
+  // sending the form again only saves the brief.
+  function hideAccountFields(){
     briefOnly = true;
-
     ["field-email", "field-password"].forEach(function(id){
       var node = document.getElementById(id);
       node.hidden = true;
       node.querySelector("input").required = false;
     });
     document.getElementById("account-label").textContent = "YOUR BUSINESS";
+  }
+
+  function showBriefMode(profile){
+    hideAccountFields();
 
     document.getElementById("plan-headline").innerHTML = 'Brief the engine for your <em>' + headlineName + '</em> drop.';
     if (isFree) {
@@ -556,6 +561,7 @@
     if (!consentBox.checked) return;
     sending = true;
     submitButton.disabled = true;
+    notice.hidden = true;
     try {
       if (briefOnly) {
         // Save the brief only. The trial starts at checkout, not here.
@@ -582,7 +588,10 @@
           ? "Check your inbox — confirm your email, then log in and send your application in one click."
           : "Check your inbox — confirm your email to carry on with the " + plan.name + " plan.";
       } else {
-        // Session already live: mark the brief done and move on.
+        // Session already live: mark the brief done and move on. If that or
+        // the application fails, the account is already made - a second try
+        // must not sign up again ("there's already an account").
+        hideAccountFields();
         await LBAuth.saveBrief(brief());
         await afterBrief();
       }
