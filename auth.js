@@ -613,10 +613,12 @@
       var res = await db.rpc("delete_my_account");
       if (res.error) throw friendlyError(res.error);
       // The session's user no longer exists — drop it locally, ignore the
-      // server's answer to signing out a deleted user.
-      try { await db.auth.signOut({ scope: "local" }); } catch (e) {}
+      // server's answer to signing out a deleted user. Cleared before the
+      // sign-out, so onAuthStateChange doesn't take it for a logout from
+      // another tab and reload the page over the "account deleted" card.
       session = null;
       profile = null;
+      try { await db.auth.signOut({ scope: "local" }); } catch (e) {}
     },
 
     // Cancels at the end of the current paid period in Paddle — access
