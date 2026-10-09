@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://adronis.app/sitemap.xml
+Sitemap: https://adronis.vercel.app/sitemap.xml
