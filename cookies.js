@@ -98,7 +98,7 @@
     ));
     text.appendChild(document.createTextNode(" "));
     var link = el("a", "", "Privacy policy");
-    link.href = "privacy.html#cookies";
+    link.href = "/privacy.html#cookies";
     text.appendChild(link);
 
     var actions = el("div", "lb-consent-actions");
