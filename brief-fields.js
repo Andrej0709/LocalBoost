@@ -43,10 +43,28 @@
     return code ? regionNames(uiLocale()).of(code) : (englishName || "");
   }
 
-  // The country the browser says the reader is in, if it says.
+  // Where most of our businesses are: listed first, above the full A-Z list.
+  var NEAR_CODES = ["RS", "BA", "ME", "HR", "MK", "SI"];
+
+  // A time zone that belongs to exactly one country we serve most.
+  var ZONE_CODES = {
+    "Europe/Belgrade": "RS", "Europe/Sarajevo": "BA", "Europe/Podgorica": "ME",
+    "Europe/Zagreb": "HR", "Europe/Skopje": "MK", "Europe/Ljubljana": "SI"
+  };
+
+  // The country the reader is probably in: the clock's time zone first (a
+  // phone set to English still keeps local time), then the browser's
+  // language region. English is left out of that - "en-US" is just the
+  // default on phones all over the world, so it says nothing about where
+  // the business is.
   function guessCountry() {
+    try {
+      var zone = ZONE_CODES[Intl.DateTimeFormat().resolvedOptions().timeZone];
+      if (zone) return englishNames.of(zone);
+    } catch (e) {}
     var langs = navigator.languages || [navigator.language || ""];
     for (var i = 0; i < langs.length; i++) {
+      if (/^en(-|$)/i.test(langs[i] || "")) continue;
       var m = /-([A-Z]{2})$/i.exec(langs[i] || "");
       if (m && COUNTRY_CODES.indexOf(m[1].toUpperCase()) > -1) return englishNames.of(m[1].toUpperCase());
     }
@@ -63,12 +81,21 @@
         return { code: code, value: englishNames.of(code), label: local.of(code) };
       });
       rows.sort(function (a, b) { return a.label.localeCompare(b.label, uiLocale()); });
+      var near = NEAR_CODES.map(function (code) {
+        return rows.filter(function (row) { return row.code === code; })[0];
+      });
+      var rest = rows.filter(function (row) { return NEAR_CODES.indexOf(row.code) === -1; });
       while (select.options.length > 1) select.remove(1);
-      rows.forEach(function (row) {
+      function add(row) {
         var opt = new Option(row.label, row.value);
         opt.dataset.code = row.code;
         select.add(opt);
-      });
+      }
+      near.forEach(add);
+      var line = new Option("──────────", "");
+      line.disabled = true;
+      select.add(line);
+      rest.forEach(add);
       select.value = picked;
     }
 
