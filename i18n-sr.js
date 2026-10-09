@@ -194,7 +194,7 @@ window.LB_I18N_SR = {
     "NO DROPS YET": "JOŠ NEMA DROPOVA",
     "Nothing here yet.": "Ovde još nema ničega.",
     "Once your first drop lands, every week is kept here — what you approved, what went live and what you turned down.":
-      "Čim stigne tvoj prvi drop, svaka nedelja se čuva ovde — šta si odobrio, šta je izašlo i šta si odbio.",
+      "Čim stigne tvoj prvi drop, svaka nedelja se čuva ovde — šta si odobrio, šta je izašlo i šta si odbacio.",
     "Go to approvals": "Idi na odobravanja",
     "Couldn't load your drops.": "Nismo uspeli da učitamo tvoje dropove.",
     "WEEKS": "NEDELJE",
@@ -209,9 +209,9 @@ window.LB_I18N_SR = {
     "No drop this week.": "Ove nedelje nije bilo dropa.",
     "No ads in this drop yet.": "U ovom dropu još nema oglasa.",
     "ADS": "OGLASI",
-    "WHY YOU REJECTED": "ZAŠTO SI ODBIO",
+    "WHY YOU REJECTED": "ZAŠTO SI ODBACIO",
     "Open this week →": "Otvori ovu nedelju →",
-    "Most common reason you turned an ad down:": "Najčešći razlog zbog kog si odbio oglas:",
+    "Most common reason you turned an ad down:": "Najčešći razlog zbog kog si odbacio oglas:",
     "Past drops →": "Prethodni dropovi →",
     "Every past week, with what you kept and why →": "Sve prethodne nedelje, šta si zadržao i zašto →",
     "Your schedule is tied to your account — sign in and it loads here.":
@@ -637,8 +637,7 @@ window.LB_I18N_SR = {
     "Saved — the next drop renders from these details.":
       "Sačuvano — sledeći drop se pravi od ovih podataka.",
     "Changes apply from the next drop that renders. Brand colors, what sets you apart and anything to avoid live in the":
-      "Izmene važe od sledećeg dropa koji se renderuje. Boje brenda, ono po čemu se izdvajaš i šta treba izbegavati nalaze se u",
-    "control room": "kontrolnoj sobi",
+      "Izmene važe od sledećeg dropa koji se renderuje. Za boje brenda, ono po čemu se izdvajaš i šta treba izbegavati, idi u",
     "NOT SIGNED IN": "NISI PRIJAVLJEN",
     "Log in to manage your account.": "Prijavi se da upravljaš nalogom.",
     "Password, connected channels and billing all live behind your login.":
@@ -2140,6 +2139,9 @@ window.LB_I18N_SR = {
     [/^Week of (.+)$/, "Nedelja od $1"],
     [/^WEEK OF (.+)$/, "NEDELJA OD $1"],
     [/^(\d+) CREATIVES?$/, "KREATIVA: $1"],
+    // The toast after "Approve all" / "Reject all", with its undo button.
+    [/^(\d+) creatives? approved\.$/, "Odobreno kreativa: $1."],
+    [/^(\d+) creatives? rejected\.$/, "Odbačeno kreativa: $1."],
     [/^Approve all waiting \((\d+)\)$/, "Odobri sve na čekanju ($1)"],
     [/^Reject all waiting \((\d+)\)$/, "Odbaci sve na čekanju ($1)"],
     [/^Review (\d+) waiting →$/, "Pregledaj $1 na čekanju →"],

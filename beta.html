@@ -189,7 +189,7 @@
   // Shown on the summary card, in this order.
   var SUMMARY = [
     ["Business", function(p){ return p.business_name; }],
-    ["Where", function(p){ return [p.city, p.country].filter(Boolean).join(", "); }],
+    ["Where", function(p){ return [p.city, p.country && LBBriefFields.countryLabel(p.country)].filter(Boolean).join(", "); }],
     ["Business type", function(p){ return p.vertical; }],
     ["Sells", function(p){ return p.what_you_sell; }],
     ["Customers", function(p){ return p.typical_customer; }],

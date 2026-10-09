@@ -230,6 +230,10 @@
         var saved = await LBAuth.updateProfile(patch);
         renderBusiness(saved);
         $("acc-name").textContent = saved.business_name || LBAuth.getUser().email;
+        // The nav shows the business name where "Log in" was (nav.js).
+        document.querySelectorAll('a[href="login.html"], a[href="/login.html"]').forEach(function (a) {
+          a.textContent = saved.business_name || LBAuth.getUser().email;
+        });
         setEditing(false);
         say(notice, "Saved — the next drop renders from these details.");
       } catch (err) {
