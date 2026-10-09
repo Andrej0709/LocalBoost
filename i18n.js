@@ -28,7 +28,9 @@
   /* --- Which language ------------------------------------------------------
      ?lang= wins and is remembered, then the remembered choice, then the
      browser's own languages. Serbian, Croatian, Bosnian and Montenegrin
-     readers all get the Serbian copy — it reads the same to all of them. */
+     readers all get the Serbian copy — it reads the same to all of them.
+     Plenty of phones there are set to English, so a reader whose clock is on
+     one of those countries' time zones also starts in Serbian. */
   function stored() {
     try {
       var v = localStorage.getItem(STORE_KEY);
@@ -47,13 +49,17 @@
     return LANGS[v] ? v : null;
   }
 
+  var SR_ZONES = ["Europe/Belgrade", "Europe/Zagreb", "Europe/Sarajevo", "Europe/Podgorica"];
+
   function fromBrowser() {
     var list = navigator.languages || [navigator.language || ""];
     for (var i = 0; i < list.length; i++) {
       var tag = String(list[i] || "").toLowerCase();
       if (/^(sr|hr|bs|me|sh)\b/.test(tag) || /^(sr|hr|bs|me|sh)-/.test(tag)) return "sr";
-      if (/^en\b/.test(tag) || /^en-/.test(tag)) return "en";
     }
+    try {
+      if (SR_ZONES.indexOf(Intl.DateTimeFormat().resolvedOptions().timeZone) > -1) return "sr";
+    } catch (e) {}
     return "en";
   }
 
@@ -199,7 +205,13 @@
     ".lb-lang-btn.is-on{color:var(--acc,#7cc6ff)}",
     ".lb-lang-btn:focus-visible{outline:2px solid var(--acc,#7cc6ff);outline-offset:3px;border-radius:4px}",
     ".lb-lang-sep{color:#2f333a}",
-    "@media (max-width:860px){.lb-lang{right:12px;bottom:12px;padding:6px 10px}}",
+    // On a phone a floating pill sits on top of whatever is under it - a
+    // form field, the approve button - so there the switch lives in the menu
+    // sheet instead (same breakpoint as the burger in adronis.css).
+    ".nav-sheet .lb-lang{position:static;justify-self:center;margin:10px auto 2px;padding:9px 16px;font-size:12px;box-shadow:none}",
+    ".nav-sheet .lb-lang-btn{padding:4px 6px}",
+    "@media (max-width:900px){#lb-lang-switch{display:none}}",
+    "@media (min-width:901px){.nav-sheet .lb-lang{display:none}}",
     "@media print{.lb-lang{display:none}}"
   ].join("");
 
@@ -214,7 +226,6 @@
   function buildSwitch() {
     var wrap = document.createElement("div");
     wrap.className = "lb-lang";
-    wrap.id = "lb-lang-switch";
     wrap.setAttribute("aria-label", "Language / Jezik");
 
     Object.keys(LANGS).forEach(function (code, i) {
@@ -248,13 +259,21 @@
     });
   }
 
-  // The switch hangs off <body> rather than off any of the page's own markup,
+  // The floating switch hangs off <body> rather than off any of the page's own markup,
   // so the home page's runtime can re-render everything underneath it without
   // taking the switch with it. Re-inserted if it ever goes missing.
   function mountSwitches() {
     if (!document.body) return;
-    if (document.getElementById("lb-lang-switch")) return;
-    document.body.appendChild(buildSwitch());
+    if (!document.getElementById("lb-lang-switch")) {
+      var floating = buildSwitch();
+      floating.id = "lb-lang-switch";
+      document.body.appendChild(floating);
+    }
+    // The phone copy, at the bottom of each menu sheet (nav.js builds one,
+    // the home page renders its own).
+    Array.prototype.forEach.call(document.querySelectorAll(".nav-sheet"), function (sheet) {
+      if (!sheet.querySelector(".lb-lang")) sheet.appendChild(buildSwitch());
+    });
   }
 
   var applying = false;

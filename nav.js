@@ -69,7 +69,7 @@
       if (!sheet.contains(e.target) && !burger.contains(e.target)) setOpen(false);
     });
     window.addEventListener("resize", function () {
-      if (window.innerWidth > 860) setOpen(false);
+      if (window.innerWidth > 900) setOpen(false);
     });
 
     if (window.LBAuth) {
