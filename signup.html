@@ -119,11 +119,11 @@
       <div class="section-label" id="account-label">ACCOUNT</div>
       <div class="field">
         <label for="business">Business name</label>
-        <input id="business" name="business" type="text" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
+        <input id="business" maxlength="200" name="business" type="text" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
       </div>
       <div class="field" id="field-email">
         <label for="email">Email</label>
-        <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@business.com">
+        <input id="email" maxlength="320" name="email" type="email" required autocomplete="email" placeholder="you@business.com">
       </div>
       <div class="field" id="field-password">
         <label for="password">Password</label>
@@ -139,7 +139,7 @@
       </div>
       <div class="field">
         <label for="city">City</label>
-        <input id="city" name="city" type="text" required autocomplete="address-level2" list="city-options" placeholder="Where's the shop?">
+        <input id="city" maxlength="200" name="city" type="text" required autocomplete="address-level2" list="city-options" placeholder="Where's the shop?">
         <datalist id="city-options"></datalist>
       </div>
       <div class="field">
@@ -159,27 +159,27 @@
       </div>
       <div class="field" id="field-vertical-other" hidden>
         <label for="vertical-other">What kind of business is it?</label>
-        <input id="vertical-other" name="vertical_other" type="text" placeholder="e.g. Record shop, tailor, dog groomer">
+        <input id="vertical-other" maxlength="200" name="vertical_other" type="text" placeholder="e.g. Record shop, tailor, dog groomer">
       </div>
       <div class="field">
         <label for="website">Website or Instagram handle (optional)</label>
-        <input id="website" name="website" type="text" autocomplete="url" placeholder="@yourbusiness or yourbusiness.com">
+        <input id="website" maxlength="300" name="website" type="text" autocomplete="url" placeholder="@yourbusiness or yourbusiness.com">
       </div>
       <div class="field">
         <label for="what">What do you sell or do, in one line?</label>
-        <input id="what" name="what" type="text" required placeholder="e.g. Sourdough and pastries, baked fresh every morning">
+        <input id="what" maxlength="500" name="what" type="text" required placeholder="e.g. Sourdough and pastries, baked fresh every morning">
       </div>
       <div class="field">
         <label for="customer">Who's your typical customer?</label>
-        <input id="customer" name="customer" type="text" required placeholder="e.g. Neighborhood regulars, 30-55, coffee-first crowd">
+        <input id="customer" maxlength="500" name="customer" type="text" required placeholder="e.g. Neighborhood regulars, 30-55, coffee-first crowd">
       </div>
       <div class="field">
         <label for="different">What makes you different from the place down the street?</label>
-        <textarea id="different" name="different" placeholder="e.g. Everything's made from scratch, we source local, third generation family recipe..."></textarea>
+        <textarea id="different" maxlength="1000" name="different" placeholder="e.g. Everything's made from scratch, we source local, third generation family recipe..."></textarea>
       </div>
       <div class="field">
         <label for="why">What made you come to us?</label>
-        <textarea id="why" name="why" required placeholder="e.g. We post once a month and it goes nowhere, nobody here has time for marketing, foot traffic has dropped since spring..."></textarea>
+        <textarea id="why" maxlength="2000" name="why" required placeholder="e.g. We post once a month and it goes nowhere, nobody here has time for marketing, foot traffic has dropped since spring..."></textarea>
       </div>
 
       <div class="section-label">BRAND &amp; VOICE</div>
@@ -196,11 +196,11 @@
       </div>
       <div class="field">
         <label for="colors">Brand colors or palette (optional)</label>
-        <input id="colors" name="colors" type="text" placeholder="e.g. Warm oak, matte black, morning light">
+        <input id="colors" maxlength="200" name="colors" type="text" placeholder="e.g. Warm oak, matte black, morning light">
       </div>
       <div class="field">
         <label for="avoid">Anything the engine should avoid? (optional)</label>
-        <textarea id="avoid" name="avoid" placeholder="e.g. No humor about pricing, never show the back kitchen..."></textarea>
+        <textarea id="avoid" maxlength="1000" name="avoid" placeholder="e.g. No humor about pricing, never show the back kitchen..."></textarea>
       </div>
 
       <div class="section-label" id="channels-label">WHERE SHOULD WE PUBLISH?</div>

@@ -1274,6 +1274,26 @@ do $$ begin
   ) not valid;
 exception when duplicate_object then null; end $$;
 
+/* The business brief goes into every drop's prompt, so a pasted wall of text
+   would cost on every render. Same caps as the brief fields in signup.html,
+   account.html and the control room. */
+do $$ begin
+  alter table public.profiles add constraint profiles_brief_sizes check (
+    char_length(coalesce(business_name, '')) <= 200
+    and char_length(coalesce(country, '')) <= 100
+    and char_length(coalesce(city, '')) <= 200
+    and char_length(coalesce(vertical, '')) <= 200
+    and char_length(coalesce(website, '')) <= 300
+    and char_length(coalesce(what_you_sell, '')) <= 500
+    and char_length(coalesce(typical_customer, '')) <= 500
+    and char_length(coalesce(differentiator, '')) <= 1000
+    and char_length(coalesce(why_us, '')) <= 2000
+    and char_length(coalesce(brand_vibe, '')) <= 100
+    and char_length(coalesce(brand_colors, '')) <= 200
+    and char_length(coalesce(avoid_notes, '')) <= 1000
+  ) not valid;
+exception when duplicate_object then null; end $$;
+
 /* ------------------------------------------------------------ */
 /* 10. Brand material - the logo, photos and menu a customer uploads */
 /*     in the control room (brand-assets.js). Files live in the private */
