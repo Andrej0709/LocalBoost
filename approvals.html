@@ -623,7 +623,7 @@
       if (res.error) {
         creative.status = previous;
         card.classList.remove("is-busy");
-        say("Couldn't save that — " + res.error.message);
+        say("Couldn't save that — " + LBAuth.friendlyError(res.error).message);
         renderAll();
         return;
       }
@@ -666,7 +666,7 @@
 
     if (res.error || !res.data) {
       if (card) card.classList.remove("is-busy");
-      say("Couldn't save that — " + (res.error ? res.error.message : "please try again."));
+      say("Couldn't save that — " + (res.error ? LBAuth.friendlyError(res.error).message : "please try again."));
       renderAll();
       return false;
     }
@@ -1043,7 +1043,7 @@
       if (res.error) {
         scope.forEach(function (creative) { creative.status = "pending"; });
         renderAll();
-        say("Couldn't save that — " + res.error.message);
+        say("Couldn't save that — " + LBAuth.friendlyError(res.error).message);
         return;
       }
       var dropIds = {};
@@ -1061,7 +1061,7 @@
 
     if (!demoMode) {
       var res = await LBAuth.db.from("creatives").update({ status: "pending" }).in("id", ids).select();
-      if (res.error) { say("Couldn't undo — " + res.error.message); return; }
+      if (res.error) { say("Couldn't undo — " + LBAuth.friendlyError(res.error).message); return; }
       var dropIds = {};
       scope.forEach(function (creative) { dropIds[creative.drop_id] = true; });
       for (var dropId in dropIds) await maybeCloseDrop(dropId);

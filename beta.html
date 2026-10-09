@@ -293,7 +293,7 @@
       window.scrollTo(0, 0);
     } catch (err) {
       button.disabled = false;
-      alert(t("Could not send:") + " " + err.message);
+      alert(t("Could not send:") + " " + t(err.message));
     }
   });
 })();

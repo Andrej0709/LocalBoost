@@ -117,7 +117,7 @@
       .select()
       .maybeSingle();
     if (res.error || !res.data) {
-      return res.error ? res.error.message : "Couldn't save the new time — try again.";
+      return res.error ? LBAuth.friendlyError(res.error).message : "Couldn't save the new time — try again.";
     }
     allCreatives = allCreatives.map(function (x) { return x.id === c.id ? res.data : x; });
     editingId = null;
@@ -937,7 +937,7 @@
     if (res.error) {
       noDrops.hidden = false;
       noDrops.querySelector("h3").textContent = "Couldn't load your control room.";
-      noDrops.querySelector("p").textContent = res.error.message;
+      noDrops.querySelector("p").textContent = LBAuth.friendlyError(res.error).message;
       return;
     }
 

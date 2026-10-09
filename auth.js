@@ -224,12 +224,56 @@
     if (weak) throw new Error(WEAK_PASSWORD);
   }
 
+  // What the customer reads when Supabase says no. Its own messages are terse,
+  // technical and English only ("Invalid login credentials", "Failed to
+  // fetch"), so the common ones become a plain sentence that i18n-sr.js also
+  // has in Serbian. Matched on the error's code and message together; anything
+  // not listed - the database's own explanations included - passes through.
+  var FRIENDLY_ERRORS = [
+    [/invalid_credentials|invalid login credentials/i,
+      "That email and password don't match. Check both and try again."],
+    [/user_already_exists|email_exists|already registered|already been registered/i,
+      "There's already an account with this email. Log in instead, or reset your password if you've forgotten it."],
+    [/email_not_confirmed|email not confirmed/i,
+      "Confirm your email first — check your inbox for the link we sent."],
+    [/rate.?limit|too many requests|for security purposes/i,
+      "Too many tries in a short time. Wait a minute, then try again."],
+    [/failed to fetch|networkerror|network request failed|load failed|fetch failed/i,
+      "Couldn't reach Adronis. Check your internet connection and try again."],
+    [/email_address_invalid|unable to validate email|invalid format/i,
+      "That email address doesn't look right. Check it and try again."],
+    [/same_password|different from the old/i,
+      "Your new password has to be different from your current one."],
+    [/weak_password|password should/i, WEAK_PASSWORD],
+    [/jwt expired|invalid jwt|session_not_found|session.*missing|refresh token/i,
+      "Your session has run out. Log in again to carry on."],
+    [/violates check constraint|value too long/i,
+      "Some of what you entered is too long. Shorten it and try again."]
+  ];
+
+  function friendlyError(err) {
+    var raw = err ? (err.code || "") + " " + (err.message || err.error_description || "") : "";
+    for (var i = 0; i < FRIENDLY_ERRORS.length; i++) {
+      if (FRIENDLY_ERRORS[i][0].test(raw)) {
+        var friendly = new Error(FRIENDLY_ERRORS[i][1]);
+        friendly.code = err.code;
+        return friendly;
+      }
+    }
+    if (err instanceof Error) return err;
+    return new Error((err && err.message) || "Something went wrong. Please try again.");
+  }
+
   window.LBAuth = {
     db: db,
     ready: ready,
 
     // Throws if the password breaks any of the rules above.
     checkPassword: checkPassword,
+
+    // A Supabase error turned into something a customer can read (see
+    // FRIENDLY_ERRORS). For pages that query LBAuth.db themselves.
+    friendlyError: friendlyError,
 
     // Shows the rules under a new-password input, each one ticking off as
     // it is met. The list goes right after `after` (default: the input).
@@ -381,7 +425,7 @@
     applyForBeta: async function (note) {
       if (!session) throw new Error("Not signed in.");
       var res = await db.rpc("apply_for_beta", { p_note: note || null });
-      if (res.error) throw res.error;
+      if (res.error) throw friendlyError(res.error);
       await loadProfile();
       return res.data;
     },
@@ -436,7 +480,7 @@
           emailRedirectTo: siteOrigin() + "login.html"
         }
       });
-      if (res.error) throw res.error;
+      if (res.error) throw friendlyError(res.error);
       session = res.data.session; // null while email confirmation is pending
       if (session) await loadProfile();
       return {
@@ -451,7 +495,7 @@
         email: email,
         password: password
       });
-      if (res.error) throw res.error;
+      if (res.error) throw friendlyError(res.error);
       session = res.data.session;
       await loadProfile();
       return session;
@@ -473,7 +517,7 @@
         .eq("id", session.user.id)
         .select()
         .maybeSingle();
-      if (res.error) throw res.error;
+      if (res.error) throw friendlyError(res.error);
 
       // An UPDATE that matches no row is not an error in PostgREST, it just
       // writes nothing. That happens when the on_auth_user_created trigger
@@ -483,7 +527,7 @@
         var row = { id: session.user.id, email: session.user.email };
         Object.keys(patch).forEach(function (k) { row[k] = patch[k]; });
         res = await db.from("profiles").upsert(row).select().maybeSingle();
-        if (res.error) throw res.error;
+        if (res.error) throw friendlyError(res.error);
         if (!res.data) throw new Error("Could not save your profile — please try again.");
       }
 
@@ -497,7 +541,7 @@
       var res = await db.auth.resetPasswordForEmail(email, {
         redirectTo: siteOrigin() + "login.html"
       });
-      if (res.error) throw res.error;
+      if (res.error) throw friendlyError(res.error);
     },
 
     // Signed in through a reset link, new password not set yet.
@@ -511,7 +555,7 @@
       if (!this.isRecovering()) throw new Error("This reset link has run out. Ask for a new one.");
       checkPassword(newPassword);
       var res = await db.auth.updateUser({ password: newPassword });
-      if (res.error) throw res.error;
+      if (res.error) throw friendlyError(res.error);
       remember(RECOVERY_KEY, false);
       return res.data.user;
     },
@@ -529,7 +573,7 @@
     updateEmail: async function (newEmail) {
       if (!session) throw new Error("Not signed in.");
       var res = await db.auth.updateUser({ email: newEmail });
-      if (res.error) throw res.error;
+      if (res.error) throw friendlyError(res.error);
       return res.data.user;
     },
 
@@ -553,7 +597,7 @@
       if (!session) throw new Error("Not signed in.");
       checkPassword(newPassword);
       var res = await db.auth.updateUser({ password: newPassword });
-      if (res.error) throw res.error;
+      if (res.error) throw friendlyError(res.error);
       return res.data.user;
     },
 
@@ -567,7 +611,7 @@
       // doesn't reach (brand-assets.js, loaded on the account page).
       if (window.LBBrand) await LBBrand.removeAll();
       var res = await db.rpc("delete_my_account");
-      if (res.error) throw res.error;
+      if (res.error) throw friendlyError(res.error);
       // The session's user no longer exists — drop it locally, ignore the
       // server's answer to signing out a deleted user.
       try { await db.auth.signOut({ scope: "local" }); } catch (e) {}

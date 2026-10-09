@@ -790,7 +790,7 @@
           LBAuth.db.from("drops").select("*").eq("user_id", user.id).order("week_starting"),
           LBAuth.db.from("creatives").select("*").eq("user_id", user.id).order("created_at")
         ]);
-        loaded.forEach(function (res) { if (res.error) throw res.error; });
+        loaded.forEach(function (res) { if (res.error) throw LBAuth.friendlyError(res.error); });
 
         // The uploaded files themselves stay in Storage; the export names them.
         var brand = await LBBrand.listAll();

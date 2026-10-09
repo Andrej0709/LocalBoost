@@ -71,7 +71,7 @@
       send.disabled = false;
       note.hidden = false;
       if (res.error) {
-        note.textContent = t("Could not send:") + " " + res.error.message;
+        note.textContent = t("Could not send:") + " " + t(LBAuth.friendlyError(res.error).message);
         return;
       }
       text.value = "";

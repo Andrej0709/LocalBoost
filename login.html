@@ -106,7 +106,7 @@
       <form id="login-form" role="tabpanel" aria-labelledby="tab-login">
         <div class="field">
           <label for="li-email">Email</label>
-          <input id="li-email" type="email" required autocomplete="email" placeholder="you@business.com">
+          <input id="li-email" type="email" maxlength="320" required autocomplete="email" placeholder="you@business.com">
         </div>
         <div class="field">
           <label for="li-password">Password</label>
@@ -119,11 +119,11 @@
       <form id="signup-form" role="tabpanel" aria-labelledby="tab-signup" hidden>
         <div class="field">
           <label for="su-business">Business name</label>
-          <input id="su-business" type="text" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
+          <input id="su-business" type="text" maxlength="200" required autocomplete="organization" placeholder="e.g. Milena's Bakery">
         </div>
         <div class="field">
           <label for="su-email">Email</label>
-          <input id="su-email" type="email" required autocomplete="email" placeholder="you@business.com">
+          <input id="su-email" type="email" maxlength="320" required autocomplete="email" placeholder="you@business.com">
         </div>
         <div class="field">
           <label for="su-password">Password</label>
@@ -139,7 +139,7 @@
       <form id="forgot-form" hidden>
         <div class="field">
           <label for="fp-email">Email</label>
-          <input id="fp-email" type="email" required autocomplete="email" placeholder="you@business.com">
+          <input id="fp-email" type="email" maxlength="320" required autocomplete="email" placeholder="you@business.com">
         </div>
         <button type="submit" class="btn btn-lg btn-block">Send reset link<span class="mono" aria-hidden="true">→</span></button>
         <div style="margin-top:16px;text-align:center">
@@ -291,9 +291,7 @@
       else redirect("control-room.html", "Logged in — taking you to your control room...");
     } catch (err) {
       button.disabled = false;
-      say(err.message === "Email not confirmed"
-        ? "Confirm your email first — check your inbox for the link we sent."
-        : err.message);
+      say(err.message);
     }
   });
 

@@ -147,7 +147,8 @@ document.getElementById("message-form").addEventListener("submit", async functio
 
   if (res.error) {
     button.disabled = false;
-    alert((window.LBLang ? LBLang.t("Could not send:") : "Could not send:") + " " + res.error.message);
+    var t = function (text) { return window.LBLang ? LBLang.t(text) : text; };
+    alert(t("Could not send:") + " " + t(LBAuth.friendlyError(res.error).message));
     return;
   }
   form.hidden = true;

@@ -1265,6 +1265,25 @@ window.LB_I18N_SR = {
       "Nismo uspeli da sačuvamo tvoj profil — pokušaj ponovo.",
     "Log out failed — try again.": "Odjava nije uspela — pokušaj ponovo.",
     "Not signed in.": "Nisi prijavljen.",
+    // Supabase's own refusals, reworded (FRIENDLY_ERRORS in auth.js).
+    "That email and password don't match. Check both and try again.":
+      "Email i lozinka se ne poklapaju. Proveri oba i pokušaj ponovo.",
+    "There's already an account with this email. Log in instead, or reset your password if you've forgotten it.":
+      "Nalog sa ovim emailom već postoji. Prijavi se, ili zatraži novu lozinku ako si je zaboravio.",
+    "Too many tries in a short time. Wait a minute, then try again.":
+      "Previše pokušaja za kratko vreme. Sačekaj minut, pa pokušaj ponovo.",
+    "Couldn't reach Adronis. Check your internet connection and try again.":
+      "Ne možemo da dođemo do Adronisa. Proveri internet vezu i pokušaj ponovo.",
+    "That email address doesn't look right. Check it and try again.":
+      "Ova email adresa ne izgleda ispravno. Proveri je i pokušaj ponovo.",
+    "Your new password has to be different from your current one.":
+      "Nova lozinka mora da bude drugačija od trenutne.",
+    "Your session has run out. Log in again to carry on.":
+      "Sesija je istekla. Prijavi se ponovo da nastaviš.",
+    "Some of what you entered is too long. Shorten it and try again.":
+      "Deo onoga što si uneo je predugačak. Skrati ga i pokušaj ponovo.",
+    "Something went wrong. Please try again.":
+      "Nešto nije uspelo. Pokušaj ponovo.",
     "You need to be signed in to check out.":
       "Moraš biti prijavljen da bi prešao na naplatu.",
     "We need a billing email before we can hand you to Paddle.":

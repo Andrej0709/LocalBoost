@@ -43,7 +43,7 @@
 
   async function list(kind) {
     var res = await db().list(userId() + "/" + kind, { limit: 100, sortBy: { column: "created_at", order: "asc" } });
-    if (res.error) throw res.error;
+    if (res.error) throw LBAuth.friendlyError(res.error);
     return (res.data || [])
       // Storage lists a placeholder for an empty folder; real files carry an id.
       .filter(function (f) { return f.id && f.name !== ".emptyFolderPlaceholder"; })
@@ -114,14 +114,14 @@
     var stamp = Date.now() + String(Math.floor(Math.random() * 1000)).padStart(3, "0");
     var path = userId() + "/" + kind + "/" + stamp + "-" + slug(file.name) + "." + EXT[file.type];
     var res = await db().upload(path, file, { contentType: file.type, upsert: false });
-    if (res.error) throw res.error;
+    if (res.error) throw LBAuth.friendlyError(res.error);
     return path;
   }
 
   async function remove(paths) {
     if (!paths.length) return;
     var res = await db().remove(paths);
-    if (res.error) throw res.error;
+    if (res.error) throw LBAuth.friendlyError(res.error);
   }
 
   // Short-lived links for showing the customer their own files.
@@ -129,7 +129,7 @@
     var out = {};
     if (!paths.length) return out;
     var res = await db().createSignedUrls(paths, 60 * 60);
-    if (res.error) throw res.error;
+    if (res.error) throw LBAuth.friendlyError(res.error);
     (res.data || []).forEach(function (r) { if (r.signedUrl) out[r.path] = r.signedUrl; });
     return out;
   }
