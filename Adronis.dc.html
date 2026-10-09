@@ -18,7 +18,7 @@ html.lb-booted #lb-boot{display:none}
 <link rel="manifest" href="site.webmanifest">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Adronis — weekly ad drops for local business</title>
-<meta name="description" content="Weekly drops of photoreal ads for local business. Render, approve in two minutes, publish everywhere. First drop free, 7-day trial, cancel any time.">
+<meta name="description" content="Weekly ready-to-post ads for local businesses. You approve them in about two minutes and Adronis publishes them for you. Free beta for a limited number of businesses until launch in Q1 2027.">
 <link rel="canonical" href="https://adronis.app/">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="theme-color" content="#050608">
@@ -27,7 +27,7 @@ html.lb-booted #lb-boot{display:none}
 <meta property="og:site_name" content="Adronis">
 <meta property="og:locale" content="en_US">
 <meta property="og:title" content="Adronis — your next forty ads are already in production">
-<meta property="og:description" content="Weekly drops of photoreal ads for local business. The engine renders, you approve in two minutes, Adronis publishes to every channel. First drop free, 7-day trial, cancel any time.">
+<meta property="og:description" content="Weekly ready-to-post ads for local businesses. You approve them in about two minutes and Adronis publishes them for you. Free beta for a limited number of businesses until launch in Q1 2027.">
 <meta property="og:url" content="https://adronis.app/">
 <meta property="og:image" content="https://adronis.app/logo.png">
 <meta property="og:image:width" content="623">
@@ -35,7 +35,7 @@ html.lb-booted #lb-boot{display:none}
 <meta property="og:image:alt" content="Adronis — weekly ad drops for local business">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Adronis — your next forty ads are already in production">
-<meta name="twitter:description" content="Weekly drops of photoreal ads for local business. The engine renders, you approve in two minutes, Adronis publishes to every channel. First drop free, 7-day trial, cancel any time.">
+<meta name="twitter:description" content="Weekly ready-to-post ads for local businesses. You approve them in about two minutes and Adronis publishes them for you. Free beta for a limited number of businesses until launch in Q1 2027.">
 <meta name="twitter:image" content="https://adronis.app/logo.png">
 <!-- Fonts and the shared design system load here, in the head, so they are
      already in hand when the runtime paints the page. -->
@@ -296,7 +296,7 @@ if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHa
         {
           "@type": "Question",
           "name": "How does the free trial work?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." }
+          "acceptedAnswer": { "@type": "Answer", "text": "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." }
         },
         {
           "@type": "Question",
@@ -502,6 +502,7 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 .free-note{max-width:720px;margin:26px auto 0;padding:15px 20px;border-radius:16px;border:1px solid var(--acc-line);background:rgba(124,198,255,.06);font-size:14.5px;line-height:1.6;color:var(--text);text-align:left}
 .free-note .mono{margin-right:10px;font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
 .plans{max-width:1200px;margin:56px auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch}
+.plans.is-three{grid-template-columns:repeat(3,minmax(0,1fr));max-width:960px}
 .plan{position:relative;display:flex;flex-direction:column;padding:28px 24px 24px;border-radius:var(--r-xl);border:1px solid var(--line);background:rgba(12,14,18,.94);text-align:left;transition:transform .45s var(--ease),border-color .3s ease,box-shadow .45s var(--ease)}
 .plan:hover{transform:translateY(-6px);border-color:rgba(124,198,255,.6);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(124,198,255,.18),0 0 60px rgba(124,198,255,.22)}
 .plan.is-featured{border-color:rgba(124,198,255,.55);background:radial-gradient(120% 60% at 50% 0%,rgba(92,182,247,.2),rgba(92,182,247,0) 65%),#0c1016;box-shadow:0 0 0 1px rgba(124,198,255,.18),0 30px 80px -24px rgba(92,182,247,.45)}
@@ -574,6 +575,7 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
   .showcase{grid-template-columns:repeat(2,minmax(0,1fr))}
   .story{grid-row:auto !important;grid-column:auto !important}
   .plans{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 14px}
+  .plans.is-three{grid-template-columns:repeat(3,minmax(0,1fr))}
   .faq-grid{grid-template-columns:minmax(0,1fr)}
   .faq-side{position:static}
   .bento{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -586,6 +588,7 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
   .showcase::-webkit-scrollbar{display:none}
   .showcase>*{flex:none;width:min(78vw,320px);scroll-snap-align:center}
   .ex-note{text-align:left}
+  .plans.is-three{grid-template-columns:minmax(0,1fr);max-width:440px}
 }
 @media (max-width:640px){
   .hero{padding:112px 20px 56px}
@@ -629,7 +632,7 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
     <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a href="control-room.html">Control room</a></sc-if>
   </div>
   <a class="nav-plain nav-login" href="login.html">Log in</a>
-  <a href="signup.html" class="nav-cta">Try it free</a>
+  <a href="signup.html" class="nav-cta">{{ navCta }}</a>
   <button type="button" class="nav-burger" onClick="{{ toggleNav }}" aria-label="Menu" aria-expanded="{{ navExpanded }}" aria-controls="home-sheet"></button>
 </nav>
 
@@ -651,13 +654,13 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
       <h1 data-in="1" style="animation-delay:.06s">We make your ads. You just say <em>yes</em>.</h1>
       <p class="hero-sub" data-in="1" style="animation-delay:.14s">Every Monday you get ready-to-post ads made for your business and sized for Instagram, Facebook and more. Approve them in about two minutes and we publish them for you.</p>
       <div class="hero-ctas" data-in="1" style="animation-delay:.22s">
-        <a href="signup.html" class="btn btn-lg">Try it free<span class="mono" aria-hidden="true">→</span></a>
+        <a href="signup.html" class="btn btn-lg">{{ mainCta }}<span class="mono" aria-hidden="true">→</span></a>
         <a href="#drop" class="btn-ghost btn-lg">See how it works</a>
       </div>
       <ul class="hero-assure" data-in="1" style="animation-delay:.3s">
-        <li><span class="tick" aria-hidden="true">✓</span>Free plan, no card needed</li>
-        <li><span class="tick" aria-hidden="true">✓</span>7-day trial on paid plans</li>
-        <li><span class="tick" aria-hidden="true">✓</span>Cancel any time</li>
+        <sc-for list="{{ assure }}" as="a" hint-placeholder-count="3">
+          <li><span class="tick" aria-hidden="true">✓</span>{{ a.text }}</li>
+        </sc-for>
       </ul>
     </div>
 
@@ -874,24 +877,29 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
     <div class="sec-head is-center" data-rv="price">
       <div class="eyebrow">Pricing</div>
       <h2>Simple prices, no contract.</h2>
-      <p class="lede">Start free, or try any paid plan free for 7 days.</p>
+      <p class="lede">{{ pricingLede }}</p>
     </div>
     <div data-rv="price" style="transition-delay:.06s">
       <div class="tabswitch billing" role="group" aria-label="Billing">
         <button type="button" class="{{ mCls }}" onClick="{{ setMonthly }}" aria-pressed="{{ mPressed }}">Monthly</button>
         <button type="button" class="{{ aCls }}" onClick="{{ setAnnual }}" aria-pressed="{{ aPressed }}">Annual<span class="save-pill">−20%</span></button>
       </div>
+      <sc-if value="{{ notBeta }}" hint-placeholder-val="{{ true }}">
       <div class="promo">
         <span class="promo-tag">PROMO CODE</span>
         <span class="promo-text">20% off any paid plan — enter it at checkout.</span>
         <button type="button" class="promo-code" onClick="{{ copyPromo }}">{{ promoCode }}<span class="copy" aria-live="polite">{{ promoCopyLabel }}</span></button>
       </div>
+      </sc-if>
+      <sc-if value="{{ beta }}" hint-placeholder-val="{{ false }}">
+        <div class="free-note"><span class="mono">BETA</span>Free until launch for the businesses we pick — and 30% off a monthly plan for your first 12 months after that.</div>
+      </sc-if>
       <sc-if value="{{ hasFreeNote }}" hint-placeholder-val="{{ false }}">
         <div class="free-note" role="status"><span class="mono">{{ freeNoteTag }}</span>{{ freeNoteText }}</div>
       </sc-if>
     </div>
 
-    <div class="plans">
+    <div class="{{ plansCls }}">
       <sc-for list="{{ plans }}" as="pl" hint-placeholder-count="4">
         <div class="{{ pl.cls }}" data-rv="price" style="transition-delay:{{ pl.delay }}">
           <sc-if value="{{ pl.featured }}" hint-placeholder-val="{{ false }}"><span class="plan-flag">Recommended</span></sc-if>
@@ -947,12 +955,14 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 
 <section id="finalcta" class="final">
   <div class="final-card" data-rv="final">
-    <h2>Your first ads can be ready this week.</h2>
-    <p class="lede">Sign up in about ten minutes. No contract, no meeting, cancel any time.</p>
+    <h2>{{ finalTitle }}</h2>
+    <p class="lede">{{ finalLede }}</p>
     <div class="hero-ctas">
-      <a href="signup.html" class="btn btn-lg">Try it free<span class="mono" aria-hidden="true">→</span></a>
+      <a href="signup.html" class="btn btn-lg">{{ mainCta }}<span class="mono" aria-hidden="true">→</span></a>
     </div>
+    <sc-if value="{{ notBeta }}" hint-placeholder-val="{{ true }}">
     <div class="final-alt"><a href="signup.html?plan=free">Or start on the Free plan</a> — <span>no card needed.</span></div>
+    </sc-if>
   </div>
 </section>
 
@@ -1171,6 +1181,10 @@ class Component extends DCLogic {
     ];
 
     const annual = this.state.billing === "annual";
+    // During the beta (BETA in boot-gate.js) there is no Free plan, no trial
+    // and no checkout: every button applies for a beta place, and the plan
+    // prices read as what Adronis costs from launch.
+    const beta = window.LBGate ? LBGate.beta : true;
     const loc = window.LBLang ? LBLang.locale() : "en-US";
     const euro = (n) => "€" + Math.round(n).toLocaleString(loc);
     const cents = (n) => "€" + n.toLocaleString(loc, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -1208,7 +1222,7 @@ class Component extends DCLogic {
         cta: "Talk to us", href: "contact.html?plan=franchise",
         after: "We reply within one business day."
       }
-    ].map((p, i) => {
+    ].filter((p) => !(beta && p.base === 0)).map((p, i) => {
       const monthly = annual ? p.base * 0.8 : p.base;
       const paidTrial = p.base > 0 && p.name !== "Franchise";
       return {
@@ -1216,8 +1230,8 @@ class Component extends DCLogic {
         featured: p.featured,
         tagline: p.tagline,
         features: p.features.map((f) => typeof f === "string" ? { text: f, soon: false } : f),
-        cta: p.cta,
-        href: p.href,
+        cta: beta && paidTrial ? "Apply for the beta" : p.cta,
+        href: beta && paidTrial ? "signup.html" : p.href,
         price: "€" + Math.round(monthly),
         per: p.base ? "/ month, incl. VAT" : "/ month",
         showYearly: annual && p.base > 0,
@@ -1226,7 +1240,8 @@ class Component extends DCLogic {
         perAd: p.perWeek ? cents(monthly / (p.perWeek * WEEKS_PER_MONTH)) : "",
         showSave: annual && p.base > 0,
         save: euro(p.base * 12 * 0.2),
-        after: paidTrial
+        after: beta && paidTrial ? "Free during the beta"
+          : paidTrial
           ? "7 days free, then " + (annual ? euro(monthly * 12) + " a year" : euro(monthly) + " a month")
           : p.after,
         cls: "plan" + (p.featured ? " is-featured" : ""),
@@ -1237,6 +1252,22 @@ class Component extends DCLogic {
 
     return {
       steps, stories, posts, plans,
+      beta,
+      notBeta: !beta,
+      navCta: beta ? "Join the beta" : "Try it free",
+      mainCta: beta ? "Apply for the beta" : "Try it free",
+      assure: (beta
+        ? ["Free during the beta", "No card needed", "Limited places"]
+        : ["Free plan, no card needed", "7-day trial on paid plans", "Cancel any time"]
+      ).map((text) => ({ text })),
+      pricingLede: beta
+        ? "These are the prices from launch in Q1 2027. Until then, Adronis is free for the businesses picked for the beta."
+        : "Start free, or try any paid plan free for 7 days.",
+      plansCls: "plans" + (beta ? " is-three" : ""),
+      finalTitle: beta ? "Be one of the first businesses on Adronis." : "Your first ads can be ready this week.",
+      finalLede: beta
+        ? "Applying takes about ten minutes. Places are limited, and it is free until launch."
+        : "Sign up in about ten minutes. No contract, no meeting, cancel any time.",
       verticals: ["Bakeries", "Barbershops", "Dental clinics", "Gyms & studios", "Wine bars", "Florists", "Auto detailers", "Physiotherapy", "Nail studios"],
       signedIn: this.state.signedIn,
       planetAccent: this.props.accent || "#7cc6ff",
@@ -1261,7 +1292,7 @@ class Component extends DCLogic {
         { q: "What if I don't like an ad?", a: "Reject it and pick a reason — wrong tone, wrong facts or price, the image doesn't fit. The engine takes that into your next drop. You can also change the text of any ad before you approve it." },
         { q: "Which networks can Adronis post to?", a: "Instagram, Facebook, TikTok, Google Business, LinkedIn and Pinterest. How many you connect at once depends on your plan: one on Free, two on Counter, up to four on Storefront and any number on Franchise." },
         { q: "Are the ads made with AI?", a: "Yes. Every image is generated for your business rather than taken from a stock library, and nothing is published until you approve it. On the Franchise plan a real designer also checks your ads." },
-        { q: "How does the free trial work?", a: "Paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." },
+        { q: "How does the free trial work?", a: "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." },
         { q: "Can I cancel any time?", a: "Yes, from your account page, in one click. Cancelling takes effect at the end of the period you have already paid for. Annual plans are billed 12 months upfront and unused months are not refunded." }
       ],
       setMonthly: () => this.setState({ billing: "monthly" }),

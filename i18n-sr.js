@@ -1913,6 +1913,19 @@ window.LB_I18N_SR = {
     "Free plan, no card needed": "Besplatan plan, bez kartice",
     "7-day trial on paid plans": "7 dana probe na plaćenim planovima",
     "Cancel any time": "Otkaži kad god želiš",
+    // The same spots while the beta runs (BETA in boot-gate.js).
+    "Join the beta": "Prijavi se za betu",
+    "Free during the beta": "Besplatno tokom bete",
+    "Limited places": "Ograničen broj mesta",
+    "These are the prices from launch in Q1 2027. Until then, Adronis is free for the businesses picked for the beta.":
+      "Ovo su cene od lansiranja u prvom kvartalu 2027. Do tada je Adronis besplatan za biznise izabrane za beta testiranje.",
+    "Free until launch for the businesses we pick — and 30% off a monthly plan for your first 12 months after that.":
+      "Besplatno do lansiranja za biznise koje izaberemo — a posle toga 30% popusta na mesečni plan prvih 12 meseci.",
+    "Be one of the first businesses on Adronis.": "Budi među prvim biznisima na Adronisu.",
+    "Applying takes about ten minutes. Places are limited, and it is free until launch.":
+      "Prijava traje oko deset minuta. Broj mesta je ograničen, a do lansiranja je besplatno.",
+    "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all.":
+      "Tokom bete Adronis je besplatan za biznise koje izaberemo: bez kartice, bez plaćanja. Od lansiranja u prvom kvartalu 2027. plaćeni planovi počinju sa 7 dana besplatne probe, jednom po nalogu. Potrebna je kartica, tokom probe se ništa ne naplaćuje, a plan se posle automatski obnavlja dok ga ne otkažeš. Za besplatni plan kartica uopšte nije potrebna.",
     "Drop ready": "Drop je spreman",
     "Posted to Instagram": "Objavljeno na Instagramu",
     "Try it: this is your Monday": "Probaj: ovako izgleda tvoj ponedeljak",
