@@ -618,6 +618,29 @@ window.LB_I18N_SR = {
     "Your first batch is still rendering.": "Tvoja prva tura se još renderuje.",
     "Drops land Monday morning. As soon as the engine finishes your week, every creative shows up here for approval.":
       "Dropovi stižu u ponedeljak ujutru. Čim mašina završi tvoju nedelju, svaki kreativ se pojavljuje ovde na odobravanje.",
+
+    // The first week, once the plan is on but nothing has landed (first-week.js)
+    "YOU'RE IN THE BETA": "U BETI SI",
+    "YOUR PLAN IS ON": "TVOJ PLAN JE UKLJUČEN",
+    "Your first ads land on Monday.": "Tvoji prvi oglasi stižu u ponedeljak.",
+    "Here's how your first week goes. Until then, everything you add under Profile strength above goes into your first ads.":
+      "Ovako izgleda tvoja prva nedelja. Do tada, sve što dodaš gore pod Snaga profila ulazi u tvoje prve oglase.",
+    "Here's how your first week goes. Until then, adding your logo and photos in the control room makes your first ads look like your business.":
+      "Ovako izgleda tvoja prva nedelja. Do tada, logo i fotografije koje dodaš u kontrolnoj sobi čine da prvi oglasi izgledaju kao tvoj biznis.",
+    "MONDAY": "PONEDELJAK",
+    "THE SAME DAY": "ISTOG DANA",
+    "THAT WEEK": "TE NEDELJE",
+    "Your ads land in Approvals.": "Oglasi stižu u Odobravanja.",
+    "Your ads land here.": "Oglasi stižu ovde.",
+    "Each one waits for your yes — nothing goes out without it.": "Svaki čeka tvoje „da“ — bez toga ništa ne izlazi.",
+    "Approve or reject.": "Odobri ili odbaci.",
+    "Tell us why you reject one and the next drop gets it right. You can edit the text, too.":
+      "Reci nam zašto odbacuješ oglas i sledeći drop će pogoditi. Možeš i da izmeniš tekst.",
+    "Approved ads go out.": "Odobreni oglasi izlaze.",
+    "They post at the best times for your channels, and this page shows when.":
+      "Objavljuju se u najbolje vreme za tvoje kanale, a ova stranica pokazuje kada.",
+    "They post at the best times for your channels — the control room shows when.":
+      "Objavljuju se u najbolje vreme za tvoje kanale — kontrolna soba pokazuje kada.",
     "See a sample drop": "Pogledaj primer dropa",
     "Account settings": "Podešavanja naloga",
     "Undo": "Poništi",

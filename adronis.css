@@ -288,7 +288,7 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
 .foot-col-title{font-family:var(--font);font-size:13px;font-weight:600;letter-spacing:0;color:var(--text);margin-bottom:4px;text-transform:none}
 .foot-col a{color:var(--text-3);width:fit-content}
 .foot-col a:hover{color:var(--text)}
-.foot-bottom{position:relative;z-index:1;max-width:1200px;margin:48px auto 0;padding-top:22px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-4)}
+.foot-bottom{position:relative;z-index:1;max-width:1200px;margin:48px auto 0;padding-top:22px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-3)}
 .foot-bottom a{color:var(--text-2)}
 .foot-bottom a:hover{color:var(--acc)}
 @media (max-width:860px){.foot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.foot-grid>:first-child{grid-column:1/-1}}
@@ -298,6 +298,14 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
 .empty .mono{font-size:11px;letter-spacing:.12em;color:var(--text-3)}
 .empty h3{margin:14px 0 8px;font-size:21px}
 .empty p{margin:0 auto;max-width:46ch;color:var(--text-2)}
+/* How the first week goes, for an account whose plan is on but whose first
+   drop hasn't landed (control room and approvals). */
+.first-week{list-style:none;margin:26px auto 0;padding:0;max-width:680px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;text-align:left}
+.first-week li{padding:16px 16px 18px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--surface)}
+.first-week .fw-when{display:block;margin-bottom:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
+.first-week b{display:block;margin-bottom:5px;font-size:15px;font-weight:600;color:var(--text)}
+.first-week .fw-text{display:block;font-size:13.5px;line-height:1.5;color:var(--text-2)}
+@media (max-width:700px){.first-week{grid-template-columns:minmax(0,1fr)}}
 /* The "LOADING ..." boxes get a slow sweep so a wait reads as work, not a freeze. */
 #loading.empty{position:relative;overflow:hidden;border-style:solid;border-color:var(--line)}
 #loading.empty::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(255,255,255,0) 30%,rgba(124,198,255,.08) 50%,rgba(255,255,255,0) 70%);transform:translateX(-100%);animation:lb-sweep 1.6s var(--ease-io) infinite}

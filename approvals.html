@@ -87,9 +87,16 @@
 .reason-keys{font-size:10px;color:var(--text-3);margin-left:6px}
 .approve-toast .reason-toast-close{border-color:var(--line-2);background:none;color:var(--text-3)}
 .ap-note{font-size:13.5px;color:var(--text-3)}
+.ap-note a{text-decoration:underline;text-underline-offset:3px}
 @media (max-width:860px){#kb-hint{display:none}.reason-keys{display:none}}
+/* The small text buttons under each ad get a thumb-sized hit area on touch
+   screens without moving anything. */
+@media (pointer:coarse){.link-btn{padding:10px 0;margin:-10px 0}}
 @media (max-width:640px){
   .board-panel{padding:18px;border-radius:22px}
+  /* Four fixed filters: wrapped onto two rows they all stay in sight, where
+     the scrolling strip cut the last two off the edge. */
+  #filterbar{flex-wrap:wrap;overflow:visible;margin:0 0 10px;padding:0}
   .bulk-actions{justify-content:flex-start}
   .approve-toast{left:16px;right:16px;transform:translateY(10px)}
   .approve-toast.show{transform:translateY(0)}
@@ -189,6 +196,12 @@
       <div class="mono">NO DROP YET</div>
       <h3>Your first batch is still rendering.</h3>
       <p>Drops land Monday morning. As soon as the engine finishes your week, every creative shows up here for approval.</p>
+      <!-- Shown once the plan is on (first-week.js) -->
+      <ol class="first-week" hidden>
+        <li><span class="fw-when">MONDAY</span><b>Your ads land here.</b><span class="fw-text">Each one waits for your yes — nothing goes out without it.</span></li>
+        <li><span class="fw-when">THE SAME DAY</span><b>Approve or reject.</b><span class="fw-text">Tell us why you reject one and the next drop gets it right. You can edit the text, too.</span></li>
+        <li><span class="fw-when">THAT WEEK</span><b>Approved ads go out.</b><span class="fw-text">They post at the best times for your channels — the control room shows when.</span></li>
+      </ol>
       <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
         <button id="demo-btn" class="btn-ghost" type="button">See a sample drop</button>
         <a href="account.html" class="btn-ghost">Account settings</a>
@@ -241,6 +254,7 @@
 <script src="feedback.js"></script>
 <script src="tour.js"></script>
 <script src="reschedule.js"></script>
+<script src="first-week.js"></script>
 <script>
 (function () {
   var loading   = document.getElementById("loading");
@@ -1311,7 +1325,7 @@
     if (dropRes.error || creativeRes.error) {
       noDrops.hidden = false;
       noDrops.querySelector("h3").textContent = "Couldn't load your drop.";
-      noDrops.querySelector("p").textContent = (dropRes.error || creativeRes.error).message;
+      noDrops.querySelector("p").textContent = LBAuth.friendlyError(dropRes.error || creativeRes.error).message;
       return;
     }
 
@@ -1319,6 +1333,10 @@
     creatives = creativeRes.data || [];
 
     if (!creatives.length) {
+      if (LBAuth.hasActivePlan()) {
+        LBFirstWeek.show(noDrops, "Here's how your first week goes. Until then, adding your logo and photos " +
+          "in the control room makes your first ads look like your business.");
+      }
       noDrops.hidden = false;
     } else {
       currentDrop = defaultDrop();

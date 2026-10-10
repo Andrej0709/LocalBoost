@@ -207,7 +207,7 @@
     "background:rgba(16,18,23,.72);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);",
     "box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 30px rgba(0,0,0,.5);",
     "font-family:'Geist Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em}",
-    ".lb-lang-btn{padding:2px;border:none;background:none;cursor:pointer;color:#5d626c;",
+    ".lb-lang-btn{padding:2px;border:none;background:none;cursor:pointer;color:#8a8f98;",
     "font:inherit;letter-spacing:inherit;line-height:1;transition:color .18s ease}",
     ".lb-lang-btn:hover{color:#f2f4f7}",
     ".lb-lang-btn.is-on{color:var(--acc,#7cc6ff)}",
@@ -216,8 +216,9 @@
     // On a phone a floating pill sits on top of whatever is under it - a
     // form field, the approve button - so there the switch lives in the menu
     // sheet instead (same breakpoint as the burger in adronis.css).
-    ".nav-sheet .lb-lang{position:static;justify-self:center;margin:10px auto 2px;padding:9px 16px;font-size:12px;box-shadow:none}",
-    ".nav-sheet .lb-lang-btn{padding:4px 6px}",
+    ".nav-sheet .lb-lang{position:static;justify-self:center;margin:10px auto 2px;padding:2px 6px;font-size:12px;box-shadow:none}",
+    // Big enough to hit with a thumb.
+    ".nav-sheet .lb-lang-btn{min-width:44px;min-height:40px;padding:0 10px}",
     "@media (max-width:900px){#lb-lang-switch{display:none}}",
     "@media (min-width:901px){.nav-sheet .lb-lang{display:none}}",
     "@media print{.lb-lang{display:none}}"

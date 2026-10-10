@@ -309,9 +309,15 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 
     <!-- No creatives at all -->
     <div id="no-drops" class="empty" hidden>
-      <div class="mono">NO DROP YET</div>
+      <div class="mono" id="no-drops-tag">NO DROP YET</div>
       <h3>Nothing to show yet.</h3>
       <p>Once your first drop renders and you approve a few creatives, this is where you'll see exactly what's posting and when.</p>
+      <!-- Shown instead of the line above once the plan is on (first-week.js) -->
+      <ol class="first-week" id="first-week" hidden>
+        <li><span class="fw-when">MONDAY</span><b>Your ads land in Approvals.</b><span class="fw-text">Each one waits for your yes — nothing goes out without it.</span></li>
+        <li><span class="fw-when">THE SAME DAY</span><b>Approve or reject.</b><span class="fw-text">Tell us why you reject one and the next drop gets it right. You can edit the text, too.</span></li>
+        <li><span class="fw-when">THAT WEEK</span><b>Approved ads go out.</b><span class="fw-text">They post at the best times for your channels, and this page shows when.</span></li>
+      </ol>
       <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
         <button type="button" id="sample-btn" class="btn-ghost">See a sample week</button>
         <a href="approvals.html" class="btn-ghost">Go to approvals</a>
@@ -348,6 +354,7 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 <script src="tour.js"></script>
 <script src="reschedule.js"></script>
 <script src="brand-assets.js"></script>
+<script src="first-week.js"></script>
 <script src="control-room.js"></script>
 </body>
 </html>

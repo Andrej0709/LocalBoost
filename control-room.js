@@ -943,6 +943,10 @@
 
     var creatives = res.data || [];
     if (!creatives.length) {
+      if (LBAuth.hasActivePlan()) {
+        LBFirstWeek.show(noDrops, "Here's how your first week goes. Until then, everything you add under " +
+          "Profile strength above goes into your first ads.");
+      }
       noDrops.hidden = false;
     } else {
       board.hidden = false;
