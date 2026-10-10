@@ -19,7 +19,8 @@
 //
 // Secrets (Supabase > Edge Functions > Secrets):
 //   PADDLE_API_KEY         server-side API key (pdl_sdbx_... in sandbox)
-//   PADDLE_WEBHOOK_SECRET  secret of the notification destination (pdl_ntfset_...)
+//   PADDLE_WEBHOOK_SECRET  secret of the notification destination (pdl_ntfset_...);
+//                          also signs the user_id on every checkout (signedUserId)
 //   PADDLE_ENV             "sandbox" or "production"
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase itself.
 
@@ -48,6 +49,13 @@ const RUNNING = ["trialing", "active", "past_due"];
 // Franchise is never bought here: it's agreed with Adronis first (the contact
 // page) and then set on the account from the Adronis Portal (handleAdmin).
 const FRANCHISE_BY_TALK = "Franchise is set up with us directly - talk to us from the contact page.";
+
+// Beta: until the public launch in Q1 2027 nobody checks out - the only way
+// onto a plan is the Beta button in the portal. The site hides checkout too,
+// but this is what holds against a request sent by hand. Set to false at
+// launch, together with BETA in boot-gate.js.
+const BETA = true;
+const CLOSED_IN_BETA = "Adronis is in a closed beta - plans open at the launch.";
 
 // ------------------------------------------------------------------ helpers
 
@@ -136,6 +144,38 @@ function promoSummary(d: any) {
   };
 }
 
+// Which account a Paddle checkout belongs to. The checkout action puts the
+// user_id on the transaction together with a signature only this function
+// can make, and Paddle copies both onto the subscription and every renewal.
+// Paddle.js can open a checkout with any custom_data, so a user_id without
+// a matching signature is ignored - otherwise anyone could check out by hand
+// (a trial price again, or a plan during the beta) and land it on an account.
+async function hmacHex(key: string, message: string) {
+  const k = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(key),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(message));
+  return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function sameHex(a: string, b: string) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+function checkoutSig(userId: string) {
+  return hmacHex(Deno.env.get("PADDLE_WEBHOOK_SECRET") || "", "checkout:" + userId);
+}
+
+async function signedUserId(customData: any): Promise<string | null> {
+  const id = customData?.user_id, sig = customData?.sig;
+  if (typeof id !== "string" || typeof sig !== "string") return null;
+  return sameHex(await checkoutSig(id), sig) ? id : null;
+}
+
 async function profileById(id: string) {
   const { data, error } = await db.from("profiles").select("*").eq("id", id).maybeSingle();
   if (error) throw error;
@@ -161,13 +201,18 @@ async function profileBySubscription(subId: string) {
 // the items' plan applies now; same period with different items -> it's
 // pending_plan.
 async function syncSubscription(sub: any, userIdHint?: string) {
-  const userId = sub.custom_data?.user_id || userIdHint;
+  const userId = userIdHint || await signedUserId(sub.custom_data);
   let profile = userId ? await profileById(userId) : null;
   if (!profile) profile = await profileBySubscription(sub.id);
   if (!profile) {
     // An ended subscription nobody points at any more (the account was
     // deleted, or given its plan for good in the portal) has nothing to update.
     if (sub.status === "canceled") return null;
+    // A checkout this function never made: no account is touched.
+    if (sub.custom_data?.user_id && !userId) {
+      console.error("Ignored a subscription from an unsigned checkout", sub.id);
+      return null;
+    }
     throw new Error("No profile for subscription " + sub.id);
   }
 
@@ -329,9 +374,13 @@ async function recordTransaction(tx: any) {
   const total = Number(tx.details?.totals?.grand_total || 0);
   if (total <= 0) return;
 
-  let profile = tx.custom_data?.user_id ? await profileById(tx.custom_data.user_id) : null;
+  const userId = await signedUserId(tx.custom_data);
+  let profile = userId ? await profileById(userId) : null;
   if (!profile) profile = await profileBySubscription(tx.subscription_id);
-  if (!profile) throw new Error("No profile for transaction " + tx.id); // retried by Paddle
+  if (!profile) {
+    if (tx.custom_data?.user_id && !userId) return; // a checkout this function never made
+    throw new Error("No profile for transaction " + tx.id); // retried by Paddle
+  }
 
   const history = Array.isArray(profile.billing_history) ? profile.billing_history : [];
   if (history.some((e: any) => e.transaction_id === tx.id)) return; // already recorded
@@ -364,17 +413,7 @@ async function verifySignature(raw: string, header: string) {
   // genuine delivery is always fresh.
   if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) return false;
 
-  const key = await crypto.subtle.importKey(
-    "raw", new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
-  );
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(ts + ":" + raw));
-  const hex = Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
-
-  if (hex.length !== h1.length) return false;
-  let diff = 0;
-  for (let i = 0; i < hex.length; i++) diff |= hex.charCodeAt(i) ^ h1.charCodeAt(i);
-  return diff === 0;
+  return sameHex(await hmacHex(secret, ts + ":" + raw), h1);
 }
 
 async function handleWebhook(req: Request, signature: string) {
@@ -419,6 +458,7 @@ async function handleAction(req: Request) {
       // Creates a Paddle transaction for the checkout overlay to open. The
       // trial/no-trial choice is made here from the database, never by the page.
       case "checkout": {
+        if (BETA) throw new UserError(CLOSED_IN_BETA);
         if (!profile.onboarded_at) throw new UserError("Finish the business brief before checking out.");
         if (!PAID_PLANS.includes(body.plan)) throw new UserError("Pick a paid plan.");
         if (body.plan === "franchise") throw new UserError(FRANCHISE_BY_TALK);
@@ -429,7 +469,7 @@ async function handleAction(req: Request) {
         const priceId = await findPrice(body.plan, body.cycle, trial);
         const tx: Record<string, unknown> = {
           items: [{ price_id: priceId, quantity: 1 }],
-          custom_data: { user_id: profile.id },
+          custom_data: { user_id: profile.id, sig: await checkoutSig(profile.id) },
           collection_mode: "automatic",
         };
         if (body.promo_code) tx.discount_id = (await findDiscount(String(body.promo_code).trim(), priceId)).id;

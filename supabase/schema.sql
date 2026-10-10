@@ -425,7 +425,8 @@ security definer
 set search_path = public, pg_temp
 as $$
 declare
-  picked public.plan_tier := (nullif(new.raw_user_meta_data ->> 'plan', ''))::public.plan_tier;
+  /* 'beta' is never a signup's pick - only the portal gives it. */
+  picked public.plan_tier := (nullif(nullif(new.raw_user_meta_data ->> 'plan', ''), 'beta'))::public.plan_tier;
 begin
   insert into public.profiles (
     id, email, business_name, country, city, vertical, website,
@@ -998,6 +999,9 @@ begin
        or new.paddle_discount is not null then
       raise exception 'Billing details can only be set through checkout.';
     end if;
+    if new.plan::text = 'beta' then
+      raise exception 'The Beta plan is switched on by Adronis.';
+    end if;
     /* The row's email is the signed-in account's, whatever the browser sent. */
     new.email := coalesce(auth.jwt() ->> 'email', new.email);
     return new;
@@ -1037,6 +1041,12 @@ begin
   if new.plan is distinct from old.plan
      and old.subscription_status in ('trialing', 'active', 'past_due') then
     raise exception 'Change your plan from the account page - it switches at your next billing date.';
+  end if;
+
+  /* Only the portal gives the Beta plan (admin_set_plan_state). Picked from
+     the browser it would pass for a tester's plan and its four channels. */
+  if new.plan is distinct from old.plan and new.plan::text = 'beta' then
+    raise exception 'The Beta plan is switched on by Adronis.';
   end if;
 
   /* No more channels than the plan publishes to. Checked only when the
@@ -1239,10 +1249,14 @@ create policy "creatives update own" on public.creatives
 
 /* contact_requests / messages: public forms. */
 /* Anyone may submit. Nobody may read them from the browser - read them in the */
-/* Supabase dashboard, which bypasses RLS. */
+/* Supabase dashboard, which bypasses RLS. A beta application is only ever     */
+/* written by apply_for_beta() from a real account's brief, so the browser may */
+/* not post one itself (it would land in the portal as an application from    */
+/* whatever email it named). */
 drop policy if exists "contact insert public" on public.contact_requests;
 create policy "contact insert public" on public.contact_requests
-  for insert to anon, authenticated with check (status = 'new');
+  for insert to anon, authenticated
+  with check (status = 'new' and plan_interest is distinct from 'beta');
 
 drop policy if exists "messages insert public" on public.messages;
 create policy "messages insert public" on public.messages
