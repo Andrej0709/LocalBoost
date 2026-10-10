@@ -619,6 +619,8 @@ window.LB_I18N_SR = {
     "Drops land Monday morning. As soon as the engine finishes your week, every creative shows up here for approval.":
       "Dropovi stižu u ponedeljak ujutru. Čim mašina završi tvoju nedelju, svaki kreativ se pojavljuje ovde na odobravanje.",
 
+    "See the post →": "Pogledaj objavu →",
+
     // The first week, once the plan is on but nothing has landed (first-week.js)
     "YOU'RE IN THE BETA": "U BETI SI",
     "YOUR PLAN IS ON": "TVOJ PLAN JE UKLJUČEN",

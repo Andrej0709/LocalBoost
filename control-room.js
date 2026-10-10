@@ -63,6 +63,16 @@
       mine.textContent = "Your time";
       main.appendChild(mine);
     }
+    // Saved by whoever posted it (the portal's Ads tab).
+    if (creative.status === "published" && /^https?:\/\//i.test(creative.post_url || "")) {
+      var post = document.createElement("a");
+      post.className = "cr-post-link";
+      post.href = creative.post_url;
+      post.target = "_blank";
+      post.rel = "noopener noreferrer";
+      post.textContent = "See the post →";
+      main.appendChild(post);
+    }
     row.appendChild(main);
 
     var chip = document.createElement("div");
