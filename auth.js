@@ -139,7 +139,20 @@
     }
 
     rememberRoute();
+    touchLastSeen();
     return profile;
+  }
+
+  // Tells the portal this account was here (touch_last_seen in schema.sql),
+  // so a beta tester who has gone quiet shows up there. At most once every
+  // half hour per browser tab, and never in the way of the page.
+  function touchLastSeen() {
+    var KEY = "lb-seen-at";
+    try {
+      if (Date.now() - Number(sessionStorage.getItem(KEY) || 0) < 30 * 60 * 1000) return;
+      sessionStorage.setItem(KEY, String(Date.now()));
+    } catch (e) {}
+    db.rpc("touch_last_seen").then(function () {}, function () {});
   }
 
   // Billing goes through the paddle Edge Function (supabase/functions/paddle),

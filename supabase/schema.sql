@@ -595,6 +595,31 @@ revoke execute on function public.apply_for_beta(text) from public, anon;
 grant execute on function public.apply_for_beta(text) to authenticated;
 
 /* ------------------------------------------------------------ */
+/* 8a-seen. touch_last_seen - when the customer was last on the site.  */
+/*     auth.js calls it when a signed-in page loads, so the Adronis     */
+/*     Portal can tell a beta tester who has gone quiet. Only the       */
+/*     database's own clock is stored, and at most every 10 minutes.    */
+/*     The customer can't write last_seen_at directly: it isn't among   */
+/*     the fields protect_profile_billing lets them change. */
+/* ------------------------------------------------------------ */
+alter table public.profiles add column if not exists last_seen_at timestamptz;
+
+create or replace function public.touch_last_seen()
+returns void
+language sql
+security definer
+set search_path = public, pg_temp
+as $$
+  update public.profiles
+     set last_seen_at = now()
+   where id = auth.uid()
+     and (last_seen_at is null or last_seen_at < now() - interval '10 minutes');
+$$;
+
+revoke execute on function public.touch_last_seen() from public, anon;
+grant execute on function public.touch_last_seen() to authenticated;
+
+/* ------------------------------------------------------------ */
 /* 8b. start_trial - the only way a trial ever begins. */
 /*     Called from checkout.js once the card has been captured. Refuses to run  */
 /*     while the business brief is missing, so the trial can never start        */
