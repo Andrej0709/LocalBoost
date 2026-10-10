@@ -94,6 +94,8 @@
   // hint (first visit on this device) any page that can redirect is hidden.
   function likelyRedirect(hint) {
     var tester = hint && hint.t, brief = hint && hint.b;
+    // The public demo (demo.js) never sends anyone away.
+    if (params.has("demo") && (page === "approvals.html" || page === "control-room.html")) return false;
     switch (page) {
       case "approvals.html":
       case "control-room.html":

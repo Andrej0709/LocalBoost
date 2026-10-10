@@ -621,6 +621,23 @@ window.LB_I18N_SR = {
 
     "See the post →": "Pogledaj objavu →",
 
+    // The public demo (demo.js)
+    "DEMO": "DEMO",
+    "A made-up café, to show how Adronis works. Try anything — nothing here is saved.":
+      "Izmišljeni kafić, da vidiš kako Adronis radi. Probaj sve — ništa se ovde ne čuva.",
+    "← Back to approvals": "← Nazad na odobravanja",
+    "See the control room →": "Pogledaj kontrolnu sobu →",
+    "Kafeterija Kutak — this week": "Kafeterija Kutak — ova nedelja",
+    "Want to see it first?": "Hoćeš prvo da vidiš kako izgleda?",
+    "Try the demo": "Probaj demo",
+    "— no account needed.": "— bez naloga.",
+    "Curious what's coming?": "Zanima te šta te čeka?",
+    "with a made-up café.": "sa izmišljenim kafićem.",
+    "Swipe through a café's week of ads: approve what fits, reject what doesn't and say why. Nothing here is saved.":
+      "Prođi kroz nedelju oglasa jednog kafića: odobri šta valja, odbaci šta ne valja i reci zašto. Ništa se ovde ne čuva.",
+    "A café's week of approved ads: what goes out and when, and what's already live.":
+      "Nedelja odobrenih oglasa jednog kafića: šta izlazi i kada, i šta je već objavljeno.",
+
     // The first week, once the plan is on but nothing has landed (first-week.js)
     "YOU'RE IN THE BETA": "U BETI SI",
     "YOUR PLAN IS ON": "TVOJ PLAN JE UKLJUČEN",

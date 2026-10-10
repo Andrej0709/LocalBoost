@@ -298,6 +298,13 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
 .empty .mono{font-size:11px;letter-spacing:.12em;color:var(--text-3)}
 .empty h3{margin:14px 0 8px;font-size:21px}
 .empty p{margin:0 auto;max-width:46ch;color:var(--text-2)}
+/* The strip on top of the public demo (demo.js). */
+.demo-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px 20px;margin:0 0 24px;padding:16px 18px;border-radius:var(--r-lg);border:1px solid var(--acc-line);background:var(--acc-soft)}
+.demo-bar-text{display:flex;align-items:baseline;gap:12px;flex:1 1 320px;color:var(--text);font-size:15px;line-height:1.5}
+.demo-bar-tag{flex:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--acc)}
+.demo-bar-links{display:flex;flex-wrap:wrap;gap:10px}
+@media (max-width:640px){.demo-bar-links{width:100%}.demo-bar-links>*{flex:1 1 100%}}
+
 /* How the first week goes, for an account whose plan is on but whose first
    drop hasn't landed (control room and approvals). */
 .first-week{list-style:none;margin:26px auto 0;padding:0;max-width:680px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;text-align:left}

@@ -68,6 +68,8 @@
   // session and profile, so it runs once they're loaded.
   function closedInBeta() {
     if (!BETA) return false;
+    // The public demo (demo.js) is open to everyone, signed in or not.
+    if (window.LBDemo && LBDemo.on) return false;
     var tester = isTester();
     if (PAGE === "checkout.html") return true;
     if (APP_PAGES.indexOf(PAGE) > -1) return !!session && !tester;

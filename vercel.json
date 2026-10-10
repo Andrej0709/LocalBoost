@@ -1,4 +1,7 @@
 {
+  "redirects": [
+    { "source": "/demo", "destination": "/approvals.html?demo=1", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/Adronis.dc.html" },
     { "source": "/full", "destination": "/Adronis-full.html" }

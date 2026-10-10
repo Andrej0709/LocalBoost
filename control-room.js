@@ -395,10 +395,12 @@
   }
 
   function showSample() {
-    var creatives = sampleCreatives();
+    // The public demo (demo.js) has its own café's week, with real pictures,
+    // and its own strip saying what it is.
+    var creatives = LBDemo.on ? LBDemo.week() : sampleCreatives();
     noDrops.hidden = true;
     board.hidden = false;
-    document.getElementById("sample-notice").hidden = false;
+    document.getElementById("sample-notice").hidden = LBDemo.on;
     renderStats(creatives);
     renderScheduled(creatives);
     renderLive(creatives);
@@ -891,6 +893,17 @@
   }
 
   LBAuth.ready.then(async function () {
+    // The public demo: the sample week for everyone, signed in or not.
+    if (LBDemo.on) {
+      loading.hidden = true;
+      LBDemo.bar();
+      document.getElementById("page-sub").textContent =
+        "A café's week of approved ads: what goes out and when, and what's already live.";
+      document.getElementById("history-link").hidden = true;
+      showSample();
+      return;
+    }
+
     if (!LBAuth.isLoggedIn()) {
       loading.hidden = true;
       signedOut.hidden = false;

@@ -244,6 +244,7 @@
 <!-- The translation loads first so scripts that format a date on load already
      know the reader's language. nav.js comes before it: its menu copies the nav
      links, and must copy them before they are translated. -->
+<script src="demo.js"></script>
 <script src="nav.js"></script>
 <script src="cookies.js"></script>
 <script src="i18n-sr.js"></script>
@@ -389,7 +390,7 @@
     var drop = drops.filter(function (d) { return d.id === currentDrop; })[0];
 
     document.getElementById("drop-title").textContent =
-      demoMode ? "Sample drop"
+      demoMode ? (LBDemo.on ? "Kafeterija Kutak — this week" : "Sample drop")
         : drop && drop.theme ? drop.theme
         : currentDrop === "all" ? "Every creative"
         : drop && drops[0] && drop.id !== drops[0].id ? "An earlier drop"
@@ -1154,7 +1155,8 @@
       theme: "Sample drop"
     }];
     currentDrop = "demo";
-    creatives = [
+    // The public demo (demo.js) has a whole café's week, with real pictures.
+    creatives = window.LBDemo && LBDemo.on ? LBDemo.drop() : [
       { id: "d1", drop_id: "demo", channel: "Instagram", format: "4:5 post", status: "pending",
         headline: "Morning rush, sorted.",
         caption: "Two blocks from the office and open at 6:30. First coffee is on the house this week.",
@@ -1285,6 +1287,17 @@
   }
 
   LBAuth.ready.then(async function () {
+    // The public demo: the sample drop for everyone, signed in or not.
+    if (LBDemo.on) {
+      loading.hidden = true;
+      lbBootDone();
+      LBDemo.bar();
+      loadDemo();
+      document.getElementById("page-sub").textContent =
+        "Swipe through a café's week of ads: approve what fits, reject what doesn't and say why. Nothing here is saved.";
+      return;
+    }
+
     if (!LBAuth.isLoggedIn()) {
       loading.hidden = true;
       signedOut.hidden = false;
