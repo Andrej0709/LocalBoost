@@ -77,7 +77,9 @@
         <li><span><b>A real person reads it</b>Every message here gets a reply within one business day.</span></li>
         <li><span><b>We come back with a plan</b>For your locations and channels, before the engine renders a thing.</span></li>
       </ol>
-      <div class="ct-alt">Just want to see it work first? <a href="signup.html?plan=free">Start on the Free plan</a> — no card needed.</div>
+      <!-- The beta wording, so it is what paints first. Outside the beta the
+           script below offers the Free plan instead. -->
+      <div class="ct-alt">Want to try Adronis? <a href="signup.html">Apply for the beta</a> — places are limited.</div>
     </aside>
 
     <div>
@@ -165,10 +167,11 @@
     notice.hidden = false;
     notice.textContent = "You're reaching out about the " + names[plan] + " plan.";
   }
-  // No Free plan during the beta: the way in is applying for a beta place.
-  if (window.LBAuth && LBAuth.beta) {
+  // The markup asks for a beta application, as there's no Free plan during
+  // the beta. After it, the way to try Adronis is the Free plan.
+  if (window.LBAuth && !LBAuth.beta) {
     document.querySelector(".ct-alt").innerHTML =
-      'Want to try Adronis? <a href="signup.html">Apply for the beta</a> — places are limited.';
+      'Just want to see it work first? <a href="signup.html?plan=free">Start on the Free plan</a> — no card needed.';
   }
 
   document.getElementById("contact-form").addEventListener("submit", async function(e){

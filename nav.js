@@ -23,10 +23,10 @@
     }
 
     // Approvals, the control room and past drops only show a "log in" card to
-    // someone who isn't signed in, so their links wait until this device has
-    // a session (the same check boot-gate.js makes).
+    // someone who isn't signed in, so their links, in the nav and the footer,
+    // wait until this device has a session (the same check boot-gate.js makes).
     if (!hasStoredSession()) {
-      Array.prototype.forEach.call(links.querySelectorAll("a"), function (a) {
+      Array.prototype.forEach.call(document.querySelectorAll(".nav-links a, footer a"), function (a) {
         if (/(^|\/)(approvals|control-room|history)\.html$/.test(a.getAttribute("href") || "")) a.remove();
       });
     }
@@ -72,21 +72,30 @@
       if (window.innerWidth > 900) setOpen(false);
     });
 
-    if (window.LBAuth) {
-      LBAuth.ready.then(function () {
-        if (!LBAuth.isLoggedIn()) return;
-        var profile = LBAuth.getProfile() || {};
-        var user = LBAuth.getUser() || {};
-        var label = profile.business_name || user.email || "Account";
-        Array.prototype.forEach.call(
-          document.querySelectorAll('a[href="login.html"], a[href="/login.html"]'),
-          function (a) {
-            a.textContent = label;
-          }
-        );
-      });
-    }
+    // auth.js loads after this file, so the account name waits for the page.
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", showAccount);
+    else showAccount();
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+
+  function showAccount() {
+    if (!window.LBAuth) return;
+    LBAuth.ready.then(function () {
+      if (!LBAuth.isLoggedIn()) return;
+      var profile = LBAuth.getProfile() || {};
+      var user = LBAuth.getUser() || {};
+      var label = profile.business_name || user.email || "Account";
+      Array.prototype.forEach.call(
+        document.querySelectorAll('a[href="login.html"], a[href="/login.html"]'),
+        function (a) {
+          a.textContent = label;
+        }
+      );
+    });
+  }
+
+  // Loaded after the nav and the footer (the end of <body>, on every page), so
+  // the menu is built straight away: it copies the nav links, and must copy
+  // them before i18n.js, which loads next, translates them.
+  if (document.querySelector("nav.nav")) init();
+  else document.addEventListener("DOMContentLoaded", init);
 })();

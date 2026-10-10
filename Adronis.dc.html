@@ -683,7 +683,7 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 <section id="operators" class="made" aria-label="Who it's for">
   <p class="made-title" data-rv="made">Made for local businesses with no time for marketing.</p>
   <div class="chips" data-rv="made" style="transition-delay:.1s">
-    <sc-for list="{{ verticals }}" as="v" hint-placeholder-count="9"><span class="vchip">{{ v }}</span></sc-for>
+    <sc-for list="{{ verticals }}" as="v" hint-placeholder-count="12"><span class="vchip">{{ v }}</span></sc-for>
   </div>
 </section>
 
@@ -1268,7 +1268,7 @@ class Component extends DCLogic {
       finalLede: beta
         ? "Applying takes about ten minutes. Places are limited, and it is free until launch."
         : "Sign up in about ten minutes. No contract, no meeting, cancel any time.",
-      verticals: ["Bakeries", "Barbershops", "Dental clinics", "Gyms & studios", "Wine bars", "Florists", "Auto detailers", "Physiotherapy", "Nail studios"],
+      verticals: ["Cafés", "Restaurants & pizzerias", "Bakeries", "Hair & beauty salons", "Barbershops", "Nail studios", "Gyms & studios", "Dental clinics", "Physiotherapy", "Florists", "Auto detailers", "Wine bars"],
       signedIn: this.state.signedIn,
       planetAccent: this.props.accent || "#7cc6ff",
       planetGlow: this.props.planetGlow == null ? 0.8 : this.props.planetGlow,

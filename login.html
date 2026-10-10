@@ -69,7 +69,7 @@
 <header class="page-hero">
   <div class="eyebrow">Your account</div>
   <h1 id="page-title">Log in to Adronis.</h1>
-  <p id="page-sub">Access your control room, or create a quick account to hold your spot.</p>
+  <p id="page-sub">Log in to review your ads and run your account.</p>
 </header>
 
 <section class="section-tight">
@@ -166,7 +166,9 @@
       <div id="reset-notice" class="notice" role="status" hidden></div>
     </div>
 
-    <p class="auth-alt">New to Adronis? <a href="signup.html?plan=free">Start on the Free plan</a> — no card needed.</p>
+    <!-- The beta wording, so it is what paints first. Outside the beta the
+         script below offers the Free plan instead. -->
+    <p class="auth-alt">Not a beta tester yet? <a href="signup.html">Apply for the beta</a> — places are limited.</p>
 
   </div>
 </section>
@@ -214,7 +216,7 @@
     selectTab(tabLogin, tabSignup);
     loginForm.hidden = false; signupForm.hidden = true; forgotForm.hidden = true;
     title.textContent = "Log in to Adronis.";
-    sub.textContent = "Access your control room, or create a quick account to hold your spot.";
+    sub.textContent = "Log in to review your ads and run your account.";
     notice.hidden = true;
   }
   function showSignup(){
@@ -259,10 +261,11 @@
 
   var notice = document.getElementById("redirect-notice");
 
-  // No Free plan during the beta: the way in is applying for a beta place.
-  if (LBAuth.beta) {
+  // The markup asks for a beta application, as there's no Free plan during
+  // the beta. After it, the way in is the Free plan.
+  if (!LBAuth.beta) {
     document.querySelector(".auth-alt").innerHTML =
-      'Not a beta tester yet? <a href="signup.html">Apply for the beta</a> — places are limited.';
+      'New to Adronis? <a href="signup.html?plan=free">Start on the Free plan</a> — no card needed.';
   }
 
   function say(message){
@@ -285,10 +288,12 @@
       );
       // A signup that stopped halfway (email confirmed, brief or card still
       // missing) goes back to where it stopped, not into an empty app.
+      // Everyone else goes to Approvals, as opening the site does (homeRoute
+      // in auth.js) and as the beta's "you're in" message promises.
       var step = LBAuth.unfinishedStep();
       if (step === "beta.html") redirect(step, "Logged in — your account isn't switched on for the beta yet...");
       else if (step) redirect(step, "Logged in — let's finish signing you up...");
-      else redirect("control-room.html", "Logged in — taking you to your control room...");
+      else redirect("approvals.html", "Logged in — taking you to your approvals...");
     } catch (err) {
       button.disabled = false;
       say(err.message);
@@ -339,8 +344,8 @@
     try {
       await LBAuth.finishRecovery(document.getElementById("rp-password").value);
       var step = LBAuth.unfinishedStep();
-      tell(step ? "Password changed — let's finish signing you up..." : "Password changed — taking you to your control room...");
-      setTimeout(function(){ location.href = step || "control-room.html"; }, 900);
+      tell(step ? "Password changed — let's finish signing you up..." : "Password changed — taking you to your approvals...");
+      setTimeout(function(){ location.href = step || "approvals.html"; }, 900);
     } catch (err) {
       button.disabled = false;
       tell(err.message);

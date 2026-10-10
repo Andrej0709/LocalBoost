@@ -14,6 +14,8 @@
 //     hidden when a redirect is likely - judged from what the account looked
 //     like on its last visit - so a customer going between pages they belong
 //     on never waits on a blank screen.
+//   - For a reader who gets the Serbian copy, the page stays hidden until
+//     i18n.js has translated it, so the English markup never shows first.
 //
 // Load it in <head>, straight after <meta charset>, on every page that loads
 // auth.js:
@@ -37,15 +39,18 @@
   var params = new URLSearchParams(location.search);
 
   var styled = false;
+  function addStyle() {
+    if (styled) return;
+    styled = true;
+    var style = document.createElement("style");
+    style.textContent =
+      "html.lb-gate,html.lb-lang-wait{background:#050608}" +
+      "html.lb-gate body>*:not(#lb-boot),html.lb-lang-wait body>*:not(#lb-boot){visibility:hidden}";
+    document.head.appendChild(style);
+  }
+
   function hide() {
-    if (!styled) {
-      styled = true;
-      var style = document.createElement("style");
-      style.textContent =
-        "html.lb-gate{background:#050608}" +
-        "html.lb-gate body>*:not(#lb-boot){visibility:hidden}";
-      document.head.appendChild(style);
-    }
+    addStyle();
     root.classList.add("lb-gate");
   }
 
@@ -144,10 +149,52 @@
     safety = setTimeout(reveal, SAFETY_MS);
   }
 
+  // --- Hide the page until it reads in Serbian -------------------------------
+  // The copy is English in the markup, and i18n.js only translates it once its
+  // dictionary has loaded at the end of <body>. Until then a Serbian reader
+  // would see the English page. Same choice of language as i18n.js: ?lang=,
+  // then the remembered choice, then the browser's languages and time zone.
+  var SR_ZONES = ["Europe/Belgrade", "Europe/Zagreb", "Europe/Sarajevo", "Europe/Podgorica"];
+  var LANG_SAFETY_MS = 3000;
+
+  function readsSerbian() {
+    var query = /[?&]lang=([a-z-]+)/i.exec(location.search);
+    var asked = query && query[1].toLowerCase().slice(0, 2);
+    if (asked === "sr" || asked === "en") return asked === "sr";
+    try {
+      var saved = localStorage.getItem("lb-lang");
+      if (saved === "sr" || saved === "en") return saved === "sr";
+    } catch (e) {}
+    var list = navigator.languages || [navigator.language || ""];
+    for (var i = 0; i < list.length; i++) {
+      if (/^(sr|hr|bs|me|sh)\b/.test(String(list[i] || "").toLowerCase())) return true;
+    }
+    try {
+      return SR_ZONES.indexOf(Intl.DateTimeFormat().resolvedOptions().timeZone) > -1;
+    } catch (e) { return false; }
+  }
+
+  function translated() {
+    root.classList.remove("lb-lang-wait");
+  }
+
+  if (readsSerbian()) {
+    addStyle();
+    root.classList.add("lb-lang-wait");
+    setTimeout(translated, LANG_SAFETY_MS);
+    // A page without i18n.js (404.html) has nothing to wait for.
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!window.LBLang) translated();
+    });
+  }
+
   window.LBGate = {
     beta: BETA,
     go: go,
     hold: hold,
+
+    // i18n.js has put the page into the reader's language: show it.
+    translated: translated,
 
     // What the account looked like, for the next page's guess. auth.js calls
     // this whenever it loads the profile.

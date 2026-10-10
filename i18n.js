@@ -30,7 +30,9 @@
      browser's own languages. Serbian, Croatian, Bosnian and Montenegrin
      readers all get the Serbian copy — it reads the same to all of them.
      Plenty of phones there are set to English, so a reader whose clock is on
-     one of those countries' time zones also starts in Serbian. */
+     one of those countries' time zones also starts in Serbian. boot-gate.js
+     makes the same choice in <head>, to keep the page hidden until it's
+     translated - change both together. */
   function stored() {
     try {
       var v = localStorage.getItem(STORE_KEY);
@@ -178,12 +180,18 @@
   }
 
   function translateTitle() {
+    // A script may have retitled the page since the last pass, as text nodes
+    // get rewritten: a title we did not write is the new English original.
+    if (document.__lbEnTitle !== undefined && document.title !== document.__lbOutTitle) {
+      document.__lbEnTitle = undefined;
+    }
     if (document.__lbEnTitle === undefined) {
       if (!lookup(document.title)) return;
       document.__lbEnTitle = document.title;
     }
     var want = lang === "en" ? document.__lbEnTitle : (lookup(document.__lbEnTitle) || document.__lbEnTitle);
     if (document.title !== want) document.title = want;
+    document.__lbOutTitle = want;
   }
 
   /* --- The switch ----------------------------------------------------------
@@ -325,12 +333,24 @@
 
   function start() {
     apply();
-    var observer = new MutationObserver(function () { schedule(); });
+    // Whatever a script adds or rewrites later is translated in the observer
+    // itself: its callback runs before the browser next paints, so new text
+    // never shows in English first, not even for a frame.
+    var observer = new MutationObserver(function () {
+      apply();
+      // The pass's own edits would only call it again.
+      observer.takeRecords();
+    });
     observer.observe(document.documentElement, {
       childList: true, subtree: true, characterData: true
     });
+    // A Serbian reader's page was kept hidden until now (boot-gate.js).
+    if (window.LBGate && LBGate.translated) LBGate.translated();
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
-  else start();
+  // This file loads at the end of <body>, so the page above it is already
+  // there: translate it now. Waiting for DOMContentLoaded would also wait for
+  // every script after this one, Supabase's included, with the page hidden.
+  if (document.body) start();
+  else document.addEventListener("DOMContentLoaded", start);
 })();

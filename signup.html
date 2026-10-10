@@ -15,8 +15,12 @@
 <link rel="apple-touch-icon" href="icon-512.png">
 <link rel="manifest" href="site.webmanifest">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Start your drop — Adronis</title>
-<meta name="description" content="Onboard in ten minutes. Your first twelve photoreal ads are waiting for approval before the week is out. No contract, no retainer.">
+<!-- During the beta (BETA in boot-gate.js) this page is the beta application,
+     and the title, search snippet and link previews say so. The script below
+     sets the plan wording outside the beta, except for these tags: crawlers and
+     link previews don't run scripts, so they change by hand at launch. -->
+<title>Apply for the beta — Adronis</title>
+<meta name="description" content="Adronis is in beta until the public launch in Q1 2027. Create your account and tell us about your business — that's your application. Places are limited, nothing to pay.">
 <link rel="canonical" href="https://adronis.vercel.app/signup.html">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="theme-color" content="#050608">
@@ -24,16 +28,16 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Adronis">
 <meta property="og:locale" content="en_US">
-<meta property="og:title" content="Start your first drop free">
-<meta property="og:description" content="Onboard in ten minutes. Your first twelve photoreal ads are waiting for approval before the week is out. No contract, no retainer.">
+<meta property="og:title" content="Apply for the Adronis beta">
+<meta property="og:description" content="Adronis is in beta until the public launch in Q1 2027. Create your account and tell us about your business — that's your application. Places are limited, nothing to pay.">
 <meta property="og:url" content="https://adronis.vercel.app/signup.html">
 <meta property="og:image" content="https://adronis.vercel.app/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Adronis — we make your ads, you just say yes. Two example ads for a pizza place and a bakery.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Start your first drop free">
-<meta name="twitter:description" content="Onboard in ten minutes. Your first twelve photoreal ads are waiting for approval before the week is out. No contract, no retainer.">
+<meta name="twitter:title" content="Apply for the Adronis beta">
+<meta name="twitter:description" content="Adronis is in beta until the public launch in Q1 2027. Create your account and tell us about your business — that's your application. Places are limited, nothing to pay.">
 <meta name="twitter:image" content="https://adronis.vercel.app/og-image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -94,10 +98,13 @@
   <a href="login.html" id="nav-login">Log in</a>
 </nav>
 
+<!-- The markup is the beta version of the page, so it is what paints first
+     during the beta. Outside it, the script below switches to the plan's own
+     signup: hero, plan summary and button. -->
 <header class="page-hero">
-  <div class="eyebrow is-mono" id="page-eyebrow">7-DAY FREE TRIAL · CANCEL ANY TIME</div>
-  <h1 id="plan-headline">Set up your <em>Storefront</em> drop.</h1>
-  <p id="page-sub">Onboard in ten minutes. Your first batch is waiting for approval before the week is out.</p>
+  <div class="eyebrow is-mono" id="page-eyebrow">BETA · NOTHING TO PAY</div>
+  <h1 id="plan-headline">Apply for the <em>Adronis</em> beta.</h1>
+  <p id="page-sub">Create your account and tell us about the business — that's your application. Places are limited: if your business is picked, we switch your plan on and email you. Nothing to pay until launch.</p>
 </header>
 
 <section class="section-tight">
@@ -112,7 +119,7 @@
     </div>
   </div>
 
-  <div id="form-view" class="su-grid">
+  <div id="form-view" class="su-grid is-beta">
 
     <form id="signup-form" class="form-card">
 
@@ -144,16 +151,22 @@
       </div>
       <div class="field">
         <label for="vertical">Business type</label>
-        <select id="vertical" name="vertical">
+        <select id="vertical" name="vertical" required>
+          <option value="">Choose your business type</option>
+          <option>Café</option>
+          <option>Restaurant</option>
+          <option>Pizzeria</option>
           <option>Bakery</option>
+          <option>Hair salon</option>
+          <option>Beauty salon</option>
           <option>Barbershop</option>
-          <option>Dental clinic</option>
+          <option>Nail studio</option>
           <option>Gym / studio</option>
-          <option>Wine bar</option>
+          <option>Dental clinic</option>
+          <option>Physiotherapy</option>
           <option>Florist</option>
           <option>Auto detailer</option>
-          <option>Physiotherapy</option>
-          <option>Nail studio</option>
+          <option>Wine bar</option>
           <option value="Other">Other</option>
         </select>
       </div>
@@ -223,12 +236,12 @@
         You can request a copy or deletion at any time at <a href="mailto:privacy@adronis.app">privacy@adronis.app</a>.
         Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.
       </p>
-      <button type="submit" class="btn btn-lg btn-block" style="margin-top:28px">Claim your first drop<span class="mono" style="font-size:13px">→</span></button>
+      <button type="submit" class="btn btn-lg btn-block" style="margin-top:28px">Apply for the beta<span class="mono" style="font-size:13px">→</span></button>
       <p class="lock-hint" id="su-lock-hint">Tick the box above to accept the terms and continue.</p>
       <div id="signup-notice" class="notice" role="status" style="margin-top:18px" hidden></div>
     </form>
 
-    <aside class="card" id="plan-summary">
+    <aside class="card" id="plan-summary" hidden>
       <div class="label">YOUR PLAN</div>
       <div class="su-plan-head">
         <div id="plan-name">Storefront</div>
@@ -331,7 +344,19 @@
   // and the Serbian copy needs the adjective there rather than the plan label.
   var headlineName = isFree ? 'free' : plan.name;
 
-  document.getElementById("plan-headline").innerHTML = 'Set up your <em>' + headlineName + '</em> drop.';
+  // The markup is the beta application. Outside the beta this is the plan's
+  // own signup, with its summary beside the form.
+  if (!BETA) {
+    document.title = "Start your drop — Adronis";
+    document.getElementById("form-view").classList.remove("is-beta");
+    document.getElementById("plan-summary").hidden = false;
+    document.getElementById("page-eyebrow").textContent = "7-DAY FREE TRIAL · CANCEL ANY TIME";
+    document.getElementById("plan-headline").innerHTML = 'Set up your <em>' + headlineName + '</em> drop.';
+    document.getElementById("page-sub").textContent =
+      "Onboard in ten minutes. Your first batch is waiting for approval before the week is out.";
+    document.querySelector('#signup-form button[type=submit]').innerHTML =
+      'Claim your first drop<span class="mono" style="font-size:13px">→</span>';
+  }
   if (isFree) {
     document.getElementById("page-eyebrow").textContent = FREE_EYEBROW;
     document.getElementById("page-sub").textContent =
@@ -356,16 +381,7 @@
   });
 
   var BETA_EYEBROW = "BETA · NOTHING TO PAY";
-  var BETA_SUB = "Create your account and tell us about the business — that's your application. Places are limited: if your business is picked, we switch your plan on and email you. Nothing to pay until launch.";
   var BETA_BUTTON = 'Apply for the beta<span class="mono" style="font-size:13px">→</span>';
-  if (BETA) {
-    document.getElementById("form-view").classList.add("is-beta");
-    document.getElementById("plan-summary").hidden = true;
-    document.getElementById("page-eyebrow").textContent = BETA_EYEBROW;
-    document.getElementById("plan-headline").innerHTML = 'Apply for the <em>Adronis</em> beta.';
-    document.getElementById("page-sub").textContent = BETA_SUB;
-    document.querySelector('#signup-form button[type=submit]').innerHTML = BETA_BUTTON;
-  }
 
   // Named after the plan actually running on the account, not the one in the
   // URL — a paying customer who clicks another plan's button still lands here.

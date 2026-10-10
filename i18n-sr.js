@@ -160,14 +160,14 @@ window.LB_I18N_SR = {
       "Postavi novu lozinku da se vratiš u nalog. Ako napustiš ovu stranicu bez nove lozinke, ostaješ odjavljen.",
     "Save new password": "Sačuvaj novu lozinku",
     "Those two passwords don't match.": "Te dve lozinke se ne poklapaju.",
-    "Password changed — taking you to your control room...":
-      "Lozinka je promenjena — vodim te u kontrolnu sobu...",
+    "Password changed — taking you to your approvals...":
+      "Lozinka je promenjena — vodim te na odobravanja...",
     "Password changed — let's finish signing you up...":
       "Lozinka je promenjena — idemo da završimo registraciju...",
     "This reset link has run out. Ask for a new one.":
       "Ovaj link za novu lozinku više ne važi. Zatraži novi.",
-    "Access your control room, or create a quick account to hold your spot.":
-      "Uđi u svoju kontrolnu sobu ili brzo napravi nalog da rezervišeš mesto.",
+    "Log in to review your ads and run your account.":
+      "Prijavi se da pregledaš oglase i upravljaš nalogom.",
     "Email:": "Email:",
     "Free trial started:": "Besplatni period počeo:",
     "Free trial ends:": "Besplatni period ističe:",
@@ -262,6 +262,9 @@ window.LB_I18N_SR = {
       "Napravljeno za vlasnike bez marketing odeljenja.",
     "NINE VERTICALS": "DEVET TIPOVA BIZNISA",
     "ONE ENGINE": "JEDNA MAŠINA",
+    "Cafés": "Kafići",
+    "Restaurants & pizzerias": "Restorani i picerije",
+    "Hair & beauty salons": "Frizerski i kozmetički saloni",
     "Bakeries": "Pekare",
     "Barbershops": "Berbernice",
     "Dental clinics": "Stomatološke ordinacije",
@@ -412,6 +415,7 @@ window.LB_I18N_SR = {
 
     /* --- Sign up: the brief ----------------------------------------------- */
     "Start your drop — Adronis": "Pokreni svoj drop — Adronis",
+    "Apply for the beta — Adronis": "Prijava za beta testiranje — Adronis",
     "SIGN UP": "REGISTRACIJA",
     "Set up your": "Postavi svoj",
     "drop.": "drop.",
@@ -430,6 +434,12 @@ window.LB_I18N_SR = {
     "Choose your country": "Izaberi državu",
     "Where's the shop?": "Gde je radnja?",
     "BUSINESS TYPE": "TIP BIZNISA",
+    "Choose your business type": "Izaberi tip biznisa",
+    "Café": "Kafić",
+    "Restaurant": "Restoran",
+    "Pizzeria": "Picerija",
+    "Hair salon": "Frizerski salon",
+    "Beauty salon": "Kozmetički salon",
     "Bakery": "Pekara",
     "Barbershop": "Berbernica",
     "Dental clinic": "Stomatološka ordinacija",
@@ -476,7 +486,7 @@ window.LB_I18N_SR = {
       "npr. Bez šala o cenama, nikad ne prikazuj zadnju kuhinju...",
     "WHERE SHOULD WE PUBLISH?": "GDE DA OBJAVLJUJEMO?",
     "BEFORE YOU START": "PRE NEGO ŠTO POČNEŠ",
-    "I have read and accept the": "Pročitao sam i prihvatam dokumente:",
+    "I have read and accept the": "Pročitao/la sam i prihvatam dokumente:",
     ", and I am opening this account for a business.":
       ", i ovaj nalog otvaram za potrebe biznisa.",
     "Tick the box above to accept the terms and continue.":
@@ -1639,7 +1649,7 @@ window.LB_I18N_SR = {
     "Create your account.": "Napravi svoj nalog.",
     "Just enough to hold your spot — you'll pick a plan and brief the engine next.":
       "Tek toliko da rezervišeš mesto — plan biraš i brif praviš u sledećem koraku.",
-    "Logged in — taking you to your control room...": "Prijavljen si — vodimo te u kontrolnu sobu...",
+    "Logged in — taking you to your approvals...": "Prijavljen si — vodimo te na odobravanja...",
     "Confirm your email first — check your inbox for the link we sent.":
       "Prvo potvrdi email — u sandučetu te čeka link koji smo poslali.",
     "Check your inbox — confirm your email, then log in to brief the engine.":
