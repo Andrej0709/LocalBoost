@@ -351,6 +351,105 @@
     renderCalendar();
   });
 
+  // --- What we've learned from you ---
+  // The customer's own feedback, given back to them: why they rejected ads,
+  // the text they rewrote, what they asked us to avoid. It is what the engine
+  // reads for their next drops, and seeing it is what keeps them giving it.
+  // Shown once they've rejected an ad with a reason or rewritten one.
+  // Mirrors REASONS in approvals.html - the same labels.
+  var REASON_LABELS = {
+    image: "Image doesn't fit",
+    tone: "Wrong tone",
+    facts: "Wrong facts or price",
+    timing: "Wrong timing",
+    other: "Something else"
+  };
+
+  function learnedItem(label) {
+    var item = document.createElement("div");
+    item.className = "learned-item";
+    var head = document.createElement("div");
+    head.className = "learned-label";
+    head.textContent = label;
+    item.appendChild(head);
+    return item;
+  }
+
+  function renderLearned(creatives, profile) {
+    var rejected = creatives.filter(function (c) { return c.status === "rejected" && c.reject_reason; });
+    var edited = creatives.filter(function (c) { return c.edited_at; })
+      .sort(function (a, b) { return new Date(b.edited_at) - new Date(a.edited_at); });
+    var box = document.getElementById("learned");
+    var grid = document.getElementById("learned-grid");
+    grid.innerHTML = "";
+    box.hidden = !rejected.length && !edited.length;
+    if (box.hidden) return;
+
+    if (rejected.length) {
+      var item = learnedItem("WHY YOU TURNED ADS DOWN");
+      var chips = document.createElement("div");
+      chips.className = "learned-chips";
+      var counts = {};
+      rejected.forEach(function (c) { counts[c.reject_reason] = (counts[c.reject_reason] || 0) + 1; });
+      Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).forEach(function (key) {
+        var chip = document.createElement("span");
+        chip.className = "learned-chip";
+        var label = document.createElement("span");
+        label.textContent = REASON_LABELS[key] || key;
+        var n = document.createElement("b");
+        n.textContent = counts[key];
+        chip.appendChild(label);
+        chip.appendChild(n);
+        chips.appendChild(chip);
+      });
+      item.appendChild(chips);
+      // The last thing they wrote in their own words, if anything.
+      var said = rejected.filter(function (c) { return c.reject_note; })
+        .sort(function (a, b) { return new Date(b.updated_at) - new Date(a.updated_at); })[0];
+      if (said) {
+        var quote = document.createElement("p");
+        quote.className = "learned-quote";
+        quote.textContent = "“" + said.reject_note + "”";
+        item.appendChild(quote);
+      }
+      grid.appendChild(item);
+    }
+
+    if (edited.length) {
+      var ed = learnedItem("TEXT YOU REWROTE");
+      edited.filter(function (c) {
+        return c.original_headline && c.headline && c.original_headline !== c.headline;
+      }).slice(0, 2).forEach(function (c) {
+        var line = document.createElement("p");
+        line.className = "learned-edit";
+        var was = document.createElement("s");
+        was.textContent = c.original_headline;
+        var now = document.createElement("span");
+        now.textContent = c.headline;
+        line.appendChild(was);
+        line.appendChild(now);
+        ed.appendChild(line);
+      });
+      if (ed.children.length === 1) {
+        // Only captions changed: say how many, rather than quote a whole caption.
+        var count = document.createElement("p");
+        count.className = "learned-text";
+        count.textContent = edited.length === 1 ? "1 ad" : edited.length + " ads";
+        ed.appendChild(count);
+      }
+      grid.appendChild(ed);
+    }
+
+    if (profile.avoid_notes) {
+      var avoid = learnedItem("WHAT TO STAY AWAY FROM");
+      var text = document.createElement("p");
+      text.className = "learned-text";
+      text.textContent = profile.avoid_notes;
+      avoid.appendChild(text);
+      grid.appendChild(avoid);
+    }
+  }
+
   // A made-up week so the page can be seen before anything is approved.
   // Nothing here touches the database.
   function sampleImage(from, to) {
@@ -975,6 +1074,7 @@
       board.hidden = false;
       allCreatives = creatives;
       renderBoard(creatives);
+      renderLearned(creatives, LBAuth.getProfile() || {});
     }
 
     LBTour.replayButton(TOUR);

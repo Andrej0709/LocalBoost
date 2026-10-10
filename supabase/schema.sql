@@ -1287,6 +1287,54 @@ drop policy if exists "messages insert public" on public.messages;
 create policy "messages insert public" on public.messages
   for insert to anon, authenticated with check (status = 'new');
 
+/* ------------------------------------------------------------ */
+/* demo_events - what visitors do in the public demo (demo.js), so the   */
+/* Adronis Portal can tell whether it sells: opened, tried approving or  */
+/* rejecting, looked at the control room, clicked Join the beta. Each    */
+/* is sent once per browser tab, with no account, cookie or IP - only a  */
+/* random tab id and where the visitor came from (?src=, e.g. the QR     */
+/* card). Anyone may add a row, nobody may read them from the browser;   */
+/* the portal reads them through its admin policy. */
+/* ------------------------------------------------------------ */
+create table if not exists public.demo_events (
+  id         bigserial primary key,
+  visit      text not null,
+  event      text not null,
+  src        text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.demo_events enable row level security;
+
+do $$ begin
+  alter table public.demo_events add constraint demo_events_fields check (
+    event in ('open', 'approve', 'reject', 'control_room', 'join')
+    and char_length(visit) between 8 and 40
+    and char_length(coalesce(src, '')) <= 40
+  );
+exception when duplicate_object then null; end $$;
+
+/* The time is the database's, whatever the browser sent. */
+create or replace function public.stamp_demo_event()
+returns trigger
+language plpgsql
+set search_path = public, pg_temp
+as $$
+begin
+  new.created_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists demo_events_stamp on public.demo_events;
+create trigger demo_events_stamp
+  before insert on public.demo_events
+  for each row execute function public.stamp_demo_event();
+
+drop policy if exists "demo events insert public" on public.demo_events;
+create policy "demo events insert public" on public.demo_events
+  for insert to anon, authenticated with check (true);
+
 /* cancellation_feedback: a signed-in customer adds their own answer only. */
 drop policy if exists "cancellation feedback insert own" on public.cancellation_feedback;
 create policy "cancellation feedback insert own" on public.cancellation_feedback

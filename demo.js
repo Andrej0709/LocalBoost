@@ -1,8 +1,13 @@
 /* The public demo: approvals.html?demo=1 and control-room.html?demo=1 (and
  * /demo, which vercel.json sends to the first). The app as a made-up café
  * sees it, for showing a business owner on the spot - on a phone, in their
- * own venue - before they have an account. No sign-in, nothing is read from
- * or written to the database, and nobody is sent away to the beta page.
+ * own venue - before they have an account. No sign-in, nothing of the
+ * visitor's is read or saved, and nobody is sent away to the beta page.
+ *
+ * The only thing written is an anonymous count of what was tried (track
+ * below, demo_events in schema.sql) - so the portal can tell whether the
+ * demo sells. ?src= says where the visitor came from (the QR card is
+ * ?src=card) and travels with them between the two demo pages.
  *
  * Load it before nav.js, so the phone menu copies the nav as the demo
  * changes it. auth.js and boot-gate.js check LBDemo.on / ?demo themselves.
@@ -10,6 +15,47 @@
 (function () {
   var on = /[?&]demo(=|&|$)/.test(location.search);
   var page = location.pathname.split("/").pop();
+  var srcMatch = /[?&]src=([a-z0-9_-]{1,40})(&|$)/i.exec(location.search);
+  var src = srcMatch ? srcMatch[1].toLowerCase() : null;
+  var demoQuery = "?demo=1" + (src ? "&src=" + src : "");
+
+  // One random id per browser tab, and each kind of event sent once per tab:
+  // the numbers count visits, not clicks.
+  function visitId() {
+    try {
+      var id = sessionStorage.getItem("lb-demo-visit");
+      if (!id) {
+        id = Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
+        sessionStorage.setItem("lb-demo-visit", id);
+      }
+      return id;
+    } catch (e) { return "no-storage-" + Date.now().toString(36); }
+  }
+
+  function firstTime(event) {
+    try {
+      var sent = JSON.parse(sessionStorage.getItem("lb-demo-sent") || "[]");
+      if (sent.indexOf(event) !== -1) return false;
+      sent.push(event);
+      sessionStorage.setItem("lb-demo-sent", JSON.stringify(sent));
+    } catch (e) {}
+    return true;
+  }
+
+  // Resolves once sent, or after a short wait - a count is never worth
+  // holding the visitor up for.
+  function track(event) {
+    if (!on || !firstTime(event)) return Promise.resolve();
+    var send = new Promise(function (resolve) {
+      function go() {
+        if (!window.LBAuth) return setTimeout(go, 200);
+        LBAuth.db.from("demo_events").insert({ visit: visitId(), event: event, src: src })
+          .then(function () { resolve(); }, function () { resolve(); });
+      }
+      go();
+    });
+    return Promise.race([send, new Promise(function (r) { setTimeout(r, 800); })]);
+  }
 
   function sr() {
     return !!(window.LBLang && LBLang.get() === "sr");
@@ -110,8 +156,8 @@
       var host = document.querySelector(".section-tight .wrap-wide");
       if (!host || document.getElementById("demo-bar")) return;
       var other = page === "control-room.html"
-        ? { href: "approvals.html?demo=1", label: "← Back to approvals" }
-        : { href: "control-room.html?demo=1", label: "See the control room →" };
+        ? { href: "approvals.html" + demoQuery, label: "← Back to approvals" }
+        : { href: "control-room.html" + demoQuery, label: "See the control room →" };
 
       var bar = document.createElement("div");
       bar.id = "demo-bar";
@@ -125,7 +171,9 @@
           '<a class="btn" href="signup.html">Join the beta<span class="mono">&rarr;</span></a>' +
         "</div>";
       host.insertBefore(bar, host.firstChild);
-    }
+    },
+
+    track: track
   };
 
   if (!on) return;
@@ -134,7 +182,7 @@
   var links = document.querySelectorAll(".nav-links a");
   Array.prototype.forEach.call(links, function (a) {
     var href = a.getAttribute("href");
-    if (href === "approvals.html" || href === "control-room.html") a.setAttribute("href", href + "?demo=1");
+    if (href === "approvals.html" || href === "control-room.html") a.setAttribute("href", href + demoQuery);
     if (href === "history.html") a.remove();
   });
   var account = document.getElementById("nav-account");
@@ -144,4 +192,14 @@
     cta.textContent = "Join the beta";
     cta.setAttribute("href", "signup.html");
   }
+
+  // Counted on arrival, and on the way out to sign up (held a moment so the
+  // count leaves before the page does).
+  track(page === "control-room.html" ? "control_room" : "open");
+  document.addEventListener("click", function (e) {
+    var link = e.target.closest && e.target.closest('a[href="signup.html"]');
+    if (!link || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    track("join").then(function () { location.href = link.href; });
+  });
 })();

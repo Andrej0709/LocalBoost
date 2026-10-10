@@ -256,6 +256,7 @@
 <script src="tour.js"></script>
 <script src="reschedule.js"></script>
 <script src="first-week.js"></script>
+<script src="install-hint.js"></script>
 <script>
 (function () {
   var loading   = document.getElementById("loading");
@@ -647,6 +648,9 @@
     } else if (status !== "rejected") {
       creative.reject_reason = null;
       creative.reject_note = null;
+    }
+    if (LBDemo.on && (status === "approved" || status === "rejected")) {
+      LBDemo.track(status === "approved" ? "approve" : "reject");
     }
 
     renderAll();
@@ -1043,6 +1047,7 @@
   }
 
   async function bulkSetStatus(status) {
+    if (LBDemo.on) LBDemo.track(status === "approved" ? "approve" : "reject");
     var scope = creatives.filter(function (creative) {
       return creative.status === "pending" && (currentDrop === "all" || creative.drop_id === currentDrop);
     });

@@ -305,6 +305,14 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
 .demo-bar-links{display:flex;flex-wrap:wrap;gap:10px}
 @media (max-width:640px){.demo-bar-links{width:100%}.demo-bar-links>*{flex:1 1 100%}}
 
+/* "Put Adronis on your home screen" on a phone (install-hint.js). */
+.install-hint{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 20px;color:var(--text)}
+.install-text{flex:1 1 240px;line-height:1.5}
+.install-tag{margin-right:10px;font-size:10px;letter-spacing:.12em;color:var(--acc)}
+.install-how{display:block;margin-top:4px;font-size:13px;color:var(--text-2)}
+.install-x{flex:none;width:44px;height:44px;border-radius:9999px;border:1px solid var(--line-2);background:none;color:var(--text-2);font-size:15px;cursor:pointer}
+.install-x:hover{color:var(--text);border-color:var(--line-3)}
+
 /* How the first week goes, for an account whose plan is on but whose first
    drop hasn't landed (control room and approvals). */
 .first-week{list-style:none;margin:26px auto 0;padding:0;max-width:680px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;text-align:left}

@@ -628,6 +628,26 @@ window.LB_I18N_SR = {
     "← Back to approvals": "← Nazad na odobravanja",
     "See the control room →": "Pogledaj kontrolnu sobu →",
     "Kafeterija Kutak — this week": "Kafeterija Kutak — ova nedelja",
+    // Put Adronis on the home screen (install-hint.js)
+    "TIP": "SAVET",
+    "Put Adronis on your home screen — it opens like an app, straight to your ads.":
+      "Stavi Adronis na početni ekran telefona — otvara se kao aplikacija, pravo na tvoje oglase.",
+    "Tap the Share button, then “Add to Home Screen”.": "Dodirni dugme Deli, pa „Dodaj na početni ekran“.",
+    "Open the browser menu (⋮), then “Add to Home screen” or “Install app”.":
+      "Otvori meni pregledača (⋮), pa „Dodaj na početni ekran“ ili „Instaliraj aplikaciju“.",
+    "Install": "Instaliraj",
+    "Dismiss": "Zatvori",
+
+    // What we've learned from you (control-room.js renderLearned)
+    "YOUR FEEDBACK": "TVOJE POVRATNE INFORMACIJE",
+    "What we've learned from you.": "Šta smo naučili od tebe.",
+    "Every answer you give goes into your next drops. This is what the engine has from you so far.":
+      "Svaki tvoj odgovor ulazi u sledeće dropove. Ovo je ono što mašina do sada zna od tebe.",
+    "WHY YOU TURNED ADS DOWN": "ZAŠTO SU OGLASI ODBIJENI",
+    "TEXT YOU REWROTE": "PREPRAVLJENI TEKSTOVI",
+    "WHAT TO STAY AWAY FROM": "ŠTA DA IZBEGAVAMO",
+    "1 ad": "1 oglas",
+
     "Want to see it first?": "Hoćeš prvo da vidiš kako izgleda?",
     "Try the demo": "Probaj demo",
     "— no account needed.": "— bez naloga.",
@@ -2154,6 +2174,7 @@ window.LB_I18N_SR = {
      through the dictionary above before it is put back, so a word like
      "monthly" is translated while a date or a plan name passes through. */
   patterns: [
+    [/^(\d+) ads$/, "$1 oglasa"],
     [/^Reset link sent to (.+?)\. Open it to choose a new password\.$/,
       "Link za novu lozinku je poslat na $1. Otvori ga da izabereš novu lozinku."],
     [/^(\d+) OF (\d+) ADDED$/, "DODATO: $1 OD $2"],
