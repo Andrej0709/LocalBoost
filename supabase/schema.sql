@@ -1404,18 +1404,34 @@ create policy "updates select own" on public.updates
 
 /* ------------------------------------------------------------ */
 /* ratings - "would you recommend Adronis?", asked in the control room   */
-/* after three weeks of ads: one to five stars, a sentence, and whether  */
-/* we may publish it with the business's name. One per account, which   */
-/* the customer may change. The portal reads them (portal-admin.sql).    */
+/* after three weeks of ads and again every six months, in the beta and  */
+/* after it: one to five stars, a sentence, and whether we may publish   */
+/* it with the business's name. Every answer is kept, so the portal can  */
+/* show how a customer's view changes over time (portal-admin.sql).      */
 /* ------------------------------------------------------------ */
 create table if not exists public.ratings (
-  user_id     uuid primary key references public.profiles (id) on delete cascade,
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references public.profiles (id) on delete cascade,
   stars       int not null,
   comment     text,
   may_publish boolean not null default false,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
+
+/* The first version kept one rating per account (user_id was the key).
+   Move an existing table to one row per answer, keeping what's there. */
+alter table public.ratings add column if not exists id uuid not null default gen_random_uuid();
+do $$ begin
+  if exists (select 1 from pg_constraint c
+              where c.conrelid = 'public.ratings'::regclass and c.contype = 'p'
+                and pg_get_constraintdef(c.oid) like '%(user_id)%') then
+    alter table public.ratings drop constraint ratings_pkey;
+    alter table public.ratings add primary key (id);
+  end if;
+end $$;
+
+create index if not exists ratings_user_idx on public.ratings (user_id, created_at desc);
 
 do $$ begin
   alter table public.ratings add constraint ratings_fields check (
@@ -1437,9 +1453,8 @@ create policy "ratings select own" on public.ratings
 drop policy if exists "ratings insert own" on public.ratings;
 create policy "ratings insert own" on public.ratings
   for insert to authenticated with check (user_id = auth.uid());
+/* An answer, once given, stays as it was: a new one is a new row. */
 drop policy if exists "ratings update own" on public.ratings;
-create policy "ratings update own" on public.ratings
-  for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
 
 /* ------------------------------------------------------------ */
 /* Referrals - a tester's invite link is /u/<code>, the first 8          */

@@ -558,8 +558,16 @@
   }
 
   // --- "Would you recommend Adronis?" (the ratings table) ---
-  // Asked once, after three weeks of ads: stars, a sentence, and whether we
+  // Asked after three weeks of ads, and again six months after the last
+  // answer - in the beta and after it: stars, a sentence, and whether we
   // may publish it with the business's name. "Later" asks again in a week.
+  var RATE_AGAIN_DAYS = 182;
+
+  function ratingDue() {
+    if (cards.rating === undefined || daysWithAds() < 21 || snoozed("rate", 7)) return false;
+    return !cards.rating || Date.now() - new Date(cards.rating.created_at) > RATE_AGAIN_DAYS * 86400000;
+  }
+
   function ratingCard() {
     if (cards.demo) return null;
     if (cards.rated) {
@@ -571,10 +579,10 @@
             "Hvala što si iskren. Čitamo svaki odgovor i javićemo ti se oko toga šta da popravimo.")));
       return done.box;
     }
-    if (cards.rating !== null || daysWithAds() < 21 || snoozed("rate", 7)) return null;
+    if (!ratingDue()) return null;
 
     var d = cards.draft;
-    var c = card(T("THREE WEEKS IN", "TRI NEDELJE KASNIJE"), true);
+    var c = card(cards.rating ? T("HOW ARE WE DOING?", "KAKO NAM IDE?") : T("THREE WEEKS IN", "TRI NEDELJE KASNIJE"), true);
     c.body.appendChild(make("div", "crc-title", T("Would you recommend Adronis to another owner?",
       "Da li bi preporučio Adronis drugom vlasniku?")));
     var stars = make("div", "crc-stars");
@@ -628,7 +636,7 @@
     var d = cards.draft;
     if (!d.stars) return;
     btn.disabled = true;
-    var res = await LBAuth.db.from("ratings").upsert({
+    var res = await LBAuth.db.from("ratings").insert({
       user_id: LBAuth.getUser().id,
       stars: d.stars,
       comment: d.comment.trim() || null,
@@ -746,7 +754,8 @@
 
   async function loadCardData() {
     var uid = LBAuth.getUser().id;
-    var rating = await LBAuth.db.from("ratings").select("*").eq("user_id", uid).maybeSingle();
+    var rating = await LBAuth.db.from("ratings").select("*").eq("user_id", uid)
+      .order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (!rating.error) cards.rating = rating.data || null;   // the table isn't there until schema.sql runs
     var refs = await LBAuth.db.rpc("my_referrals");
     if (!refs.error) cards.referrals = refs.data;
