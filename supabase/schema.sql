@@ -40,6 +40,13 @@ do $$ begin
   create type public.creative_status as enum ('pending', 'approved', 'rejected', 'published');
 exception when duplicate_object then null; end $$;
 
+/* 'expired': an ad the customer neither approved nor rejected before the next
+   week's ads arrived (expire_unreviewed, section 11b). It is never posted; the
+   customer sees it under Expired in Approvals. Like 'beta' above, it can't be
+   used in the transaction that adds it, so the functions below compare
+   status::text with 'expired'. */
+alter type public.creative_status add value if not exists 'expired';
+
 do $$ begin
   create type public.lead_status as enum ('new', 'contacted', 'closed');
 exception when duplicate_object then null; end $$;
@@ -318,6 +325,9 @@ exception when duplicate_object then null; end $$;
 /* like this".                                                                   */
 alter table public.creatives add column if not exists decided_at       timestamptz;
 alter table public.creatives add column if not exists auto_approved_at timestamptz;
+
+/* expired_at: when expire_unreviewed() let this ad go (status 'expired'). */
+alter table public.creatives add column if not exists expired_at timestamptz;
 
 /* ready_at: when the drop landed in Approvals (its status became               */
 /* awaiting_approval), stamped by drops_stamp_ready below. The 48 hours of      */
@@ -1221,6 +1231,15 @@ begin
     raise exception 'Only a creative''s approval, feedback, text and posting time can be changed.';
   end if;
 
+  /* An expired ad stays as it was: it went when the next week's ads arrived,
+     and only expire_unreviewed() lets an ad expire. */
+  if old.status::text = 'expired' then
+    raise exception 'This ad expired when the next week''s ads arrived - it can''t be changed now.';
+  end if;
+  if new.status::text = 'expired' then
+    raise exception 'Ads expire on their own when the next week''s ads arrive.';
+  end if;
+
   /* The customer may move an approved creative that hasn't gone out, or hand
      the time back to the engine (null). A slot about to go out (or going out
      right now) stays put, so the engine is never publishing something whose
@@ -1769,6 +1788,68 @@ $$;
 revoke execute on function public.auto_approve_due() from public, anon, authenticated;
 
 /* ------------------------------------------------------------ */
+/* 11b. Expiry - an ad still waiting when the next week's ads       */
+/*      arrive expires. It isn't carried over: a week-old ad can     */
+/*      be about an offer or a date that has passed, and a pile of   */
+/*      old ads is no help to an owner who didn't get to four. It    */
+/*      is never posted, and the customer finds it under Expired in  */
+/*      Approvals. The engine reads 'expired' too - an ad nobody     */
+/*      looked at says nothing about whether it was any good.        */
+/*      Runs every 15 minutes through pg_cron (section 13).          */
+/* ------------------------------------------------------------ */
+
+/* Expires every ad still waiting in a drop that has a newer drop of the same
+   account in Approvals already, and returns how many. A drop left with
+   nothing waiting is closed: approved if the customer kept anything from it,
+   skipped if not. */
+create or replace function public.expire_unreviewed()
+returns int
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  n int;
+begin
+  with stale as (
+    select c.id
+      from public.creatives c
+      join public.drops d on d.id = c.drop_id
+     where c.status = 'pending'
+       and exists (select 1 from public.drops newer
+                    where newer.user_id = d.user_id
+                      and newer.week_starting > d.week_starting
+                      and newer.ready_at is not null
+                      and newer.status <> 'rendering')
+       for update of c skip locked
+  )
+  update public.creatives c
+     set status = 'expired'::text::public.creative_status,
+         expired_at = now()
+    from stale
+   where c.id = stale.id;
+  get diagnostics n = row_count;
+
+  if n > 0 then
+    update public.drops d
+       set status = case when exists (select 1 from public.creatives c
+                                       where c.drop_id = d.id and c.status in ('approved', 'published'))
+                         then 'approved'::public.drop_status
+                         else 'skipped'::public.drop_status end
+     where d.status = 'awaiting_approval'
+       and exists (select 1 from public.creatives c
+                    where c.drop_id = d.id and c.status::text = 'expired')
+       and not exists (select 1 from public.creatives c
+                        where c.drop_id = d.id and c.status = 'pending');
+  end if;
+
+  return n;
+end;
+$$;
+
+revoke execute on function public.expire_unreviewed() from public, anon, authenticated;
+
+/* ------------------------------------------------------------ */
 /* 12. client_errors - a JavaScript error a visitor's browser hit   */
 /*     (errors.js, on every page), so a broken page on a tester's    */
 /*     phone shows up in the Adronis Portal's Errors tab instead of  */
@@ -1845,8 +1926,10 @@ create policy "client errors insert public" on public.client_errors
   for insert to anon, authenticated with check (true);
 
 /* ------------------------------------------------------------ */
-/* 13. Scheduled jobs (pg_cron): auto-approval every 15 minutes, and */
-/*     error reports older than 30 days cleared every night. If      */
+/* 13. Scheduled jobs (pg_cron): auto-approval and expiry every 15   */
+/*     minutes (expiry 7 minutes after, so an ad due both ways is    */
+/*     approved), and error reports older than 30 days cleared every */
+/*     night. If                                                      */
 /*     pg_cron can't be switched on from here, turn it on under       */
 /*     Database -> Extensions (or Integrations -> Cron) and re-run    */
 /*     this file; until then auto-approval doesn't run. To check:     */
@@ -1857,6 +1940,8 @@ begin
   create extension if not exists pg_cron with schema pg_catalog;
   perform cron.schedule('adronis-auto-approve', '*/15 * * * *',
     'select public.auto_approve_due()');
+  perform cron.schedule('adronis-expire-unreviewed', '7-59/15 * * * *',
+    'select public.expire_unreviewed()');
   perform cron.schedule('adronis-clear-old-errors', '17 3 * * *',
     'delete from public.client_errors where created_at < now() - interval ''30 days''');
 exception when others then

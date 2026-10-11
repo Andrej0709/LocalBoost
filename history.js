@@ -68,13 +68,16 @@
     date.className = "hs-week-date";
     date.textContent = "WEEK OF " + fmtWeek(week.drop.week_starting).toUpperCase();
     head.appendChild(date);
-    var chipText = week.drop.status === "skipped" ? "SKIPPED"
+    // A week nobody looked at before the next one arrived: every ad expired.
+    var allExpired = list.length > 0 && list.every(function (c) { return c.status === "expired"; });
+    var chipText = allExpired ? "EXPIRED"
+      : week.drop.status === "skipped" ? "SKIPPED"
       : week.drop.status === "rendering" ? "RENDERING"
       : count(list, function (c) { return c.status === "pending"; }) ? "WAITING ON YOU"
       : isLatest ? "LATEST" : null;
     if (chipText) {
       var chip = document.createElement("span");
-      chip.className = "hs-week-chip" + (chipText === "SKIPPED" || chipText === "RENDERING" ? " muted" : "");
+      chip.className = "hs-week-chip" + (chipText === "SKIPPED" || chipText === "RENDERING" || chipText === "EXPIRED" ? " muted" : "");
       chip.textContent = chipText;
       head.appendChild(chip);
     }
@@ -95,15 +98,15 @@
       return card;
     }
 
-    // Kept ads first, then what's waiting, then what was turned down.
-    var order = { published: 0, approved: 1, pending: 2, rejected: 3 };
+    // Kept ads first, then what's waiting, then what was turned down or expired.
+    var order = { published: 0, approved: 1, pending: 2, rejected: 3, expired: 4 };
     var sorted = list.slice().sort(function (a, b) { return (order[a.status] || 0) - (order[b.status] || 0); });
     var MAX_THUMBS = 7;
     var thumbs = document.createElement("div");
     thumbs.className = "hs-thumbs";
     sorted.slice(0, MAX_THUMBS).forEach(function (c) {
       var t = document.createElement("div");
-      t.className = "hs-thumb" + (c.status === "rejected" ? " is-rejected" : c.status === "published" ? " is-live" : "");
+      t.className = "hs-thumb" + (c.status === "rejected" || c.status === "expired" ? " is-rejected" : c.status === "published" ? " is-live" : "");
       t.title = c.headline || "";
       if (c.image_url) {
         var img = new Image();
@@ -130,6 +133,8 @@
     ];
     var waiting = count(list, function (c) { return c.status === "pending"; });
     if (waiting) parts.push(["WAITING", waiting]);
+    var expired = count(list, function (c) { return c.status === "expired"; });
+    if (expired) parts.push(["EXPIRED", expired]);
     card.appendChild(countsLine(parts));
 
     var reasons = reasonTally(list);

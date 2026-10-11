@@ -1755,8 +1755,21 @@ window.LB_I18N_SR = {
     "APPROVED FOR YOU": "ODOBRENO UMESTO TEBE",
     "It waited 48 hours, so it was approved for you — the switch is above the ads.":
       "Čekao je 48 sati, pa je odobren umesto tebe — prekidač je iznad oglasa.",
-    "Off — every ad waits for your yes. Switch it on and a busy week won't go by without ads.":
-      "Isključeno — svaki oglas čeka tvoje odobrenje. Uključi i nedelja neće proći bez oglasa ni kad ne stigneš.",
+    "Off — ads wait for your yes until next week's arrive, then expire. Switch it on and a busy week won't go by without ads.":
+      "Isključeno — oglasi čekaju tvoje odobrenje dok ne stignu novi, a onda ističu. Uključi i nedelja neće proći bez oglasa ni kad ne stigneš.",
+    // Expired ads: still waiting when the next week's arrived (approvals, past drops).
+    "Expired": "Istekli",
+    "EXPIRED": "ISTEKLO",
+    "Nothing expired.": "Ništa nije isteklo.",
+    "Ads that aren't approved or rejected before the next week's arrive show up here.":
+      "Ovde se pojavljuju oglasi koji ne budu ni odobreni ni odbijeni pre nego što stignu novi.",
+    "Ads that weren't approved or rejected before the next week's arrived. They were never posted — they stay here so you can see what went by.":
+      "Oglasi koji nisu bili ni odobreni ni odbijeni pre nego što su stigli novi. Nikad nisu objavljeni — ovde stoje da vidiš šta je prošlo.",
+    "Ads that expired when the new ones arrived:": "Oglasi koji su istekli kad su stigli novi:",
+    "They weren't approved or rejected in time, so they weren't posted.":
+      "Nisu bili ni odobreni ni odbijeni na vreme, pa nisu objavljeni.",
+    "See them": "Pogledaj ih",
+    "Got it": "Važi",
     "On — ads you don't review within 48 hours of landing are approved for you.":
       "Uključeno — oglasi koje ne pregledaš u roku od 48 sati od kad stignu odobravaju se sami.",
     "What's still waiting is approved for you in the next few minutes.":
@@ -2279,6 +2292,7 @@ window.LB_I18N_SR = {
     [/^Reject all waiting \((\d+)\)$/, "Odbaci sve na čekanju ($1)"],
     [/^Review (\d+) waiting →$/, "Pregledaj $1 na čekanju →"],
     [/^PUBLISHED (.+)$/, "OBJAVLJENO $1"],
+    [/^EXPIRED (.+)$/, "ISTEKLO $1"],
     [/^SAMPLE (\d+)$/, "PRIMER $1"],
     [/^Couldn't save that — (.+)$/, "Nismo uspeli to da sačuvamo — $1"],
     [/^Couldn't undo — (.+)$/, "Nismo uspeli da poništimo — $1"],
@@ -2309,7 +2323,7 @@ window.LB_I18N_SR = {
     // Approvals: the lightbox, and a creative's channel and format badge.
     [/^View full size: (.+)$/, "Prikaži u punoj veličini: $1"],
     [/^(.+?) · (\d+) CREATIVES?$/, "$1 · KREATIVA: $2"],
-    [/^(Waiting on you|Approved|Rejected|Everything) \((\d+)\)$/, "$1 ($2)"],
+    [/^(Waiting on you|Approved|Rejected|Expired|Everything) \((\d+)\)$/, "$1 ($2)"],
     [/^(.+) — (waiting|approved|rejected|published)$/, "$1 — $2"],
     [/^(.+) — full size$/, "$1 — puna veličina"],
     [/^(.+?) · (\d+:\d+) POST$/, "$1 · $2 OBJAVA"],
