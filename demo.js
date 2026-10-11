@@ -9,6 +9,12 @@
  * demo sells. ?src= says where the visitor came from (the QR card is
  * ?src=card) and travels with them between the two demo pages.
  *
+ * ?p= is a business from the portal's Sales tab (prospects.code): the demo
+ * then wears that business's name instead of the made-up café's, and every
+ * count carries the code, so the portal can say who opened their link. The
+ * proposal (proposal.html) and the date calendar (calendar.html) read the
+ * same business through prospect() and count their visits through track().
+ *
  * Load it before nav.js, so the phone menu copies the nav as the demo
  * changes it. auth.js and boot-gate.js check LBDemo.on / ?demo themselves.
  */
@@ -17,7 +23,11 @@
   var page = location.pathname.split("/").pop();
   var srcMatch = /[?&]src=([a-z0-9_-]{1,40})(&|$)/i.exec(location.search);
   var src = srcMatch ? srcMatch[1].toLowerCase() : null;
-  var demoQuery = "?demo=1" + (src ? "&src=" + src : "");
+  var codeMatch = /[?&]p=([a-z0-9]{6,20})(&|$)/i.exec(location.search);
+  var code = codeMatch ? codeMatch[1].toLowerCase() : null;
+  var demoQuery = "?demo=1" + (src ? "&src=" + src : "") + (code ? "&p=" + code : "");
+  var CAFE = "Kafeterija Kutak";
+  var business = null;   // { name, ... } once prospect() has it
 
   // One random id per browser tab, and each kind of event sent once per tab:
   // the numbers count visits, not clicks.
@@ -42,19 +52,48 @@
     return true;
   }
 
+  function whenAuth(fn) {
+    if (window.LBAuth) fn();
+    else setTimeout(function () { whenAuth(fn); }, 200);
+  }
+
   // Resolves once sent, or after a short wait - a count is never worth
   // holding the visitor up for.
   function track(event) {
-    if (!on || !firstTime(event)) return Promise.resolve();
+    if (!firstTime(event)) return Promise.resolve();
     var send = new Promise(function (resolve) {
-      function go() {
-        if (!window.LBAuth) return setTimeout(go, 200);
-        LBAuth.db.from("demo_events").insert({ visit: visitId(), event: event, src: src })
+      whenAuth(function () {
+        var row = { visit: visitId(), event: event, src: src };
+        if (code) row.code = code;
+        LBAuth.db.from("demo_events").insert(row)
           .then(function () { resolve(); }, function () { resolve(); });
-      }
-      go();
+      });
     });
     return Promise.race([send, new Promise(function (r) { setTimeout(r, 800); })]);
+  }
+
+  // The business behind ?p= (prospect_page in the portal's SQL): its name,
+  // and what the proposal offers it. null without a code, for a code that
+  // no longer exists, or when the database is slow to answer.
+  var prospectWait = null;
+  function prospect() {
+    if (!code) return Promise.resolve(null);
+    if (!prospectWait) {
+      var ask = new Promise(function (resolve) {
+        whenAuth(function () {
+          LBAuth.db.rpc("prospect_page", { p_code: code }).then(function (res) {
+            business = res.data && res.data.name ? res.data : null;
+            resolve(business);
+          }, function () { resolve(null); });
+        });
+      });
+      prospectWait = Promise.race([ask, new Promise(function (r) { setTimeout(function () { r(null); }, 3000); })]);
+    }
+    return prospectWait;
+  }
+
+  function venue() {
+    return business ? business.name : CAFE;
   }
 
   function sr() {
@@ -77,12 +116,19 @@
       '<stop offset="0" stop-color="' + from + '"/><stop offset="1" stop-color="' + to + '"/>' +
       '</linearGradient></defs><rect width="800" height="1000" fill="url(#g)"/>' + text +
       '<text x="80" y="900" fill="rgba(255,255,255,.6)" font-family="Helvetica,Arial,sans-serif" ' +
-      'font-size="30" letter-spacing="4">KAFETERIJA KUTAK</text></svg>';
+      'font-size="30" letter-spacing="4">' + venue().toUpperCase().slice(0, 34).replace(/&/g, "&amp;").replace(/</g, "&lt;") +
+      "</text></svg>";
     return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
 
   window.LBDemo = {
     on: on,
+    code: code,
+    prospect: prospect,
+    // The demo pages wait for this before drawing anything with a name on it.
+    ready: function () { return on ? prospect() : Promise.resolve(null); },
+    // Approvals' heading. The made-up café's has its own Serbian entry.
+    title: function () { return venue() + " — this week"; },
 
     // This week's drop for the made-up café, waiting on approval: the
     // approvals page's creatives, in the reader's language.
@@ -165,12 +211,22 @@
       bar.setAttribute("role", "status");
       bar.innerHTML =
         '<div class="demo-bar-text"><span class="demo-bar-tag">DEMO</span>' +
-        "<span>A made-up café, to show how Adronis works. Try anything — nothing here is saved.</span></div>" +
+        '<span id="demo-bar-line">A made-up café, to show how Adronis works. Try anything — nothing here is saved.</span></div>' +
         '<div class="demo-bar-links">' +
           '<a class="btn-ghost" href="' + other.href + '">' + other.label + "</a>" +
           '<a class="btn" href="signup.html">Join the beta<span class="mono">&rarr;</span></a>' +
         "</div>";
       host.insertBefore(bar, host.firstChild);
+
+      // A business's own link says whose demo it is, in the reader's language.
+      if (!business) return;
+      function personal() {
+        document.getElementById("demo-bar-line").textContent = sr()
+          ? "Ovako bi izgledali oglasi za " + business.name + ". Probaj sve — ništa se ovde ne čuva."
+          : "This is how ads for " + business.name + " could look. Try anything — nothing here is saved.";
+      }
+      personal();
+      document.addEventListener("lb:langchange", personal);
     },
 
     track: track

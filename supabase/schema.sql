@@ -269,6 +269,19 @@ exception when duplicate_object then null; end $$;
 /* Null means the time (if any) is the engine's.                                  */
 alter table public.creatives add column if not exists rescheduled_at timestamptz;
 
+/* --- Migration for "did this ad bring anyone in?" --------------------------- */
+/* outcome: the customer's answer, asked in the control room a couple of days   */
+/* after an ad went out - 'yes' (someone came in or mentioned it), 'unsure' or  */
+/* 'no'. outcome_at is stamped by protect_creative_fields. Null: not asked yet. */
+alter table public.creatives add column if not exists outcome    text;
+alter table public.creatives add column if not exists outcome_at timestamptz;
+
+do $ begin
+  alter table public.creatives add constraint creatives_outcome check (
+    outcome is null or outcome in ('yes', 'unsure', 'no')
+  ) not valid;
+exception when duplicate_object then null; end $;
+
 create index if not exists creatives_drop_idx on public.creatives (drop_id);
 create index if not exists creatives_user_idx on public.creatives (user_id, created_at desc);
 
@@ -1107,7 +1120,8 @@ create trigger profiles_protect_billing
   for each row execute function public.protect_profile_billing();
 
 /* A customer approves or rejects a creative, says why they rejected it, and
-   may rewrite its headline and caption before it goes out. The image, channel,
+   may rewrite its headline and caption before it goes out. Once it has gone
+   out, they may say whether it brought anyone in. The image, channel,
    schedule and everything else belong to the engine. */
 create or replace function public.protect_creative_fields()
 returns trigger
@@ -1128,6 +1142,7 @@ begin
   editable.headline      := new.headline;
   editable.caption       := new.caption;
   editable.scheduled_at  := new.scheduled_at;
+  editable.outcome       := new.outcome;
   editable.updated_at    := new.updated_at;
 
   if new is distinct from editable then
@@ -1163,6 +1178,13 @@ begin
   if new.status is distinct from old.status
      and (old.status = 'published' or new.status = 'published') then
     raise exception 'Publishing is handled by Adronis.';
+  end if;
+
+  if new.outcome is distinct from old.outcome then
+    if old.status <> 'published' then
+      raise exception 'Only an ad that has gone out can say whether it brought people in.';
+    end if;
+    new.outcome_at := case when new.outcome is null then null else now() end;
   end if;
 
   if new.headline is distinct from old.headline or new.caption is distinct from old.caption then
@@ -1290,11 +1312,14 @@ create policy "messages insert public" on public.messages
 /* ------------------------------------------------------------ */
 /* demo_events - what visitors do in the public demo (demo.js), so the   */
 /* Adronis Portal can tell whether it sells: opened, tried approving or  */
-/* rejecting, looked at the control room, clicked Join the beta. Each    */
-/* is sent once per browser tab, with no account, cookie or IP - only a  */
-/* random tab id and where the visitor came from (?src=, e.g. the QR     */
-/* card). Anyone may add a row, nobody may read them from the browser;   */
-/* the portal reads them through its admin policy. */
+/* rejecting, looked at the control room, clicked Join the beta - and    */
+/* opened a proposal (proposal.html) or the date calendar               */
+/* (calendar.html). Each is sent once per browser tab, with no account,  */
+/* cookie or IP - only a random tab id, where the visitor came from      */
+/* (?src=, e.g. the QR card) and, from a link made for one business in   */
+/* the portal's Sales tab, that business's code (prospects.code). Anyone */
+/* may add a row, nobody may read them from the browser; the portal      */
+/* reads them through its admin policy. */
 /* ------------------------------------------------------------ */
 create table if not exists public.demo_events (
   id         bigserial primary key,
@@ -1304,15 +1329,19 @@ create table if not exists public.demo_events (
   created_at timestamptz not null default now()
 );
 
+alter table public.demo_events add column if not exists code text;
+
 alter table public.demo_events enable row level security;
 
-do $$ begin
-  alter table public.demo_events add constraint demo_events_fields check (
-    event in ('open', 'approve', 'reject', 'control_room', 'join')
-    and char_length(visit) between 8 and 40
-    and char_length(coalesce(src, '')) <= 40
-  );
-exception when duplicate_object then null; end $$;
+/* Dropped and added again on every run, so a new kind of event only needs
+   adding here. */
+alter table public.demo_events drop constraint if exists demo_events_fields;
+alter table public.demo_events add constraint demo_events_fields check (
+  event in ('open', 'approve', 'reject', 'control_room', 'join', 'proposal', 'calendar')
+  and char_length(visit) between 8 and 40
+  and char_length(coalesce(src, '')) <= 40
+  and char_length(coalesce(code, '')) <= 40
+);
 
 /* The time is the database's, whatever the browser sent. */
 create or replace function public.stamp_demo_event()
@@ -1334,6 +1363,36 @@ create trigger demo_events_stamp
 drop policy if exists "demo events insert public" on public.demo_events;
 create policy "demo events insert public" on public.demo_events
   for insert to anon, authenticated with check (true);
+
+/* ------------------------------------------------------------ */
+/* updates - short notes from the Adronis team in the control room:      */
+/* "on your suggestion, you can now ..." for one customer (user_id), or  */
+/* news for everyone (user_id null). The portal writes them              */
+/* (admin_post_update in portal-admin.sql); a customer reads the ones    */
+/* for them and the ones for everyone, and nothing else.                 */
+/* ------------------------------------------------------------ */
+create table if not exists public.updates (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid references public.profiles (id) on delete cascade,
+  body       text not null,
+  created_by text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists updates_user_idx on public.updates (user_id, created_at desc);
+
+do $ begin
+  alter table public.updates add constraint updates_fields check (
+    char_length(body) between 1 and 600
+    and char_length(coalesce(created_by, '')) <= 100
+  );
+exception when duplicate_object then null; end $;
+
+alter table public.updates enable row level security;
+
+drop policy if exists "updates select own" on public.updates;
+create policy "updates select own" on public.updates
+  for select to authenticated using (user_id is null or user_id = auth.uid());
 
 /* cancellation_feedback: a signed-in customer adds their own answer only. */
 drop policy if exists "cancellation feedback insert own" on public.cancellation_feedback;

@@ -646,6 +646,7 @@ window.LB_I18N_SR = {
     "WHY YOU TURNED ADS DOWN": "ZAŠTO SU OGLASI ODBIJENI",
     "TEXT YOU REWROTE": "PREPRAVLJENI TEKSTOVI",
     "WHAT TO STAY AWAY FROM": "ŠTA DA IZBEGAVAMO",
+    "WHAT BROUGHT PEOPLE IN": "ŠTA JE DOVELO LJUDE",
     "1 ad": "1 oglas",
 
     "Want to see it first?": "Hoćeš prvo da vidiš kako izgleda?",
@@ -2175,6 +2176,10 @@ window.LB_I18N_SR = {
      "monthly" is translated while a date or a plan name passes through. */
   patterns: [
     [/^(\d+) ads$/, "$1 oglasa"],
+    [/^(\d+) of (\d+) ads you answered about brought people in\.$/,
+      "Ljude je dovelo $1 od $2 oglasa za koje si odgovorio."],
+    // The demo's heading, when a business's own link names it (demo.js).
+    [/^(.+) — this week$/, "$1 — ova nedelja"],
     [/^Reset link sent to (.+?)\. Open it to choose a new password\.$/,
       "Link za novu lozinku je poslat na $1. Otvori ga da izabereš novu lozinku."],
     [/^(\d+) OF (\d+) ADDED$/, "DODATO: $1 OD $2"],

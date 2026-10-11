@@ -1,6 +1,10 @@
 {
   "redirects": [
-    { "source": "/demo", "destination": "/approvals.html?demo=1", "permanent": false }
+    { "source": "/demo", "destination": "/approvals.html?demo=1", "permanent": false },
+    { "source": "/d/:code", "destination": "/approvals.html?demo=1&src=dm&p=:code", "permanent": false },
+    { "source": "/p/:code", "destination": "/proposal.html?p=:code", "permanent": false },
+    { "source": "/k/:code", "destination": "/calendar.html?p=:code", "permanent": false },
+    { "source": "/kalendar", "destination": "/calendar.html", "permanent": false }
   ],
   "rewrites": [
     { "source": "/", "destination": "/Adronis.dc.html" },

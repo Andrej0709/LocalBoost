@@ -75,6 +75,28 @@ button.cal-item:active{transform:scale(.98)}
   .cr-row.has-action .cr-edit{flex-basis:100%;margin:0;padding:10px 0 0;border-top:1px solid var(--line);text-align:left}
 }
 #scheduled-wrap{margin-top:36px}
+.cr-cards{display:grid;gap:12px;margin:0 0 28px}
+.cr-cards:empty{display:none}
+.crc{display:flex;gap:16px;align-items:flex-start;padding:20px 22px;border-radius:var(--r-lg);border:1px solid var(--line-2);background:var(--surface)}
+.crc.is-acc{border-color:var(--acc-line);background:radial-gradient(90% 140% at 100% 0%,rgba(92,182,247,.12),rgba(92,182,247,0) 60%),var(--surface)}
+.crc-thumb{width:64px;height:64px;border-radius:12px;object-fit:cover;flex:none;background:#161a1e}
+.crc-body{flex:1;min-width:0}
+.crc-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
+.crc-title{margin-top:8px;font-size:16px;font-weight:600;line-height:1.35;color:var(--text);letter-spacing:-.015em}
+.crc-meta{margin-top:3px;font-size:13px;color:var(--text-3)}
+.crc-text{margin:8px 0 0;font-size:14.5px;line-height:1.55;color:var(--text-2);white-space:pre-wrap;overflow-wrap:anywhere}
+.crc-sign{margin-top:8px;font-size:13px;color:var(--text-3)}
+.crc-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}
+.crc-actions .btn-ghost{min-height:42px;padding:0 18px;font-size:14px}
+.crc-hint{margin:10px 0 0;font-size:12.5px;line-height:1.5;color:var(--text-3)}
+.crc-done{margin:10px 0 0;font-size:14.5px;line-height:1.5;color:#9fd7b0}
+.crc-msg{margin-top:8px;font-size:13px;color:#f0a8a8}
+.crc-msg:empty{display:none}
+@media (max-width:640px){
+  .crc{padding:18px}
+  .crc-thumb{width:52px;height:52px}
+  .crc-actions .btn-ghost{flex:1 1 auto}
+}
 .eh{position:relative;margin:0 0 36px;padding:28px;border-radius:var(--r-xl);border:1px solid var(--acc-line);background:radial-gradient(90% 120% at 100% 0%,rgba(92,182,247,.14),rgba(92,182,247,0) 60%),var(--surface);box-shadow:var(--shadow-card)}
 .eh-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
 .eh-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--acc)}
@@ -231,6 +253,10 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
       <a href="signup.html" id="finish-notice-link" style="margin-left:4px;white-space:nowrap">Finish signing up →</a>
     </div>
 
+    <!-- A note from us, "did it bring anyone in?", a date coming up
+         (control-room.js: renderCards) -->
+    <div id="cr-cards" class="cr-cards"></div>
+
     <!-- Optional extras the engine renders better with -->
     <div id="engine-help" class="eh" hidden>
       <div class="eh-head">
@@ -381,6 +407,7 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 <script src="reschedule.js"></script>
 <script src="brand-assets.js"></script>
 <script src="first-week.js"></script>
+<script src="dates-rs.js"></script>
 <script src="install-hint.js"></script>
 <script src="control-room.js"></script>
 </body>

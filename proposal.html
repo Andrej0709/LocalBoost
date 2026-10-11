@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="boot-gate.js"></script>
+<link rel="icon" type="image/png" sizes="256x256" href="icon-256.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proposal — Adronis</title>
+<meta name="description" content="What Adronis would do for your business: what you get in the beta, how it starts and what it costs after.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
+<link rel="stylesheet" href="adronis.css">
+<style>
+.pr-wrap{max-width:720px;margin:0 auto}
+.pr-pitch{margin:0 0 18px;padding:22px 24px;border-radius:var(--r-lg);border:1px solid var(--acc-line);background:radial-gradient(90% 140% at 100% 0%,rgba(92,182,247,.12),rgba(92,182,247,0) 60%),var(--surface)}
+.pr-pitch p{margin:0;font-size:16.5px;line-height:1.6;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+.pr-pitch .pr-sign{margin-top:10px;font-size:13.5px;color:var(--text-3)}
+.pr-card{margin:0 0 18px;padding:26px 28px;border-radius:var(--r-lg);border:1px solid var(--line-2);background:var(--surface)}
+.pr-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
+.pr-card h2{margin:10px 0 0;font-size:clamp(22px,2.6vw,28px);letter-spacing:-.025em}
+.pr-list{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:12px}
+.pr-list li{position:relative;padding-left:28px;font-size:15px;line-height:1.55;color:var(--text-2)}
+.pr-list li::before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:9999px;background:var(--acc-soft);color:var(--acc);font-size:11px;line-height:18px;text-align:center}
+.pr-list b{color:var(--text);font-weight:600}
+.pr-price{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-top:16px}
+.pr-price-v{font-size:40px;font-weight:600;letter-spacing:-.04em;color:var(--text);line-height:1}
+.pr-price-k{font-size:15px;color:var(--text-2)}
+.pr-text{margin:12px 0 0;font-size:15px;line-height:1.6;color:var(--text-2)}
+.pr-after{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.pr-after s{color:var(--text-3)}
+.pr-after b{color:var(--text)}
+.pr-steps{margin:16px 0 0;padding:0;list-style:none;counter-reset:step;display:grid;gap:14px}
+.pr-steps li{counter-increment:step;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;font-size:15px;line-height:1.55;color:var(--text-2)}
+.pr-steps li::before{content:counter(step);width:28px;height:28px;border-radius:9999px;border:1px solid var(--acc-line);color:var(--acc);font-family:var(--mono);font-size:12px;display:flex;align-items:center;justify-content:center}
+.pr-steps b{display:block;color:var(--text);font-weight:600}
+.pr-cta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:28px}
+.pr-fine{margin:16px 0 0;text-align:center;font-size:13px;line-height:1.55;color:var(--text-3)}
+@media (max-width:640px){
+  .pr-card,.pr-pitch{padding:20px}
+  .pr-cta>*{flex:1 1 100%}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .nav,.nav-sheet,footer,.pr-cta,#lb-lang-switch,.page-hero::before,.page-hero::after{display:none !important}
+  .page-hero{padding:0 0 16px}
+  .pr-card,.pr-pitch{background:#fff;border-color:#ccc;break-inside:avoid}
+  .page-hero h1,.pr-card h2,.pr-list b,.pr-price-v,.pr-steps b,.pr-pitch p{color:#111}
+  .page-hero p,.pr-list li,.pr-text,.pr-steps li,.pr-price-k{color:#333}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
+  <div class="nav-links">
+    <a href="/#drop">How it works</a>
+    <a href="/#engine">Examples</a>
+    <a href="/#pricing">Pricing</a>
+  </div>
+  <a href="login.html" id="nav-login">Log in</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow is-mono" id="pr-eyebrow">PROPOSAL</div>
+  <h1 id="pr-title"></h1>
+  <p id="pr-lead"></p>
+</header>
+
+<section class="section-tight">
+  <div class="pr-wrap" id="pr-body">
+    <div class="empty" id="pr-loading"><div class="mono">LOADING</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>MADE BY <a href="https://creativesbyandrej.vercel.app" target="_blank" rel="noopener">CREATIVESBYANDREJ</a></span></div>
+</footer>
+
+<!-- The translation loads first so scripts that format a date on load already
+     know the reader's language. nav.js comes before it: its menu copies the nav
+     links, and must copy them before they are translated. -->
+<script src="demo.js"></script>
+<script src="nav.js"></script>
+<script src="cookies.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+/* A proposal for one business, from the portal's Sales tab: /p/<code> (a
+   redirect in vercel.json) opens proposal.html?p=<code>. What it offers -
+   the networks, the plan priced for after the beta, a line from whoever
+   talked to them - comes from prospect_page in the portal's SQL, through
+   demo.js, which also counts the visit for the portal. The beta's terms
+   are the ones beta.html states. The words are in both languages in this
+   file, so a language switch draws the page again. */
+(function () {
+  // When the beta ends and what testers pay after it. Keep in step with
+  // beta.html and LAUNCH_DAY_SR in the portal. Written out rather than
+  // formatted: Serbian needs the month in the genitive here ("februara").
+  var LAUNCH = { en: "1 February 2027", sr: "1. februara 2027" };
+  var FOUNDER_OFF = 0.3;
+  var FOUNDER_MONTHS = 12;
+  // Mirrors the plan cards on the home page.
+  var PLANS = {
+    counter:    { name: "Counter",    price: 59,  en: "4 ads every Monday, on 2 networks",        sr: "4 oglasa svakog ponedeljka, na 2 mreže" },
+    storefront: { name: "Storefront", price: 149, en: "12 ads every Monday, on up to 4 networks", sr: "12 oglasa svakog ponedeljka, na najviše 4 mreže" }
+  };
+
+  function T(en, srText) { return window.LBLang && LBLang.get() === "sr" ? srText : en; }
+  function locale() { return window.LBLang ? LBLang.locale() : "en-US"; }
+  function $(id) { return document.getElementById(id); }
+  function money(n) {
+    return new Intl.NumberFormat(locale(), { style: "currency", currency: "EUR",
+      minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }).format(n);
+  }
+  function make(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  // A list item with its first words in bold.
+  function item(bold, rest) {
+    var li = make("li");
+    li.appendChild(make("b", null, bold));
+    li.appendChild(document.createTextNode(" " + rest));
+    return li;
+  }
+  function section(tag, title) {
+    var card = make("div", "pr-card");
+    card.appendChild(make("div", "pr-tag", tag));
+    card.appendChild(make("h2", null, title));
+    return card;
+  }
+
+  var offer;   // undefined while loading, null for a link that doesn't work
+
+  function render() {
+    var body = $("pr-body");
+    document.title = T("Proposal — Adronis", "Predlog — Adronis");
+    if (offer === undefined) return;
+    body.innerHTML = "";
+
+    if (!offer) {
+      $("pr-eyebrow").textContent = T("PROPOSAL", "PREDLOG");
+      $("pr-title").textContent = T("This link doesn't work anymore.", "Ovaj link više ne radi.");
+      $("pr-lead").textContent = T(
+        "Ask whoever sent it for a new one — or see how Adronis works on your own.",
+        "Zatraži novi od onoga ko ti ga je poslao — ili sam pogledaj kako Adronis radi.");
+      var links = make("div", "pr-cta");
+      var demo = make("a", "btn", T("See the demo", "Pogledaj demo"));
+      demo.href = "approvals.html?demo=1&src=proposal";
+      var join = make("a", "btn-ghost", T("Join the beta", "Prijavi se za betu"));
+      join.href = "beta.html";
+      links.appendChild(demo);
+      links.appendChild(join);
+      body.appendChild(links);
+      return;
+    }
+
+    var plan = PLANS[offer.plan] || PLANS.counter;
+    var founder = Math.round(plan.price * (1 - FOUNDER_OFF) * 100) / 100;
+
+    $("pr-eyebrow").textContent = T("PROPOSAL", "PREDLOG") +
+      (offer.at ? " · " + new Date(offer.at).toLocaleDateString(locale(), { day: "numeric", month: "short", year: "numeric" }).toUpperCase().replace(/\.$/, "") : "");
+    $("pr-title").textContent = T("Ads for " + offer.name + ", every week.", "Oglasi za " + offer.name + ", svake nedelje.");
+    $("pr-lead").textContent = offer.by
+      ? T("Prepared by " + offer.by + " from Adronis — what you'd get, how it starts and what it costs.",
+          "Pripremio " + offer.by + " iz Adronisa — šta dobijaš, kako počinje i koliko košta.")
+      : T("What you'd get, how it starts and what it costs.", "Šta dobijaš, kako počinje i koliko košta.");
+
+    if (offer.pitch) {
+      var pitch = make("div", "pr-pitch");
+      pitch.appendChild(make("p", null, offer.pitch));
+      if (offer.by) pitch.appendChild(make("div", "pr-sign", "— " + offer.by));
+      body.appendChild(pitch);
+    }
+
+    var channels = (offer.channels || []).filter(Boolean);
+    var get = section(T("WHAT YOU GET IN THE BETA", "ŠTA DOBIJAŠ U BETI"),
+      T("We make the ads. You just say yes.", "Mi pravimo oglase. Ti samo kažeš „da“."));
+    var list = make("ul", "pr-list");
+    list.appendChild(item(T("4 ready ads every Monday", "4 gotova oglasa svakog ponedeljka"),
+      T("— picture, headline and caption, made for " + offer.name + ".", "— slika, naslov i tekst, napravljeni za " + offer.name + ".")));
+    list.appendChild(channels.length
+      ? item(T("For " + channels.join(", "), "Za " + channels.join(", ")),
+             T("— sized and written for each network.", "— prilagođeni svakoj mreži."))
+      : item(T("For up to four networks you pick", "Za do četiri mreže po izboru"),
+             T("— Instagram, Facebook, TikTok, Google Business and more.", "— Instagram, Facebook, TikTok, Google Business i druge.")));
+    list.appendChild(item(T("You approve each one on your phone.", "Svaki odobriš na telefonu."),
+      T("Nothing goes out without your yes — it takes about two minutes a week.", "Bez tvog „da“ ništa ne izlazi — to traje oko dva minuta nedeljno.")));
+    list.appendChild(item(T("We post the approved ones for you,", "Odobrene objavljujemo mi,"),
+      T("at the times your customers are looking.", "u vreme kada ih tvoji gosti gledaju.")));
+    list.appendChild(item(T("Turn one down and say why,", "Odbij oglas i reci zašto,"),
+      T("and next week's ads get it right.", "i oglasi sledeće nedelje to pogađaju.")));
+    get.appendChild(list);
+    body.appendChild(get);
+
+    var cost = section(T("WHAT IT COSTS", "KOLIKO KOŠTA"), T("Nothing, until the launch.", "Ništa, do lansiranja."));
+    var price = make("div", "pr-price");
+    price.appendChild(make("span", "pr-price-v", money(0)));
+    price.appendChild(make("span", "pr-price-k", T("until " + LAUNCH.en + " · no card, no contract",
+      "do " + LAUNCH.sr + " · bez kartice, bez ugovora")));
+    cost.appendChild(price);
+    var after = make("div", "pr-after");
+    var line = make("p", "pr-text");
+    line.appendChild(document.createTextNode(T("After that, if you stay: ", "Posle toga, ako ostaneš: ")));
+    line.appendChild(make("b", null, plan.name + " " + T("for", "za") + " " + money(founder) + T(" a month", " mesečno")));
+    line.appendChild(document.createTextNode(" " + T("instead of", "umesto") + " "));
+    line.appendChild(make("s", null, money(plan.price)));
+    line.appendChild(document.createTextNode(T(
+      " for your first " + FOUNDER_MONTHS + " months — 30% off for businesses from the beta. " + plan.name + " gives you " + plan.en + ".",
+      " prvih " + FOUNDER_MONTHS + " meseci — 30% popusta za lokale iz bete. " + plan.name + " donosi " + plan.sr + ".")));
+    after.appendChild(line);
+    after.appendChild(make("p", "pr-text", T(
+      "If you don't stay, nothing happens: the beta simply ends.",
+      "Ako ne ostaneš, ništa se ne dešava: beta se jednostavno završava.")));
+    cost.appendChild(after);
+    body.appendChild(cost);
+
+    var start = section(T("HOW IT STARTS", "KAKO POČINJE"), T("Three steps, one of them yours.", "Tri koraka, samo jedan je tvoj."));
+    var steps = make("ol", "pr-steps");
+    [[T("Apply — about ten minutes.", "Prijavi se — oko deset minuta."),
+      T("An account and a few lines about " + offer.name + ". No card.", "Nalog i par rečenica o lokalu " + offer.name + ". Bez kartice.")],
+     [T("We switch your beta on.", "Uključujemo ti betu."),
+      T("You get an email as soon as you're in.", "Dobiješ mejl čim si unutra.")],
+     [T("Your first ads arrive on Monday.", "Prvi oglasi stižu u ponedeljak."),
+      T("Approve them on your phone — we take it from there.", "Odobriš ih na telefonu — dalje je na nama.")]
+    ].forEach(function (s) {
+      var li = make("li");
+      var text = make("div");
+      text.appendChild(make("b", null, s[0]));
+      text.appendChild(document.createTextNode(s[1]));
+      li.appendChild(text);
+      steps.appendChild(li);
+    });
+    start.appendChild(steps);
+    body.appendChild(start);
+
+    var cta = make("div", "pr-cta");
+    var apply = make("a", "btn btn-lg", T("Apply for the beta →", "Prijavi se za betu →"));
+    apply.href = "signup.html";
+    var see = make("a", "btn-ghost", T("See your demo", "Pogledaj svoj demo"));
+    see.href = "approvals.html?demo=1&src=proposal&p=" + LBDemo.code;
+    cta.appendChild(apply);
+    cta.appendChild(see);
+    body.appendChild(cta);
+    body.appendChild(make("p", "pr-fine", T(
+      "Places in the beta are limited, so we review every application.",
+      "Mesta u beti su ograničena, pa pregledamo svaku prijavu.")));
+  }
+
+  render();
+  document.addEventListener("lb:langchange", render);
+
+  if (!LBDemo.code) { offer = null; render(); return; }
+  LBDemo.track("proposal");
+  LBDemo.prospect().then(function (p) {
+    offer = p;
+    render();
+  });
+})();
+</script>
+
+</body>
+</html>

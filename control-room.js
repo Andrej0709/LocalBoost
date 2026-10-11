@@ -379,11 +379,23 @@
     var rejected = creatives.filter(function (c) { return c.status === "rejected" && c.reject_reason; });
     var edited = creatives.filter(function (c) { return c.edited_at; })
       .sort(function (a, b) { return new Date(b.edited_at) - new Date(a.edited_at); });
+    var answered = creatives.filter(function (c) { return c.outcome; });
     var box = document.getElementById("learned");
     var grid = document.getElementById("learned-grid");
     grid.innerHTML = "";
-    box.hidden = !rejected.length && !edited.length;
+    box.hidden = !rejected.length && !edited.length && !answered.length;
     if (box.hidden) return;
+
+    // Their answers to "did it bring anyone in?" (the card at the top).
+    if (answered.length) {
+      var brought = learnedItem("WHAT BROUGHT PEOPLE IN");
+      var told = document.createElement("p");
+      told.className = "learned-text";
+      told.textContent = answered.filter(function (c) { return c.outcome === "yes"; }).length + " of " +
+        answered.length + " ads you answered about brought people in.";
+      brought.appendChild(told);
+      grid.appendChild(brought);
+    }
 
     if (rejected.length) {
       var item = learnedItem("WHY YOU TURNED ADS DOWN");
@@ -447,6 +459,279 @@
       text.textContent = profile.avoid_notes;
       avoid.appendChild(text);
       grid.appendChild(avoid);
+    }
+  }
+
+  // --- Cards at the top of the page ---
+  // One thing each to answer or close: a note from the Adronis team (the
+  // updates table, written from the portal), "did this ad bring anyone in?"
+  // for an ad that went out a couple of days ago (creatives.outcome), and a
+  // date coming up that's worth an ad (dates-rs.js), offered for the weekly
+  // note. Their words are in both languages here, so a language switch just
+  // draws them again. In the public demo they work on the made-up week and
+  // save nothing.
+  var cards = {
+    on: false,
+    demo: false,
+    creatives: [],     // the demo's week; a real account reads allCreatives
+    updates: [],
+    answered: {},      // outcome answers given on this visit, by ad
+    thanks: null,      // the answer just given, while its thank-you shows
+    dateAdded: null    // a date just put in the weekly note
+  };
+  var DISMISSED_KEY = "lb-cr-dismissed";
+
+  function T(en, srText) {
+    return window.LBLang && LBLang.get() === "sr" ? srText : en;
+  }
+
+  function make(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function button(cls, text, onClick) {
+    var b = make("button", cls, text);
+    b.type = "button";
+    b.addEventListener("click", onClick);
+    return b;
+  }
+
+  // The demo's cards are closed for this visit only: the same phone shows
+  // the demo to the next owner too.
+  var demoClosed = [];
+
+  function dismissed() {
+    if (cards.demo) return demoClosed;
+    try { return JSON.parse(localStorage.getItem(DISMISSED_KEY) || "[]"); } catch (e) { return []; }
+  }
+
+  function dismiss(id) {
+    if (cards.demo) { demoClosed.push(id); return; }
+    try {
+      var list = dismissed();
+      if (list.indexOf(id) === -1) list.push(id);
+      localStorage.setItem(DISMISSED_KEY, JSON.stringify(list.slice(-200)));
+    } catch (e) {}
+  }
+
+  function card(tag, accent) {
+    var box = make("section", "crc" + (accent ? " is-acc" : ""));
+    var body = make("div", "crc-body");
+    body.appendChild(make("div", "crc-tag", tag));
+    box.appendChild(body);
+    return { box: box, body: body };
+  }
+
+  function renderCards() {
+    if (!cards.on) return;
+    var host = document.getElementById("cr-cards");
+    host.innerHTML = "";
+    [noteCard(), outcomeCard(), dateCard()].forEach(function (c) { if (c) host.appendChild(c); });
+  }
+
+  document.addEventListener("lb:langchange", renderCards);
+
+  // A note from the team: the newest one this account hasn't closed, for a
+  // month and a half.
+  function noteCard() {
+    var gone = dismissed();
+    var u = cards.updates.filter(function (x) {
+      return gone.indexOf("update-" + x.id) === -1 && Date.now() - new Date(x.created_at) < 45 * 86400000;
+    })[0];
+    if (!u) return null;
+    var c = card(u.user_id ? T("ON YOUR SUGGESTION", "NA TVOJ PREDLOG") : T("NEW IN ADRONIS", "NOVO U ADRONISU"), true);
+    c.body.appendChild(make("p", "crc-text", u.body));
+    c.body.appendChild(make("div", "crc-sign", "— " + (u.created_by || "Adronis") + ", " + shortDate(u.created_at)));
+    var actions = make("div", "crc-actions");
+    actions.appendChild(button("btn-ghost", T("Got it", "Važi"), function () {
+      dismiss("update-" + u.id);
+      renderCards();
+    }));
+    c.body.appendChild(actions);
+    return c.box;
+  }
+
+  async function loadUpdates() {
+    var res = await LBAuth.db.from("updates").select("*").order("created_at", { ascending: false }).limit(20);
+    if (res.error) return;   // the table isn't there until schema.sql is re-run
+    cards.updates = res.data || [];
+    renderCards();
+  }
+
+  // Ads that went out two to thirty days ago and haven't been answered for,
+  // oldest first. An account whose database has no outcome column yet is
+  // never asked.
+  function adKey(c) {
+    return c.id || c.headline + "|" + c.published_at;
+  }
+
+  function outcomeQueue() {
+    var list = cards.demo ? cards.creatives : allCreatives;
+    return list.filter(function (c) {
+      if (c.status !== "published" || !c.published_at || !("outcome" in c) || c.outcome) return false;
+      if (cards.answered[adKey(c)]) return false;
+      var ago = -LBDates.daysUntil(new Date(c.published_at));
+      return ago >= 2 && ago <= 30;
+    }).sort(function (a, b) { return new Date(a.published_at) - new Date(b.published_at); });
+  }
+
+  var THANKS = {
+    yes: ["Great — that's the kind of ad we'll make more of.", "Odlično — takvih oglasa ćemo praviti još."],
+    unsure: ["Fair enough — it's often hard to tell. Thanks for answering.", "Razumljivo — često se ne zna. Hvala na odgovoru."],
+    no: ["Thanks for the honest answer — we'll try something different.", "Hvala na iskrenom odgovoru — probaćemo nešto drugačije."]
+  };
+
+  function outcomeCard() {
+    if (cards.thanks) {
+      var t = card(T("DID IT BRING ANYONE IN?", "DA LI JE DOVEO LJUDE?"));
+      t.body.appendChild(make("p", "crc-done", T(THANKS[cards.thanks][0], THANKS[cards.thanks][1])));
+      return t.box;
+    }
+    var queue = outcomeQueue();
+    if (!queue.length) return null;
+    var ad = queue[0];
+    var c = card(T("DID IT BRING ANYONE IN?", "DA LI JE DOVEO LJUDE?") +
+      (queue.length > 1 ? " · 1 / " + queue.length : ""));
+    if (ad.image_url) {
+      var img = make("img", "crc-thumb");
+      img.src = ad.image_url;
+      img.alt = "";
+      c.box.insertBefore(img, c.body);
+    }
+    c.body.appendChild(make("div", "crc-title", ad.headline || T("Your ad", "Tvoj oglas")));
+    c.body.appendChild(make("div", "crc-meta", [ad.channel, shortDate(ad.published_at)].filter(Boolean).join(" · ")));
+    c.body.appendChild(make("p", "crc-text", T(
+      "Since it went out, has anyone come in because of it, or mentioned it?",
+      "Od kad je objavljen, da li je neko došao zbog njega ili ga pomenuo?")));
+    var actions = make("div", "crc-actions");
+    var msg = make("div", "crc-msg");
+    [["yes", "Yes", "Da"], ["unsure", "Can't tell", "Ne znam"], ["no", "No", "Ne"]].forEach(function (o) {
+      actions.appendChild(button("btn-ghost", T(o[1], o[2]), function () { answer(ad, o[0], actions, msg); }));
+    });
+    c.body.appendChild(actions);
+    c.body.appendChild(make("p", "crc-hint", cards.demo
+      ? T("In a real account, your answer shows us which ads to make more of.",
+          "U pravom nalogu, tvoj odgovor nam pokazuje kakvih oglasa da pravimo više.")
+      : T("Your answer shows us which ads to make more of.",
+          "Tvoj odgovor nam pokazuje kakvih oglasa da pravimo više.")));
+    c.body.appendChild(msg);
+    return c.box;
+  }
+
+  async function answer(ad, value, actions, msg) {
+    Array.prototype.forEach.call(actions.querySelectorAll("button"), function (b) { b.disabled = true; });
+    if (!cards.demo) {
+      var res = await LBAuth.db.from("creatives").update({ outcome: value }).eq("id", ad.id).select().maybeSingle();
+      if (res.error || !res.data) {
+        Array.prototype.forEach.call(actions.querySelectorAll("button"), function (b) { b.disabled = false; });
+        msg.textContent = res.error ? LBAuth.friendlyError(res.error).message
+          : T("Couldn't save that — try again.", "Nismo uspeli da sačuvamo — pokušaj ponovo.");
+        return;
+      }
+      allCreatives = allCreatives.map(function (x) { return x.id === ad.id ? res.data : x; });
+      renderLearned(allCreatives, LBAuth.getProfile() || {});
+    }
+    cards.answered[adKey(ad)] = value;
+    cards.thanks = value;
+    renderCards();
+    setTimeout(function () {
+      cards.thanks = null;
+      renderCards();
+    }, 2800);
+  }
+
+  // The next date worth an ad, once it's close enough to get into a Monday
+  // drop and still far enough to post ahead of it. The demo shows the next
+  // one whatever the day, so there's always one to try.
+  function comingUp() {
+    var gone = dismissed();
+    return LBDates.between(new Date(), 60).filter(function (d) {
+      var days = LBDates.daysUntil(d.date);
+      return days >= 2 && (cards.demo || days <= d.lead + 7) && gone.indexOf("date-" + d.id) === -1;
+    })[0] || null;
+  }
+
+  function inNote(d) {
+    var note = String((LBAuth.getProfile() || {}).next_week_note || "").toLowerCase();
+    return d.names.some(function (n) { return note.indexOf(n.toLowerCase()) > -1; });
+  }
+
+  function srDays(n) {
+    return n % 10 === 1 && n % 100 !== 11 ? "dan" : "dana";
+  }
+
+  function dateCard() {
+    var d = comingUp();
+    if (!d) return null;
+    var locale = window.LBLang ? LBLang.locale() : "en-US";
+    var n = LBDates.daysUntil(d.date);
+    var c = card(T("COMING UP · IN " + n + " DAYS", "USKORO · ZA " + n + " " + srDays(n).toUpperCase()));
+    c.body.appendChild(make("div", "crc-title", d.name + " — " +
+      d.date.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })));
+    c.body.appendChild(make("p", "crc-text", d.idea));
+
+    var actions = make("div", "crc-actions");
+    var msg = make("div", "crc-msg");
+    var added = cards.dateAdded === d.id || (!cards.demo && inNote(d));
+    if (added) {
+      c.body.appendChild(make("p", "crc-done", "✓ " + T(
+        "It's in your note for next week — your next drop plans an ad for it.",
+        "Upisano je u belešku za sledeću nedelju — sledeći drop planira oglas za to.")));
+      actions.appendChild(button("eh-plain", T("Close", "Zatvori"), function () {
+        dismiss("date-" + d.id);
+        renderCards();
+      }));
+    } else {
+      actions.appendChild(button("btn-ghost", T("Add to my note for next week", "Dodaj u belešku za sledeću nedelju"),
+        function (e) { addDate(d, e.currentTarget, msg); }));
+      actions.appendChild(button("eh-plain", T("Not for us", "Ne treba nam"), function () {
+        dismiss("date-" + d.id);
+        renderCards();
+      }));
+    }
+    c.body.appendChild(actions);
+    if (!added) {
+      c.body.appendChild(make("p", "crc-hint", cards.demo
+        ? T("In a real account this adds a line to your note for next week.",
+            "U pravom nalogu ovo dodaje red u belešku za sledeću nedelju.")
+        : T("Adds one line to your note for next week — you can change it under Profile strength.",
+            "Dodaje jedan red u belešku za sledeću nedelju — možeš da je izmeniš pod Snaga profila.")));
+    }
+    c.body.appendChild(msg);
+    return c.box;
+  }
+
+  async function addDate(d, btn, msg) {
+    if (cards.demo) {
+      cards.dateAdded = d.id;
+      renderCards();
+      return;
+    }
+    var profile = LBAuth.getProfile() || {};
+    var when = d.date.toLocaleDateString(window.LBLang ? LBLang.locale() : "en-US",
+      window.LBLang && LBLang.get() === "sr" ? { day: "numeric", month: "numeric" } : { month: "short", day: "numeric" });
+    var line = d.name + " (" + when + "): " + T("I'd like an ad for it.", "hoću oglas za to.");
+    // A note gone out of date is about a week that's over: start a new one.
+    var at = profile.next_week_note_at ? new Date(profile.next_week_note_at).getTime() : 0;
+    var old = at && Date.now() - at <= NOTE_FRESH_MS ? String(profile.next_week_note || "").trim() : "";
+    var next = (old ? old + "\n" : "") + line;
+    if (next.length > 1000) {
+      msg.textContent = T("Your note is full — make some room under Profile strength first.",
+        "Beleška je puna — prvo napravi mesta pod Snaga profila.");
+      return;
+    }
+    btn.disabled = true;
+    try {
+      await LBAuth.updateProfile({ next_week_note: next });
+      cards.dateAdded = d.id;
+      renderExtras();
+      renderCards();
+    } catch (err) {
+      btn.disabled = false;
+      msg.textContent = err.message;
     }
   }
 
@@ -994,12 +1279,17 @@
   LBAuth.ready.then(async function () {
     // The public demo: the sample week for everyone, signed in or not.
     if (LBDemo.on) {
+      await LBDemo.ready();
       loading.hidden = true;
       LBDemo.bar();
       document.getElementById("page-sub").textContent =
         "A café's week of approved ads: what goes out and when, and what's already live.";
       document.getElementById("history-link").hidden = true;
       showSample();
+      cards.on = true;
+      cards.demo = true;
+      cards.creatives = LBDemo.week().map(function (c) { return Object.assign({ outcome: null }, c); });
+      renderCards();
       return;
     }
 
@@ -1076,6 +1366,10 @@
       renderBoard(creatives);
       renderLearned(creatives, LBAuth.getProfile() || {});
     }
+
+    cards.on = true;
+    renderCards();
+    loadUpdates();
 
     LBTour.replayButton(TOUR);
     LBTour.auto(TOUR);

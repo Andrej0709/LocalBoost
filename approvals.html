@@ -391,7 +391,7 @@
     var drop = drops.filter(function (d) { return d.id === currentDrop; })[0];
 
     document.getElementById("drop-title").textContent =
-      demoMode ? (LBDemo.on ? "Kafeterija Kutak — this week" : "Sample drop")
+      demoMode ? (LBDemo.on ? LBDemo.title() : "Sample drop")
         : drop && drop.theme ? drop.theme
         : currentDrop === "all" ? "Every creative"
         : drop && drops[0] && drop.id !== drops[0].id ? "An earlier drop"
@@ -1292,8 +1292,10 @@
   }
 
   LBAuth.ready.then(async function () {
-    // The public demo: the sample drop for everyone, signed in or not.
+    // The public demo: the sample drop for everyone, signed in or not -
+    // with a business's own name when the link came from the portal.
     if (LBDemo.on) {
+      await LBDemo.ready();
       loading.hidden = true;
       lbBootDone();
       LBDemo.bar();

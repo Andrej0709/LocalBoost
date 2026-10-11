@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="boot-gate.js"></script>
+<link rel="icon" type="image/png" sizes="256x256" href="icon-256.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dates worth an ad — Adronis</title>
+<meta name="description" content="Every date in the next 12 months worth an ad for a café, restaurant or shop in Serbia, with an idea for each and when to post it. Free, no sign-up.">
+<link rel="canonical" href="https://adronis.vercel.app/calendar.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Adronis">
+<meta property="og:title" content="Dates worth an ad, the next 12 months">
+<meta property="og:description" content="For cafés, restaurants and shops in Serbia: every date worth an ad, an idea for each and when to post it.">
+<meta property="og:url" content="https://adronis.vercel.app/calendar.html">
+<meta property="og:image" content="https://adronis.vercel.app/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
+<link rel="stylesheet" href="adronis.css">
+<style>
+.dc-wrap{max-width:860px;margin:0 auto}
+.dc-for{position:relative;z-index:1;margin:18px auto 0;font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--acc)}
+.dc-for:empty{display:none}
+.dc-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:0 0 8px}
+.dc-tools p{margin:0;font-size:14px;line-height:1.55;color:var(--text-3)}
+.dc-tools .btn-ghost{min-height:42px;padding:0 18px;font-size:14px}
+.dc-month{margin:40px 0 12px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--text-2)}
+.dc-row{display:grid;grid-template-columns:72px minmax(0,1fr) 128px;gap:18px;align-items:start;padding:18px 20px;margin-bottom:10px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
+.dc-when{text-align:center}
+.dc-day{font-size:30px;font-weight:600;line-height:1;letter-spacing:-.04em;color:var(--text);font-feature-settings:"tnum" on}
+.dc-wd{margin-top:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--text-3)}
+.dc-name{font-size:16.5px;font-weight:600;line-height:1.35;letter-spacing:-.015em;color:var(--text)}
+.dc-idea{margin:6px 0 0;font-size:14.5px;line-height:1.55;color:var(--text-2)}
+.dc-post{text-align:right}
+.dc-post-k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--text-3)}
+.dc-post-v{margin-top:5px;font-size:14px;font-weight:500;color:var(--acc)}
+.dc-row.is-now{border-color:var(--acc-line)}
+.dc-row.is-now .dc-post-v{color:#f0c878}
+.dc-cta{margin-top:48px;text-align:center}
+.dc-cta .dc-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
+.dc-cta h2{margin:12px auto 0;max-width:22ch;font-size:clamp(24px,3vw,32px)}
+.dc-cta p{margin:12px auto 0;max-width:52ch;font-size:15px;line-height:1.6;color:var(--text-2)}
+.dc-cta-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}
+@media (max-width:640px){
+  .dc-row{grid-template-columns:52px minmax(0,1fr);gap:14px;padding:16px}
+  .dc-day{font-size:24px}
+  .dc-post{grid-column:2;text-align:left;display:flex;gap:8px;align-items:baseline}
+  .dc-post-v{margin:0}
+  .dc-tools .btn-ghost{width:100%}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .nav,.nav-sheet,footer,.dc-tools .btn-ghost,.dc-cta,#lb-lang-switch,.page-hero::before,.page-hero::after{display:none !important}
+  .page-hero{padding:0 0 16px}
+  .page-hero h1,.dc-name,.dc-day{color:#111}
+  .page-hero p,.dc-idea,.dc-tools p{color:#333}
+  .dc-row{break-inside:avoid;background:#fff;border-color:#ccc}
+  .dc-month,.dc-wd,.dc-post-k{color:#555}
+  .dc-post-v,.dc-for{color:#1b5fa6}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
+  <div class="nav-links">
+    <a href="/#drop">How it works</a>
+    <a href="/#engine">Examples</a>
+    <a href="approvals.html?demo=1&amp;src=calendar">Demo</a>
+    <a href="/#pricing">Pricing</a>
+  </div>
+  <a href="login.html" id="nav-login">Log in</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow is-mono" id="dc-eyebrow"></div>
+  <h1 id="dc-title"></h1>
+  <p id="dc-lead"></p>
+  <div class="dc-for" id="dc-for"></div>
+</header>
+
+<section class="section-tight">
+  <div class="dc-wrap">
+    <div class="dc-tools">
+      <p id="dc-how"></p>
+      <button type="button" class="btn-ghost" id="dc-print"></button>
+    </div>
+    <div id="dc-list"></div>
+
+    <div class="form-card dc-cta">
+      <div class="dc-tag" id="dc-cta-tag"></div>
+      <h2 id="dc-cta-title"></h2>
+      <p id="dc-cta-text"></p>
+      <div class="dc-cta-links">
+        <a class="btn" id="dc-demo" href="approvals.html?demo=1&amp;src=calendar"></a>
+        <a class="btn-ghost" id="dc-join" href="signup.html"></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>MADE BY <a href="https://creativesbyandrej.vercel.app" target="_blank" rel="noopener">CREATIVESBYANDREJ</a></span></div>
+</footer>
+
+<!-- The translation loads first so scripts that format a date on load already
+     know the reader's language. nav.js comes before it: its menu copies the nav
+     links, and must copy them before they are translated. -->
+<script src="demo.js"></script>
+<script src="nav.js"></script>
+<script src="cookies.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="dates-rs.js"></script>
+<script>
+/* The date calendar: every date in the next 12 months worth an ad (dates-rs.js),
+   with an idea for each and the day to start posting about it. Something
+   useful to hand a business before asking it for anything - the portal's
+   Sales tab sends it as /k/<code>, which names the business here and counts
+   the visit for it (demo.js). The words are in both languages in this file,
+   so a language switch draws the page again. */
+(function () {
+  function T(en, srText) { return window.LBLang && LBLang.get() === "sr" ? srText : en; }
+  function locale() { return window.LBLang ? LBLang.locale() : "en-US"; }
+  function $(id) { return document.getElementById(id); }
+  var forName = null;
+
+  // Links onward keep the business's code, so their demo wears their name.
+  var code = LBDemo.code;
+  if (code) $("dc-demo").href = "approvals.html?demo=1&src=calendar&p=" + code;
+
+  function make(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function render() {
+    document.title = T("Dates worth an ad — Adronis", "Datumi vredni oglasa — Adronis");
+    $("dc-eyebrow").textContent = T("FREE · FOR CAFÉS, RESTAURANTS AND SHOPS", "BESPLATNO · ZA KAFIĆE, RESTORANE I RADNJE");
+    $("dc-title").textContent = T("Every date worth an ad, for the next 12 months.", "Svi datumi vredni oglasa, za narednih 12 meseci.");
+    $("dc-lead").textContent = T(
+      "The days your customers already have in mind — holidays, slavas, proms, the first warm weekend — with an idea for each ad and the day to start posting it.",
+      "Dani na koje tvoji gosti već misle — praznici, slave, mature, prvi topao vikend — uz ideju za svaki oglas i dan kada da počneš da ga objavljuješ.");
+    $("dc-for").textContent = forName ? T("MADE FOR ", "NAPRAVLJENO ZA ") + forName.toUpperCase() : "";
+    $("dc-how").textContent = T(
+      "Post a little ahead: people plan their week a few days before.",
+      "Objavi malo unapred: ljudi planiraju nedelju nekoliko dana ranije.");
+    $("dc-print").textContent = T("Print or save as PDF", "Odštampaj ili sačuvaj kao PDF");
+
+    var list = $("dc-list");
+    list.innerHTML = "";
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var lastMonth = null;
+    LBDates.between(new Date(), 365).forEach(function (d) {
+      var month = d.date.toLocaleDateString(locale(), { month: "long", year: "numeric" }).toUpperCase();
+      if (month !== lastMonth) {
+        list.appendChild(make("h2", "dc-month", month.replace(/\.$/, "")));
+        lastMonth = month;
+      }
+      var now = d.postFrom <= today;
+      var row = make("div", "dc-row" + (now ? " is-now" : ""));
+      var when = make("div", "dc-when");
+      when.appendChild(make("div", "dc-day", String(d.date.getDate())));
+      when.appendChild(make("div", "dc-wd", d.date.toLocaleDateString(locale(), { weekday: "short" }).toUpperCase().replace(/\.$/, "")));
+      var what = make("div", "dc-what");
+      what.appendChild(make("div", "dc-name", d.name));
+      what.appendChild(make("p", "dc-idea", d.idea));
+      var post = make("div", "dc-post");
+      post.appendChild(make("div", "dc-post-k", T("POST FROM", "OBJAVI OD")));
+      post.appendChild(make("div", "dc-post-v", now ? T("Now", "Odmah")
+        : d.postFrom.toLocaleDateString(locale(), { day: "numeric", month: "short" })));
+      row.appendChild(when);
+      row.appendChild(what);
+      row.appendChild(post);
+      list.appendChild(row);
+    });
+
+    $("dc-cta-tag").textContent = T("WANT THESE MADE FOR YOU?", "HOĆEŠ DA IH NEKO PRAVI UMESTO TEBE?");
+    $("dc-cta-title").textContent = T("Adronis makes the ads for these days, every week.", "Adronis pravi oglase za ove dane, svake nedelje.");
+    $("dc-cta-text").textContent = T(
+      "You approve them on your phone, we post them. Adronis is in beta now — free until the launch.",
+      "Ti ih odobriš na telefonu, mi ih objavimo. Adronis je sada u beti — besplatno do lansiranja.");
+    $("dc-demo").textContent = forName ? T("See the demo for " + forName, "Pogledaj demo za " + forName) : T("See the demo", "Pogledaj demo");
+    $("dc-join").textContent = T("Join the beta", "Prijavi se za betu");
+  }
+
+  render();
+  document.addEventListener("lb:langchange", render);
+  $("dc-print").addEventListener("click", function () { window.print(); });
+
+  LBDemo.track("calendar");
+  LBDemo.prospect().then(function (p) {
+    if (!p) return;
+    forName = p.name;
+    render();
+  });
+})();
+</script>
+
+</body>
+</html>
