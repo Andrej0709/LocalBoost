@@ -1926,6 +1926,67 @@ create policy "client errors insert public" on public.client_errors
   for insert to anon, authenticated with check (true);
 
 /* ------------------------------------------------------------ */
+/* 12b. generation_costs - what making each ad cost us. The ad      */
+/*     engine (Claude + Higgsfield, running with the service role)   */
+/*     writes one row per paid API call: writing the copy, making    */
+/*     the image, checking it. The Adronis Portal adds the rows up   */
+/*     per tester against the beta budget (portal-admin.sql gives    */
+/*     admins read access). Customers can neither read nor write it. */
+/*                                                                  */
+/*     What the engine fills in:                                    */
+/*       user_id      the account the ad is for (required)          */
+/*       drop_id      the week's drop, when there is one            */
+/*       creative_id  the ad, once it exists (a call that made no   */
+/*                    ad - a failed or thrown-away image - leaves    */
+/*                    it null; it still cost money)                  */
+/*       provider     'claude' or 'higgsfield' ('other' otherwise)  */
+/*       model        the exact model id, e.g. claude-sonnet-5-5    */
+/*       step         'copy', 'image', 'check', 'reel' or 'other'   */
+/*       input_tokens, output_tokens, cached_tokens  for Claude     */
+/*       units        images or video seconds, for Higgsfield       */
+/*       cost_usd     what the provider bills for this call, in USD */
+/*       note         anything worth keeping (retry, batch, ...)    */
+/*                                                                  */
+/*     A deleted account keeps its rows (user_id goes null): the    */
+/*     money was spent either way.                                  */
+/* ------------------------------------------------------------ */
+create table if not exists public.generation_costs (
+  id            bigserial primary key,
+  created_at    timestamptz not null default now(),
+  user_id       uuid references public.profiles (id) on delete set null,
+  drop_id       uuid references public.drops (id) on delete set null,
+  creative_id   uuid references public.creatives (id) on delete set null,
+  provider      text not null default 'other',
+  model         text,
+  step          text not null default 'other',
+  input_tokens  int,
+  output_tokens int,
+  cached_tokens int,
+  units         numeric(10, 2),
+  cost_usd      numeric(12, 6) not null,
+  note          text
+);
+
+do $$ begin
+  alter table public.generation_costs add constraint generation_costs_values check (
+    provider in ('claude', 'higgsfield', 'other')
+    and step in ('copy', 'image', 'check', 'reel', 'other')
+    and cost_usd >= 0
+    and coalesce(input_tokens, 0) >= 0
+    and coalesce(output_tokens, 0) >= 0
+    and coalesce(cached_tokens, 0) >= 0
+    and coalesce(units, 0) >= 0
+  );
+exception when duplicate_object then null; end $$;
+
+create index if not exists generation_costs_created_idx on public.generation_costs (created_at desc);
+create index if not exists generation_costs_user_idx on public.generation_costs (user_id, created_at desc);
+
+/* RLS on with no policy for anon or authenticated: only the service role
+   (the engine) writes, and only portal admins read. */
+alter table public.generation_costs enable row level security;
+
+/* ------------------------------------------------------------ */
 /* 13. Scheduled jobs (pg_cron): auto-approval and expiry every 15   */
 /*     minutes (expiry 7 minutes after, so an ad due both ways is    */
 /*     approved), and error reports older than 30 days cleared every */
