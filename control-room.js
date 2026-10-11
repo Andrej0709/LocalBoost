@@ -581,10 +581,11 @@
     stars.setAttribute("role", "radiogroup");
     stars.setAttribute("aria-label", T("Your rating", "Tvoja ocena"));
     [1, 2, 3, 4, 5].forEach(function (n) {
-      var s = button("crc-star" + (n <= d.stars ? " is-on" : ""), "★", function () {
+      var s = button("crc-star" + (n <= d.stars ? " is-on" : ""), "", function () {
         d.stars = n;
         renderCards();
       });
+      s.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.9l2.8 5.7 6.3.9-4.55 4.45 1.07 6.27L12 17.25l-5.62 2.97 1.07-6.27L2.9 9.5l6.3-.9z"/></svg>';
       s.setAttribute("role", "radio");
       s.setAttribute("aria-checked", n === d.stars ? "true" : "false");
       s.setAttribute("aria-label", n + " / 5");

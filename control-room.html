@@ -93,12 +93,16 @@ button.cal-item:active{transform:scale(.98)}
 .crc-msg{margin-top:8px;font-size:13px;color:#f0a8a8}
 .crc-msg:empty{display:none}
 .crc-msg.crc-ok{color:#9fd7b0}
-.crc-stars{display:flex;gap:6px;margin-top:14px}
-.crc-star{width:46px;height:46px;border-radius:12px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--text-4,#4a4f58);font-size:24px;line-height:1;cursor:pointer;transition:color .15s ease,border-color .15s ease,transform .12s ease}
-.crc-star:hover{border-color:var(--line-3);color:#f0c878}
-.crc-star:active{transform:scale(.94)}
-.crc-star.is-on{color:#f0c878;border-color:rgba(240,200,120,.45);background:rgba(240,200,120,.08)}
-.crc-star:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+/* Small outlined stars that fill with the brand blue once picked. The
+   button stays thumb-sized around the small star. */
+.crc-stars{display:flex;gap:0;margin:10px 0 0 -8px}
+.crc-star{width:38px;height:38px;padding:0;border:none;background:none;display:inline-flex;align-items:center;justify-content:center;color:var(--text-3);cursor:pointer;transition:color .15s ease,transform .12s ease}
+.crc-star svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round;transition:fill .15s ease}
+.crc-star:hover{color:var(--acc)}
+.crc-star:active{transform:scale(.88)}
+.crc-star.is-on{color:var(--acc)}
+.crc-star.is-on svg{fill:var(--acc)}
+.crc-star:focus-visible{outline:2px solid var(--acc);outline-offset:-2px;border-radius:10px}
 .crc-field{display:block;width:100%;box-sizing:border-box;margin-top:12px;padding:11px 13px;border-radius:12px;border:1px solid var(--line-2);background:var(--field);color:var(--text);font-family:var(--font);font-size:14.5px;line-height:1.5;resize:vertical}
 .crc-field:focus{outline:none;border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(124,198,255,.14)}
 .crc-link{font-family:var(--mono);font-size:13px;color:var(--acc)}
