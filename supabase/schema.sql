@@ -427,6 +427,13 @@ as $$
   end
 $$;
 
+/* --- Migration for referrals ------------------------------------------------ */
+/* referred_by: the code of the tester whose invite link brought this account   */
+/* (the first 8 characters of their id - see referrer_name and my_referrals).    */
+/* Set once, at signup, from the link (?ref= on invite.html, kept by signup);    */
+/* the customer can't change it afterwards (protect_profile_billing).            */
+alter table public.profiles add column if not exists referred_by text;
+
 /* ------------------------------------------------------------ */
 /* 8. Auto-create a profile whenever a user signs up. */
 /*    Reads the metadata passed in supabase.auth.signUp({ options: { data: ... } }). */
@@ -445,7 +452,7 @@ begin
     id, email, business_name, country, city, vertical, website,
     what_you_sell, typical_customer, differentiator, why_us,
     brand_vibe, brand_colors, avoid_notes, channels, plan,
-    terms_accepted_at, terms_version
+    terms_accepted_at, terms_version, referred_by
   )
   values (
     new.id,
@@ -478,7 +485,8 @@ begin
     /* The server clock, not the browser's: the signup request is the moment the
        box was ticked, and a timestamp the browser sends could say anything. */
     case when nullif(new.raw_user_meta_data ->> 'terms_version', '') is not null then now() end,
-    nullif(new.raw_user_meta_data ->> 'terms_version', '')
+    nullif(new.raw_user_meta_data ->> 'terms_version', ''),
+    case when (new.raw_user_meta_data ->> 'ref') ~ '^[0-9a-f]{8}$' then new.raw_user_meta_data ->> 'ref' end
   )
   on conflict (id) do nothing;
 
@@ -1337,7 +1345,7 @@ alter table public.demo_events enable row level security;
    adding here. */
 alter table public.demo_events drop constraint if exists demo_events_fields;
 alter table public.demo_events add constraint demo_events_fields check (
-  event in ('open', 'approve', 'reject', 'control_room', 'join', 'proposal', 'calendar')
+  event in ('open', 'approve', 'reject', 'control_room', 'join', 'proposal', 'calendar', 'review', 'invite')
   and char_length(visit) between 8 and 40
   and char_length(coalesce(src, '')) <= 40
   and char_length(coalesce(code, '')) <= 40
@@ -1393,6 +1401,88 @@ alter table public.updates enable row level security;
 drop policy if exists "updates select own" on public.updates;
 create policy "updates select own" on public.updates
   for select to authenticated using (user_id is null or user_id = auth.uid());
+
+/* ------------------------------------------------------------ */
+/* ratings - "would you recommend Adronis?", asked in the control room   */
+/* after three weeks of ads: one to five stars, a sentence, and whether  */
+/* we may publish it with the business's name. One per account, which   */
+/* the customer may change. The portal reads them (portal-admin.sql).    */
+/* ------------------------------------------------------------ */
+create table if not exists public.ratings (
+  user_id     uuid primary key references public.profiles (id) on delete cascade,
+  stars       int not null,
+  comment     text,
+  may_publish boolean not null default false,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+do $$ begin
+  alter table public.ratings add constraint ratings_fields check (
+    stars between 1 and 5
+    and char_length(coalesce(comment, '')) <= 500
+  );
+exception when duplicate_object then null; end $$;
+
+drop trigger if exists ratings_set_updated_at on public.ratings;
+create trigger ratings_set_updated_at
+  before update on public.ratings
+  for each row execute function public.set_updated_at();
+
+alter table public.ratings enable row level security;
+
+drop policy if exists "ratings select own" on public.ratings;
+create policy "ratings select own" on public.ratings
+  for select to authenticated using (user_id = auth.uid());
+drop policy if exists "ratings insert own" on public.ratings;
+create policy "ratings insert own" on public.ratings
+  for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "ratings update own" on public.ratings;
+create policy "ratings update own" on public.ratings
+  for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+/* ------------------------------------------------------------ */
+/* Referrals - a tester's invite link is /u/<code>, the first 8          */
+/* characters of their account id. referrer_name tells invite.html whose */
+/* link it is (only a tester in the beta can invite); my_referrals tells */
+/* the tester how many signed up through it, without saying who.         */
+/* ------------------------------------------------------------ */
+create or replace function public.referrer_name(p_code text)
+returns text
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select business_name
+    from public.profiles
+   where p_code ~ '^[0-9a-f]{8}$'
+     and left(id::text, 8) = p_code
+     and plan::text = 'beta'
+     and subscription_status in ('trialing', 'active')
+   limit 1;
+$$;
+
+revoke execute on function public.referrer_name(text) from public;
+grant execute on function public.referrer_name(text) to anon, authenticated;
+
+create or replace function public.my_referrals()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select jsonb_build_object(
+           'signed_up', count(*),
+           'in_beta',   count(*) filter (where plan::text = 'beta'
+                                           and subscription_status in ('trialing', 'active')))
+    from public.profiles
+   where referred_by = left(auth.uid()::text, 8);
+$$;
+
+revoke execute on function public.my_referrals() from public, anon;
+grant execute on function public.my_referrals() to authenticated;
 
 /* cancellation_feedback: a signed-in customer adds their own answer only. */
 drop policy if exists "cancellation feedback insert own" on public.cancellation_feedback;

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="boot-gate.js"></script>
+<link rel="icon" type="image/png" sizes="256x256" href="icon-256.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monthly report — Adronis</title>
+<meta name="description" content="A month of your ads in one page: what arrived, what you approved, what went out and what brought people in.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
+<link rel="stylesheet" href="adronis.css">
+<style>
+/* The report is a document: one sheet on screen, one A4 page set on paper.
+   On screen it sits on the site's dark surface; printed, it turns to ink
+   on white and keeps the accent for the numbers. */
+.rp-section{padding-top:116px}
+.rp-page{max-width:960px;margin:0 auto}
+.rp-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 18px}
+.rp-tools .spacer{flex:1}
+.rp-tools select{min-height:42px;padding:0 38px 0 16px;border-radius:9999px;border:1px solid var(--line-2);background:var(--field);color:var(--text);font:inherit;font-size:14px;cursor:pointer}
+.rp-tools .btn-ghost{min-height:42px;padding:0 18px;font-size:14px}
+.rp-tools a.rp-back{font-size:14px;font-weight:500}
+
+.rp-doc{position:relative;padding:56px 60px 44px;border-radius:30px;border:1px solid var(--line-2);
+  background:radial-gradient(70% 50% at 100% 0%,rgba(92,182,247,.10),rgba(92,182,247,0) 70%),linear-gradient(180deg,#0f1217,#0b0d11);
+  box-shadow:0 40px 120px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.05);overflow:hidden}
+.rp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:28px;border-bottom:1px solid var(--line-2)}
+.rp-brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;letter-spacing:-.01em;color:var(--text)}
+.rp-brand img{width:26px;height:26px;border-radius:7px}
+.rp-kind{margin-top:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--text-3)}
+.rp-month{text-align:right}
+.rp-month-v{font-size:26px;font-weight:600;letter-spacing:-.03em;color:var(--text);line-height:1.1}
+.rp-month-k{margin-top:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
+.rp-title{margin:34px 0 0;font-size:clamp(34px,5vw,52px);font-weight:600;letter-spacing:-.045em;line-height:1.02;color:var(--text)}
+.rp-lede{margin:14px 0 0;max-width:60ch;font-size:16px;line-height:1.6;color:var(--text-2)}
+
+.rp-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:34px 0 0}
+.rp-kpi{padding:20px 20px 18px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.025)}
+.rp-kpi-v{font-size:42px;font-weight:600;letter-spacing:-.05em;line-height:1;color:var(--text);font-feature-settings:"tnum" on}
+.rp-kpi-k{margin-top:12px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--text-3)}
+.rp-kpi-s{margin-top:6px;font-size:13px;line-height:1.4;color:var(--text-2)}
+.rp-kpi.is-acc{border-color:var(--acc-line);background:var(--acc-soft)}
+.rp-kpi.is-acc .rp-kpi-v{color:var(--acc)}
+
+.rp-sec{margin-top:42px}
+.rp-sec-k{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--acc)}
+.rp-sec h2{margin:8px 0 0;font-size:22px;letter-spacing:-.025em;color:var(--text)}
+.rp-sec-p{margin:8px 0 0;font-size:14.5px;line-height:1.6;color:var(--text-2)}
+.rp-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+
+.rp-split{display:flex;height:14px;margin-top:18px;border-radius:9999px;overflow:hidden;background:rgba(255,255,255,.06)}
+.rp-split span{display:block;height:100%}
+.rp-split .is-ok{background:var(--acc)}
+.rp-split .is-no{background:#e58f8f}
+.rp-split .is-wait{background:rgba(255,255,255,.22)}
+.rp-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-size:13px;color:var(--text-2)}
+.rp-legend span::before{content:"";display:inline-block;width:9px;height:9px;margin-right:7px;border-radius:3px;background:var(--acc)}
+.rp-legend .is-no::before{background:#e58f8f}
+.rp-legend .is-wait::before{background:rgba(255,255,255,.3)}
+.rp-legend b{color:var(--text);font-weight:600;font-feature-settings:"tnum" on}
+
+.rp-weeks{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:10px;align-items:end;height:150px;margin-top:20px;padding-bottom:4px}
+.rp-week{display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end}
+.rp-week-bars{display:flex;align-items:flex-end;gap:4px;height:100%;width:100%;justify-content:center}
+.rp-week-bars span{width:min(18px,40%);border-radius:5px 5px 2px 2px;background:rgba(255,255,255,.16);min-height:2px}
+.rp-week-bars span.is-live{background:var(--acc)}
+.rp-week-k{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--text-3);white-space:nowrap}
+
+.rp-rows{margin-top:16px;display:grid;gap:10px}
+.rp-row{display:grid;grid-template-columns:130px minmax(0,1fr) 32px;gap:12px;align-items:center;font-size:14px;color:var(--text)}
+.rp-row-t{height:8px;border-radius:9999px;background:rgba(255,255,255,.06);overflow:hidden}
+.rp-row-t span{display:block;height:100%;border-radius:9999px;background:var(--acc)}
+.rp-row-n{text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--text-2)}
+
+.rp-best{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:28px;align-items:center;margin-top:18px;padding:22px;border-radius:22px;border:1px solid var(--line-2);background:rgba(255,255,255,.02)}
+.rp-best img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:14px;background:#161a1e}
+.rp-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:9999px;border:1px solid rgba(159,215,176,.4);background:rgba(159,215,176,.12);font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#9fd7b0}
+.rp-best h3{margin:14px 0 0;font-size:24px;letter-spacing:-.03em;line-height:1.2;color:var(--text)}
+.rp-best p{margin:10px 0 0;font-size:15px;line-height:1.6;color:var(--text-2)}
+.rp-best .rp-meta{margin-top:14px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-3)}
+
+.rp-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
+.rp-shot img{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;background:#161a1e}
+.rp-shot div{margin-top:7px;font-size:12.5px;line-height:1.35;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp-shot small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--text-3)}
+.rp-more{margin-top:12px;font-size:13px;color:var(--text-3)}
+
+.rp-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.rp-chip{padding:6px 12px;border-radius:9999px;border:1px solid var(--line-2);font-size:13px;color:var(--text)}
+.rp-chip b{margin-left:6px;font-family:var(--mono);font-weight:500;color:var(--acc)}
+
+.rp-dates{margin-top:16px;display:grid;gap:10px}
+.rp-date{display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:start;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.02)}
+.rp-date-d{font-size:24px;font-weight:600;letter-spacing:-.04em;line-height:1;color:var(--text);text-align:center}
+.rp-date-d small{display:block;margin-top:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--text-3)}
+.rp-date b{display:block;font-size:15px;color:var(--text)}
+.rp-date span{display:block;margin-top:4px;font-size:13.5px;line-height:1.5;color:var(--text-2)}
+
+.rp-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;margin-top:44px;padding-top:20px;border-top:1px solid var(--line-2);font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--text-3)}
+.rp-empty{margin-top:34px;padding:34px;border-radius:20px;border:1px dashed var(--line-3);text-align:center;color:var(--text-2);font-size:15px;line-height:1.6}
+
+@media (max-width:860px){
+  .rp-doc{padding:36px 26px 30px;border-radius:24px}
+  .rp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rp-cols{grid-template-columns:1fr;gap:0}
+  .rp-best{grid-template-columns:1fr}
+  .rp-best img{max-width:340px}
+  .rp-gallery{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:520px){
+  .rp-doc{padding:28px 18px 24px;border-radius:20px}
+  .rp-head{flex-direction:column;gap:16px}
+  .rp-month{text-align:left}
+  .rp-kpi-v{font-size:34px}
+  .rp-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rp-row{grid-template-columns:96px minmax(0,1fr) 28px}
+  .rp-tools select,.rp-tools .btn-ghost{flex:1 1 auto}
+}
+
+@page{size:A4;margin:14mm}
+@media print{
+  html,body{background:#fff !important;color:#111}
+  .nav,.nav-sheet,footer,.rp-tools,#lb-lang-switch,.page-hero,.lb-cookie,[class*="cookie"]{display:none !important}
+  .section-tight,.rp-section{padding:0}
+  .rp-page{max-width:none}
+  .rp-doc{padding:0;border:none;border-radius:0;background:#fff;box-shadow:none}
+  .rp-head,.rp-foot{border-color:#d6d9de}
+  .rp-brand,.rp-month-v,.rp-title,.rp-kpi-v,.rp-sec h2,.rp-best h3,.rp-row,.rp-date b,.rp-date-d,.rp-legend b,.rp-chip{color:#111}
+  .rp-lede,.rp-kpi-s,.rp-sec-p,.rp-best p,.rp-shot div,.rp-legend,.rp-date span{color:#3a3f47}
+  .rp-kind,.rp-kpi-k,.rp-week-k,.rp-row-n,.rp-meta,.rp-shot small,.rp-foot,.rp-date-d small,.rp-more{color:#6b7280}
+  .rp-month-k,.rp-sec-k,.rp-kpi.is-acc .rp-kpi-v,.rp-chip b{color:#1b5fa6}
+  .rp-kpi,.rp-best,.rp-date{background:#f5f7fa;border-color:#e2e6eb}
+  .rp-kpi.is-acc{background:#eaf3fc;border-color:#bcd6f0}
+  .rp-split,.rp-row-t{background:#e9edf2}
+  .rp-split .is-ok,.rp-row-t span,.rp-week-bars span.is-live,.rp-legend span::before{background:#1b5fa6}
+  .rp-week-bars span{background:#c9d1db}
+  .rp-chip{border-color:#d6d9de}
+  .rp-badge{color:#1f7a45;border-color:#9fd7b0;background:#eaf7ef}
+  .rp-sec,.rp-best,.rp-kpis,.rp-date{break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
+  <div class="nav-links">
+    <a href="approvals.html">Approvals</a>
+    <a href="control-room.html">Control room</a>
+    <a href="history.html">Past drops</a>
+    <a href="/#pricing">Pricing</a>
+  </div>
+  <a href="account.html" id="nav-account">Account</a>
+  <a href="login.html" class="nav-cta" id="nav-cta">Log in</a>
+</nav>
+
+<section class="section-tight rp-section">
+  <div class="rp-page">
+    <div class="rp-tools" id="rp-tools" hidden>
+      <a href="control-room.html" class="rp-back" id="rp-back"></a>
+      <span class="spacer"></span>
+      <select id="rp-month" aria-label="Month"></select>
+      <button type="button" class="btn-ghost" id="rp-print"></button>
+    </div>
+    <div id="rp-out"><div class="empty"><div class="mono">LOADING</div></div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>MADE BY <a href="https://creativesbyandrej.vercel.app" target="_blank" rel="noopener">CREATIVESBYANDREJ</a></span></div>
+</footer>
+
+<script src="demo.js"></script>
+<script src="nav.js"></script>
+<script src="cookies.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="dates-rs.js"></script>
+<script>
+/* The monthly report: one month of a customer's ads on one page - what
+   arrived, what they approved, what went out, what brought people in, the
+   ad of the month, everything that posted, what they told us, and the dates
+   worth an ad next month. ?m=YYYY-MM picks the month; without it, the month
+   just ended during the first week of a new one, otherwise this month so far.
+   Print or save as PDF gives an A4 page set (the print styles above).
+   ?demo=1 shows a made-up month for the demo's café, or for the business a
+   portal link names (demo.js). The words are in both languages here, so a
+   language switch draws the page again. */
+(function () {
+  function T(en, srText) { return window.LBLang && LBLang.get() === "sr" ? srText : en; }
+  function locale() { return window.LBLang ? LBLang.locale() : "en-US"; }
+  function $(id) { return document.getElementById(id); }
+  function make(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function pct(n, d) { return d ? Math.round((n / d) * 100) : 0; }
+  function monthKey(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); }
+  function fromKey(k) { var p = k.split("-"); return new Date(Number(p[0]), Number(p[1]) - 1, 1); }
+  function inMonth(iso, start, end) { if (!iso) return false; var t = new Date(iso); return t >= start && t < end; }
+  function monthName(d) {
+    var s = d.toLocaleDateString(locale(), { month: "long", year: "numeric" }).replace(/\.$/, "");
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  function shortDay(iso) {
+    return new Date(iso).toLocaleDateString(locale(), { day: "numeric", month: "short" }).replace(/\.$/, "");
+  }
+
+  var REASONS = {
+    image: ["Image doesn't fit", "Slika ne odgovara"],
+    tone: ["Wrong tone", "Pogrešan ton"],
+    facts: ["Wrong facts or price", "Pogrešni podaci ili cena"],
+    timing: ["Wrong timing", "Pogrešno vreme"],
+    other: ["Something else", "Nešto drugo"]
+  };
+
+  var state = { business: "", city: "", creatives: [], month: null, months: [], demo: false };
+
+  // --- The demo's month: four ads a week, most of them out, a couple
+  // turned down, and three answers about who they brought in.
+  function demoMonth(key) {
+    var start = fromKey(key);
+    var end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+    var now = new Date();
+    var pool = LBDemo.drop();
+    var out = [];
+    var d = new Date(start);
+    while (d.getDay() !== 1) d.setDate(d.getDate() + 1);
+    var week = 0;
+    for (; d < end && d <= now; d.setDate(d.getDate() + 7), week++) {
+      for (var i = 0; i < 4; i++) {
+        var src = pool[(week + i) % 4];
+        var made = new Date(d);
+        made.setHours(7, 0, 0, 0);
+        var post = new Date(d);
+        post.setDate(post.getDate() + i + 1);
+        post.setHours([8, 12, 17, 10][i], [30, 0, 30, 0][i], 0, 0);
+        var c = { channel: src.channel, format: src.format, headline: src.headline, caption: src.caption,
+                  image_url: src.image_url, created_at: made.toISOString(), status: "approved" };
+        if (i === 3 && week % 2 === 1) { c.status = "rejected"; c.reject_reason = week % 4 === 1 ? "tone" : "timing"; }
+        else if (post < now) {
+          c.status = "published";
+          c.published_at = post.toISOString();
+          if (i === 0 && week < 3) c.outcome = week === 1 ? "unsure" : "yes";
+          if (i === 1 && week === 1) c.outcome = "yes";
+        } else if (Date.now() - made < 86400000) c.status = "pending";
+        else c.scheduled_at = post.toISOString();
+        if (i === 2 && week === 0) { c.edited_at = made.toISOString(); }
+        out.push(c);
+      }
+    }
+    return out;
+  }
+
+  function pickMonths() {
+    var now = new Date();
+    var first = state.creatives.reduce(function (min, c) {
+      var t = new Date(c.created_at);
+      return !min || t < min ? t : min;
+    }, null) || now;
+    var list = [];
+    var d = new Date(first.getFullYear(), first.getMonth(), 1);
+    while (d <= now) {
+      list.push(monthKey(d));
+      d = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    }
+    return list.reverse();
+  }
+
+  function defaultMonth() {
+    var asked = /[?&]m=(\d{4}-\d{2})(&|$)/.exec(location.search);
+    if (asked && state.months.indexOf(asked[1]) > -1) return asked[1];
+    var now = new Date();
+    var prev = monthKey(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+    if ((now.getDate() <= 7 || state.demo) && state.months.indexOf(prev) > -1) return prev;
+    return state.months[0];
+  }
+
+  function section(kicker, title, text) {
+    var s = make("div", "rp-sec");
+    s.appendChild(make("div", "rp-sec-k", kicker));
+    s.appendChild(make("h2", null, title));
+    if (text) s.appendChild(make("p", "rp-sec-p", text));
+    return s;
+  }
+
+  function kpi(value, label, sub, accent) {
+    var k = make("div", "rp-kpi" + (accent ? " is-acc" : ""));
+    k.appendChild(make("div", "rp-kpi-v", String(value)));
+    k.appendChild(make("div", "rp-kpi-k", label));
+    if (sub) k.appendChild(make("div", "rp-kpi-s", sub));
+    return k;
+  }
+
+  function render() {
+    document.title = T("Monthly report — Adronis", "Mesečni izveštaj — Adronis");
+    $("rp-back").textContent = T("← Control room", "← Kontrolna soba");
+    $("rp-back").href = state.demo ? "control-room.html?demo=1" + (LBDemo.code ? "&p=" + LBDemo.code : "") : "control-room.html";
+    $("rp-print").textContent = T("Print or save as PDF", "Odštampaj ili sačuvaj PDF");
+    if (!state.month) return;
+
+    var sel = $("rp-month");
+    sel.innerHTML = "";
+    state.months.forEach(function (k) {
+      var o = make("option", null, monthName(fromKey(k)));
+      o.value = k;
+      sel.appendChild(o);
+    });
+    sel.value = state.month;
+    $("rp-tools").hidden = false;
+
+    var start = fromKey(state.month);
+    var end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+    var now = new Date();
+    var running = now < end;
+    var all = state.creatives;
+
+    var delivered = all.filter(function (c) { return inMonth(c.created_at, start, end); });
+    var approved = delivered.filter(function (c) { return c.status === "approved" || c.status === "published"; });
+    var rejected = delivered.filter(function (c) { return c.status === "rejected"; });
+    var waiting = delivered.filter(function (c) { return c.status === "pending"; });
+    var decided = approved.length + rejected.length;
+    var posted = all.filter(function (c) { return c.status === "published" && inMonth(c.published_at, start, end); })
+      .sort(function (a, b) { return new Date(a.published_at) - new Date(b.published_at); });
+    var answered = posted.filter(function (c) { return c.outcome; });
+    var brought = answered.filter(function (c) { return c.outcome === "yes"; });
+
+    var out = $("rp-out");
+    out.innerHTML = "";
+    var doc = make("article", "rp-doc");
+
+    // --- Head
+    var head = make("header", "rp-head");
+    var brand = make("div");
+    var b = make("div", "rp-brand");
+    var logo = make("img");
+    logo.src = "logo-128.png";
+    logo.alt = "";
+    b.appendChild(logo);
+    b.appendChild(document.createTextNode("Adronis"));
+    brand.appendChild(b);
+    brand.appendChild(make("div", "rp-kind", T("MONTHLY REPORT", "MESEČNI IZVEŠTAJ")));
+    var month = make("div", "rp-month");
+    month.appendChild(make("div", "rp-month-v", monthName(start)));
+    month.appendChild(make("div", "rp-month-k", running ? T("IN PROGRESS · SO FAR", "U TOKU · DO DANAS") : T("FULL MONTH", "CEO MESEC")));
+    head.appendChild(brand);
+    head.appendChild(month);
+    doc.appendChild(head);
+
+    doc.appendChild(make("h1", "rp-title", state.business || T("Your business", "Tvoj lokal")));
+    var lastDay = new Date(Math.min(end - 1, now.getTime()));
+    doc.appendChild(make("p", "rp-lede", delivered.length || posted.length
+      ? T("Everything your ads did from " + shortDay(start) + " to " + shortDay(lastDay) + ": what arrived, what you approved, what went out — and what brought people in.",
+          "Sve što su tvoji oglasi uradili od " + shortDay(start) + " do " + shortDay(lastDay) + ": šta je stiglo, šta si odobrio, šta je objavljeno — i šta je dovelo ljude.")
+      : T("A quiet month: no ads arrived or went out.", "Tih mesec: nijedan oglas nije stigao ni objavljen.")));
+
+    if (!delivered.length && !posted.length) {
+      doc.appendChild(make("div", "rp-empty", T(
+        "Nothing to report for this month yet. Once your weekly ads arrive, this page fills itself in.",
+        "Za ovaj mesec još nema šta da se prikaže. Kad tvoji nedeljni oglasi stignu, ova stranica se sama popuni.")));
+      footer(doc);
+      out.appendChild(doc);
+      return;
+    }
+
+    // --- The four numbers
+    var kpis = make("div", "rp-kpis");
+    kpis.appendChild(kpi(delivered.length, T("ADS ARRIVED", "OGLASA STIGLO"),
+      T(Math.ceil(delivered.length / 4) + " weekly drops", "nedeljnih dropova: " + Math.ceil(delivered.length / 4))));
+    kpis.appendChild(kpi(approved.length, T("APPROVED", "ODOBRENO"),
+      decided ? T(pct(approved.length, decided) + "% of what you decided on", pct(approved.length, decided) + "% od onoga o čemu si odlučio") : T("none decided yet", "još nijedna odluka")));
+    kpis.appendChild(kpi(posted.length, T("WENT OUT", "OBJAVLJENO"),
+      T("posted on your channels", "na tvojim kanalima")));
+    kpis.appendChild(kpi(answered.length ? brought.length : "—", T("BROUGHT PEOPLE IN", "DOVELO LJUDE"),
+      answered.length ? T("of " + answered.length + " you answered about", "od " + answered.length + " za koje si odgovorio") : T("no answers yet", "još bez odgovora"), true));
+    doc.appendChild(kpis);
+
+    // --- Decisions and weeks
+    var cols = make("div", "rp-cols");
+    var dec = section(T("YOUR DECISIONS", "TVOJE ODLUKE"), T("What happened to the ads", "Šta se desilo sa oglasima"));
+    var split = make("div", "rp-split");
+    [["is-ok", approved.length], ["is-no", rejected.length], ["is-wait", waiting.length]].forEach(function (x) {
+      if (!x[1]) return;
+      var s = make("span", x[0]);
+      s.style.width = pct(x[1], delivered.length) + "%";
+      split.appendChild(s);
+    });
+    dec.appendChild(split);
+    var legend = make("div", "rp-legend");
+    [["", approved.length, T("approved", "odobreno")], ["is-no", rejected.length, T("turned down", "odbijeno")],
+     ["is-wait", waiting.length, T("still waiting", "još čeka")]].forEach(function (x) {
+      var l = make("span", x[0]);
+      l.appendChild(make("b", null, String(x[1])));
+      l.appendChild(document.createTextNode(" " + x[2]));
+      legend.appendChild(l);
+    });
+    dec.appendChild(legend);
+    cols.appendChild(dec);
+
+    var weeks = section(T("WEEK BY WEEK", "NEDELJU PO NEDELJU"), T("Arrived and went out", "Stiglo i objavljeno"));
+    var wrap = make("div", "rp-weeks");
+    var w = new Date(start);
+    w.setDate(w.getDate() - ((w.getDay() + 6) % 7));
+    var weekList = [];
+    for (; w < end; w.setDate(w.getDate() + 7)) {
+      var wEnd = new Date(w);
+      wEnd.setDate(wEnd.getDate() + 7);
+      weekList.push({
+        from: new Date(Math.max(w, start)),
+        made: delivered.filter(function (c) { return inMonth(c.created_at, w, wEnd); }).length,
+        live: posted.filter(function (c) { return inMonth(c.published_at, w, wEnd); }).length
+      });
+    }
+    var top = Math.max.apply(null, weekList.map(function (x) { return Math.max(x.made, x.live); }).concat([1]));
+    weekList.forEach(function (x) {
+      var col = make("div", "rp-week");
+      var bars = make("div", "rp-week-bars");
+      var made = make("span");
+      made.style.height = Math.max(2, (x.made / top) * 100) + "%";
+      made.title = x.made + " " + T("arrived", "stiglo");
+      var live = make("span", "is-live");
+      live.style.height = Math.max(2, (x.live / top) * 100) + "%";
+      live.title = x.live + " " + T("went out", "objavljeno");
+      bars.appendChild(made);
+      bars.appendChild(live);
+      col.appendChild(bars);
+      col.appendChild(make("div", "rp-week-k", shortDay(x.from).toUpperCase()));
+      wrap.appendChild(col);
+    });
+    weeks.appendChild(wrap);
+    var wl = make("div", "rp-legend");
+    var l1 = make("span", "is-wait");
+    l1.textContent = T("arrived", "stiglo");
+    var l2 = make("span");
+    l2.textContent = T("went out", "objavljeno");
+    wl.appendChild(l1);
+    wl.appendChild(l2);
+    weeks.appendChild(wl);
+    cols.appendChild(weeks);
+    doc.appendChild(cols);
+
+    // --- Channels
+    if (posted.length) {
+      var by = {};
+      posted.forEach(function (c) { by[c.channel || "—"] = (by[c.channel || "—"] || 0) + 1; });
+      var ch = section(T("WHERE THEY WENT OUT", "GDE SU IZAŠLI"), T("Posts by channel", "Objave po kanalima"));
+      var rows = make("div", "rp-rows");
+      var max = Math.max.apply(null, Object.keys(by).map(function (k) { return by[k]; }));
+      Object.keys(by).sort(function (a, b2) { return by[b2] - by[a]; }).forEach(function (k) {
+        var r = make("div", "rp-row");
+        r.appendChild(make("span", null, k));
+        var t = make("span", "rp-row-t");
+        var f = make("span");
+        f.style.width = pct(by[k], max) + "%";
+        t.appendChild(f);
+        r.appendChild(t);
+        r.appendChild(make("span", "rp-row-n", String(by[k])));
+        rows.appendChild(r);
+      });
+      ch.appendChild(rows);
+      doc.appendChild(ch);
+    }
+
+    // --- The ad of the month: one that brought people in, or the latest out
+    var best = brought.slice(-1)[0] || posted.filter(function (c) { return c.image_url; }).slice(-1)[0] ||
+      approved.filter(function (c) { return c.image_url; }).slice(-1)[0];
+    if (best) {
+      var bs = section(T("AD OF THE MONTH", "OGLAS MESECA"), best.outcome === "yes"
+        ? T("The one that brought people in", "Onaj koji je doveo ljude")
+        : T("The latest one out", "Poslednji objavljeni"));
+      var card = make("div", "rp-best");
+      if (best.image_url) {
+        var img = make("img");
+        img.src = best.image_url;
+        img.alt = best.headline || "";
+        card.appendChild(img);
+      }
+      var txt = make("div");
+      if (best.outcome === "yes") txt.appendChild(make("span", "rp-badge", "✓ " + T("BROUGHT PEOPLE IN", "DOVEO LJUDE")));
+      txt.appendChild(make("h3", null, best.headline || ""));
+      if (best.caption) txt.appendChild(make("p", null, best.caption));
+      txt.appendChild(make("div", "rp-meta", [best.channel, best.format, best.published_at ? shortDay(best.published_at) : null]
+        .filter(Boolean).join(" · ").toUpperCase()));
+      card.appendChild(txt);
+      bs.appendChild(card);
+      doc.appendChild(bs);
+    }
+
+    // --- Everything that went out
+    if (posted.length) {
+      var gs = section(T("EVERYTHING THAT WENT OUT", "SVE ŠTO JE OBJAVLJENO"),
+        T(posted.length + " post" + (posted.length === 1 ? "" : "s"), posted.length + " " + (posted.length % 10 >= 2 && posted.length % 10 <= 4 && (posted.length % 100 < 12 || posted.length % 100 > 14) ? "objave" : "objava")));
+      var gallery = make("div", "rp-gallery");
+      posted.slice(0, 12).forEach(function (c) {
+        var shot = make("div", "rp-shot");
+        var im = make("img");
+        im.src = c.image_url || "";
+        im.alt = "";
+        im.loading = "lazy";
+        shot.appendChild(im);
+        var cap = make("div", null, c.headline || "");
+        cap.appendChild(make("small", null, (shortDay(c.published_at) + " · " + (c.channel || "")).toUpperCase()));
+        shot.appendChild(cap);
+        gallery.appendChild(shot);
+      });
+      gs.appendChild(gallery);
+      if (posted.length > 12) gs.appendChild(make("div", "rp-more", T("and " + (posted.length - 12) + " more", "i još " + (posted.length - 12))));
+      doc.appendChild(gs);
+    }
+
+    // --- What they told us
+    var reasons = {};
+    rejected.forEach(function (c) { if (c.reject_reason) reasons[c.reject_reason] = (reasons[c.reject_reason] || 0) + 1; });
+    var edits = all.filter(function (c) { return inMonth(c.edited_at, start, end); }).length;
+    if (Object.keys(reasons).length || edits || answered.length) {
+      var said = section(T("WHAT YOU TOLD US", "ŠTA SI NAM REKAO"), T("And what we're doing with it", "I šta radimo sa tim"),
+        T("Every reason, rewrite and answer goes into your next drops — this is how the ads get more like you.",
+          "Svaki razlog, ispravka i odgovor ulaze u tvoje sledeće dropove — tako oglasi sve više liče na tebe."));
+      var chips = make("div", "rp-chips");
+      Object.keys(reasons).sort(function (a, b2) { return reasons[b2] - reasons[a]; }).forEach(function (k) {
+        var c = make("span", "rp-chip", T((REASONS[k] || [k, k])[0], (REASONS[k] || [k, k])[1]));
+        c.appendChild(make("b", null, String(reasons[k])));
+        chips.appendChild(c);
+      });
+      if (edits) {
+        var e = make("span", "rp-chip", T("Text you rewrote", "Prepravljen tekst"));
+        e.appendChild(make("b", null, String(edits)));
+        chips.appendChild(e);
+      }
+      if (answered.length) {
+        var a = make("span", "rp-chip", T("Answers about results", "Odgovori o rezultatima"));
+        a.appendChild(make("b", null, String(answered.length)));
+        chips.appendChild(a);
+      }
+      said.appendChild(chips);
+      doc.appendChild(said);
+    }
+
+    // --- Next month
+    var next = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+    var nextEnd = new Date(start.getFullYear(), start.getMonth() + 2, 1);
+    var dates = LBDates.between(running ? now : next, Math.round((nextEnd - (running ? now : next)) / 86400000)).slice(0, 4);
+    if (dates.length) {
+      var ns = section(T("COMING UP", "ŠTA DOLAZI"), T("Dates worth an ad", "Datumi vredni oglasa"),
+        T("Put the ones that fit you in your note for next week, in the control room.",
+          "Upiši one koji ti odgovaraju u belešku za sledeću nedelju, u kontrolnoj sobi."));
+      var dl = make("div", "rp-dates");
+      dates.forEach(function (d) {
+        var row = make("div", "rp-date");
+        var day = make("div", "rp-date-d", String(d.date.getDate()));
+        day.appendChild(make("small", null, d.date.toLocaleDateString(locale(), { month: "short" }).toUpperCase().replace(/\.$/, "")));
+        row.appendChild(day);
+        var t = make("div");
+        t.appendChild(make("b", null, d.name));
+        t.appendChild(make("span", null, d.idea));
+        row.appendChild(t);
+        dl.appendChild(row);
+      });
+      ns.appendChild(dl);
+      doc.appendChild(ns);
+    }
+
+    footer(doc);
+    out.appendChild(doc);
+  }
+
+  function footer(doc) {
+    var f = make("footer", "rp-foot");
+    f.appendChild(make("span", null, "ADRONIS · " + T("MONTHLY REPORT", "MESEČNI IZVEŠTAJ") + " · " + monthName(fromKey(state.month)).toUpperCase()));
+    f.appendChild(make("span", null, (state.demo ? T("SAMPLE · ", "PRIMER · ") : "") + T("PREPARED ", "PRIPREMLJENO ") +
+      new Date().toLocaleDateString(locale(), { day: "numeric", month: "numeric", year: "numeric" })));
+    doc.appendChild(f);
+  }
+
+  $("rp-month").addEventListener("change", function () {
+    state.month = this.value;
+    var url = new URL(location.href);
+    url.searchParams.set("m", state.month);
+    history.replaceState(null, "", url);
+    render();
+  });
+  $("rp-print").addEventListener("click", function () { window.print(); });
+  document.addEventListener("lb:langchange", render);
+  render();
+
+  LBAuth.ready.then(async function () {
+    if (LBDemo.on) {
+      await LBDemo.ready();
+      state.demo = true;
+      state.business = LBDemo.venue();
+      var now = new Date();
+      state.months = [monthKey(now), monthKey(new Date(now.getFullYear(), now.getMonth() - 1, 1))];
+      var key = defaultMonth();
+      state.creatives = demoMonth(state.months[1]).concat(demoMonth(state.months[0]));
+      state.month = key;
+      render();
+      return;
+    }
+
+    if (!LBAuth.isLoggedIn()) {
+      $("rp-out").innerHTML = "";
+      var box = make("div", "form-card");
+      box.style.cssText = "max-width:460px;margin:0 auto;text-align:center";
+      box.appendChild(make("h3", null, T("Log in to see your report.", "Prijavi se da vidiš svoj izveštaj.")));
+      var go = make("a", "btn", T("Log in", "Prijava"));
+      go.href = "login.html";
+      go.style.marginTop = "18px";
+      box.appendChild(go);
+      $("rp-out").appendChild(box);
+      return;
+    }
+
+    var cta = $("nav-cta");
+    cta.textContent = "Approvals";
+    cta.href = "approvals.html";
+    var profile = LBAuth.getProfile() || {};
+    state.business = profile.business_name || "";
+    var res = await LBAuth.db.from("creatives").select("*").eq("user_id", LBAuth.getUser().id)
+      .order("created_at", { ascending: true });
+    if (res.error) {
+      $("rp-out").innerHTML = "";
+      $("rp-out").appendChild(make("div", "rp-empty", LBAuth.friendlyError(res.error).message));
+      return;
+    }
+    state.creatives = res.data || [];
+    state.months = pickMonths();
+    state.month = defaultMonth();
+    render();
+  });
+})();
+</script>
+
+</body>
+</html>

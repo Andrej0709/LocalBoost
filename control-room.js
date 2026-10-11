@@ -477,7 +477,11 @@
     updates: [],
     answered: {},      // outcome answers given on this visit, by ad
     thanks: null,      // the answer just given, while its thank-you shows
-    dateAdded: null    // a date just put in the weekly note
+    dateAdded: null,   // a date just put in the weekly note
+    rating: undefined, // their stars (ratings table): undefined until loaded, null for none
+    draft: { stars: 0, comment: "", publish: false },
+    rated: false,      // the thank-you after rating, until the page is left
+    referrals: null    // { signed_up, in_beta } through their invite link
   };
   var DISMISSED_KEY = "lb-cr-dismissed";
 
@@ -529,7 +533,223 @@
     if (!cards.on) return;
     var host = document.getElementById("cr-cards");
     host.innerHTML = "";
-    [noteCard(), outcomeCard(), dateCard()].forEach(function (c) { if (c) host.appendChild(c); });
+    [noteCard(), outcomeCard(), ratingCard(), reportCard(), dateCard(), inviteCard()]
+      .forEach(function (c) { if (c) host.appendChild(c); });
+  }
+
+  // "Later" on a card hides it for a while rather than for good.
+  function snoozed(key, days) {
+    try { return Date.now() - Number(localStorage.getItem("lb-cr-later-" + key) || 0) < days * 86400000; }
+    catch (e) { return false; }
+  }
+
+  function snooze(key) {
+    try { localStorage.setItem("lb-cr-later-" + key, String(Date.now())); } catch (e) {}
+    renderCards();
+  }
+
+  // How long ago their first ad arrived, in days (0 with none yet).
+  function daysWithAds() {
+    var first = allCreatives.reduce(function (min, c) {
+      var t = new Date(c.created_at).getTime();
+      return !min || t < min ? t : min;
+    }, 0);
+    return first ? Math.floor((Date.now() - first) / 86400000) : 0;
+  }
+
+  // --- "Would you recommend Adronis?" (the ratings table) ---
+  // Asked once, after three weeks of ads: stars, a sentence, and whether we
+  // may publish it with the business's name. "Later" asks again in a week.
+  function ratingCard() {
+    if (cards.demo) return null;
+    if (cards.rated) {
+      var done = card(T("THANK YOU", "HVALA"), true);
+      done.body.appendChild(make("p", "crc-done", cards.rating && cards.rating.stars >= 4
+        ? T("Thank you — that means a lot to a small team. If you know an owner it would help, your invite link is just below.",
+            "Hvala ti — malom timu to puno znači. Ako znaš vlasnika kome bi ovo koristilo, tvoj link za preporuku je odmah ispod.")
+        : T("Thank you for being straight with us. We read every answer, and we'll get in touch about what to fix.",
+            "Hvala što si iskren. Čitamo svaki odgovor i javićemo ti se oko toga šta da popravimo.")));
+      return done.box;
+    }
+    if (cards.rating !== null || daysWithAds() < 21 || snoozed("rate", 7)) return null;
+
+    var d = cards.draft;
+    var c = card(T("THREE WEEKS IN", "TRI NEDELJE KASNIJE"), true);
+    c.body.appendChild(make("div", "crc-title", T("Would you recommend Adronis to another owner?",
+      "Da li bi preporučio Adronis drugom vlasniku?")));
+    var stars = make("div", "crc-stars");
+    stars.setAttribute("role", "radiogroup");
+    stars.setAttribute("aria-label", T("Your rating", "Tvoja ocena"));
+    [1, 2, 3, 4, 5].forEach(function (n) {
+      var s = button("crc-star" + (n <= d.stars ? " is-on" : ""), "★", function () {
+        d.stars = n;
+        renderCards();
+      });
+      s.setAttribute("role", "radio");
+      s.setAttribute("aria-checked", n === d.stars ? "true" : "false");
+      s.setAttribute("aria-label", n + " / 5");
+      stars.appendChild(s);
+    });
+    c.body.appendChild(stars);
+
+    var text = make("textarea", "crc-field");
+    text.rows = 2;
+    text.maxLength = 500;
+    text.value = d.comment;
+    text.placeholder = T("One sentence you'd say to another owner (optional)",
+      "Jedna rečenica koju bi rekao drugom vlasniku (nije obavezno)");
+    text.setAttribute("aria-label", T("Your words", "Tvoje reči"));
+    text.addEventListener("input", function () { d.comment = text.value; });
+    c.body.appendChild(text);
+
+    var ok = make("label", "crc-check");
+    var box = make("input");
+    box.type = "checkbox";
+    box.checked = d.publish;
+    box.addEventListener("change", function () { d.publish = box.checked; });
+    ok.appendChild(box);
+    ok.appendChild(document.createTextNode(T(" You may publish this with my business's name.",
+      " Smete da ovo objavite sa imenom mog lokala.")));
+    c.body.appendChild(ok);
+
+    var actions = make("div", "crc-actions");
+    var msg = make("div", "crc-msg");
+    var send = button("btn-ghost", T("Send", "Pošalji"), function () { sendRating(send, msg); });
+    send.disabled = !d.stars;
+    actions.appendChild(send);
+    actions.appendChild(button("eh-plain", T("Later", "Kasnije"), function () { snooze("rate"); }));
+    c.body.appendChild(actions);
+    c.body.appendChild(msg);
+    return c.box;
+  }
+
+  async function sendRating(btn, msg) {
+    var d = cards.draft;
+    if (!d.stars) return;
+    btn.disabled = true;
+    var res = await LBAuth.db.from("ratings").upsert({
+      user_id: LBAuth.getUser().id,
+      stars: d.stars,
+      comment: d.comment.trim() || null,
+      may_publish: d.publish
+    }).select().maybeSingle();
+    if (res.error || !res.data) {
+      btn.disabled = false;
+      msg.textContent = res.error ? LBAuth.friendlyError(res.error).message
+        : T("Couldn't send that — try again.", "Nismo uspeli da pošaljemo — pokušaj ponovo.");
+      return;
+    }
+    cards.rating = res.data;
+    cards.rated = true;
+    renderCards();
+  }
+
+  // --- The monthly report (report.html) ---
+  // In the first week of a month, for an account that had ads the month
+  // before. The demo always offers the sample.
+  function lastMonthKey() {
+    var d = new Date();
+    d = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+  }
+
+  function reportCard() {
+    var locale = window.LBLang ? LBLang.locale() : "en-US";
+    if (cards.demo) {
+      var demo = card(T("MONTHLY REPORT", "MESEČNI IZVEŠTAJ"));
+      demo.body.appendChild(make("div", "crc-title", T("Every month, one page with the results", "Svakog meseca, jedna stranica sa rezultatima")));
+      demo.body.appendChild(make("p", "crc-text", T(
+        "What arrived, what was approved, what went out and what brought people in — ready to print or show a partner.",
+        "Šta je stiglo, šta je odobreno, šta je objavljeno i šta je dovelo ljude — spremno za štampu ili da pokažeš partneru.")));
+      var da = make("div", "crc-actions");
+      var open = make("a", "btn-ghost", T("See a sample report", "Pogledaj primer izveštaja"));
+      open.href = "report.html?demo=1" + (LBDemo.code ? "&p=" + LBDemo.code : "");
+      da.appendChild(open);
+      demo.body.appendChild(da);
+      return demo.box;
+    }
+    var key = lastMonthKey();
+    if (new Date().getDate() > 7 || dismissed().indexOf("report-" + key) > -1) return null;
+    var start = new Date(Number(key.slice(0, 4)), Number(key.slice(5)) - 1, 1);
+    var end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+    var had = allCreatives.some(function (c) { var t = new Date(c.created_at); return t >= start && t < end; });
+    if (!had) return null;
+    var month = start.toLocaleDateString(locale, { month: "long" });
+    var c = card(T("MONTHLY REPORT", "MESEČNI IZVEŠTAJ"), true);
+    c.body.appendChild(make("div", "crc-title", T("Your " + month + " report is ready", "Tvoj izveštaj za " + month + " je spreman")));
+    c.body.appendChild(make("p", "crc-text", T(
+      "What arrived, what you approved, what went out and what brought people in — on one page, ready to print.",
+      "Šta je stiglo, šta si odobrio, šta je objavljeno i šta je dovelo ljude — na jednoj stranici, spremno za štampu.")));
+    var actions = make("div", "crc-actions");
+    var go = make("a", "btn-ghost", T("Open the report", "Otvori izveštaj"));
+    go.href = "report.html?m=" + key;
+    actions.appendChild(go);
+    actions.appendChild(button("eh-plain", T("Close", "Zatvori"), function () {
+      dismiss("report-" + key);
+      renderCards();
+    }));
+    c.body.appendChild(actions);
+    return c.box;
+  }
+
+  // --- Invite another owner (referral.js, invite.html) ---
+  // For a tester two weeks in, or right after a good rating. "Later" hides it
+  // for a month.
+  function inviteCard() {
+    if (cards.demo || !LBAuth.hasActivePlan() || snoozed("invite", 30)) return null;
+    var happy = cards.rating && cards.rating.stars >= 4;
+    if (daysWithAds() < 14 && !happy) return null;
+    var link = LBReferral.link(LBAuth.getUser().id);
+    var c = card(T("INVITE AN OWNER YOU KNOW", "PREPORUČI NEKOG VLASNIKA"));
+    c.body.appendChild(make("p", "crc-text", T(
+      "Know an owner it would help? Send them your link — they'll see it's from you, and can try the demo straight away.",
+      "Znaš vlasnika kome bi ovo koristilo? Pošalji mu svoj link — videće da je od tebe i odmah može da proba demo.")));
+    var perk = LBReferral.perk("referrer");
+    if (perk) c.body.appendChild(make("p", "crc-done", perk));
+    var field = make("input", "crc-field crc-link");
+    field.type = "text";
+    field.readOnly = true;
+    field.value = link;
+    field.setAttribute("aria-label", T("Your invite link", "Tvoj link za preporuku"));
+    field.addEventListener("focus", function () { field.select(); });
+    c.body.appendChild(field);
+    var actions = make("div", "crc-actions");
+    var msg = make("div", "crc-msg crc-ok");
+    if (navigator.share) {
+      actions.appendChild(button("btn-ghost", T("Share", "Podeli"), function () {
+        navigator.share({
+          title: "Adronis",
+          text: T("This is what I use for our ads — have a look:", "Ovo koristim za naše oglase — pogledaj:"),
+          url: link
+        }).catch(function () {});
+      }));
+    }
+    actions.appendChild(button("btn-ghost", T("Copy link", "Kopiraj link"), function () {
+      try {
+        navigator.clipboard.writeText(link).then(function () {
+          msg.textContent = T("Copied.", "Kopirano.");
+        }, function () { field.select(); });
+      } catch (e) { field.select(); }
+    }));
+    actions.appendChild(button("eh-plain", T("Later", "Kasnije"), function () { snooze("invite"); }));
+    c.body.appendChild(actions);
+    var r = cards.referrals;
+    if (r && r.signed_up) {
+      c.body.appendChild(make("p", "crc-hint", T(
+        "Through your link so far: " + r.signed_up + " signed up, " + r.in_beta + " in the beta.",
+        "Preko tvog linka do sada: prijavljenih " + r.signed_up + ", u beti " + r.in_beta + ".")));
+    }
+    c.body.appendChild(msg);
+    return c.box;
+  }
+
+  async function loadCardData() {
+    var uid = LBAuth.getUser().id;
+    var rating = await LBAuth.db.from("ratings").select("*").eq("user_id", uid).maybeSingle();
+    if (!rating.error) cards.rating = rating.data || null;   // the table isn't there until schema.sql runs
+    var refs = await LBAuth.db.rpc("my_referrals");
+    if (!refs.error) cards.referrals = refs.data;
+    renderCards();
   }
 
   document.addEventListener("lb:langchange", renderCards);
@@ -1285,6 +1505,7 @@
       document.getElementById("page-sub").textContent =
         "A café's week of approved ads: what goes out and when, and what's already live.";
       document.getElementById("history-link").hidden = true;
+      document.getElementById("report-link").href = "report.html?demo=1" + (LBDemo.code ? "&p=" + LBDemo.code : "");
       showSample();
       cards.on = true;
       cards.demo = true;
@@ -1370,6 +1591,7 @@
     cards.on = true;
     renderCards();
     loadUpdates();
+    loadCardData();
 
     LBTour.replayButton(TOUR);
     LBTour.auto(TOUR);

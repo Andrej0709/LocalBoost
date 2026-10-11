@@ -548,6 +548,17 @@
     );
   }
 
+  // A tester's invite link (invite.html) leaves its code here for up to 60
+  // days. It goes with a new account only - the signup trigger stores it as
+  // referred_by - never with a brief saved to an existing one.
+  function withRef(meta){
+    try {
+      var ref = JSON.parse(localStorage.getItem("lb-ref") || "null");
+      if (ref && /^[0-9a-f]{8}$/.test(ref.code) && Date.now() - ref.at < 60 * 86400000) meta.ref = ref.code;
+    } catch (e) {}
+    return meta;
+  }
+
   function brief(){
     return {
       business_name:    document.getElementById("business").value,
@@ -590,7 +601,7 @@
       var result = await LBAuth.signUp(
         document.getElementById("email").value,
         document.getElementById("password").value,
-        brief()
+        withRef(brief())
       );
       if (result.needsEmailConfirmation) {
         document.getElementById("form-view").hidden = true;

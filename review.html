@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="boot-gate.js"></script>
+<link rel="icon" type="image/png" sizes="256x256" href="icon-256.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instagram review — Adronis</title>
+<meta name="description" content="A quick look at a business's Instagram: what works, what could work better, and a tip for each.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
+<link rel="stylesheet" href="adronis.css">
+<style>
+.rv-wrap{max-width:720px;margin:0 auto}
+.rv-score{display:flex;align-items:center;gap:18px;margin:0 0 18px;padding:22px 24px;border-radius:var(--r-lg);border:1px solid var(--acc-line);background:radial-gradient(90% 140% at 100% 0%,rgba(92,182,247,.12),rgba(92,182,247,0) 60%),var(--surface)}
+.rv-score-n{flex:none;font-size:46px;font-weight:600;line-height:1;letter-spacing:-.04em;color:var(--text)}
+.rv-score-n small{font-size:22px;color:var(--text-3)}
+.rv-score p{margin:0;font-size:15px;line-height:1.55;color:var(--text-2)}
+.rv-item{display:grid;grid-template-columns:30px minmax(0,1fr);gap:14px;padding:20px 22px;margin:0 0 10px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
+.rv-dot{width:26px;height:26px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.rv-item.is-good .rv-dot{background:rgba(159,215,176,.14);color:#9fd7b0;border:1px solid rgba(159,215,176,.4)}
+.rv-item.is-ok .rv-dot{background:rgba(240,200,120,.12);color:#f0c878;border:1px solid rgba(240,200,120,.4)}
+.rv-item.is-fix .rv-dot{background:rgba(240,168,168,.12);color:#f0a8a8;border:1px solid rgba(240,168,168,.4)}
+.rv-k{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--text-3)}
+.rv-v{margin-top:6px;font-size:16px;font-weight:600;line-height:1.4;color:var(--text);letter-spacing:-.01em}
+.rv-tip{margin:8px 0 0;font-size:14.5px;line-height:1.55;color:var(--text-2)}
+.rv-cta{margin-top:28px;padding:26px 28px;border-radius:var(--r-lg);border:1px solid var(--line-2);background:var(--surface);text-align:center}
+.rv-cta h2{margin:10px auto 0;max-width:24ch;font-size:clamp(22px,2.6vw,28px)}
+.rv-cta p{margin:10px auto 0;max-width:50ch;font-size:15px;line-height:1.6;color:var(--text-2)}
+.rv-cta-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px}
+.rv-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
+.rv-fine{margin:16px 0 0;text-align:center;font-size:13px;line-height:1.55;color:var(--text-3)}
+@media (max-width:640px){.rv-item{padding:16px}.rv-cta{padding:20px}.rv-cta-links>*{flex:1 1 100%}.rv-score{padding:18px}}
+@media print{
+  body{background:#fff;color:#111}
+  .nav,.nav-sheet,footer,.rv-cta-links,#lb-lang-switch,.page-hero::before,.page-hero::after{display:none !important}
+  .page-hero{padding:0 0 16px}
+  .rv-item,.rv-score,.rv-cta{background:#fff;border-color:#ccc;break-inside:avoid}
+  .page-hero h1,.rv-v,.rv-score-n,.rv-cta h2{color:#111}
+  .page-hero p,.rv-tip,.rv-score p,.rv-cta p{color:#333}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
+  <div class="nav-links">
+    <a href="/#drop">How it works</a>
+    <a href="/#engine">Examples</a>
+    <a href="/#pricing">Pricing</a>
+  </div>
+  <a href="login.html" id="nav-login">Log in</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow is-mono" id="rv-eyebrow">INSTAGRAM</div>
+  <h1 id="rv-title"></h1>
+  <p id="rv-lead"></p>
+</header>
+
+<section class="section-tight">
+  <div class="rv-wrap" id="rv-body">
+    <div class="empty"><div class="mono">LOADING</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>MADE BY <a href="https://creativesbyandrej.vercel.app" target="_blank" rel="noopener">CREATIVESBYANDREJ</a></span></div>
+</footer>
+
+<script src="demo.js"></script>
+<script src="nav.js"></script>
+<script src="cookies.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+/* A quick review of one business's Instagram, for the first conversation:
+   /r/<code> (vercel.json) opens review.html?p=<code>. What was seen on the
+   profile is typed into the portal's Sales tab by hand (prospects.review) -
+   nothing here reads Instagram - and comes through prospect_page and
+   demo.js, which also counts the visit. Five checks, each with a plain tip.
+   The words are in both languages here, so a language switch draws the page
+   again. */
+(function () {
+  function T(en, srText) { return window.LBLang && LBLang.get() === "sr" ? srText : en; }
+  function $(id) { return document.getElementById(id); }
+  function make(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function srDays(n) { return n % 10 === 1 && n % 100 !== 11 ? "dan" : "dana"; }
+  function daysAgo(ymd) {
+    var d = new Date(ymd + "T12:00");
+    var t = new Date();
+    t.setHours(12, 0, 0, 0);
+    return Math.max(0, Math.round((t - d) / 86400000));
+  }
+
+  var data;   // undefined while loading, null for a link that doesn't work
+
+  // Each check: "good", "ok" or "fix", what was seen, and the tip.
+  function checks(r) {
+    var out = [];
+
+    if (r.last_post) {
+      var n = daysAgo(r.last_post);
+      var seen = n === 0 ? T("Last post: today", "Poslednja objava: danas")
+        : T("Last post: " + n + " day" + (n === 1 ? "" : "s") + " ago", "Poslednja objava: pre " + n + " " + srDays(n));
+      out.push({ k: T("LAST POST", "POSLEDNJA OBJAVA"), v: seen,
+        s: n <= 7 ? "good" : n <= 21 ? "ok" : "fix",
+        tip: n <= 7
+          ? T("The profile looks alive — people who check it see something going on.",
+              "Profil deluje živo — ko ga otvori, vidi da se nešto dešava.")
+          : T("When a profile goes quiet for weeks, it can look as if the place isn't really open. Someone deciding where to go tonight often checks Instagram first.",
+              "Kad je profil tih nedeljama, deluje kao da lokal ne radi punom parom. Ko bira gde će večeras, često prvo pogleda Instagram.") });
+    } else {
+      out.push({ k: T("LAST POST", "POSLEDNJA OBJAVA"), v: T("No posts yet", "Još nema objava"), s: "fix",
+        tip: T("Even a few posts with real photos tell people the place exists and what it's like.",
+               "I nekoliko objava sa pravim fotografijama ljudima kaže da lokal postoji i kakav je.") });
+    }
+
+    if (typeof r.per_month === "number") {
+      var pm = r.per_month;
+      out.push({ k: T("HOW OFTEN", "KOLIKO ČESTO"),
+        v: T(pm + " post" + (pm === 1 ? "" : "s") + " a month", pm + " " + (pm % 10 === 1 && pm % 100 !== 11 ? "objava" : (pm % 10 >= 2 && pm % 10 <= 4 && (pm % 100 < 12 || pm % 100 > 14)) ? "objave" : "objava") + " mesečno"),
+        s: pm >= 8 ? "good" : pm >= 4 ? "ok" : "fix",
+        tip: pm >= 8
+          ? T("About twice a week — enough to stay in people's feeds.", "Otprilike dva puta nedeljno — dovoljno da ostaneš u fidu ljudima.")
+          : T("Two or three posts a week keep a place on people's minds, and they don't have to take much of your time.",
+              "Dve do tri objave nedeljno drže lokal u glavi gostima, a ne moraju da ti oduzmu mnogo vremena.") });
+    }
+
+    if (r.photos) {
+      out.push({ k: T("REAL PHOTOS", "PRAVE FOTOGRAFIJE"),
+        v: r.photos === "many" ? T("Mostly real photos of the place and what you serve", "Uglavnom prave fotografije lokala i onoga što služiš")
+          : r.photos === "few" ? T("A few real photos", "Nekoliko pravih fotografija")
+          : T("Hardly any real photos", "Skoro nijedna prava fotografija"),
+        s: r.photos === "many" ? "good" : r.photos === "few" ? "ok" : "fix",
+        tip: r.photos === "many"
+          ? T("People want to see what's waiting for them — and they can.", "Ljudi žele da vide šta ih čeka — i mogu.")
+          : T("People want to see what's waiting for them: the food, the drinks, the room. Real photos do that better than text on a graphic.",
+              "Ljudi žele da vide šta ih čeka: hranu, piće, prostor. Prave fotografije to rade bolje od teksta na grafici.") });
+    }
+
+    if (typeof r.bio === "boolean") {
+      out.push({ k: T("PROFILE DESCRIPTION", "OPIS PROFILA"),
+        v: r.bio ? T("Opening hours and address are there", "Radno vreme i adresa su tu")
+                 : T("No opening hours or address", "Nema radnog vremena ni adrese"),
+        s: r.bio ? "good" : "fix",
+        tip: r.bio
+          ? T("The first two things people look for — easy to find.", "Prve dve stvari koje ljudi traže — lako se nalaze.")
+          : T("Opening hours and the address are the first things people look for. Put both in the description at the top of the profile.",
+              "Radno vreme i adresa su prvo što ljudi traže. Stavi oboje u opis na vrhu profila.") });
+    }
+
+    if (typeof r.video === "boolean") {
+      out.push({ k: T("SHORT VIDEO", "KRATAK VIDEO"),
+        v: r.video ? T("A reel or video in the last month", "Reel ili video u poslednjih mesec dana")
+                   : T("No reel or video in the last month", "Nijedan reel ni video u poslednjih mesec dana"),
+        s: r.video ? "good" : "fix",
+        tip: T("Instagram also shows short videos (reels) to people who don't follow you yet — a simple way to be seen by new people nearby.",
+               "Instagram kratke videe (reels) pokazuje i ljudima koji te još ne prate — jednostavan način da te vide novi ljudi iz kraja.") });
+    }
+    return out;
+  }
+
+  function render() {
+    document.title = T("Instagram review — Adronis", "Pregled Instagrama — Adronis");
+    var body = $("rv-body");
+    if (data === undefined) return;
+    body.innerHTML = "";
+
+    var r = data && data.review;
+    var list = r ? checks(r) : [];
+    if (!data || !list.length) {
+      $("rv-eyebrow").textContent = "INSTAGRAM";
+      $("rv-title").textContent = data
+        ? T("This review isn't ready yet.", "Ovaj pregled još nije spreman.")
+        : T("This link doesn't work anymore.", "Ovaj link više ne radi.");
+      $("rv-lead").textContent = T("Meanwhile, see how Adronis works.", "U međuvremenu, pogledaj kako Adronis radi.");
+      var links = make("div", "rv-cta-links");
+      var demo = make("a", "btn", T("See the demo", "Pogledaj demo"));
+      demo.href = "approvals.html?demo=1&src=review" + (data ? "&p=" + LBDemo.code : "");
+      links.appendChild(demo);
+      body.appendChild(links);
+      return;
+    }
+
+    // "11 October", or in Serbian "11. oktobra" - the genitive, which Intl
+    // doesn't give.
+    var SR_MONTHS = ["januara", "februara", "marta", "aprila", "maja", "juna", "jula", "avgusta",
+                     "septembra", "oktobra", "novembra", "decembra"];
+    var when = r.checked_at ? new Date(r.checked_at + "T12:00") : null;
+    var checked = when ? T(when.toLocaleDateString("en-GB", { day: "numeric", month: "long" }),
+      when.getDate() + ". " + SR_MONTHS[when.getMonth()]) : null;
+    $("rv-eyebrow").textContent = T("INSTAGRAM · QUICK REVIEW", "INSTAGRAM · BRZI PREGLED");
+    $("rv-title").textContent = T("Instagram for " + data.name + ", at a glance.", "Instagram lokala " + data.name + ", na brzinu.");
+    $("rv-lead").textContent = T(
+      "We had a look at the profile" + (checked ? " on " + checked : "") + ": what works, what could work better, and a tip for each.",
+      "Pogledali smo profil" + (checked ? " " + checked : "") + ": šta radi, šta bi moglo bolje, i savet za svaku stavku.");
+
+    var good = list.filter(function (c) { return c.s === "good"; }).length;
+    var score = make("div", "rv-score");
+    // None in good shape reads as tips, not as a zero.
+    var tips = list.length;
+    var n = make("div", "rv-score-n", String(good || tips));
+    n.appendChild(make("small", null, good ? " / " + list.length
+      : T(tips === 1 ? " tip" : " tips", tips === 1 ? " savet" : " saveta")));
+    score.appendChild(n);
+    score.appendChild(make("p", null, good === list.length
+      ? T("Everything we checked is in good shape. The hard part now is keeping it up, week after week.",
+          "Sve što smo proverili je u dobrom stanju. Sad je najteže da tako ostane, nedelju za nedeljom.")
+      : good
+        ? T(good + " of " + list.length + " things we checked are in good shape. The rest are quick to fix — here's how.",
+            good + " od " + list.length + " stvari koje smo proverili je u redu. Ostalo se brzo popravlja — evo kako.")
+        : T("Quick things that would make the profile work harder for you — here's how.",
+            "Brze stvari zbog kojih bi profil radio više za tebe — evo kako.")));
+    body.appendChild(score);
+
+    list.forEach(function (c) {
+      var item = make("div", "rv-item is-" + c.s);
+      item.appendChild(make("div", "rv-dot", c.s === "good" ? "✓" : c.s === "ok" ? "~" : "!"));
+      var text = make("div");
+      text.appendChild(make("div", "rv-k", c.k));
+      text.appendChild(make("div", "rv-v", c.v));
+      text.appendChild(make("p", "rv-tip", c.tip));
+      item.appendChild(text);
+      body.appendChild(item);
+    });
+
+    var cta = make("div", "rv-cta");
+    cta.appendChild(make("div", "rv-tag", T("NO TIME FOR THIS?", "NEMAŠ VREMENA ZA OVO?")));
+    cta.appendChild(make("h2", null, T("Adronis does it every week, for you.", "Adronis to radi umesto tebe, svake nedelje.")));
+    cta.appendChild(make("p", null, T(
+      "Four ready ads every Monday, made for " + data.name + ". You approve them on your phone, we post them. Free during the beta.",
+      "Četiri gotova oglasa svakog ponedeljka, napravljena za " + data.name + ". Ti ih odobriš na telefonu, mi ih objavimo. Besplatno tokom bete.")));
+    var go = make("div", "rv-cta-links");
+    var see = make("a", "btn", T("See your demo", "Pogledaj svoj demo"));
+    see.href = "approvals.html?demo=1&src=review&p=" + LBDemo.code;
+    var offer = make("a", "btn-ghost", T("Our proposal for you", "Naš predlog za tebe"));
+    offer.href = "proposal.html?p=" + LBDemo.code;
+    go.appendChild(see);
+    go.appendChild(offer);
+    cta.appendChild(go);
+    body.appendChild(cta);
+    body.appendChild(make("p", "rv-fine", T(
+      "We looked at the public profile only, the way any visitor sees it — no access to your account.",
+      "Gledali smo samo javni profil, kako ga vidi svaki posetilac — bez ikakvog pristupa tvom nalogu.")));
+  }
+
+  render();
+  document.addEventListener("lb:langchange", render);
+
+  if (!LBDemo.code) { data = null; render(); return; }
+  LBDemo.track("review");
+  LBDemo.prospect().then(function (p) {
+    data = p;
+    render();
+  });
+})();
+</script>
+
+</body>
+</html>

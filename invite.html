@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="boot-gate.js"></script>
+<link rel="icon" type="image/png" sizes="256x256" href="icon-256.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An invite to Adronis</title>
+<meta name="description" content="A business already in the Adronis beta thinks it would help yours too: weekly ads you approve on your phone, posted for you.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Adronis">
+<meta property="og:title" content="An invite to the Adronis beta">
+<meta property="og:description" content="Weekly ads for your business — you approve them on your phone, we post them.">
+<meta property="og:image" content="https://adronis.vercel.app/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
+<link rel="stylesheet" href="adronis.css">
+<style>
+.iv-wrap{max-width:640px;margin:0 auto}
+.iv-card{padding:26px 28px;border-radius:var(--r-lg);border:1px solid var(--line-2);background:var(--surface)}
+.iv-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
+.iv-list{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:12px}
+.iv-list li{position:relative;padding-left:28px;font-size:15px;line-height:1.55;color:var(--text-2)}
+.iv-list li::before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:9999px;background:var(--acc-soft);color:var(--acc);font-size:11px;line-height:18px;text-align:center}
+.iv-list b{color:var(--text);font-weight:600}
+.iv-perk{margin:18px 0 0;padding:14px 16px;border-radius:var(--r);border:1px solid var(--acc-line);background:var(--acc-soft);font-size:14.5px;line-height:1.55;color:var(--text)}
+.iv-perk:empty{display:none}
+.iv-cta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:26px}
+.iv-fine{margin:16px 0 0;text-align:center;font-size:13px;line-height:1.55;color:var(--text-3)}
+@media (max-width:640px){.iv-card{padding:20px}.iv-cta>*{flex:1 1 100%}}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
+  <div class="nav-links">
+    <a href="/#drop">How it works</a>
+    <a href="/#engine">Examples</a>
+    <a href="/#pricing">Pricing</a>
+  </div>
+  <a href="login.html" id="nav-login">Log in</a>
+</nav>
+
+<header class="page-hero">
+  <div class="eyebrow is-mono" id="iv-eyebrow"></div>
+  <h1 id="iv-title"></h1>
+  <p id="iv-lead"></p>
+</header>
+
+<section class="section-tight">
+  <div class="iv-wrap">
+    <div class="iv-card">
+      <div class="iv-tag" id="iv-tag"></div>
+      <ul class="iv-list" id="iv-list"></ul>
+      <p class="iv-perk" id="iv-perk"></p>
+    </div>
+    <div class="iv-cta">
+      <a class="btn btn-lg" id="iv-demo" href="approvals.html?demo=1&amp;src=invite"></a>
+      <a class="btn-ghost" id="iv-join" href="signup.html"></a>
+    </div>
+    <p class="iv-fine" id="iv-fine"></p>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+  </div>
+  <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>MADE BY <a href="https://creativesbyandrej.vercel.app" target="_blank" rel="noopener">CREATIVESBYANDREJ</a></span></div>
+</footer>
+
+<script src="demo.js"></script>
+<script src="nav.js"></script>
+<script src="cookies.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="referral.js"></script>
+<script>
+/* Where a tester's invite link lands: /u/<code> (vercel.json) opens
+   invite.html?ref=<code>. It names the tester who sent it (referrer_name in
+   schema.sql), and keeps the code for signup.html, which stores it on the new
+   account as referred_by - that is how the portal knows who brought whom.
+   The perk, if one is set, lives in referral.js. The words are in both
+   languages here, so a language switch draws the page again. */
+(function () {
+  function T(en, srText) { return window.LBLang && LBLang.get() === "sr" ? srText : en; }
+  function $(id) { return document.getElementById(id); }
+  var m = /[?&]ref=([0-9a-f]{8})(&|$)/i.exec(location.search);
+  var code = m ? m[1].toLowerCase() : null;
+  var who = null;
+
+  // Kept for signup, which may come days later.
+  if (code) {
+    try { localStorage.setItem("lb-ref", JSON.stringify({ code: code, at: Date.now() })); } catch (e) {}
+  }
+
+  function li(bold, rest) {
+    var item = document.createElement("li");
+    var b = document.createElement("b");
+    b.textContent = bold;
+    item.appendChild(b);
+    item.appendChild(document.createTextNode(" " + rest));
+    return item;
+  }
+
+  function render() {
+    document.title = T("An invite to Adronis", "Poziv u Adronis");
+    $("iv-eyebrow").textContent = T("AN INVITE · BETA", "POZIV · BETA");
+    $("iv-title").textContent = who
+      ? T(who + " is inviting you to Adronis.", who + " te poziva u Adronis.")
+      : T("You're invited to the Adronis beta.", "Pozvan si u Adronis betu.");
+    $("iv-lead").textContent = who
+      ? T(who + " is in the Adronis beta and thinks it would help your business too.",
+          who + " je u Adronis beti i misli da bi i tvom lokalu koristio.")
+      : T("A business in the Adronis beta thinks it would help yours too.",
+          "Jedan lokal iz Adronis bete misli da bi i tvom koristio.");
+    $("iv-tag").textContent = T("WHAT ADRONIS DOES", "ŠTA ADRONIS RADI");
+    var list = $("iv-list");
+    list.innerHTML = "";
+    list.appendChild(li(T("Ready ads every Monday", "Gotovi oglasi svakog ponedeljka"),
+      T("— picture, headline and caption, made for your business.", "— slika, naslov i tekst, napravljeni za tvoj lokal.")));
+    list.appendChild(li(T("You approve them on your phone.", "Odobriš ih na telefonu."),
+      T("About two minutes a week. Nothing goes out without your yes.", "Oko dva minuta nedeljno. Bez tvog „da“ ništa ne izlazi.")));
+    list.appendChild(li(T("We post them for you,", "Mi ih objavimo,"),
+      T("on Instagram, Facebook, Google and more.", "na Instagramu, Facebooku, Google-u i drugde.")));
+    list.appendChild(li(T("Free during the beta.", "Besplatno tokom bete."),
+      T("No card, no contract.", "Bez kartice, bez ugovora.")));
+    $("iv-perk").textContent = LBReferral.perk("friend") || "";
+    $("iv-demo").textContent = T("See how it works", "Pogledaj kako radi");
+    $("iv-join").textContent = T("Apply for the beta", "Prijavi se za betu");
+    $("iv-fine").textContent = T(
+      "Places in the beta are limited, so we review every application.",
+      "Mesta u beti su ograničena, pa pregledamo svaku prijavu.");
+  }
+
+  render();
+  document.addEventListener("lb:langchange", render);
+  if (!code) return;
+
+  LBDemo.track("invite");
+  function ask() {
+    if (!window.LBAuth) return setTimeout(ask, 200);
+    LBAuth.db.rpc("referrer_name", { p_code: code }).then(function (res) {
+      if (res.data) { who = res.data; render(); }
+    }, function () {});
+  }
+  ask();
+})();
+</script>
+
+</body>
+</html>

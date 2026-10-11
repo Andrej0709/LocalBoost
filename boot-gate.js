@@ -95,11 +95,12 @@
   function likelyRedirect(hint) {
     var tester = hint && hint.t, brief = hint && hint.b;
     // The public demo (demo.js) never sends anyone away.
-    if (params.has("demo") && (page === "approvals.html" || page === "control-room.html")) return false;
+    if (params.has("demo") && (page === "approvals.html" || page === "control-room.html" || page === "report.html")) return false;
     switch (page) {
       case "approvals.html":
       case "control-room.html":
       case "history.html":
+      case "report.html":
       case "login.html":
         return !hint || (BETA && !tester);
       case "signup.html":

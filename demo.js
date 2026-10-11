@@ -129,6 +129,8 @@
     ready: function () { return on ? prospect() : Promise.resolve(null); },
     // Approvals' heading. The made-up café's has its own Serbian entry.
     title: function () { return venue() + " — this week"; },
+    // The business the demo is for: the made-up café, or the one named by ?p=.
+    venue: venue,
 
     // This week's drop for the made-up café, waiting on approval: the
     // approvals page's creatives, in the reader's language.

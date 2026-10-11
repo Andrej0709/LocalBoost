@@ -647,6 +647,7 @@ window.LB_I18N_SR = {
     "TEXT YOU REWROTE": "PREPRAVLJENI TEKSTOVI",
     "WHAT TO STAY AWAY FROM": "ŠTA DA IZBEGAVAMO",
     "WHAT BROUGHT PEOPLE IN": "ŠTA JE DOVELO LJUDE",
+    "Your monthly report →": "Tvoj mesečni izveštaj →",
     "1 ad": "1 oglas",
 
     "Want to see it first?": "Hoćeš prvo da vidiš kako izgleda?",

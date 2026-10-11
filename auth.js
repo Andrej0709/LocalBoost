@@ -62,7 +62,7 @@
   // in boot-gate.js, which runs before this; without it, assume the beta.
   var BETA = window.LBGate ? LBGate.beta : true;
   var PAGE = location.pathname.split("/").pop();
-  var APP_PAGES = ["approvals.html", "control-room.html", "history.html"];
+  var APP_PAGES = ["approvals.html", "control-room.html", "history.html", "report.html"];
 
   // Whether this page is closed to the visitor during the beta. Needs the
   // session and profile, so it runs once they're loaded.

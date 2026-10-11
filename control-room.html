@@ -92,6 +92,19 @@ button.cal-item:active{transform:scale(.98)}
 .crc-done{margin:10px 0 0;font-size:14.5px;line-height:1.5;color:#9fd7b0}
 .crc-msg{margin-top:8px;font-size:13px;color:#f0a8a8}
 .crc-msg:empty{display:none}
+.crc-msg.crc-ok{color:#9fd7b0}
+.crc-stars{display:flex;gap:6px;margin-top:14px}
+.crc-star{width:46px;height:46px;border-radius:12px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--text-4,#4a4f58);font-size:24px;line-height:1;cursor:pointer;transition:color .15s ease,border-color .15s ease,transform .12s ease}
+.crc-star:hover{border-color:var(--line-3);color:#f0c878}
+.crc-star:active{transform:scale(.94)}
+.crc-star.is-on{color:#f0c878;border-color:rgba(240,200,120,.45);background:rgba(240,200,120,.08)}
+.crc-star:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.crc-field{display:block;width:100%;box-sizing:border-box;margin-top:12px;padding:11px 13px;border-radius:12px;border:1px solid var(--line-2);background:var(--field);color:var(--text);font-family:var(--font);font-size:14.5px;line-height:1.5;resize:vertical}
+.crc-field:focus{outline:none;border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(124,198,255,.14)}
+.crc-link{font-family:var(--mono);font-size:13px;color:var(--acc)}
+.crc-check{display:flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:13.5px;line-height:1.45;color:var(--text-2);cursor:pointer}
+.crc-check input{margin-top:2px;width:16px;height:16px;accent-color:var(--acc)}
+a.btn-ghost{text-decoration:none}
 @media (max-width:640px){
   .crc{padding:18px}
   .crc-thumb{width:52px;height:52px}
@@ -190,7 +203,9 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 .cal-legend{display:flex;gap:16px;margin-top:12px;font-size:12.5px;color:var(--text-3)}
 .cal-legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:6px;background:var(--acc)}
 .cal-legend span.live::before{background:#9fd7b0}
-#history-link{display:inline-flex;margin-top:16px;font-size:14px;font-weight:500}
+#history-link,#report-link{display:inline-flex;margin-top:16px;font-size:14px;font-weight:500}
+#report-link{margin-left:22px}
+@media (max-width:640px){#report-link{display:flex;margin-left:0;margin-top:10px}}
 @media (max-width:860px){
   .cal-grid{grid-template-columns:1fr}
   .cal-day{min-height:0;flex-direction:row;flex-wrap:wrap;align-items:center}
@@ -354,6 +369,7 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
           <p>Once a scheduled creative goes out, it lands here with the exact time it posted.</p>
         </div>
         <a href="history.html" id="history-link">Every past week, with what you kept and why →</a>
+        <a href="report.html" id="report-link">Your monthly report →</a>
       </div>
 
     </div>
@@ -408,6 +424,7 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 <script src="brand-assets.js"></script>
 <script src="first-week.js"></script>
 <script src="dates-rs.js"></script>
+<script src="referral.js"></script>
 <script src="install-hint.js"></script>
 <script src="control-room.js"></script>
 </body>
