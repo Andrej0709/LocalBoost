@@ -276,11 +276,11 @@ alter table public.creatives add column if not exists rescheduled_at timestamptz
 alter table public.creatives add column if not exists outcome    text;
 alter table public.creatives add column if not exists outcome_at timestamptz;
 
-do $ begin
+do $$ begin
   alter table public.creatives add constraint creatives_outcome check (
     outcome is null or outcome in ('yes', 'unsure', 'no')
   ) not valid;
-exception when duplicate_object then null; end $;
+exception when duplicate_object then null; end $$;
 
 create index if not exists creatives_drop_idx on public.creatives (drop_id);
 create index if not exists creatives_user_idx on public.creatives (user_id, created_at desc);
@@ -1381,12 +1381,12 @@ create table if not exists public.updates (
 
 create index if not exists updates_user_idx on public.updates (user_id, created_at desc);
 
-do $ begin
+do $$ begin
   alter table public.updates add constraint updates_fields check (
     char_length(body) between 1 and 600
     and char_length(coalesce(created_by, '')) <= 100
   );
-exception when duplicate_object then null; end $;
+exception when duplicate_object then null; end $$;
 
 alter table public.updates enable row level security;
 
