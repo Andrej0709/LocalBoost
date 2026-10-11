@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script src="boot-gate.js"></script>
+<script src="errors.js"></script>
 <style>
 #lb-boot{display:none}
 @media (display-mode:standalone){
@@ -150,6 +151,10 @@
         <datalist id="city-options"></datalist>
       </div>
       <div class="field">
+        <label for="address">Street address (optional)</label>
+        <input id="address" maxlength="200" name="address" type="text" autocomplete="street-address" placeholder="e.g. Bulevar oslobođenja 12">
+      </div>
+      <div class="field">
         <label for="vertical">Business type</label>
         <select id="vertical" name="vertical" required>
           <option value="">Choose your business type</option>
@@ -177,6 +182,14 @@
       <div class="field">
         <label for="website">Website or Instagram handle (optional)</label>
         <input id="website" maxlength="300" name="website" type="text" autocomplete="url" placeholder="@yourbusiness or yourbusiness.com">
+      </div>
+      <div class="field">
+        <label for="hours">Opening hours (optional)</label>
+        <input id="hours" maxlength="300" name="hours" type="text" placeholder="e.g. Mon–Fri 7–22, Sat 8–23, closed Sunday">
+      </div>
+      <div class="field">
+        <label for="phone">Phone (optional)</label>
+        <input id="phone" maxlength="40" name="phone" type="tel" autocomplete="tel" placeholder="e.g. 064 123 4567">
       </div>
       <div class="field">
         <label for="what">What do you sell or do, in one line?</label>
@@ -476,7 +489,8 @@
       business: "business_name",
       website: "website", what: "what_you_sell", customer: "typical_customer",
       different: "differentiator", why: "why_us", vibe: "brand_vibe",
-      colors: "brand_colors", avoid: "avoid_notes", city: "city"
+      colors: "brand_colors", avoid: "avoid_notes", city: "city",
+      address: "address", hours: "opening_hours", phone: "phone"
     };
     Object.keys(map).forEach(function(id){
       var value = profile[map[id]];
@@ -566,6 +580,9 @@
       city:             document.getElementById("city").value,
       vertical:         verticalValue(),
       website:          document.getElementById("website").value,
+      address:          document.getElementById("address").value.trim(),
+      opening_hours:    document.getElementById("hours").value.trim(),
+      phone:            document.getElementById("phone").value.trim(),
       what_you_sell:    document.getElementById("what").value,
       typical_customer: document.getElementById("customer").value,
       differentiator:   document.getElementById("different").value,

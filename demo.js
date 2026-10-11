@@ -57,10 +57,13 @@
     else setTimeout(function () { whenAuth(fn); }, 200);
   }
 
+  // Trying the demo while working on the site locally isn't a visit.
+  var LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+
   // Resolves once sent, or after a short wait - a count is never worth
   // holding the visitor up for.
   function track(event) {
-    if (!firstTime(event)) return Promise.resolve();
+    if (LOCAL || !firstTime(event)) return Promise.resolve();
     var send = new Promise(function (resolve) {
       whenAuth(function () {
         var row = { visit: visitId(), event: event, src: src };

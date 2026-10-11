@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script src="boot-gate.js"></script>
+<script src="errors.js"></script>
 <style>
 #lb-boot{display:none}
 @media (display-mode:standalone){
@@ -87,6 +88,10 @@
 .reason-keys{font-size:10px;color:var(--text-3);margin-left:6px}
 .approve-toast .reason-toast-close{border-color:var(--line-2);background:none;color:var(--text-3)}
 .ap-note{font-size:13.5px;color:var(--text-3)}
+.ap-auto{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:14px 0 0;font-size:13.5px;line-height:1.5;color:var(--text-2)}
+.ap-auto b{color:var(--text);font-weight:600}
+.ap-auto a{color:var(--acc);white-space:nowrap}
+.ap-auto-tag{font-size:10px;letter-spacing:.1em;color:var(--acc)}
 .ap-note a{text-decoration:underline;text-underline-offset:3px}
 @media (max-width:860px){#kb-hint{display:none}.reason-keys{display:none}}
 /* The small text buttons under each ad get a thumb-sized hit area on touch
@@ -177,6 +182,7 @@
           <button data-filter="rejected" data-label="Rejected">Rejected</button>
           <button data-filter="all" data-label="Everything">Everything</button>
         </div>
+        <p id="auto-line" class="ap-auto" hidden></p>
         <div id="kb-hint" class="mono">Y approve &middot; N reject &middot; 1&ndash;5 say why &middot; &larr;&rarr; navigate</div>
       </div>
 
@@ -252,6 +258,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
+<script src="brand-assets.js"></script>
+<script src="post-preview.js"></script>
 <script src="feedback.js"></script>
 <script src="tour.js"></script>
 <script src="reschedule.js"></script>
@@ -423,6 +431,8 @@
       button.textContent = button.dataset.label + " (" + n + ")";
     });
 
+    renderAutoLine(scoped);
+
     var waiting = count("pending");
     var bulkActions = document.getElementById("bulk-actions");
     if (waiting > 0) {
@@ -432,6 +442,65 @@
     } else {
       bulkActions.hidden = true;
     }
+  }
+
+  // --- Auto-approval (the account page's switch, auto_approve_due in schema.sql) ---
+  // With it on, an ad still waiting 48 hours after the latest of its drop
+  // landing, the ad itself appearing and the switch going on is approved for
+  // the customer. An ad they already decided once (then put back) never is.
+  var AUTO_MS = 48 * 3600000;
+
+  function autoDueAt(creative, profile) {
+    var drop = drops.filter(function (d) { return d.id === creative.drop_id; })[0];
+    return Math.max(
+      drop ? new Date(drop.ready_at || drop.created_at || 0).getTime() : 0,
+      new Date(creative.created_at || 0).getTime(),
+      profile.auto_approve_at ? new Date(profile.auto_approve_at).getTime() : 0
+    ) + AUTO_MS;
+  }
+
+  // One line under the filters: when the waiting ads go on their own, or,
+  // with the switch off, that they could. Each part is its own node so the
+  // Serbian copy matches it whole.
+  function renderAutoLine(scoped) {
+    var line = document.getElementById("auto-line");
+    line.innerHTML = "";
+    line.hidden = true;
+    if (demoMode || !LBAuth.isLoggedIn() || !LBAuth.hasActivePlan()) return;
+    var profile = LBAuth.getProfile() || {};
+    var waiting = scoped.filter(function (c) { return c.status === "pending"; });
+    if (!waiting.length) return;
+
+    if (profile.auto_approve) {
+      var due = waiting.filter(function (c) { return !c.decided_at; })
+        .map(function (c) { return autoDueAt(c, profile); });
+      if (!due.length) return;
+      var first = Math.min.apply(null, due);
+      var tag = document.createElement("span");
+      tag.className = "mono ap-auto-tag";
+      tag.textContent = "AUTO-APPROVE ON";
+      line.appendChild(tag);
+      var text = document.createElement("span");
+      if (first <= Date.now()) {
+        text.textContent = "What's still waiting is approved for you in the next few minutes.";
+        line.appendChild(text);
+      } else {
+        text.textContent = "Anything still waiting is approved for you from";
+        var when = document.createElement("b");
+        when.textContent = fmtPostTime(new Date(first).toISOString());
+        line.appendChild(text);
+        line.appendChild(when);
+      }
+    } else {
+      var hint = document.createElement("span");
+      hint.textContent = "Busy week? Adronis can approve what you don't get to within 48 hours.";
+      var link = document.createElement("a");
+      link.href = "account.html#auto-card";
+      link.textContent = "Turn it on →";
+      line.appendChild(hint);
+      line.appendChild(link);
+    }
+    line.hidden = false;
   }
 
   var STATUS_LABEL = {
@@ -531,6 +600,16 @@
 
     var tools = document.createElement("div");
     tools.className = "creative-tools";
+    // The ad the way it will look in the app (post-preview.js).
+    var previewKind = LBPreview.kind(creative);
+    if (previewKind) {
+      var see = document.createElement("button");
+      see.type = "button";
+      see.className = "link-btn";
+      see.textContent = previewKind === "ig-story" ? "See it as a story" : "See it as a post";
+      see.addEventListener("click", function () { LBPreview.open(creative); });
+      tools.appendChild(see);
+    }
     if (LBReschedule.canReschedule(creative)) {
       var retime = document.createElement("button");
       retime.type = "button";
@@ -553,6 +632,13 @@
       mark.className = "mono edited-mark";
       mark.textContent = "EDITED BY YOU";
       tools.appendChild(mark);
+    }
+    if (creative.auto_approved_at && (creative.status === "approved" || creative.status === "published")) {
+      var auto = document.createElement("span");
+      auto.className = "mono edited-mark";
+      auto.textContent = "APPROVED FOR YOU";
+      auto.title = "It waited 48 hours, so it was approved for you. Busy weeks, on the account page.";
+      tools.appendChild(auto);
     }
     if (creative.status !== "published") {
       var edit = document.createElement("button");
@@ -1291,11 +1377,27 @@
     document.getElementById("free-strip").hidden = false;
   }
 
+  // The name and logo on top of the post preview. The logo is a private file
+  // (brand-assets.js), so it comes as a short-lived link; without one the
+  // preview shows the business's initials.
+  async function loadPreviewAccount(profile) {
+    var info = { name: profile.business_name, website: profile.website };
+    LBPreview.setAccount(info);
+    try {
+      var logos = await LBBrand.list("logo");
+      if (!logos.length) return;
+      var urls = await LBBrand.signedUrls([logos[0].path]);
+      info.logoUrl = urls[logos[0].path];
+      LBPreview.setAccount(info);
+    } catch (e) {}
+  }
+
   LBAuth.ready.then(async function () {
     // The public demo: the sample drop for everyone, signed in or not -
     // with a business's own name when the link came from the portal.
     if (LBDemo.on) {
       await LBDemo.ready();
+      LBPreview.setAccount({ name: LBDemo.venue() });
       loading.hidden = true;
       lbBootDone();
       LBDemo.bar();
@@ -1316,6 +1418,7 @@
     var cta = document.getElementById("nav-cta");
     cta.textContent = "Control room";
     cta.href = "control-room.html";
+    loadPreviewAccount(LBAuth.getProfile() || {});
 
     // A failed charge isn't the Free plan, even though the free allowance is
     // what renders until it's paid — say what's wrong and where to fix it.

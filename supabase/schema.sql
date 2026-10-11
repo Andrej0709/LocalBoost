@@ -190,6 +190,32 @@ do $$ begin
     check (cardinality(tours_seen) <= 20);
 exception when duplicate_object then null; end $$;
 
+/* --- Migration for the practical facts a local ad leans on ------------------ */
+/* address: the street address ("Bulevar oslobođenja 12"), opening_hours in the  */
+/* customer's own words ("Mon-Fri 7-22, Sat 8-23, closed Sunday"), phone for     */
+/* ads that say "call to book" and for us to reach them. All optional; the      */
+/* engine puts them in an ad only where they help. Rows from before stay null.   */
+alter table public.profiles add column if not exists address       text;
+alter table public.profiles add column if not exists opening_hours text;
+alter table public.profiles add column if not exists phone         text;
+
+do $$ begin
+  alter table public.profiles add constraint profiles_contact_sizes check (
+    char_length(coalesce(address, '')) <= 200
+    and char_length(coalesce(opening_hours, '')) <= 300
+    and char_length(coalesce(phone, '')) <= 40
+  ) not valid;
+exception when duplicate_object then null; end $$;
+
+/* --- Migration for "approve it for me if I don't get to it" ----------------- */
+/* auto_approve: the customer's own switch (account page). While it is on, an   */
+/* ad still waiting 48 hours after its drop landed is approved for them by      */
+/* auto_approve_due() below. auto_approve_at is stamped by                       */
+/* protect_profile_billing when the switch goes on, and the 48 hours never      */
+/* count from before it, so turning it on never approves a backlog at once.     */
+alter table public.profiles add column if not exists auto_approve    boolean not null default false;
+alter table public.profiles add column if not exists auto_approve_at timestamptz;
+
 /* Existing paying accounts predate current_period_end - seed it from the trial
    date they already have so finalize_billing_period() has an anchor to work from. */
 update public.profiles
@@ -281,6 +307,27 @@ do $$ begin
     outcome is null or outcome in ('yes', 'unsure', 'no')
   ) not valid;
 exception when duplicate_object then null; end $$;
+
+/* --- Migration for auto-approval -------------------------------------------- */
+/* decided_at: the last time the customer approved, rejected or put back this   */
+/* creative (stamped by protect_creative_fields). An ad they have touched is     */
+/* never approved for them - "undo approval" stays undone.                      */
+/* auto_approved_at: set by auto_approve_due() when it approved the ad because  */
+/* the customer didn't get to it in 48 hours; cleared the moment the customer   */
+/* decides it themselves. The engine reads it too: silence isn't a "yes, more   */
+/* like this".                                                                   */
+alter table public.creatives add column if not exists decided_at       timestamptz;
+alter table public.creatives add column if not exists auto_approved_at timestamptz;
+
+/* ready_at: when the drop landed in Approvals (its status became               */
+/* awaiting_approval), stamped by drops_stamp_ready below. The 48 hours of      */
+/* auto-approval count from here.                                                */
+alter table public.drops add column if not exists ready_at timestamptz;
+
+update public.drops
+   set ready_at = coalesce(updated_at, created_at)
+ where ready_at is null
+   and status <> 'rendering';
 
 create index if not exists creatives_drop_idx on public.creatives (drop_id);
 create index if not exists creatives_user_idx on public.creatives (user_id, created_at desc);
@@ -450,6 +497,7 @@ declare
 begin
   insert into public.profiles (
     id, email, business_name, country, city, vertical, website,
+    address, opening_hours, phone,
     what_you_sell, typical_customer, differentiator, why_us,
     brand_vibe, brand_colors, avoid_notes, channels, plan,
     terms_accepted_at, terms_version, referred_by
@@ -462,6 +510,9 @@ begin
     nullif(new.raw_user_meta_data ->> 'city', ''),
     nullif(new.raw_user_meta_data ->> 'vertical', ''),
     nullif(new.raw_user_meta_data ->> 'website', ''),
+    left(nullif(btrim(new.raw_user_meta_data ->> 'address'), ''), 200),
+    left(nullif(btrim(new.raw_user_meta_data ->> 'opening_hours'), ''), 300),
+    left(nullif(btrim(new.raw_user_meta_data ->> 'phone'), ''), 40),
     nullif(new.raw_user_meta_data ->> 'what_you_sell', ''),
     nullif(new.raw_user_meta_data ->> 'typical_customer', ''),
     nullif(new.raw_user_meta_data ->> 'differentiator', ''),
@@ -597,6 +648,9 @@ begin
       'Where: '         || nullif(concat_ws(', ', p.city, p.country), ''),
       'Business type: ' || p.vertical,
       'Website / Instagram: ' || nullif(p.website, ''),
+      'Address: '       || nullif(p.address, ''),
+      'Opening hours: ' || nullif(p.opening_hours, ''),
+      'Phone: '         || nullif(p.phone, ''),
       'Channels: '      || nullif(array_to_string(p.channels, ', '), ''),
       '',
       'What they sell: '    || p.what_you_sell,
@@ -1050,6 +1104,7 @@ begin
     end if;
     /* The row's email is the signed-in account's, whatever the browser sent. */
     new.email := coalesce(auth.jwt() ->> 'email', new.email);
+    new.auto_approve_at := case when new.auto_approve then now() end;
     return new;
   end if;
 
@@ -1059,6 +1114,10 @@ begin
   editable.city             := new.city;
   editable.vertical         := new.vertical;
   editable.website          := new.website;
+  editable.address          := new.address;
+  editable.opening_hours    := new.opening_hours;
+  editable.phone            := new.phone;
+  editable.auto_approve     := new.auto_approve;
   editable.what_you_sell    := new.what_you_sell;
   editable.typical_customer := new.typical_customer;
   editable.differentiator   := new.differentiator;
@@ -1107,6 +1166,11 @@ begin
 
   if new.next_week_note is distinct from old.next_week_note then
     new.next_week_note_at := now();
+  end if;
+
+  /* The 48 hours of auto-approval count from when the switch went on. */
+  if new.auto_approve is distinct from old.auto_approve then
+    new.auto_approve_at := case when new.auto_approve then now() end;
   end if;
 
   /* Consent evidence is never cleared or backdated: a new version gets
@@ -1186,6 +1250,13 @@ begin
   if new.status is distinct from old.status
      and (old.status = 'published' or new.status = 'published') then
     raise exception 'Publishing is handled by Adronis.';
+  end if;
+
+  /* The customer decided this one themselves: it is theirs from now on, and
+     auto-approval never touches it again. */
+  if new.status is distinct from old.status then
+    new.decided_at       := now();
+    new.auto_approved_at := null;
   end if;
 
   if new.outcome is distinct from old.outcome then
@@ -1608,3 +1679,186 @@ create policy "brand assets delete own" on storage.objects
     bucket_id = 'brand-assets'
     and (storage.foldername(name))[1] = auth.uid()::text
   );
+
+/* ------------------------------------------------------------ */
+/* 11. Auto-approval - "approve it for me if I don't get to it".     */
+/*     A customer who switches profiles.auto_approve on (account      */
+/*     page) has every ad still waiting 48 hours after it landed in   */
+/*     Approvals approved for them. Ads they touched themselves       */
+/*     (creatives.decided_at) are never approved for them. Runs every */
+/*     15 minutes through pg_cron (section 13).                       */
+/* ------------------------------------------------------------ */
+
+/* drops.ready_at: when the drop landed in Approvals. Stamped the first time it
+   is awaiting approval, and again if the engine renders it over (rendering ->
+   awaiting_approval), so a re-rendered week gets its own 48 hours. Runs after
+   drops_protect_fields (triggers fire in name order), which already refuses a
+   ready_at sent from the browser. */
+create or replace function public.stamp_drop_ready()
+returns trigger
+language plpgsql
+set search_path = public, pg_temp
+as $$
+begin
+  if new.status = 'awaiting_approval'
+     and (new.ready_at is null or (tg_op = 'UPDATE' and old.status = 'rendering')) then
+    new.ready_at := now();
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists drops_stamp_ready on public.drops;
+create trigger drops_stamp_ready
+  before insert or update on public.drops
+  for each row execute function public.stamp_drop_ready();
+
+/* Approves what is due and returns how many ads it approved. The 48 hours count
+   from the latest of: the drop landing, the ad itself appearing (a replacement
+   added later gets its own two days) and the switch going on. An ad whose
+   posting slot has already gone by loses the slot (scheduled_at null), so it is
+   posted at the next good time instead of showing up as late. Only accounts
+   with a running plan - a beta tester's included - are touched. */
+create or replace function public.auto_approve_due()
+returns int
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  n int;
+begin
+  with due as (
+    select c.id
+      from public.creatives c
+      join public.drops d    on d.id = c.drop_id
+      join public.profiles p on p.id = c.user_id
+     where c.status = 'pending'
+       and c.decided_at is null
+       and d.status = 'awaiting_approval'
+       and p.auto_approve
+       and p.subscription_status in ('trialing', 'active')
+       and greatest(coalesce(d.ready_at, d.created_at), c.created_at, p.auto_approve_at)
+           <= now() - interval '48 hours'
+       for update of c skip locked
+  )
+  update public.creatives c
+     set status           = 'approved',
+         auto_approved_at = now(),
+         scheduled_at     = case when c.scheduled_at < now() + interval '10 minutes'
+                                 then null else c.scheduled_at end
+    from due
+   where c.id = due.id;
+  get diagnostics n = row_count;
+
+  /* A drop with nothing left waiting is approved, as when the customer clears it. */
+  if n > 0 then
+    update public.drops d
+       set status = 'approved'
+     where d.status = 'awaiting_approval'
+       and exists (select 1 from public.creatives c
+                    where c.drop_id = d.id and c.auto_approved_at is not null)
+       and not exists (select 1 from public.creatives c
+                        where c.drop_id = d.id and c.status = 'pending');
+  end if;
+
+  return n;
+end;
+$$;
+
+revoke execute on function public.auto_approve_due() from public, anon, authenticated;
+
+/* ------------------------------------------------------------ */
+/* 12. client_errors - a JavaScript error a visitor's browser hit   */
+/*     (errors.js, on every page), so a broken page on a tester's    */
+/*     phone shows up in the Adronis Portal's Errors tab instead of  */
+/*     going unnoticed. Anyone may add a row, nobody may read them   */
+/*     from the browser; the portal reads them through its admin     */
+/*     policy (portal-admin.sql). Kept 30 days. Stored: the page,    */
+/*     the error and where in the code, the browser's user agent and */
+/*     language, a random id for the tab - and the account, when a   */
+/*     signed-in customer hit it, so we can tell them it's fixed.    */
+/* ------------------------------------------------------------ */
+create table if not exists public.client_errors (
+  id         bigserial primary key,
+  created_at timestamptz not null default now(),
+  user_id    uuid references public.profiles (id) on delete cascade,
+  page       text,
+  message    text not null,
+  source     text,
+  line       int,
+  col        int,
+  stack      text,
+  user_agent text,
+  lang       text,
+  visit      text
+);
+
+create index if not exists client_errors_created_idx on public.client_errors (created_at desc);
+
+alter table public.client_errors enable row level security;
+
+/* The time and the account are the database's, whatever the browser sent.
+   Long fields are cut rather than refused - a cut error still tells us
+   something. A runaway loop or a script posting junk stops at 20 rows per tab
+   and 500 in all per hour; the rest are dropped without an error. */
+create or replace function public.stamp_client_error()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  new.message := left(nullif(btrim(coalesce(new.message, '')), ''), 1000);
+  if new.message is null then
+    return null;
+  end if;
+  new.created_at := now();
+  new.user_id    := (select id from public.profiles where id = auth.uid());
+  new.page       := left(new.page, 300);
+  new.source     := left(new.source, 500);
+  new.stack      := left(new.stack, 4000);
+  new.user_agent := left(new.user_agent, 400);
+  new.lang       := left(new.lang, 10);
+  new.visit      := left(new.visit, 40);
+
+  if (select count(*) from public.client_errors
+       where created_at > now() - interval '1 hour') >= 500 then
+    return null;
+  end if;
+  if new.visit is not null
+     and (select count(*) from public.client_errors
+           where visit = new.visit and created_at > now() - interval '1 hour') >= 20 then
+    return null;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists client_errors_stamp on public.client_errors;
+create trigger client_errors_stamp
+  before insert on public.client_errors
+  for each row execute function public.stamp_client_error();
+
+drop policy if exists "client errors insert public" on public.client_errors;
+create policy "client errors insert public" on public.client_errors
+  for insert to anon, authenticated with check (true);
+
+/* ------------------------------------------------------------ */
+/* 13. Scheduled jobs (pg_cron): auto-approval every 15 minutes, and */
+/*     error reports older than 30 days cleared every night. If      */
+/*     pg_cron can't be switched on from here, turn it on under       */
+/*     Database -> Extensions (or Integrations -> Cron) and re-run    */
+/*     this file; until then auto-approval doesn't run. To check:     */
+/*       select jobname, schedule, active from cron.job;              */
+/* ------------------------------------------------------------ */
+do $$
+begin
+  create extension if not exists pg_cron with schema pg_catalog;
+  perform cron.schedule('adronis-auto-approve', '*/15 * * * *',
+    'select public.auto_approve_due()');
+  perform cron.schedule('adronis-clear-old-errors', '17 3 * * *',
+    'delete from public.client_errors where created_at < now() - interval ''30 days''');
+exception when others then
+  raise notice 'pg_cron is not available yet (%). Turn it on in Database -> Extensions and re-run this file.', sqlerrm;
+end $$;

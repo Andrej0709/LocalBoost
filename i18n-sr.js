@@ -1151,8 +1151,8 @@ window.LB_I18N_SR = {
     "contact and support forms, including anything you choose to write in them.":
       "forme za kontakt i podršku, uključujući sve što odlučiš da u njima napišeš.",
     "Technical data:": "Tehnički podaci:",
-    "IP address, browser and device information, and server and security logs generated when you use the site.":
-      "IP adresa, podaci o pregledaču i uređaju, kao i serverski i bezbednosni logovi koji nastaju dok koristiš sajt.",
+    "IP address, browser and device information, server and security logs generated when you use the site, and reports of errors the site runs into in your browser.":
+      "IP adresa, podaci o pregledaču i uređaju, serverski i bezbednosni logovi koji nastaju dok koristiš sajt, i izveštaji o greškama na koje sajt naiđe u tvom pregledaču.",
     "4. Why we process it, and on what legal basis":
       "4. Zašto to obrađujemo i po kom pravnom osnovu",
     "To provide the service": "Da pružimo uslugu",
@@ -1229,6 +1229,8 @@ window.LB_I18N_SR = {
       "24 meseca od poslednje poruke u prepisci.",
     "Server and security logs:": "Serverski i bezbednosni logovi:",
     "up to 12 months.": "do 12 meseci.",
+    "Error reports from your browser:": "Izveštaji o greškama iz tvog pregledača:",
+    "30 days.": "30 dana.",
     "Backups:": "Rezervne kopije:",
     "deleted data can persist in encrypted backups for up to 35 days before those backups expire.":
       "obrisani podaci mogu ostati u šifrovanim rezervnim kopijama do 35 dana, dok te kopije ne isteknu.",
@@ -1334,6 +1336,16 @@ window.LB_I18N_SR = {
     "Password updated.": "Lozinka je promenjena.",
     "Channels saved — next week's drop renders for these only.":
       "Kanali sačuvani — sledeći drop se renderuje samo za njih.",
+    // Auto-approval switch (account.js).
+    "Busy weeks": "Kad ne stigneš",
+    "Every ad waits in Approvals for your yes. If a week gets away from you, Adronis can approve what you haven't looked at, so the week doesn't go by without ads.":
+      "Svaki oglas čeka u Odobravanjima da ga odobriš. Ako ti nedelja pobegne, Adronis može sam da odobri ono što još čeka, da nedelja ne prođe bez oglasa.",
+    "Approve what I don't get to within 48 hours": "Odobri sam ono što ne pregledam za 48 sati",
+    "Only ads still waiting on you. Anything you approve or reject stays your call, and an approved ad can still be pulled back in Approvals until it goes out.":
+      "Samo oglase koji još čekaju tebe. Šta god odobriš ili odbiješ ostaje tvoja odluka, a odobren oglas i dalje možeš da povučeš u Odobravanjima dok ne izađe.",
+    "On — anything you haven't reviewed 48 hours after it lands is approved for you.":
+      "Uključeno — šta god ne pregledaš u roku od 48 sati od kad stigne, odobrava se samo.",
+    "Off — every ad waits for your yes.": "Isključeno — svaki oglas čeka tvoje odobrenje.",
     "Could not save your profile — please try again.":
       "Nismo uspeli da sačuvamo tvoj profil — pokušaj ponovo.",
     "Log out failed — try again.": "Odjava nije uspela — pokušaj ponovo.",
@@ -1739,6 +1751,33 @@ window.LB_I18N_SR = {
 
     /* --- Approvals: text edits and reject reasons ------------------------ */
     "EDITED BY YOU": "TVOJA IZMENA",
+    // Auto-approval on the approvals page.
+    "APPROVED FOR YOU": "ODOBRENO UMESTO TEBE",
+    "It waited 48 hours, so it was approved for you. Busy weeks, on the account page.":
+      "Čekao je 48 sati, pa je odobren umesto tebe. Podešava se pod Kad ne stigneš, na stranici Nalog.",
+    "AUTO-APPROVE ON": "AUTOMATSKO ODOBRAVANJE",
+    "What's still waiting is approved for you in the next few minutes.":
+      "Ono što još čeka biće odobreno u narednih nekoliko minuta.",
+    "Anything still waiting is approved for you from": "Sve što još čeka odobrava se samo od",
+    "Busy week? Adronis can approve what you don't get to within 48 hours.":
+      "Gužva? Adronis može sam da odobri ono što ne stigneš da pregledaš za 48 sati.",
+    "Turn it on →": "Uključi →",
+    // The ad as it will look in the app (post-preview.js).
+    "See it as a post": "Pogledaj kao objavu",
+    "See it as a story": "Pogledaj kao priču",
+    "HOW IT LOOKS ON INSTAGRAM": "OVAKO IZGLEDA NA INSTAGRAMU",
+    "HOW IT LOOKS AS A STORY": "OVAKO IZGLEDA KAO PRIČA",
+    "HOW IT LOOKS ON FACEBOOK": "OVAKO IZGLEDA NA FEJSBUKU",
+    "Preview of the ad as it will be posted": "Pregled oglasa onako kako će biti objavljen",
+    "Close to what people will see — the app may crop or shorten it a little differently.":
+      "Blizu onoga što će ljudi videti — aplikacija može malo drugačije da ga iseče ili skrati.",
+    "more": "još",
+    "Just now": "Upravo sada",
+    "now": "sada",
+    "See more": "Prikaži još",
+    "Like": "Sviđa mi se",
+    "Comment": "Komentariši",
+    "Share": "Podeli",
     "Edit text": "Izmeni tekst",
     "Restore original": "Vrati original",
     "HEADLINE": "NASLOV",
@@ -1829,6 +1868,13 @@ window.LB_I18N_SR = {
     "Shows the engine how you already present yourself, so new ads match it.":
       "Pokazuje mašini kako se već predstavljaš, da novi oglasi to prate.",
     "e.g. @milenasbakery or milenas.rs": "npr. @milenasbakery ili milenas.rs",
+    "Your opening hours": "Tvoje radno vreme",
+    "Ads can say when to come by — open late, open on Sunday — and never send anyone to a closed door.":
+      "Oglasi mogu da kažu kad da svrate — radiš do kasno, radiš nedeljom — i nikoga ne šalju pred zatvorena vrata.",
+    "e.g. Mon–Fri 7–22, Sat 8–23, closed Sunday": "npr. pon–pet 7–22, sub 8–23, nedeljom zatvoreno",
+    "Your street address": "Tvoja adresa",
+    "So an ad can tell people exactly where to find you.": "Da oglas može tačno da kaže gde da te nađu.",
+    "e.g. Bulevar oslobođenja 12": "npr. Bulevar oslobođenja 12",
     "Anything to avoid": "Šta treba izbegavati",
     "Things that should never show up in your ads — the engine steers clear of them.":
       "Stvari koje nikad ne treba da se pojave u tvojim oglasima — mašina ih zaobilazi.",
@@ -2144,6 +2190,14 @@ window.LB_I18N_SR = {
     "City": "Grad",
     "What kind of business is it?": "Koji je to tip biznisa?",
     "Website or Instagram handle (optional)": "Sajt ili Instagram nalog (opciono)",
+    "Street address (optional)": "Adresa (opciono)",
+    "Opening hours (optional)": "Radno vreme (opciono)",
+    "Phone (optional)": "Telefon (opciono)",
+    "e.g. Mon–Fri 7–22, Sat 8–23": "npr. pon–pet 7–22, sub 8–23",
+    "e.g. 064 123 4567": "npr. 064 123 4567",
+    "Street address": "Adresa",
+    "Opening hours": "Radno vreme",
+    "Phone": "Telefon",
     "What do you sell or do, in one line?": "Šta prodaješ ili radiš, u jednoj rečenici?",
     "Who's your typical customer?": "Ko ti je tipična mušterija?",
     "What makes you different from the place down the street?": "Po čemu se razlikuješ od radnje niz ulicu?",

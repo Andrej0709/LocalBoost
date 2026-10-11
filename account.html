@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script src="boot-gate.js"></script>
+<script src="errors.js"></script>
 <link rel="icon" type="image/png" sizes="256x256" href="icon-256.png">
 <link rel="apple-touch-icon" href="icon-512.png">
 <link rel="manifest" href="site.webmanifest">
@@ -71,6 +72,18 @@
 #bill-beta-perks{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:8px;font-size:14px;line-height:1.5;color:var(--text-2)}
 #bill-beta-perks li{position:relative;padding-left:18px}
 #bill-beta-perks li::before{content:"▪";position:absolute;left:0;top:0;color:var(--acc);font-family:var(--mono);font-size:11px}
+#account-content .card,#billing{scroll-margin-top:96px}
+/* The auto-approval switch. */
+.acc-switch{display:flex;align-items:center;gap:14px;margin:4px 0 0;cursor:pointer;font-size:15px;color:var(--text);line-height:1.45}
+.acc-switch input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.acc-switch-track{position:relative;flex:0 0 auto;width:46px;height:28px;border-radius:9999px;border:1px solid var(--line-2);background:rgba(255,255,255,.06);transition:background .25s var(--ease),border-color .25s var(--ease)}
+.acc-switch-track::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--text-3);transition:transform .25s var(--ease),background .25s var(--ease)}
+.acc-switch input:checked+.acc-switch-track{background:var(--acc-soft);border-color:var(--acc-line)}
+.acc-switch input:checked+.acc-switch-track::after{transform:translateX(18px);background:var(--acc)}
+.acc-switch input:focus-visible+.acc-switch-track{box-shadow:0 0 0 3px rgba(124,198,255,.25)}
+.acc-switch input:disabled+.acc-switch-track{opacity:.5}
+.acc-switch-note{margin:12px 0 0;font-size:13px;line-height:1.6;color:var(--text-3)}
+@media (prefers-reduced-motion:reduce){.acc-switch-track,.acc-switch-track::after{transition:none}}
 @media (max-width:640px){
   #account-content .card{padding:20px;border-radius:22px}
   #biz-rows .acc-row-value{max-width:none}
@@ -148,6 +161,9 @@
         <div id="biz-rows">
           <div class="acc-row"><div class="acc-row-label">Business name</div><div class="acc-row-value" id="biz-name">—</div></div>
           <div class="acc-row"><div class="acc-row-label">Location</div><div class="acc-row-value" id="biz-location">—</div></div>
+          <div class="acc-row"><div class="acc-row-label">Street address</div><div class="acc-row-value" id="biz-address">—</div></div>
+          <div class="acc-row"><div class="acc-row-label">Opening hours</div><div class="acc-row-value" id="biz-hours">—</div></div>
+          <div class="acc-row"><div class="acc-row-label">Phone</div><div class="acc-row-value" id="biz-phone">—</div></div>
           <div class="acc-row"><div class="acc-row-label">Business type</div><div class="acc-row-value" id="biz-vertical">—</div></div>
           <div class="acc-row"><div class="acc-row-label">Website or Instagram</div><div class="acc-row-value" id="biz-website">—</div></div>
           <div class="acc-row"><div class="acc-row-label">What you sell</div><div class="acc-row-value" id="biz-what">—</div></div>
@@ -171,6 +187,20 @@
               <label for="biz-in-city">City</label>
               <input id="biz-in-city" type="text" required maxlength="200" autocomplete="address-level2" list="biz-city-options" placeholder="Where's the shop?">
               <datalist id="biz-city-options"></datalist>
+            </div>
+          </div>
+          <div class="field">
+            <label for="biz-in-address">Street address (optional)</label>
+            <input id="biz-in-address" type="text" maxlength="200" autocomplete="street-address" placeholder="e.g. Bulevar oslobođenja 12">
+          </div>
+          <div class="field-pair" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+            <div class="field">
+              <label for="biz-in-hours">Opening hours (optional)</label>
+              <input id="biz-in-hours" type="text" maxlength="300" placeholder="e.g. Mon–Fri 7–22, Sat 8–23">
+            </div>
+            <div class="field">
+              <label for="biz-in-phone">Phone (optional)</label>
+              <input id="biz-in-phone" type="tel" maxlength="40" autocomplete="tel" placeholder="e.g. 064 123 4567">
             </div>
           </div>
           <div class="field">
@@ -303,6 +333,21 @@
         </form>
 
         <div id="channels-notice" class="notice" role="status" hidden></div>
+      </div>
+
+      <!-- Auto-approval: what happens to ads the customer doesn't get to -->
+      <div class="card" id="auto-card">
+        <h3 class="acc-card-title">Busy weeks</h3>
+        <p class="acc-card-sub">Every ad waits in Approvals for your yes. If a week gets away from you, Adronis can approve what you haven't looked at, so the week doesn't go by without ads.</p>
+
+        <label class="acc-switch" for="auto-approve">
+          <input type="checkbox" id="auto-approve" role="switch">
+          <span class="acc-switch-track" aria-hidden="true"></span>
+          <span class="acc-switch-text">Approve what I don't get to within 48 hours</span>
+        </label>
+        <p class="acc-switch-note">Only ads still waiting on you. Anything you approve or reject stays your call, and an approved ad can still be pulled back in Approvals until it goes out.</p>
+
+        <div id="auto-notice" class="notice" role="status" hidden></div>
       </div>
 
       <!-- Plan & billing group: plan details + payment history, visually grouped but not merged -->

@@ -166,6 +166,9 @@
     var rows = {
       "biz-name": profile.business_name,
       "biz-location": location,
+      "biz-address": profile.address,
+      "biz-hours": profile.opening_hours,
+      "biz-phone": profile.phone,
       "biz-vertical": profile.vertical,
       "biz-website": profile.website,
       "biz-what": profile.what_you_sell,
@@ -181,6 +184,9 @@
     $("biz-in-name").value = profile.business_name || "";
     bizCountry.set(profile.country || LBBriefFields.guessCountry());
     $("biz-in-city").value = profile.city || "";
+    $("biz-in-address").value = profile.address || "";
+    $("biz-in-hours").value = profile.opening_hours || "";
+    $("biz-in-phone").value = profile.phone || "";
     bizVertical.set(profile.vertical || "Bakery");
     $("biz-in-website").value = profile.website || "";
     $("biz-in-what").value = profile.what_you_sell || "";
@@ -219,6 +225,9 @@
         business_name:    $("biz-in-name").value.trim(),
         country:          $("biz-in-country").value,
         city:             $("biz-in-city").value.trim(),
+        address:          $("biz-in-address").value.trim() || null,
+        opening_hours:    $("biz-in-hours").value.trim() || null,
+        phone:            $("biz-in-phone").value.trim() || null,
         vertical:         bizVertical.value(),
         website:          $("biz-in-website").value.trim(),
         what_you_sell:    $("biz-in-what").value.trim(),
@@ -284,6 +293,37 @@
         say(notice, err.message, true);
       } finally {
         channelsField.sync();
+      }
+    });
+  }
+
+  // ----------------------------------------------------------- busy weeks
+  // profiles.auto_approve: ads still waiting 48 hours after they land are
+  // approved for the customer (auto_approve_due in schema.sql). Saved the
+  // moment the switch moves; the database stamps when it went on.
+  function renderAuto(profile) {
+    var box = $("auto-approve");
+    box.checked = !!profile.auto_approve;
+    // Only an account whose ads get published has anything to approve.
+    $("auto-card").hidden = !LBAuth.hasActivePlan();
+  }
+
+  function wireAuto() {
+    var box = $("auto-approve");
+    var notice = $("auto-notice");
+    box.addEventListener("change", async function () {
+      var on = box.checked;
+      box.disabled = true;
+      try {
+        await LBAuth.updateProfile({ auto_approve: on });
+        say(notice, on
+          ? "On — anything you haven't reviewed 48 hours after it lands is approved for you."
+          : "Off — every ad waits for your yes.");
+      } catch (err) {
+        box.checked = !on;
+        say(notice, err.message, true);
+      } finally {
+        box.disabled = false;
       }
     });
   }
@@ -895,6 +935,7 @@
   wireSecurity();
   wireBusiness();
   wireChannels();
+  wireAuto();
 
   LBAuth.ready.then(function () {
     var loading = $("loading");
@@ -915,6 +956,7 @@
     $("business-card").hidden = !LBAuth.hasBrief();
     renderBusiness(profile);
     renderChannels(profile);
+    renderAuto(profile);
     renderBilling(profile);
     renderPayments(profile);
     wirePlanChange(function () { return currentProfile; });
@@ -925,5 +967,10 @@
 
     loading.hidden = true;
     $("account-content").hidden = false;
+
+    // A link to one card (approvals.html's "Turn it on", #billing) lands on
+    // it once the page is showing - the browser looked for it while hidden.
+    var target = location.hash && document.getElementById(location.hash.slice(1));
+    if (target && !target.hidden) target.scrollIntoView({ block: "start" });
   });
 })();
