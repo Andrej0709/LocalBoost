@@ -88,11 +88,14 @@
 .reason-keys{font-size:10px;color:var(--text-3);margin-left:6px}
 .approve-toast .reason-toast-close{border-color:var(--line-2);background:none;color:var(--text-3)}
 .ap-note{font-size:13.5px;color:var(--text-3)}
-.ap-auto{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:14px 0 0;font-size:13.5px;line-height:1.5;color:var(--text-2)}
-.ap-auto b{color:var(--text);font-weight:600}
-.ap-auto a{color:var(--acc);white-space:nowrap}
-.ap-auto-tag{font-size:10px;letter-spacing:.1em;color:var(--acc)}
 .ap-note a{text-decoration:underline;text-underline-offset:3px}
+/* Auto-approval, at the bottom of the panel: the switch, and what it means
+   for this week's waiting ads right now. */
+.ap-auto-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;margin-top:6px;padding-top:18px;border-top:1px solid var(--line)}
+.ap-auto-row .acc-switch{flex:0 1 auto;font-size:14.5px}
+.ap-auto-status{flex:1 1 300px;margin:0;font-size:13.5px;line-height:1.55;color:var(--text-3)}
+.ap-auto-status b{color:var(--text);font-weight:600}
+.ap-auto-status.is-bad{color:#f0a8a8}
 @media (max-width:860px){#kb-hint{display:none}.reason-keys{display:none}}
 /* The small text buttons under each ad get a thumb-sized hit area on touch
    screens without moving anything. */
@@ -182,8 +185,16 @@
           <button data-filter="rejected" data-label="Rejected">Rejected</button>
           <button data-filter="all" data-label="Everything">Everything</button>
         </div>
-        <p id="auto-line" class="ap-auto" hidden></p>
         <div id="kb-hint" class="mono">Y approve &middot; N reject &middot; 1&ndash;5 say why &middot; &larr;&rarr; navigate</div>
+        <!-- Auto-approval: the same switch as on the account page -->
+        <div id="auto-row" class="ap-auto-row" hidden>
+          <label class="acc-switch" for="ap-auto">
+            <input type="checkbox" id="ap-auto" role="switch" aria-describedby="ap-auto-status">
+            <span class="acc-switch-track" aria-hidden="true"></span>
+            <span>Approve what I don't get to within 48 hours</span>
+          </label>
+          <p id="ap-auto-status" class="ap-auto-status" aria-live="polite"></p>
+        </div>
       </div>
 
       <div id="board-notice" class="notice" role="status" hidden style="margin:0 0 20px"></div>
@@ -431,7 +442,7 @@
       button.textContent = button.dataset.label + " (" + n + ")";
     });
 
-    renderAutoLine(scoped);
+    renderAutoRow(scoped);
 
     var waiting = count("pending");
     var bulkActions = document.getElementById("bulk-actions");
@@ -459,49 +470,72 @@
     ) + AUTO_MS;
   }
 
-  // One line under the filters: when the waiting ads go on their own, or,
-  // with the switch off, that they could. Each part is its own node so the
-  // Serbian copy matches it whole.
-  function renderAutoLine(scoped) {
-    var line = document.getElementById("auto-line");
-    line.innerHTML = "";
-    line.hidden = true;
-    if (demoMode || !LBAuth.isLoggedIn() || !LBAuth.hasActivePlan()) return;
-    var profile = LBAuth.getProfile() || {};
-    var waiting = scoped.filter(function (c) { return c.status === "pending"; });
-    if (!waiting.length) return;
+  // The switch at the bottom of the panel - the same one as on the account
+  // page - and one sentence on what it means for the ads waiting right now.
+  // The public demo flips it on the page only, like everything else there.
+  var autoRow = document.getElementById("auto-row");
+  var autoBox = document.getElementById("ap-auto");
+  var autoStatus = document.getElementById("ap-auto-status");
+  var demoAuto = false;
+  var autoError = null;
 
-    if (profile.auto_approve) {
-      var due = waiting.filter(function (c) { return !c.decided_at; })
-        .map(function (c) { return autoDueAt(c, profile); });
-      if (!due.length) return;
-      var first = Math.min.apply(null, due);
-      var tag = document.createElement("span");
-      tag.className = "mono ap-auto-tag";
-      tag.textContent = "AUTO-APPROVE ON";
-      line.appendChild(tag);
-      var text = document.createElement("span");
-      if (first <= Date.now()) {
-        text.textContent = "What's still waiting is approved for you in the next few minutes.";
-        line.appendChild(text);
-      } else {
-        text.textContent = "Anything still waiting is approved for you from";
-        var when = document.createElement("b");
-        when.textContent = fmtPostTime(new Date(first).toISOString());
-        line.appendChild(text);
-        line.appendChild(when);
-      }
-    } else {
-      var hint = document.createElement("span");
-      hint.textContent = "Busy week? Adronis can approve what you don't get to within 48 hours.";
-      var link = document.createElement("a");
-      link.href = "account.html#auto-card";
-      link.textContent = "Turn it on →";
-      line.appendChild(hint);
-      line.appendChild(link);
-    }
-    line.hidden = false;
+  function autoIsOn() {
+    return LBDemo.on ? demoAuto : !!(LBAuth.getProfile() || {}).auto_approve;
   }
+
+  function renderAutoRow(scoped) {
+    autoRow.hidden = !(LBDemo.on || (LBAuth.isLoggedIn() && LBAuth.hasActivePlan()));
+    if (autoRow.hidden) return;
+    autoBox.checked = autoIsOn();
+    autoStatus.innerHTML = "";
+    autoStatus.classList.toggle("is-bad", !!autoError);
+    if (autoError) { autoStatus.textContent = autoError; return; }
+
+    if (!autoIsOn()) {
+      autoStatus.textContent = "Off — every ad waits for your yes. Switch it on and a busy week won't go by without ads.";
+      return;
+    }
+    // Each part is its own node, so the Serbian copy matches it whole.
+    var profile = LBAuth.getProfile() || {};
+    var due = demoMode ? [] : scoped.filter(function (c) { return c.status === "pending" && !c.decided_at; })
+      .map(function (c) { return autoDueAt(c, profile); });
+    if (!due.length) {
+      autoStatus.textContent = "On — ads you don't review within 48 hours of landing are approved for you.";
+      return;
+    }
+    var first = Math.min.apply(null, due);
+    if (first <= Date.now()) {
+      autoStatus.textContent = "What's still waiting is approved for you in the next few minutes.";
+      return;
+    }
+    var when = document.createElement("b");
+    when.textContent = fmtPostTime(new Date(first).toISOString());
+    autoStatus.appendChild(document.createTextNode("Anything still waiting is approved for you from"));
+    autoStatus.appendChild(document.createTextNode(" "));
+    autoStatus.appendChild(when);
+    autoStatus.appendChild(document.createTextNode("."));
+  }
+
+  // Saved the moment it moves; the database stamps when it went on, which is
+  // where the 48 hours count from, so the row comes back before re-rendering.
+  autoBox.addEventListener("change", async function () {
+    var on = autoBox.checked;
+    autoError = null;
+    if (LBDemo.on) {
+      demoAuto = on;
+      renderHeader();
+      return;
+    }
+    autoBox.disabled = true;
+    try {
+      await LBAuth.updateProfile({ auto_approve: on });
+    } catch (err) {
+      autoBox.checked = !on;
+      autoError = err.message;
+    }
+    autoBox.disabled = false;
+    renderHeader();
+  });
 
   var STATUS_LABEL = {
     pending: "WAITING",
@@ -637,7 +671,7 @@
       var auto = document.createElement("span");
       auto.className = "mono edited-mark";
       auto.textContent = "APPROVED FOR YOU";
-      auto.title = "It waited 48 hours, so it was approved for you. Busy weeks, on the account page.";
+      auto.title = "It waited 48 hours, so it was approved for you — the switch is above the ads.";
       tools.appendChild(auto);
     }
     if (creative.status !== "published") {

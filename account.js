@@ -968,7 +968,7 @@
     loading.hidden = true;
     $("account-content").hidden = false;
 
-    // A link to one card (approvals.html's "Turn it on", #billing) lands on
+    // A link to one card (#auto-card, #billing) lands on
     // it once the page is showing - the browser looked for it while hidden.
     var target = location.hash && document.getElementById(location.hash.slice(1));
     if (target && !target.hidden) target.scrollIntoView({ block: "start" });

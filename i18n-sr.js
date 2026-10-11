@@ -1753,15 +1753,15 @@ window.LB_I18N_SR = {
     "EDITED BY YOU": "TVOJA IZMENA",
     // Auto-approval on the approvals page.
     "APPROVED FOR YOU": "ODOBRENO UMESTO TEBE",
-    "It waited 48 hours, so it was approved for you. Busy weeks, on the account page.":
-      "Čekao je 48 sati, pa je odobren umesto tebe. Podešava se pod Kad ne stigneš, na stranici Nalog.",
-    "AUTO-APPROVE ON": "AUTOMATSKO ODOBRAVANJE",
+    "It waited 48 hours, so it was approved for you — the switch is above the ads.":
+      "Čekao je 48 sati, pa je odobren umesto tebe — prekidač je iznad oglasa.",
+    "Off — every ad waits for your yes. Switch it on and a busy week won't go by without ads.":
+      "Isključeno — svaki oglas čeka tvoje odobrenje. Uključi i nedelja neće proći bez oglasa ni kad ne stigneš.",
+    "On — ads you don't review within 48 hours of landing are approved for you.":
+      "Uključeno — oglasi koje ne pregledaš u roku od 48 sati od kad stignu odobravaju se sami.",
     "What's still waiting is approved for you in the next few minutes.":
       "Ono što još čeka biće odobreno u narednih nekoliko minuta.",
     "Anything still waiting is approved for you from": "Sve što još čeka odobrava se samo od",
-    "Busy week? Adronis can approve what you don't get to within 48 hours.":
-      "Gužva? Adronis može sam da odobri ono što ne stigneš da pregledaš za 48 sati.",
-    "Turn it on →": "Uključi →",
     // The ad as it will look in the app (post-preview.js).
     "See it as a post": "Pogledaj kao objavu",
     "See it as a story": "Pogledaj kao priču",
