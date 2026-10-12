@@ -12,7 +12,8 @@
 //
 // Secrets (Supabase > Edge Functions > Secrets):
 //   VAPID_PRIVATE_KEY  the private half of PUBLIC_KEY below - never in the site's code
-//   VAPID_SUBJECT      who to contact about the pushes, e.g. mailto:you@gmail.com
+//   VAPID_SUBJECT      optional; an https address to contact about the pushes
+//                      (the site's own address when it is missing or a mailto:)
 //   PUSH_CRON_SECRET   the same value as the Vault secret 'push_cron_secret'
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase itself.
 
@@ -42,10 +43,14 @@ let vapidError: string | null | undefined;
 function vapid() {
   if (vapidError !== undefined) return vapidError;
   try {
-    const subject = clean(Deno.env.get("VAPID_SUBJECT")).replace(/^mailto:\s*/i, "mailto:");
+    // web-push checks the subject with Node's url.parse, which under Deno finds
+    // no host in a mailto: address and refuses it - so only an https address
+    // is used, and the site's own one otherwise. Apple accepts either kind.
+    const given = clean(Deno.env.get("VAPID_SUBJECT"));
+    const subject = /^https:\/\//i.test(given) ? given : SITE;
     const privateKey = clean(Deno.env.get("VAPID_PRIVATE_KEY")).replace(/=+$/, "")
       .replace(/\+/g, "-").replace(/\//g, "_");
-    webpush.setVapidDetails(subject || "mailto:hello@adronis.app", PUBLIC_KEY, privateKey);
+    webpush.setVapidDetails(subject, PUBLIC_KEY, privateKey);
     vapidError = null;
   } catch (err) {
     vapidError = "VAPID setup failed: " + (err as Error).message;
