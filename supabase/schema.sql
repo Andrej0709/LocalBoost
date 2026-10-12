@@ -2257,9 +2257,7 @@ end $$;
    only answers a call carrying the secret saved in Vault as
    'push_cron_secret' - the same value as the function's PUSH_CRON_SECRET.
    Until pg_net is on and the secret saved, nothing is sent and nothing else
-   is affected. The address is this project's own. The public anon key
-   (the same one as in supabase-config.js) goes along so Supabase lets the
-   call through even while the function still checks for a signed-in user. */
+   is affected. The address is this project's own. */
 do $$
 begin
   create extension if not exists pg_net with schema extensions;
@@ -2268,8 +2266,6 @@ begin
       url     := 'https://jctvpizlzznabcjaxlgk.supabase.co/functions/v1/push',
       headers := jsonb_build_object(
                    'Content-Type', 'application/json',
-                   'apikey', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjdHZwaXpsenpuYWJjamF4bGdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MTgzOTQsImV4cCI6MjEwNDE5NDM5NH0.KSCLwVBtaLxZ7ke9l11i4ah-9JhB6HKcgqWrYzmWcwc',
-                   'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjdHZwaXpsenpuYWJjamF4bGdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MTgzOTQsImV4cCI6MjEwNDE5NDM5NH0.KSCLwVBtaLxZ7ke9l11i4ah-9JhB6HKcgqWrYzmWcwc',
                    'x-cron-secret', coalesce((select decrypted_secret from vault.decrypted_secrets
                                                where name = 'push_cron_secret'), '')),
       body    := '{}'::jsonb)
@@ -2285,8 +2281,6 @@ end $$;
      select net.http_post(
        url     := 'https://jctvpizlzznabcjaxlgk.supabase.co/functions/v1/push',
        headers := jsonb_build_object('Content-Type', 'application/json',
-                    'apikey', '<the anon key from supabase-config.js>',
-                    'Authorization', 'Bearer <the anon key from supabase-config.js>',
                     'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets
                                        where name = 'push_cron_secret')),
        body    := jsonb_build_object('test', 'you@example.com'));
