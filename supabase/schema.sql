@@ -2103,9 +2103,11 @@ alter table public.generation_costs enable row level security;
 /*     or Approvals (push.js); the browser hands over an address to */
 /*     send to, kept here. The push Edge Function                   */
 /*     (supabase/functions/push) runs every 15 minutes (section 13) */
-/*     and sends two things per week's drop: once when it lands in  */
-/*     Approvals, and one reminder a day later if ads are still     */
-/*     waiting. It asks push_due() what to send.                    */
+/*     and sends, per week's drop: once when it lands in Approvals, */
+/*     a reminder a day later and a last call the evening before   */
+/*     the next week's ads land if ads are still waiting. Also: the */
+/*     trial ending in three days, and ads that went out. It asks  */
+/*     push_due() what to send.                                     */
 /* ------------------------------------------------------------ */
 create table if not exists public.push_subscriptions (
   id           bigserial primary key,
@@ -2173,20 +2175,41 @@ $$;
 revoke execute on function public.save_push_subscription(text, text, text, text, text) from public, anon;
 grant execute on function public.save_push_subscription(text, text, text, text, text) to authenticated;
 
-/* When each drop's two notifications went out, so each goes once. Locked
-   to the browser: protect_drop_fields lets it change only the status. */
-alter table public.drops add column if not exists push_ready_at    timestamptz;
-alter table public.drops add column if not exists push_reminder_at timestamptz;
+/* When each notification went out, so each goes once. Locked to the browser:
+   protect_drop_fields lets it change only a drop's status, and the guards on
+   profiles and creatives copy over only the columns a customer may edit. */
+alter table public.drops     add column if not exists push_ready_at     timestamptz;
+alter table public.drops     add column if not exists push_reminder_at  timestamptz;
+alter table public.drops     add column if not exists push_last_call_at timestamptz;
+alter table public.profiles  add column if not exists push_trial_at     timestamptz;
+alter table public.creatives add column if not exists push_published_at timestamptz;
 
 /* What to send now, stamped as sent in the same step so two runs never send
-   the same thing twice. 'ready': a drop that landed in Approvals in the last
-   day. 'reminder': a drop that landed more than a day ago (and less than six)
-   with ads still waiting, at least 12 hours after its 'ready'. Only accounts
-   with a running plan - a beta tester's included - that have a device
-   to send to. waiting is how many ads are still waiting; auto_approve says
-   whether they'd be approved for the customer if left. */
+   the same thing twice. Only accounts that have a device to send to.
+
+     ready      a drop that landed in Approvals in the last day.
+     reminder   a drop that landed more than a day ago with ads still waiting,
+                at least 12 hours after its 'ready'.
+     last_call  the evening before next week's ads land (Sunday 18:00 Belgrade
+                time - drops render Monday at 09:00), ads still waiting: those
+                expire when the new ones arrive. Not with auto-approval on
+                (they'd be approved, not lost), nor when the plan ends before
+                Monday (no new drop comes, so nothing expires).
+     trial      three days or less left of the free trial, sent once, between
+                09:00 and 21:00 Belgrade time. days is how many are left;
+                canceled says the plan stops when the trial ends.
+     published  ads that went out in the last two hours, one notification
+                per account; channel is set when they all went to one.
+
+   The three about a drop only for accounts with a running plan - a beta
+   tester's included. waiting is how many ads are still waiting (or went
+   out); auto_approve says whether they'd be approved for the customer if
+   left. The three drop kinds never overlap for one drop, so the stamping
+   update meets each drop once. */
+drop function if exists public.push_due();
 create or replace function public.push_due()
-returns table (kind text, drop_id uuid, user_id uuid, waiting int, auto_approve boolean)
+returns table (kind text, drop_id uuid, user_id uuid, waiting int, auto_approve boolean,
+               channel text, days int, canceled boolean)
 language plpgsql
 security definer
 set search_path = public, pg_temp
@@ -2194,36 +2217,94 @@ as $$
 begin
   return query
   with candidates as (
-    select d.id, d.user_id, d.ready_at, d.push_ready_at, d.push_reminder_at, p.auto_approve,
+    select d.id, d.user_id, d.ready_at, d.push_ready_at, d.push_reminder_at, d.push_last_call_at,
+           p.auto_approve, p.cancel_at_period_end, p.current_period_end,
+           /* Monday 00:00 after the drop landed, Belgrade time: the next drop lands that morning. */
+           date_trunc('week', d.ready_at at time zone 'Europe/Belgrade') + interval '7 days' as next_monday,
            (select count(*)::int from public.creatives c
              where c.drop_id = d.id and c.status = 'pending') as n
       from public.drops d
       join public.profiles p on p.id = d.user_id
      where d.status = 'awaiting_approval'
        and d.ready_at is not null
-       and d.ready_at > now() - interval '6 days'
+       and d.ready_at > now() - interval '8 days'
        and p.subscription_status in ('trialing', 'active')
        and exists (select 1 from public.push_subscriptions s where s.user_id = d.user_id)
   ),
+  windowed as (
+    select c.*,
+           (c.next_monday - interval '6 hours') at time zone 'Europe/Belgrade' as last_call_from,
+           (c.next_monday + interval '9 hours') at time zone 'Europe/Belgrade' as last_call_until
+      from candidates c
+  ),
   due as (
-    select 'ready'::text as k, c.id, c.user_id, c.n, c.auto_approve from candidates c
-     where c.push_ready_at is null and c.ready_at > now() - interval '1 day' and c.n > 0
+    select 'ready'::text as k, w.id, w.user_id, w.n, w.auto_approve from windowed w
+     where w.push_ready_at is null and w.ready_at > now() - interval '1 day' and w.n > 0
     union all
-    select 'reminder'::text, c.id, c.user_id, c.n, c.auto_approve from candidates c
-     where c.push_reminder_at is null and c.ready_at <= now() - interval '1 day' and c.n > 0
-       and (c.push_ready_at is null or c.push_ready_at <= now() - interval '12 hours')
+    select 'reminder'::text, w.id, w.user_id, w.n, w.auto_approve from windowed w
+     where w.push_reminder_at is null and w.ready_at <= now() - interval '1 day' and w.n > 0
+       and w.ready_at > now() - interval '6 days'
+       and now() < w.last_call_from
+       and (w.push_ready_at is null or w.push_ready_at <= now() - interval '12 hours')
+    union all
+    select 'last_call'::text, w.id, w.user_id, w.n, w.auto_approve from windowed w
+     where w.push_last_call_at is null and w.ready_at <= now() - interval '1 day' and w.n > 0
+       and not w.auto_approve
+       and now() >= w.last_call_from and now() < w.last_call_until
+       and not (w.cancel_at_period_end and w.current_period_end <= w.last_call_until)
   ),
   stamped as (
     update public.drops d
-       set push_ready_at    = case when due.k = 'ready'    then now() else d.push_ready_at end,
-           push_reminder_at = case when due.k = 'reminder' then now() else d.push_reminder_at end
+       set push_ready_at     = case when due.k = 'ready'     then now() else d.push_ready_at end,
+           push_reminder_at  = case when due.k = 'reminder'  then now() else d.push_reminder_at end,
+           push_last_call_at = case when due.k = 'last_call' then now() else d.push_last_call_at end
       from due
      where d.id = due.id
     returning d.id
   )
-  select due.k, due.id, due.user_id, due.n, due.auto_approve
+  select due.k, due.id, due.user_id, due.n, due.auto_approve, null::text, null::int, null::boolean
     from due
    where due.id in (select id from stamped);
+
+  return query
+  with due as (
+    select p.id,
+           greatest(1, ceil(extract(epoch from p.trial_ends_at - now()) / 86400))::int as left_days,
+           p.cancel_at_period_end
+      from public.profiles p
+     where p.subscription_status = 'trialing'
+       and p.trial_ends_at is not null
+       and p.push_trial_at is null
+       and p.trial_ends_at > now() + interval '1 hour'
+       and p.trial_ends_at <= now() + interval '3 days'
+       and extract(hour from now() at time zone 'Europe/Belgrade') between 9 and 20
+       and exists (select 1 from public.push_subscriptions s where s.user_id = p.id)
+  ),
+  stamped as (
+    update public.profiles p set push_trial_at = now() from due where p.id = due.id returning p.id
+  )
+  select 'trial'::text, null::uuid, due.id, 0, false, null::text, due.left_days, due.cancel_at_period_end
+    from due
+   where due.id in (select id from stamped);
+
+  return query
+  with fresh as (
+    select c.id, c.user_id, c.channel
+      from public.creatives c
+     where c.status = 'published'
+       and c.push_published_at is null
+       and c.published_at > now() - interval '2 hours'
+       and exists (select 1 from public.push_subscriptions s where s.user_id = c.user_id)
+       for update of c skip locked
+  ),
+  stamped as (
+    update public.creatives c set push_published_at = now() from fresh where c.id = fresh.id
+    returning c.id, c.user_id, c.channel
+  )
+  select 'published'::text, null::uuid, s.user_id, count(*)::int, false,
+         case when count(distinct s.channel) = 1 then min(s.channel) end, null::int, null::boolean
+    from stamped s
+   group by s.user_id;
 end;
 $$;
 
@@ -2284,6 +2365,10 @@ end $$;
                     'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets
                                        where name = 'push_cron_secret')),
        body    := jsonb_build_object('test', 'you@example.com'));
+
+   To see one of every kind instead, a few seconds apart:
+       body    := jsonb_build_object('test', 'you@example.com', 'all', true),
+       timeout_milliseconds := 30000);
 
    A few seconds later, what the function answered:
      select status_code, content from net._http_response order by id desc limit 1; */

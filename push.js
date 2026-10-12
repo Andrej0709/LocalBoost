@@ -2,8 +2,9 @@
  * a plan on, in the control room and Approvals. Turning them on registers
  * sw.js, asks the browser's permission and hands the device's address to
  * save_push_subscription (schema.sql, section 12c); the push Edge Function
- * then sends one notification when the week's ads land and one reminder a
- * day later if some are still waiting.
+ * then sends one notification when the week's ads land, a reminder a day
+ * later and a last call the evening before they expire if some are still
+ * waiting, one when ads go out and one before the free trial ends.
  *
  * Asked once per device: "Not now" or a browser that refused keeps it away.
  * On an iPhone, notifications only work from the home-screen app, so there
@@ -83,7 +84,7 @@
     lead.textContent = "Get a ping on this device when your new ads arrive.";
     var how = document.createElement("span");
     how.className = "install-how";
-    how.textContent = "One when they land, one reminder a day later if some are still waiting. Nothing else.";
+    how.textContent = "When new ads land, a reminder if some are still waiting, the evening before they expire, when they go live and before your trial ends. Nothing else.";
     text.appendChild(tag);
     text.appendChild(lead);
     text.appendChild(how);

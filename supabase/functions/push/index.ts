@@ -2,8 +2,11 @@
 // of supabase/schema.sql); it asks push_due() what is due and sends it to every
 // device the customer turned notifications on for (push.js on the site):
 //
-//   ready     the week's ads just landed in Approvals
-//   reminder  a day later, some are still waiting
+//   ready      the week's ads just landed in Approvals
+//   reminder   a day later, some are still waiting
+//   last_call  the evening before next week's arrive, some are still waiting
+//   trial      three days or less left of the free trial
+//   published  ads that just went out
 //
 // A device that has gone away (the browser says 404 or 410) is forgotten.
 //
@@ -58,18 +61,29 @@ function vapid() {
   return vapidError;
 }
 
-type Due = { kind: "ready" | "reminder"; drop_id: string; user_id: string; waiting: number; auto_approve: boolean };
+type Due = {
+  kind: "ready" | "reminder" | "last_call" | "trial" | "published";
+  drop_id: string | null;
+  user_id: string;
+  waiting: number;
+  auto_approve: boolean;
+  channel: string | null;
+  days: number | null;
+  canceled: boolean | null;
+};
 
 // Serbian counts: 1 oglas, 2-4 oglasa, 5+ oglasa - "oglasa" from 2 up, but
-// "čeka" for 1 and 5+, "čekaju" for 2-4. New ones: 1 novi oglas, 2-4 nova
-// oglasa, 5+ novih oglasa.
+// the verb is singular for 1 and 5+ and plural for 2-4 ("čeka" / "čekaju").
+// New ones: 1 novi oglas, 2-4 nova oglasa, 5+ novih oglasa.
 function srAds(n: number) {
   const ten = n % 10, hundred = n % 100;
-  if (ten === 1 && hundred !== 11) return { ads: n + " oglas", fresh: n + " novi oglas", waits: "čeka", one: true };
-  if (ten >= 2 && ten <= 4 && (hundred < 12 || hundred > 14)) {
-    return { ads: n + " oglasa", fresh: n + " nova oglasa", waits: "čekaju", one: false };
+  if (ten === 1 && hundred !== 11) {
+    return { ads: n + " oglas", fresh: n + " novi oglas", waits: "čeka", expire: "ističe", live: "je objavljen", one: true };
   }
-  return { ads: n + " oglasa", fresh: n + " novih oglasa", waits: "čeka", one: false };
+  if (ten >= 2 && ten <= 4 && (hundred < 12 || hundred > 14)) {
+    return { ads: n + " oglasa", fresh: n + " nova oglasa", waits: "čekaju", expire: "ističu", live: "su objavljena", one: false };
+  }
+  return { ads: n + " oglasa", fresh: n + " novih oglasa", waits: "čeka", expire: "ističe", live: "je objavljeno", one: false };
 }
 
 // The business's own name leads the title ("Kafić Mia: 4 nova oglasa ✨"), so
@@ -81,39 +95,93 @@ function titled(business: string | undefined, rest: string) {
 }
 
 function message(d: Due, lang: string, business?: string) {
-  const url = SITE + "/approvals.html";
+  const approvals = SITE + "/approvals.html";
+  const n = d.waiting;
+  const days = d.days || 1;
   if (lang === "sr") {
-    const s = srAds(d.waiting);
-    if (d.kind === "ready") {
-      return {
-        title: titled(business, s.fresh + " ✨"),
-        body: (s.one ? "Spreman je" : "Spremni su") + " za pregled u Odobravanjima. Treba ti minut.",
-        url,
-      };
+    const s = srAds(n);
+    switch (d.kind) {
+      case "ready":
+        return {
+          title: titled(business, s.fresh + " ✨"),
+          body: (s.one ? "Spreman je" : "Spremni su") + " za pregled u Odobravanjima. Treba ti minut.",
+          url: approvals,
+        };
+      case "reminder":
+        return {
+          title: titled(business, s.one ? "oglas te još čeka" : "oglasi te još čekaju"),
+          body: s.ads + " te još " + s.waits + ". " + (d.auto_approve
+            ? "Ako ih ne pogledaš, odobrićemo ih za tebe sutra."
+            : "Oni koje ne pregledaš ističu kad stignu oglasi za sledeću nedelju."),
+          url: approvals,
+        };
+      case "last_call":
+        return {
+          title: titled(business, s.ads + " " + s.expire + " sutra ⏳"),
+          body: "Pogledaj " + (s.one ? "ga" : "ih") + " danas, ujutru stižu novi za sledeću nedelju.",
+          url: approvals,
+        };
+      case "trial":
+        return {
+          title: titled(business, days === 1 ? "probni period ističe sutra" : "probni period ističe za " + days + " dana"),
+          body: d.canceled
+            ? "Posle toga oglasi prestaju da stižu. Plan možeš ponovo da uključiš na stranici naloga."
+            : "Tog dana ide prva uplata i plan se nastavlja sam. Ne moraš ništa da radiš.",
+          url: SITE + "/account.html",
+        };
+      case "published":
+        return {
+          title: titled(business, (s.one ? "oglas" : s.ads) + " " + s.live + " ✅"),
+          body: (s.one ? "Upravo je izašao" : "Upravo su izašli") + " na " + (d.channel || "tvoje kanale") + ".",
+          url: SITE + "/history.html",
+        };
     }
-    return {
-      title: titled(business, s.one ? "oglas te još čeka" : "oglasi te još čekaju"),
-      body: s.ads + " te još " + s.waits + ". " + (d.auto_approve
-        ? "Ako ih ne pogledaš, odobrićemo ih za tebe sutra."
-        : "Oni koje ne pregledaš ističu kad stignu oglasi za sledeću nedelju."),
-      url,
-    };
   }
-  const ads = d.waiting === 1 ? "1 ad" : d.waiting + " ads";
-  if (d.kind === "ready") {
-    return {
-      title: titled(business, (d.waiting === 1 ? "1 new ad" : d.waiting + " new ads") + " ✨"),
-      body: "Ready for you in Approvals. A minute is all it takes.",
-      url,
-    };
+  const ads = n === 1 ? "1 ad" : n + " ads";
+  switch (d.kind) {
+    case "ready":
+      return {
+        title: titled(business, (n === 1 ? "1 new ad" : n + " new ads") + " ✨"),
+        body: "Ready for you in Approvals. A minute is all it takes.",
+        url: approvals,
+      };
+    case "reminder":
+      return {
+        title: titled(business, n === 1 ? "your ad is still waiting" : "your ads are still waiting"),
+        body: ads + " still waiting. " + (d.auto_approve
+          ? "If you don't get to them, we'll approve them for you tomorrow."
+          : "Unreviewed ads expire when next week's arrive."),
+        url: approvals,
+      };
+    case "last_call":
+      return {
+        title: titled(business, ads + (n === 1 ? " expires" : " expire") + " tomorrow ⏳"),
+        body: "Take a look today. Next week's ads arrive in the morning.",
+        url: approvals,
+      };
+    case "trial":
+      return {
+        title: titled(business, days === 1 ? "your trial ends tomorrow" : "your trial ends in " + days + " days"),
+        body: d.canceled
+          ? "After that your ads stop. You can switch your plan back on from your account."
+          : "Your first payment goes through that day and your plan carries on. Nothing to do.",
+        url: SITE + "/account.html",
+      };
+    case "published":
+      return {
+        title: titled(business, (n === 1 ? "your ad is live" : ads + " are live") + " ✅"),
+        body: (n === 1 ? "It just went out on " : "They just went out on ") + (d.channel || "your channels") + ".",
+        url: SITE + "/history.html",
+      };
   }
-  return {
-    title: titled(business, d.waiting === 1 ? "your ad is still waiting" : "your ads are still waiting"),
-    body: ads + " still waiting. " + (d.auto_approve
-      ? "If you don't get to them, we'll approve them for you tomorrow."
-      : "Unreviewed ads expire when next week's arrive."),
-    url,
-  };
+}
+
+// What the service worker gets. count sets the red number on the home-screen
+// icon, so only the kinds about ads still waiting carry it.
+function payload(d: Due, m: { title: string; body: string; url: string }) {
+  const waitingKind = d.kind === "ready" || d.kind === "reminder" || d.kind === "last_call";
+  const tag = d.drop_id ? "drop-" + d.drop_id : d.kind + "-" + d.user_id;
+  return JSON.stringify({ title: m.title, body: m.body, url: m.url, tag, count: waitingKind ? d.waiting : 0 });
 }
 
 Deno.serve(async (req) => {
@@ -125,8 +193,9 @@ Deno.serve(async (req) => {
   if (setupError) return Response.json({ sent: 0, error: setupError }, { status: 500 });
 
   // A test send: {"test": "someone@example.com"} sends one notification to
-  // every device that account turned notifications on for, and nothing else.
-  // Run from the SQL editor (see the end of section 13 in schema.sql).
+  // every device that account turned notifications on for, and nothing else;
+  // with "all": true, one of every kind, a few seconds apart. Run from the SQL
+  // editor (see the end of section 13 in schema.sql).
   const body = await req.json().catch(() => ({}));
   if (body && typeof body.test === "string" && body.test.includes("@")) {
     const who = await db.from("profiles").select("id, business_name").ilike("email", body.test.trim()).maybeSingle();
@@ -134,20 +203,31 @@ Deno.serve(async (req) => {
     const devices = await db.from("push_subscriptions").select("*").eq("user_id", who.data.id);
     if (devices.error) return new Response(devices.error.message, { status: 500 });
     if (!devices.data?.length) return Response.json({ sent: 0, error: "That account hasn't turned notifications on yet." });
+    const base = { drop_id: null, user_id: who.data.id, auto_approve: false, channel: null, days: null, canceled: null };
+    const samples: Due[] = body.all === true
+      ? [
+        { ...base, kind: "ready", drop_id: "test-ready", waiting: 4 },
+        { ...base, kind: "reminder", drop_id: "test-reminder", waiting: 3 },
+        { ...base, kind: "last_call", drop_id: "test-last-call", waiting: 2 },
+        { ...base, kind: "trial", waiting: 0, days: 3, canceled: false },
+        { ...base, kind: "published", waiting: 1, channel: "Instagram" },
+      ]
+      : [{ ...base, kind: "ready", drop_id: "test", waiting: 4 }];
     let sent = 0;
     const errors: string[] = [];
-    for (const s of devices.data) {
-      const m = message({ kind: "ready", drop_id: "test", user_id: who.data.id, waiting: 4, auto_approve: false },
-        s.lang, who.data.business_name);
-      try {
-        await webpush.sendNotification(
-          { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          JSON.stringify({ title: m.title, body: m.body, url: m.url, tag: "test", count: 4 }),
-          { TTL: 600 },
-        );
-        sent++;
-      } catch (err) {
-        errors.push(((err as { statusCode?: number }).statusCode || "") + " " + (err as Error).message);
+    for (const [i, d] of samples.entries()) {
+      if (i) await new Promise((r) => setTimeout(r, 1500));
+      for (const s of devices.data) {
+        try {
+          await webpush.sendNotification(
+            { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+            payload(d, message(d, s.lang, who.data.business_name)),
+            { TTL: 600 },
+          );
+          sent++;
+        } catch (err) {
+          errors.push(d.kind + ": " + ((err as { statusCode?: number }).statusCode || "") + " " + (err as Error).message);
+        }
       }
     }
     return Response.json({ sent, devices: devices.data.length, errors });
@@ -169,28 +249,27 @@ Deno.serve(async (req) => {
   for (const p of profiles.data || []) if (p.business_name) names.set(p.id, p.business_name);
 
   let sent = 0;
-  const gone: number[] = [];
-  const ok: number[] = [];
+  const gone = new Set<number>();
+  const ok = new Set<number>();
   for (const d of rows) {
-    for (const s of (subs.data || []).filter((x) => x.user_id === d.user_id)) {
-      const m = message(d, s.lang, names.get(d.user_id));
+    for (const s of (subs.data || []).filter((x) => x.user_id === d.user_id && !gone.has(x.id))) {
       try {
         await webpush.sendNotification(
           { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          JSON.stringify({ title: m.title, body: m.body, url: m.url, tag: "drop-" + d.drop_id, count: d.waiting }),
+          payload(d, message(d, s.lang, names.get(d.user_id))),
           { TTL: 12 * 3600, urgency: "normal" },
         );
         sent++;
-        ok.push(s.id);
+        ok.add(s.id);
       } catch (err) {
         const code = (err as { statusCode?: number }).statusCode;
-        if (code === 404 || code === 410) gone.push(s.id);
-        else console.error("push failed", code, (err as Error).message);
+        if (code === 404 || code === 410) gone.add(s.id);
+        else console.error("push failed", d.kind, code, (err as Error).message);
       }
     }
   }
 
-  if (gone.length) await db.from("push_subscriptions").delete().in("id", gone);
-  if (ok.length) await db.from("push_subscriptions").update({ last_sent_at: new Date().toISOString() }).in("id", ok);
-  return Response.json({ sent, forgotten: gone.length });
+  if (gone.size) await db.from("push_subscriptions").delete().in("id", [...gone]);
+  if (ok.size) await db.from("push_subscriptions").update({ last_sent_at: new Date().toISOString() }).in("id", [...ok]);
+  return Response.json({ sent, forgotten: gone.size });
 });

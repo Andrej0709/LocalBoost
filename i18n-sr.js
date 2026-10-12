@@ -2292,8 +2292,8 @@ window.LB_I18N_SR = {
     /* --- Push notifications (push.js) ------------------------------------ */
     "NEW": "NOVO",
     "Get a ping on this device when your new ads arrive.": "Dobij obaveštenje na ovom uređaju kad stignu novi oglasi.",
-    "One when they land, one reminder a day later if some are still waiting. Nothing else.":
-      "Jedno kad stignu, i jedan podsetnik dan kasnije ako neki još čekaju. Ništa više.",
+    "When new ads land, a reminder if some are still waiting, the evening before they expire, when they go live and before your trial ends. Nothing else.":
+      "Kad stignu novi oglasi, podsetnik ako neki još čekaju, veče pre nego što isteknu, kad budu objavljeni i pred kraj probnog perioda. Ništa više.",
     "Turn on": "Uključi",
     "Not now": "Ne sada",
     "Done — you'll get a ping when your next ads arrive.": "Gotovo — javićemo ti kad stignu sledeći oglasi.",
