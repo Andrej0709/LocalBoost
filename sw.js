@@ -12,13 +12,20 @@ self.addEventListener("push", function (event) {
   var data = {};
   try { data = event.data ? event.data.json() : {}; } catch (e) {}
   var title = data.title || "Adronis";
-  event.waitUntil(self.registration.showNotification(title, {
+  var shown = self.registration.showNotification(title, {
     body: data.body || "",
     icon: "/icon-256.png",
     badge: "/icon-256.png",
     tag: data.tag || "adronis",
     data: { url: data.url || "/approvals.html" }
-  }));
+  });
+  // The red number on the home-screen icon: how many ads are waiting.
+  // Approvals clears it as they're reviewed.
+  var count = Number(data.count) || 0;
+  var badged = count > 0 && self.navigator.setAppBadge
+    ? self.navigator.setAppBadge(count).catch(function () {})
+    : Promise.resolve();
+  event.waitUntil(Promise.all([shown, badged]));
 });
 
 self.addEventListener("notificationclick", function (event) {

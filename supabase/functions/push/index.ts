@@ -61,23 +61,38 @@ function vapid() {
 type Due = { kind: "ready" | "reminder"; drop_id: string; user_id: string; waiting: number; auto_approve: boolean };
 
 // Serbian counts: 1 oglas, 2-4 oglasa, 5+ oglasa - "oglasa" from 2 up, but
-// "čeka" for 1 and 5+, "čekaju" for 2-4.
+// "čeka" for 1 and 5+, "čekaju" for 2-4. New ones: 1 novi oglas, 2-4 nova
+// oglasa, 5+ novih oglasa.
 function srAds(n: number) {
   const ten = n % 10, hundred = n % 100;
-  if (ten === 1 && hundred !== 11) return { ads: n + " oglas", waits: "čeka" };
-  if (ten >= 2 && ten <= 4 && (hundred < 12 || hundred > 14)) return { ads: n + " oglasa", waits: "čekaju" };
-  return { ads: n + " oglasa", waits: "čeka" };
+  if (ten === 1 && hundred !== 11) return { ads: n + " oglas", fresh: n + " novi oglas", waits: "čeka", one: true };
+  if (ten >= 2 && ten <= 4 && (hundred < 12 || hundred > 14)) {
+    return { ads: n + " oglasa", fresh: n + " nova oglasa", waits: "čekaju", one: false };
+  }
+  return { ads: n + " oglasa", fresh: n + " novih oglasa", waits: "čeka", one: false };
 }
 
-function message(d: Due, lang: string) {
+// The business's own name leads the title ("Kafić Mia: 4 nova oglasa ✨"), so
+// the notification reads as theirs. Without one, the rest stands alone.
+function titled(business: string | undefined, rest: string) {
+  const name = (business || "").replace(/\s+/g, " ").trim();
+  if (!name) return rest.charAt(0).toUpperCase() + rest.slice(1);
+  return (name.length > 40 ? name.slice(0, 39).trimEnd() + "…" : name) + ": " + rest;
+}
+
+function message(d: Due, lang: string, business?: string) {
   const url = SITE + "/approvals.html";
   if (lang === "sr") {
     const s = srAds(d.waiting);
     if (d.kind === "ready") {
-      return { title: "Stigli su novi oglasi", body: s.ads + " te " + s.waits + " u Odobravanjima. Pregledaš ih za minut.", url };
+      return {
+        title: titled(business, s.fresh + " ✨"),
+        body: (s.one ? "Spreman je" : "Spremni su") + " za pregled u Odobravanjima. Treba ti minut.",
+        url,
+      };
     }
     return {
-      title: "Oglasi te još čekaju",
+      title: titled(business, s.one ? "oglas te još čeka" : "oglasi te još čekaju"),
       body: s.ads + " te još " + s.waits + ". " + (d.auto_approve
         ? "Ako ih ne pogledaš, odobrićemo ih za tebe sutra."
         : "Oni koje ne pregledaš ističu kad stignu oglasi za sledeću nedelju."),
@@ -86,10 +101,14 @@ function message(d: Due, lang: string) {
   }
   const ads = d.waiting === 1 ? "1 ad" : d.waiting + " ads";
   if (d.kind === "ready") {
-    return { title: "Your new ads are here", body: ads + " waiting for you in Approvals. A minute is all it takes.", url };
+    return {
+      title: titled(business, (d.waiting === 1 ? "1 new ad" : d.waiting + " new ads") + " ✨"),
+      body: "Ready for you in Approvals. A minute is all it takes.",
+      url,
+    };
   }
   return {
-    title: "Your ads are still waiting",
+    title: titled(business, d.waiting === 1 ? "your ad is still waiting" : "your ads are still waiting"),
     body: ads + " still waiting. " + (d.auto_approve
       ? "If you don't get to them, we'll approve them for you tomorrow."
       : "Unreviewed ads expire when next week's arrive."),
@@ -110,7 +129,7 @@ Deno.serve(async (req) => {
   // Run from the SQL editor (see the end of section 13 in schema.sql).
   const body = await req.json().catch(() => ({}));
   if (body && typeof body.test === "string" && body.test.includes("@")) {
-    const who = await db.from("profiles").select("id").ilike("email", body.test.trim()).maybeSingle();
+    const who = await db.from("profiles").select("id, business_name").ilike("email", body.test.trim()).maybeSingle();
     if (who.error || !who.data) return Response.json({ sent: 0, error: "No account with that email." });
     const devices = await db.from("push_subscriptions").select("*").eq("user_id", who.data.id);
     if (devices.error) return new Response(devices.error.message, { status: 500 });
@@ -118,11 +137,12 @@ Deno.serve(async (req) => {
     let sent = 0;
     const errors: string[] = [];
     for (const s of devices.data) {
-      const m = message({ kind: "ready", drop_id: "test", user_id: who.data.id, waiting: 4, auto_approve: false }, s.lang);
+      const m = message({ kind: "ready", drop_id: "test", user_id: who.data.id, waiting: 4, auto_approve: false },
+        s.lang, who.data.business_name);
       try {
         await webpush.sendNotification(
           { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          JSON.stringify({ title: m.title, body: m.body, url: m.url, tag: "test" }),
+          JSON.stringify({ title: m.title, body: m.body, url: m.url, tag: "test", count: 4 }),
           { TTL: 600 },
         );
         sent++;
@@ -142,16 +162,22 @@ Deno.serve(async (req) => {
   const subs = await db.from("push_subscriptions").select("*").in("user_id", users);
   if (subs.error) return new Response(subs.error.message, { status: 500 });
 
+  // Each account's business name, for the titles. Without it a title just
+  // goes without the name, so a failed look-up sends nothing less.
+  const names = new Map<string, string>();
+  const profiles = await db.from("profiles").select("id, business_name").in("id", users);
+  for (const p of profiles.data || []) if (p.business_name) names.set(p.id, p.business_name);
+
   let sent = 0;
   const gone: number[] = [];
   const ok: number[] = [];
   for (const d of rows) {
     for (const s of (subs.data || []).filter((x) => x.user_id === d.user_id)) {
-      const m = message(d, s.lang);
+      const m = message(d, s.lang, names.get(d.user_id));
       try {
         await webpush.sendNotification(
           { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          JSON.stringify({ title: m.title, body: m.body, url: m.url, tag: "drop-" + d.drop_id }),
+          JSON.stringify({ title: m.title, body: m.body, url: m.url, tag: "drop-" + d.drop_id, count: d.waiting }),
           { TTL: 12 * 3600, urgency: "normal" },
         );
         sent++;

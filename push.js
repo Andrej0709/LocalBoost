@@ -98,6 +98,7 @@
         var done = await turnOn();
         remember();
         if (!done) { box.remove(); return; }
+        document.addEventListener("lb:langchange", refresh);
         text.innerHTML = "";
         var ok = document.createElement("span");
         ok.textContent = "Done — you'll get a ping when your next ads arrive.";
@@ -154,7 +155,13 @@
       admin = !res.error && res.data === true;
       if (!admin) return;
     }
-    if (Notification.permission === "granted") { refresh(); return; }
+    if (Notification.permission === "granted") {
+      refresh();
+      // Notifications come in the language the site is shown in, so a switch
+      // of language is handed over at once, not on the next visit.
+      document.addEventListener("lb:langchange", refresh);
+      return;
+    }
     if (Notification.permission === "denied" || (asked() && !admin)) return;
     show();
   });

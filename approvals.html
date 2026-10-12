@@ -474,6 +474,7 @@
 
     renderAutoRow(scoped);
     renderExpiredNotice();
+    updateBadge();
 
     var waiting = count("pending");
     var bulkActions = document.getElementById("bulk-actions");
@@ -484,6 +485,16 @@
     } else {
       bulkActions.hidden = true;
     }
+  }
+
+  // The red number on the home-screen icon: a push notification sets it to
+  // the ads waiting (sw.js), and here it follows every decision, going away
+  // once nothing is left. Not for the demo or an admin viewing someone else.
+  function updateBadge() {
+    if (demoMode || !("setAppBadge" in navigator)) return;
+    if (LBAuth.viewingAs && LBAuth.viewingAs()) return;
+    var waiting = creatives.filter(function (c) { return c.status === "pending"; }).length;
+    (waiting ? navigator.setAppBadge(waiting) : navigator.clearAppBadge()).catch(function () {});
   }
 
   // --- Auto-approval (the account page's switch, auto_approve_due in schema.sql) ---
