@@ -650,6 +650,14 @@
     logOut: async function () {
       remember(RECOVERY_KEY, false);
       stopViewing();
+      // This device stops getting the account's notifications (push.js): on
+      // a shared phone or computer, whoever uses it next must not see them.
+      // Logging in again with notifications allowed signs it back up.
+      try {
+        var reg = "serviceWorker" in navigator && await navigator.serviceWorker.getRegistration("/");
+        var sub = reg && reg.pushManager && await reg.pushManager.getSubscription();
+        if (sub && session) await db.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+      } catch (e) {}
       await db.auth.signOut();
       session = null;
       profile = null;
@@ -686,6 +694,8 @@
     // Emails a link that signs the customer in and brings them back to the
     // login page to choose a new password (see startRecovery above).
     resetPassword: async function (email) {
+      // While viewing, the account page would send the tester a reset email.
+      writable();
       var res = await db.auth.resetPasswordForEmail(email, {
         redirectTo: siteOrigin() + "login.html"
       });
@@ -716,10 +726,15 @@
       return had;
     },
 
-    // Changes the login email. Supabase sends a confirmation link before the
-    // change takes effect — session.user.email stays the old address until then.
+    // Changes the login email. With email confirmation on, Supabase sends a
+    // confirmation link first and session.user.email stays the old address
+    // until then; with it off, the change is made at once. The returned
+    // user's email says which happened.
+    // While viewing a tester (and in updatePassword below) the session is the
+    // admin's own, so the change would land on the admin's login: refused.
     updateEmail: async function (newEmail) {
       if (!session) throw new Error("Not signed in.");
+      writable();
       var res = await db.auth.updateUser({ email: newEmail });
       if (res.error) throw friendlyError(res.error);
       return res.data.user;
@@ -743,6 +758,7 @@
     // one needs confirming; Supabase's updateUser itself doesn't ask for it.
     updatePassword: async function (newPassword) {
       if (!session) throw new Error("Not signed in.");
+      writable();
       checkPassword(newPassword);
       var res = await db.auth.updateUser({ password: newPassword });
       if (res.error) throw friendlyError(res.error);

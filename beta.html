@@ -98,6 +98,8 @@
           <p class="bt-lead">Every place in this round is taken, so we aren't taking applications. More places open before the launch in early 2027.</p>
           <p class="bt-edit">Want us to keep you in mind? <a href="message-us.html">Message us</a> — we'll write when a place opens.</p>
           <p class="bt-edit">Curious what's coming? <a href="approvals.html?demo=1">Try the demo</a> with a made-up café.</p>
+          <!-- Only for a signed-in account: this page is the only one it can reach. -->
+          <div class="bt-alt" id="bt-full-out" hidden><button type="button" class="link-btn bt-logout" style="margin:0">Log out</button></div>
         </div>
 
         <form id="beta-form" hidden>
@@ -265,6 +267,7 @@
     intro.hidden = true;
     form.hidden = true;
     document.getElementById("bt-full").hidden = false;
+    document.getElementById("bt-full-out").hidden = !LBAuth.isLoggedIn();
   }
 
   LBAuth.ready.then(async function(){

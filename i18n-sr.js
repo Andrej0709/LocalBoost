@@ -1334,6 +1334,8 @@ window.LB_I18N_SR = {
     "Keep my subscription": "Zadrži moju pretplatu",
     "Check both your old and new inbox — confirm the change to finish.":
       "Proveri i staro i novo sanduče — potvrdi promenu da završiš.",
+    "Email changed — log in with the new address from now on.":
+      "Email je promenjen — od sada se prijavljuj novom adresom.",
     "Those two new passwords don't match.": "Te dve nove lozinke se ne poklapaju.",
     // Beta testers' feedback button (feedback.js).
     "Feedback": "Utisak",
@@ -2345,7 +2347,8 @@ window.LB_I18N_SR = {
     "BETA FULL": "BETA JE POPUNJENA",
     "More places open before the launch in early 2027.": "Nova mesta otvaramo pre lansiranja početkom 2027.",
     "Message us and we'll write to you when a place opens.": "Piši nam i javićemo ti kad se otvori mesto.",
-    "The beta is full right now - every place is taken.": "Beta je trenutno popunjena — sva mesta su zauzeta."
+    "The beta is full right now - every place is taken.": "Beta je trenutno popunjena — sva mesta su zauzeta.",
+    "Tell us about your business first.": "Prvo nam opiši svoj biznis."
 
 
   },

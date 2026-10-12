@@ -77,8 +77,14 @@
       var newEmail = $("acc-new-email").value;
       button.disabled = true;
       try {
-        await LBAuth.updateEmail(newEmail);
-        say(emailNotice, "Check both your old and new inbox — confirm the change to finish.");
+        var changed = await LBAuth.updateEmail(newEmail);
+        // Email confirmation off: the new address is already the login.
+        if (changed && String(changed.email).toLowerCase() === newEmail.trim().toLowerCase()) {
+          $("acc-email-display").textContent = changed.email;
+          say(emailNotice, "Email changed — log in with the new address from now on.");
+        } else {
+          say(emailNotice, "Check both your old and new inbox — confirm the change to finish.");
+        }
         e.target.reset();
       } catch (err) {
         say(emailNotice, err.message, true);
