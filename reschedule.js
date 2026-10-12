@@ -22,6 +22,8 @@
     if (isNaN(date.getTime())) return "Pick a day and a time.";
     if (date.getTime() < Date.now() + LEAD_MS) return "Pick a time at least 10 minutes from now.";
     if (date.getTime() > Date.now() + MAX_AHEAD_MS) return "Pick a time within the next 90 days.";
+    // The days the customer marked closed (closed-days.js, where it's loaded).
+    if (window.LBClosed && LBClosed.closedOn(date)) return "You marked that day as closed. Pick a day you're open.";
     return null;
   }
 

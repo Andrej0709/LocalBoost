@@ -223,6 +223,50 @@ exception when duplicate_object then null; end $$;
 alter table public.profiles add column if not exists auto_approve    boolean not null default false;
 alter table public.profiles add column if not exists auto_approve_at timestamptz;
 
+/* --- Migration for the days a business is closed ---------------------------- */
+/* closed_days: the stretches the customer told us they're shut - a holiday,    */
+/* a week off, a renovation - as a list of {"from": "2026-12-30",               */
+/* "to": "2027-01-02", "note": "New Year"}, dates in the business's own time.   */
+/* Their usual weekly day off belongs in opening_hours, not here. The engine    */
+/* reads it when it renders: no ad is slotted for a closed day, no ad tells     */
+/* people to come by while the door is shut, and a week that is closed from     */
+/* Monday to Sunday gets no drop at all - nobody pays to make ads nobody can    */
+/* use. The control room writes it (closed-days.js); protect_profile_billing    */
+/* checks each entry, and the browser drops entries long past.                  */
+alter table public.profiles add column if not exists closed_days jsonb not null default '[]'::jsonb;
+
+do $$ begin
+  alter table public.profiles add constraint profiles_closed_days_shape check (
+    jsonb_typeof(closed_days) = 'array'
+    and jsonb_array_length(closed_days) <= 30
+    and octet_length(closed_days::text) <= 8000
+  );
+exception when duplicate_object then null; end $$;
+
+/* --- Migration for the quick "never in my ads" picks ------------------------ */
+/* avoid_tags: the common things a customer can rule out with one tap in the    */
+/* control room, next to avoid_notes (their own words, which still wins when    */
+/* the two disagree). The engine reads both. The keys are fixed so the engine   */
+/* and both languages agree on what each one means:                             */
+/*   no_emoji      no emojis                                                    */
+/*   no_prices     never show or mention prices                                 */
+/*   no_discounts  no sales talk - no "% off", no "cheapest"                    */
+/*   no_faces      no people's faces in the images                              */
+/*   no_alcohol    no alcohol in the images or the text                         */
+/*   no_jokes      no jokes or puns - keep it straight                          */
+/*   no_slang      no slang or street talk                                      */
+/*   no_english    no English words in Serbian ads                              */
+/*   no_competitors never name or hint at another business                     */
+/*   no_urgency    no pressure lines - "last chance", "hurry"                   */
+alter table public.profiles add column if not exists avoid_tags text[] not null default '{}';
+
+do $$ begin
+  alter table public.profiles add constraint profiles_avoid_tags_known check (
+    avoid_tags <@ array['no_emoji', 'no_prices', 'no_discounts', 'no_faces', 'no_alcohol',
+                        'no_jokes', 'no_slang', 'no_english', 'no_competitors', 'no_urgency']::text[]
+  );
+exception when duplicate_object then null; end $$;
+
 /* Existing paying accounts predate current_period_end - seed it from the trial
    date they already have so finalize_billing_period() has an anchor to work from. */
 update public.profiles
@@ -627,6 +671,43 @@ grant execute on function public.delete_my_account() to authenticated;
 /* ------------------------------------------------------------ */
 alter table public.profiles add column if not exists beta_applied_at timestamptz;
 
+/* beta_seats - how many beta places there are, how many are taken and how
+   many are left: {"seats": 12, "taken": 9, "left": 3}. The number of places
+   is set in the Adronis Portal (app_settings 'beta_seats', {"seats": 12});
+   taken is every account with the Beta plan on. null while no number is set
+   - then nothing is limited. signup.html and beta.html read it to say the
+   beta is full instead of taking an application, and apply_for_beta refuses
+   one while it is. Anyone may ask: it says no more than the page does. */
+create or replace function public.beta_seats()
+returns json
+language plpgsql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  seats int;
+  taken int;
+begin
+  /* app_settings comes with the portal's portal-admin.sql. */
+  if to_regclass('public.app_settings') is null then
+    return null;
+  end if;
+  select case when jsonb_typeof(value->'seats') = 'number' then (value->>'seats')::int end
+    into seats
+    from public.app_settings where key = 'beta_seats';
+  if seats is null then
+    return null;
+  end if;
+  select count(*) into taken
+    from public.profiles
+   where plan::text = 'beta' and subscription_status = 'active';
+  return json_build_object('seats', seats, 'taken', taken, 'left', greatest(seats - taken, 0));
+end;
+$$;
+
+grant execute on function public.beta_seats() to anon, authenticated;
+
 create or replace function public.apply_for_beta(p_note text default null)
 returns timestamptz
 language plpgsql
@@ -646,6 +727,9 @@ begin
   end if;
   if p.beta_applied_at is not null then
     return p.beta_applied_at;
+  end if;
+  if coalesce((public.beta_seats() ->> 'left')::int, 1) <= 0 then
+    raise exception 'The beta is full right now - every place is taken.';
   end if;
 
   insert into public.contact_requests (business_name, email, plan_interest, message)
@@ -1135,6 +1219,8 @@ begin
   editable.brand_vibe       := new.brand_vibe;
   editable.brand_colors     := new.brand_colors;
   editable.avoid_notes      := new.avoid_notes;
+  editable.avoid_tags       := new.avoid_tags;
+  editable.closed_days      := new.closed_days;
   editable.channels         := new.channels;
   editable.next_week_note   := new.next_week_note;
   editable.tours_seen       := new.tours_seen;
@@ -1176,6 +1262,31 @@ begin
 
   if new.next_week_note is distinct from old.next_week_note then
     new.next_week_note_at := now();
+  end if;
+
+  /* Every closed stretch is two real dates in order, at most three months
+     long, with a short note at most. */
+  if new.closed_days is distinct from old.closed_days then
+    if exists (
+      select 1 from jsonb_array_elements(new.closed_days) e
+       where jsonb_typeof(e) <> 'object'
+          or coalesce(e->>'from', '') !~ '^\d{4}-\d{2}-\d{2}$'
+          or coalesce(e->>'to', '') !~ '^\d{4}-\d{2}-\d{2}$'
+          or char_length(coalesce(e->>'note', '')) > 120
+    ) then
+      raise exception 'Each closed stretch needs a first and a last day.';
+    end if;
+    begin
+      if exists (
+        select 1 from jsonb_array_elements(new.closed_days) e
+         where (e->>'to')::date < (e->>'from')::date
+            or (e->>'to')::date - (e->>'from')::date > 92
+      ) then
+        raise exception 'The last closed day has to be on or after the first, at most three months later.';
+      end if;
+    exception when invalid_datetime_format or datetime_field_overflow then
+      raise exception 'Each closed stretch needs a first and a last day.';
+    end;
   end if;
 
   /* The 48 hours of auto-approval count from when the switch went on. */
@@ -1987,6 +2098,138 @@ create index if not exists generation_costs_user_idx on public.generation_costs 
 alter table public.generation_costs enable row level security;
 
 /* ------------------------------------------------------------ */
+/* 12c. Push notifications - "your new ads are here" on the phone,  */
+/*     without email. A customer turns them on in the control room  */
+/*     or Approvals (push.js); the browser hands over an address to */
+/*     send to, kept here. The push Edge Function                   */
+/*     (supabase/functions/push) runs every 15 minutes (section 13) */
+/*     and sends two things per week's drop: once when it lands in  */
+/*     Approvals, and one reminder a day later if ads are still     */
+/*     waiting. It asks push_due() what to send.                    */
+/* ------------------------------------------------------------ */
+create table if not exists public.push_subscriptions (
+  id           bigserial primary key,
+  user_id      uuid not null references public.profiles (id) on delete cascade,
+  endpoint     text not null unique,
+  p256dh       text not null,
+  auth         text not null,
+  lang         text not null default 'en',
+  user_agent   text,
+  created_at   timestamptz not null default now(),
+  last_sent_at timestamptz
+);
+
+create index if not exists push_subscriptions_user_idx on public.push_subscriptions (user_id);
+
+/* Read and removed by their owner; written only by save_push_subscription
+   below, and sent to only by the Edge Function (service role). */
+alter table public.push_subscriptions enable row level security;
+
+drop policy if exists "push select own" on public.push_subscriptions;
+create policy "push select own" on public.push_subscriptions
+  for select to authenticated using (auth.uid() = user_id);
+
+drop policy if exists "push delete own" on public.push_subscriptions;
+create policy "push delete own" on public.push_subscriptions
+  for delete to authenticated using (auth.uid() = user_id);
+
+/* A device's address belongs to whoever turned notifications on last on it -
+   two people sharing a phone each get only their own ads. At most 10 devices
+   an account; the oldest goes first. */
+create or replace function public.save_push_subscription(
+  p_endpoint text,
+  p_p256dh   text,
+  p_auth     text,
+  p_lang     text default 'en',
+  p_ua       text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if auth.uid() is null or not exists (select 1 from public.profiles where id = auth.uid()) then
+    raise exception 'Not signed in.';
+  end if;
+  if coalesce(p_endpoint, '') !~ '^https://' or char_length(p_endpoint) > 1000
+     or char_length(coalesce(p_p256dh, '')) not between 40 and 200
+     or char_length(coalesce(p_auth, '')) not between 8 and 100 then
+    raise exception 'This browser sent a notification address we can''t use.';
+  end if;
+
+  delete from public.push_subscriptions where endpoint = p_endpoint;
+  insert into public.push_subscriptions (user_id, endpoint, p256dh, auth, lang, user_agent)
+  values (auth.uid(), p_endpoint, p_p256dh, p_auth,
+          case when p_lang = 'sr' then 'sr' else 'en' end, left(p_ua, 300));
+
+  delete from public.push_subscriptions
+   where user_id = auth.uid()
+     and id not in (select id from public.push_subscriptions
+                     where user_id = auth.uid() order by created_at desc limit 10);
+end;
+$$;
+
+revoke execute on function public.save_push_subscription(text, text, text, text, text) from public, anon;
+grant execute on function public.save_push_subscription(text, text, text, text, text) to authenticated;
+
+/* When each drop's two notifications went out, so each goes once. Locked
+   to the browser: protect_drop_fields lets it change only the status. */
+alter table public.drops add column if not exists push_ready_at    timestamptz;
+alter table public.drops add column if not exists push_reminder_at timestamptz;
+
+/* What to send now, stamped as sent in the same step so two runs never send
+   the same thing twice. 'ready': a drop that landed in Approvals in the last
+   day. 'reminder': a drop that landed more than a day ago (and less than six)
+   with ads still waiting, at least 12 hours after its 'ready'. Only accounts
+   with a running plan - a beta tester's included - that have a device
+   to send to. waiting is how many ads are still waiting; auto_approve says
+   whether they'd be approved for the customer if left. */
+create or replace function public.push_due()
+returns table (kind text, drop_id uuid, user_id uuid, waiting int, auto_approve boolean)
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  return query
+  with candidates as (
+    select d.id, d.user_id, d.ready_at, d.push_ready_at, d.push_reminder_at, p.auto_approve,
+           (select count(*)::int from public.creatives c
+             where c.drop_id = d.id and c.status = 'pending') as n
+      from public.drops d
+      join public.profiles p on p.id = d.user_id
+     where d.status = 'awaiting_approval'
+       and d.ready_at is not null
+       and d.ready_at > now() - interval '6 days'
+       and p.subscription_status in ('trialing', 'active')
+       and exists (select 1 from public.push_subscriptions s where s.user_id = d.user_id)
+  ),
+  due as (
+    select 'ready'::text as k, c.id, c.user_id, c.n, c.auto_approve from candidates c
+     where c.push_ready_at is null and c.ready_at > now() - interval '1 day' and c.n > 0
+    union all
+    select 'reminder'::text, c.id, c.user_id, c.n, c.auto_approve from candidates c
+     where c.push_reminder_at is null and c.ready_at <= now() - interval '1 day' and c.n > 0
+       and (c.push_ready_at is null or c.push_ready_at <= now() - interval '12 hours')
+  ),
+  stamped as (
+    update public.drops d
+       set push_ready_at    = case when due.k = 'ready'    then now() else d.push_ready_at end,
+           push_reminder_at = case when due.k = 'reminder' then now() else d.push_reminder_at end
+      from due
+     where d.id = due.id
+    returning d.id
+  )
+  select due.k, due.id, due.user_id, due.n, due.auto_approve
+    from due
+   where due.id in (select id from stamped);
+end;
+$$;
+
+revoke execute on function public.push_due() from public, anon, authenticated;
+
+/* ------------------------------------------------------------ */
 /* 13. Scheduled jobs (pg_cron): auto-approval and expiry every 15   */
 /*     minutes (expiry 7 minutes after, so an ad due both ways is    */
 /*     approved), and error reports older than 30 days cleared every */
@@ -2007,4 +2250,26 @@ begin
     'delete from public.client_errors where created_at < now() - interval ''30 days''');
 exception when others then
   raise notice 'pg_cron is not available yet (%). Turn it on in Database -> Extensions and re-run this file.', sqlerrm;
+end $$;
+
+/* The push notifications (section 12c): every 15 minutes pg_net calls the push
+   Edge Function, which sends whatever push_due() says is due. The function
+   only answers a call carrying the secret saved in Vault as
+   'push_cron_secret' - the same value as the function's PUSH_CRON_SECRET.
+   Until pg_net is on and the secret saved, nothing is sent and nothing else
+   is affected. The address is this project's own. */
+do $$
+begin
+  create extension if not exists pg_net with schema extensions;
+  perform cron.schedule('adronis-push', '11-59/15 * * * *', $job$
+    select net.http_post(
+      url     := 'https://jctvpizlzznabcjaxlgk.supabase.co/functions/v1/push',
+      headers := jsonb_build_object(
+                   'Content-Type', 'application/json',
+                   'x-cron-secret', coalesce((select decrypted_secret from vault.decrypted_secrets
+                                               where name = 'push_cron_secret'), '')),
+      body    := '{}'::jsonb)
+  $job$);
+exception when others then
+  raise notice 'Push notifications are not scheduled yet (%). Turn on pg_net and pg_cron in Database -> Extensions and re-run this file.', sqlerrm;
 end $$;

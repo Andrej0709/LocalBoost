@@ -82,6 +82,9 @@
 .reason-note input{padding:8px 10px;font-size:13px}
 .reason-note button{padding:6px 13px;border-radius:9999px;border:1px solid var(--line-2);background:none;color:var(--text-2);font-size:12.5px;font-family:var(--font);cursor:pointer;white-space:nowrap}
 .reason-note button:hover{color:var(--text);border-color:var(--line-3)}
+.reason-never{margin-top:8px;padding:6px 13px;border-radius:9999px;border:1px dashed var(--line-2);background:none;color:var(--text-2);font-size:12.5px;font-family:var(--font);cursor:pointer}
+.reason-never:hover:not(:disabled){color:var(--text);border-color:var(--acc-line)}
+.reason-never:disabled{cursor:default;border-style:solid;color:var(--text-3)}
 .reason-toast{flex-wrap:wrap;justify-content:center;padding:14px 16px;border-radius:22px;max-width:min(760px,calc(100vw - 32px))}
 .approve-toast .reason-chips button{border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--text)}
 .approve-toast .reason-chips button:hover{border-color:var(--bad-line);color:var(--bad)}
@@ -292,9 +295,11 @@
 <script src="post-preview.js"></script>
 <script src="feedback.js"></script>
 <script src="tour.js"></script>
+<script src="closed-days.js"></script>
 <script src="reschedule.js"></script>
 <script src="first-week.js"></script>
 <script src="install-hint.js"></script>
+<script src="push.js"></script>
 <script>
 (function () {
   var loading   = document.getElementById("loading");
@@ -1086,6 +1091,38 @@
       saveCreative(creative, { reject_note: value || null }, card);
     });
     panel.appendChild(noteForm);
+
+    // A note that is about every ad, not just this one, can go on the
+    // "Anything to avoid" list in the control room, which the engine reads
+    // for every drop. Offered once the note is saved; not in the demo.
+    if (creative.reject_note && !LBDemo.on) {
+      var profile = LBAuth.getProfile() || {};
+      var already = (profile.avoid_notes || "").indexOf(creative.reject_note) > -1;
+      var never = document.createElement("button");
+      never.type = "button";
+      never.className = "reason-never";
+      never.textContent = already ? "On your “never” list ✓" : "Never do this again";
+      never.disabled = already;
+      never.title = "Adds this note to Anything to avoid in your control room, for every future drop.";
+      never.addEventListener("click", async function () {
+        never.disabled = true;
+        var current = (LBAuth.getProfile() || {}).avoid_notes || "";
+        var next = current ? current.replace(/\s+$/, "") + "\n" + creative.reject_note : creative.reject_note;
+        if (next.length > 1000) {
+          never.disabled = false;
+          never.textContent = "Your list is full — tidy it in the control room";
+          return;
+        }
+        try {
+          await LBAuth.updateProfile({ avoid_notes: next });
+          never.textContent = "On your “never” list ✓";
+        } catch (err) {
+          never.disabled = false;
+          never.textContent = err.message || "Couldn't save — try again";
+        }
+      });
+      panel.appendChild(never);
+    }
 
     return panel;
   }

@@ -90,6 +90,16 @@
 
         <!-- Signed in, brief done, not applied yet: the account already says
              everything, so only what's missing is asked for. -->
+        <!-- Every beta place taken (beta_seats in schema.sql): no applications
+             until one opens. -->
+        <div id="bt-full" hidden>
+          <div class="bt-tag">EVERY PLACE TAKEN</div>
+          <div class="bt-title">The beta is full right now.</div>
+          <p class="bt-lead">Every place in this round is taken, so we aren't taking applications. More places open before the launch in early 2027.</p>
+          <p class="bt-edit">Want us to keep you in mind? <a href="message-us.html">Message us</a> — we'll write when a place opens.</p>
+          <p class="bt-edit">Curious what's coming? <a href="approvals.html?demo=1">Try the demo</a> with a made-up café.</p>
+        </div>
+
         <form id="beta-form" hidden>
           <div class="bt-title" style="margin:0 0 6px">Apply for the beta</div>
           <p class="bt-lead">Your account already tells us about the business, so this takes one click.</p>
@@ -251,8 +261,17 @@
     document.getElementById("bt-done-when").textContent = t("Sent on") + " " + when.replace(/\.?$/, ".");
   }
 
-  LBAuth.ready.then(function(){
-    if (!LBAuth.isLoggedIn()) return;
+  function showFull(){
+    intro.hidden = true;
+    form.hidden = true;
+    document.getElementById("bt-full").hidden = false;
+  }
+
+  LBAuth.ready.then(async function(){
+    if (!LBAuth.isLoggedIn()) {
+      if (await LBAuth.betaFull()) showFull();
+      return;
+    }
     // A beta tester whose plan is on belongs in the app.
     if (LBAuth.hasActivePlan()) { LBGate.go("approvals.html"); return; }
     // Applying needs the brief: signup.html asks for it, prefilled.
@@ -260,6 +279,7 @@
 
     var profile = LBAuth.getProfile() || {};
     if (LBAuth.betaApplied()) showDone(profile);
+    else if (await LBAuth.betaFull()) showFull();
     else showForm(profile);
   });
 

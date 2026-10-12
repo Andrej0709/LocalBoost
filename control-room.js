@@ -101,6 +101,8 @@
   // save them to.
   var allCreatives = [];
   var editingId = null;
+  // The closed-days card (closed-days.js), once mounted.
+  var closedCard = null;
 
   function canReschedule(c) { return LBReschedule.canReschedule(c); }
 
@@ -134,6 +136,7 @@
     // Show the week the creative now sits in.
     if (res.data.scheduled_at) calStart = startOfWeek(new Date(res.data.scheduled_at));
     renderBoard(allCreatives);
+    if (closedCard) closedCard.render();
     return null;
   }
 
@@ -278,13 +281,23 @@
       var day = new Date(calStart);
       day.setDate(day.getDate() + i);
 
+      // A day the customer marked closed (closed-days.js). Not in the demo:
+      // the made-up café is open all week.
+      var closed = !LBDemo.on && window.LBClosed ? LBClosed.closedOn(day) : null;
       var cell = document.createElement("div");
       cell.className = "cal-day" +
-        (sameDay(day, today) ? " is-today" : day < startOfDay(today) ? " is-past" : "");
+        (sameDay(day, today) ? " is-today" : day < startOfDay(today) ? " is-past" : "") +
+        (closed ? " is-closed" : "");
       var label = document.createElement("div");
       label.className = "cal-date";
       label.textContent = day.toLocaleDateString(locale, { weekday: "short", day: "numeric" }).toUpperCase();
       cell.appendChild(label);
+      if (closed) {
+        var shut = document.createElement("div");
+        shut.className = "cal-closed";
+        shut.textContent = closed.note || "Closed";
+        cell.appendChild(shut);
+      }
 
       var items = calCreatives
         .filter(function (c) { var at = calendarDate(c); return at && sameDay(new Date(at), day); })
@@ -325,7 +338,7 @@
         cell.appendChild(item);
       });
 
-      if (!items.length) {
+      if (!items.length && !closed) {
         var none = document.createElement("div");
         none.className = "cal-none";
         none.textContent = "—";
@@ -338,6 +351,78 @@
   function startOfDay(date) {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
+
+  // --- "Add to my calendar": the ads still to post as an .ics file ---
+  // Opens in Google, Apple or Outlook calendar on any phone or computer. Each
+  // ad is a 15-minute event at its posting time, with a link to the control
+  // room; the closed days go in as all-day events. A file is a snapshot: a
+  // time changed later means downloading it again.
+  function icsEscape(s) {
+    return String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  }
+  function icsStamp(d) {
+    return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  }
+  function icsDay(s) { return s.replace(/-/g, ""); }
+  // Lines over 75 octets fold onto the next with a leading space.
+  function icsFold(line) {
+    var out = [];
+    while (line.length > 74) { out.push(line.slice(0, 74)); line = " " + line.slice(74); }
+    out.push(line);
+    return out.join("\r\n");
+  }
+
+  function calendarFile(creatives) {
+    var t = window.LBLang ? LBLang.t : function (x) { return x; };
+    var now = icsStamp(new Date());
+    var link = location.origin + "/control-room.html";
+    var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Adronis//Posting calendar//EN", "CALSCALE:GREGORIAN",
+      "X-WR-CALNAME:Adronis"];
+    var ads = creatives.filter(function (c) {
+      return c.id && c.status === "approved" && c.scheduled_at && new Date(c.scheduled_at) > new Date();
+    });
+    ads.forEach(function (c) {
+      var start = new Date(c.scheduled_at);
+      lines.push("BEGIN:VEVENT", "UID:" + c.id + "@adronis", "DTSTAMP:" + now,
+        "DTSTART:" + icsStamp(start), "DTEND:" + icsStamp(new Date(start.getTime() + 15 * 60000)),
+        icsFold("SUMMARY:" + icsEscape(t("Ad goes out") + " · " + (c.channel || "Adronis"))),
+        icsFold("DESCRIPTION:" + icsEscape((c.headline || "") + "\n" + link)),
+        "URL:" + link, "END:VEVENT");
+    });
+    (window.LBClosed ? LBClosed.list() : []).forEach(function (r, i) {
+      var end = new Date(r.to.replace(/-/g, "/"));
+      end.setDate(end.getDate() + 1);
+      var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+      lines.push("BEGIN:VEVENT", "UID:closed-" + r.from + "-" + i + "@adronis", "DTSTAMP:" + now,
+        "DTSTART;VALUE=DATE:" + icsDay(r.from),
+        "DTEND;VALUE=DATE:" + end.getFullYear() + pad(end.getMonth() + 1) + pad(end.getDate()),
+        icsFold("SUMMARY:" + icsEscape(t("Closed — no ads") + (r.note ? " · " + r.note : ""))),
+        "TRANSP:TRANSPARENT", "END:VEVENT");
+    });
+    lines.push("END:VCALENDAR");
+    return { text: lines.join("\r\n") + "\r\n", count: ads.length };
+  }
+
+  document.getElementById("cal-export").addEventListener("click", function () {
+    var msg = document.getElementById("cal-export-msg");
+    var file = calendarFile(allCreatives);
+    msg.hidden = false;
+    if (!file.count) {
+      msg.textContent = "Nothing is scheduled to post yet. Approve some ads, then come back.";
+      return;
+    }
+    var url = URL.createObjectURL(new Blob([file.text], { type: "text/calendar;charset=utf-8" }));
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "adronis-posts.ics";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+    msg.textContent = file.count === 1
+      ? "Downloaded 1 ad. Open the file to add it to your calendar."
+      : "Downloaded " + file.count + " ads. Open the file to add them to your calendar.";
+  });
 
   function shiftWeek(weeks) {
     calStart.setDate(calStart.getDate() + weeks * 7);
@@ -452,12 +537,27 @@
       grid.appendChild(ed);
     }
 
-    if (profile.avoid_notes) {
+    var avoidTags = avoidTagLabels(profile);
+    if (profile.avoid_notes || avoidTags.length) {
       var avoid = learnedItem("WHAT TO STAY AWAY FROM");
-      var text = document.createElement("p");
-      text.className = "learned-text";
-      text.textContent = profile.avoid_notes;
-      avoid.appendChild(text);
+      if (avoidTags.length) {
+        var tagChips = document.createElement("div");
+        tagChips.className = "learned-chips";
+        avoidTags.forEach(function (label) {
+          var chip = document.createElement("span");
+          chip.className = "learned-chip";
+          chip.textContent = label;
+          tagChips.appendChild(chip);
+        });
+        avoid.appendChild(tagChips);
+      }
+      if (profile.avoid_notes) {
+        var text = document.createElement("p");
+        text.className = "learned-text";
+        if (avoidTags.length) text.style.marginTop = "10px";
+        text.textContent = profile.avoid_notes;
+        avoid.appendChild(text);
+      }
       grid.appendChild(avoid);
     }
   }
@@ -1116,7 +1216,31 @@
   var openExtra = null;
   var completeOpen = false;
 
+  // The quick picks under "Anything to avoid" (profiles.avoid_tags). The keys
+  // are fixed in schema.sql, where each one's meaning for the engine is set.
+  var AVOID_TAGS = [
+    { key: "no_emoji", label: "No emojis" },
+    { key: "no_prices", label: "No prices" },
+    { key: "no_discounts", label: "No sales or discounts" },
+    { key: "no_faces", label: "No people's faces" },
+    { key: "no_alcohol", label: "No alcohol" },
+    { key: "no_jokes", label: "No jokes or puns" },
+    { key: "no_slang", label: "No slang" },
+    { key: "no_english", label: "No English words" },
+    { key: "no_competitors", label: "No other businesses" },
+    { key: "no_urgency", label: "No “last chance” pressure" }
+  ];
+
+  function avoidTagLabels(profile) {
+    var on = profile.avoid_tags || [];
+    return AVOID_TAGS.filter(function (x) { return on.indexOf(x.key) > -1; })
+      .map(function (x) { return window.LBLang ? LBLang.t(x.label) : x.label; });
+  }
+
   function extraValue(x, profile) {
+    if (x.key === "avoid_notes") {
+      return avoidTagLabels(profile).concat(profile.avoid_notes ? [profile.avoid_notes] : []).join(" · ");
+    }
     if (x.asset) {
       var files = assets[x.asset];
       if (!files.length) return "";
@@ -1271,12 +1395,37 @@
     var form = document.createElement("form");
     form.className = "eh-form";
 
+    // "Anything to avoid" starts with one-tap picks, saved with the words.
+    var avoid = x.key === "avoid_notes";
+    var tags = avoid ? (profile.avoid_tags || []).slice() : null;
+    if (avoid) {
+      var tagsLabel = document.createElement("div");
+      tagsLabel.className = "eh-tags-label";
+      tagsLabel.textContent = "TAP ANY THAT APPLY";
+      form.appendChild(tagsLabel);
+      var picks = document.createElement("div");
+      picks.className = "eh-tags";
+      AVOID_TAGS.forEach(function (tag) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = tag.label;
+        b.setAttribute("aria-pressed", tags.indexOf(tag.key) > -1 ? "true" : "false");
+        b.addEventListener("click", function () {
+          var i = tags.indexOf(tag.key);
+          if (i > -1) tags.splice(i, 1); else tags.push(tag.key);
+          b.setAttribute("aria-pressed", i > -1 ? "false" : "true");
+        });
+        picks.appendChild(b);
+      });
+      form.appendChild(picks);
+    }
+
     var field = document.createElement(x.multiline ? "textarea" : "input");
     if (x.multiline) field.rows = 3; else field.type = "text";
     field.maxLength = x.max;
-    field.placeholder = x.placeholder;
+    field.placeholder = avoid ? "Anything else, in your own words — e.g. never show the back kitchen" : x.placeholder;
     field.setAttribute("aria-label", x.title);
-    field.value = value;
+    field.value = avoid ? (profile.avoid_notes || "") : value;
     form.appendChild(field);
 
     var row = document.createElement("div");
@@ -1292,7 +1441,9 @@
       clear.type = "button";
       clear.className = "eh-plain";
       clear.textContent = "Clear";
-      clear.addEventListener("click", function () { saveExtra(x.key, null, form); });
+      clear.addEventListener("click", function () {
+        saveExtra(x.key, null, form, avoid ? { avoid_tags: [] } : null);
+      });
       row.appendChild(clear);
     }
 
@@ -1313,7 +1464,7 @@
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();
-      saveExtra(x.key, field.value.trim() || null, form);
+      saveExtra(x.key, field.value.trim() || null, form, avoid ? { avoid_tags: tags } : null);
     });
     form.addEventListener("keydown", function (event) {
       if (event.key === "Escape") { openExtra = null; renderExtras(); }
@@ -1322,11 +1473,11 @@
     return form;
   }
 
-  async function saveExtra(key, value, form) {
+  async function saveExtra(key, value, form, also) {
     var buttons = form.querySelectorAll("button");
     Array.prototype.forEach.call(buttons, function (b) { b.disabled = true; });
     try {
-      var patch = {};
+      var patch = Object.assign({}, also || {});
       patch[key] = value;
       await LBAuth.updateProfile(patch);
       openExtra = null;
@@ -1521,6 +1672,7 @@
       document.getElementById("page-sub").textContent =
         "A café's week of approved ads: what goes out and when, and what's already live.";
       document.getElementById("history-link").hidden = true;
+      document.getElementById("cal-export").hidden = true;
       document.getElementById("report-link").href = "report.html?demo=1" + (LBDemo.code ? "&p=" + LBDemo.code : "");
       showSample();
       cards.on = true;
@@ -1566,6 +1718,14 @@
     document.getElementById("engine-help").hidden = false;
     renderExtras();
 
+    // The days they're closed, for an account the engine makes ads for.
+    if (LBAuth.hasBrief()) {
+      closedCard = LBClosed.mount(document.getElementById("closed-days"), {
+        creatives: function () { return allCreatives; },
+        onChange: function () { renderCalendar(); }
+      });
+    }
+
     // Uploaded files only add to the score, so the board doesn't wait on them.
     // Rebuilding the list would wipe an answer someone is typing, so with a
     // row open only the score catches up.
@@ -1602,6 +1762,8 @@
       allCreatives = creatives;
       renderBoard(creatives);
       renderLearned(creatives, LBAuth.getProfile() || {});
+      // Now it can tell which approved ads land on a closed day.
+      if (closedCard) closedCard.render();
     }
 
     cards.on = true;

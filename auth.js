@@ -95,6 +95,110 @@
   var profile = null;
   var ready_ = false;
 
+  // --- Viewing a tester's account from the Adronis Portal ------------------
+  // The portal's "View as tester" button opens a page with ?as=<their id>.
+  // For an admin signed in here (is_portal_admin in the portal's SQL) the app
+  // pages then show that account - its ads, calendar, profile - exactly as
+  // its owner sees them, with a bar on top saying so. Nothing can be changed:
+  // every write is refused right here, and the database would refuse it
+  // anyway (an admin may read other accounts, never write them). It sticks to
+  // this browser tab until Exit. Anyone else's ?as= is ignored, and the
+  // database shows them nothing but their own rows whatever the page asks.
+  var VIEW_KEY = "lb-view-as";
+  var VIEW_ONLY = "View only — you're looking at this account from the Adronis Portal.";
+  var viewAsId = (function () {
+    try {
+      var m = /[?&]as=([0-9a-f-]{36})(&|$)/i.exec(location.search);
+      if (m) sessionStorage.setItem(VIEW_KEY, m[1].toLowerCase());
+      return sessionStorage.getItem(VIEW_KEY);
+    } catch (e) { return null; }
+  })();
+  var viewing = null;   // { id, email } once the database said yes
+
+  function stopViewing() {
+    try { sessionStorage.removeItem(VIEW_KEY); } catch (e) {}
+    viewing = null;
+  }
+
+  function writable() {
+    if (viewing) throw new Error(VIEW_ONLY);
+  }
+
+  // What a refused write hands back: the same { data, error } a Supabase
+  // query resolves to, whatever is chained onto it.
+  function refusal() {
+    var result = { data: null, error: { message: VIEW_ONLY, code: "view_only" }, count: null };
+    var chain = new Proxy(function () {}, {
+      get: function (t, key) {
+        if (key === "then") return function (ok, bad) { return Promise.resolve(result).then(ok, bad); };
+        return function () { return chain; };
+      },
+      apply: function () { return chain; }
+    });
+    return chain;
+  }
+
+  // LBAuth.db while viewing: reads pass through, writes come back refused.
+  function readOnly(client) {
+    return new Proxy(client, {
+      get: function (target, key) {
+        if (key === "from") {
+          return function (table) {
+            var query = target.from(table);
+            return new Proxy(query, {
+              get: function (q, k) {
+                if (k === "insert" || k === "update" || k === "upsert" || k === "delete") return refusal;
+                var v = q[k];
+                return typeof v === "function" ? v.bind(q) : v;
+              }
+            });
+          };
+        }
+        if (key === "rpc") return refusal;
+        if (key === "functions") return { invoke: function () { return Promise.resolve({ data: null, error: new Error(VIEW_ONLY) }); } };
+        if (key === "storage") return { from: function () { return new Proxy({}, { get: function () { return refusal; } }); } };
+        var v = target[key];
+        return typeof v === "function" ? v.bind(target) : v;
+      }
+    });
+  }
+
+  var readOnlyDb = readOnly(db);
+
+  // Asks the database whether this admin may look, then loads the account.
+  async function startViewing() {
+    var ok = await db.rpc("is_portal_admin");
+    if (ok.error || ok.data !== true) { stopViewing(); return false; }
+    var res = await db.from("profiles").select("*").eq("id", viewAsId).maybeSingle();
+    if (res.error || !res.data) { stopViewing(); return false; }
+    viewing = { id: res.data.id, email: res.data.email };
+    profile = res.data;
+    return true;
+  }
+
+  function viewingBar() {
+    if (!viewing || document.getElementById("lb-viewing")) return;
+    var bar = document.createElement("div");
+    bar.id = "lb-viewing";
+    bar.setAttribute("role", "status");
+    bar.style.cssText = "position:sticky;top:0;z-index:1000;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;" +
+      "padding:10px 16px;background:#3a2f12;color:#f6e7b8;font:13px/1.4 var(--font,system-ui);border-bottom:1px solid #6b5520";
+    var text = document.createElement("span");
+    text.style.flex = "1 1 220px";
+    text.textContent = "Viewing " + ((profile && profile.business_name) || viewing.email) + " — read only, from the Adronis Portal.";
+    var exit = document.createElement("button");
+    exit.type = "button";
+    exit.textContent = "Exit";
+    exit.style.cssText = "padding:6px 14px;border-radius:9999px;border:1px solid #6b5520;background:none;color:inherit;font:inherit;cursor:pointer";
+    exit.addEventListener("click", function () {
+      stopViewing();
+      location.replace(location.pathname.replace(/[^/]*$/, "") + "login.html");
+    });
+    bar.appendChild(text);
+    bar.appendChild(exit);
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
+
   // Leaves for url without the page showing itself first (boot-gate.js).
   function leave(url) {
     if (window.LBGate) LBGate.go(url);
@@ -116,6 +220,12 @@
       profile = null;
       rememberRoute();
       return null;
+    }
+    // Viewing a tester: their row, fresh, and nothing stamped on anyone's.
+    if (viewing) {
+      var seen = await db.from("profiles").select("*").eq("id", viewing.id).maybeSingle();
+      if (seen.data) profile = seen.data;
+      return profile;
     }
     var res = await db
       .from("profiles")
@@ -160,6 +270,7 @@
   // meant for the customer.
   async function billing(action, body) {
     if (!session) throw new Error("Not signed in.");
+    writable();
     var payload = { action: action };
     Object.keys(body || {}).forEach(function (k) { payload[k] = body[k]; });
     var res = await db.functions.invoke("paddle", { body: payload });
@@ -201,7 +312,12 @@
     }
     if (cameFromResetLink && session) { startRecovery(); if (!onLoginPage()) return leaving(); }
 
-    await loadProfile();
+    if (viewAsId && session && await startViewing()) {
+      if (document.body) viewingBar();
+      else document.addEventListener("DOMContentLoaded", viewingBar);
+    } else {
+      await loadProfile();
+    }
     if (closedInBeta()) { leave(siteOrigin() + "beta.html"); return leaving(); }
     ready_ = true;
   })();
@@ -280,8 +396,13 @@
   }
 
   window.LBAuth = {
-    db: db,
+    // Read-only while viewing a tester's account (see VIEW_KEY above).
+    get db() { return viewing ? readOnlyDb : db; },
     ready: ready,
+
+    // While an admin is viewing someone's account from the portal: that
+    // account's { id, email }. null otherwise.
+    viewingAs: function () { return viewing; },
 
     // Throws if the password breaks any of the rules above.
     checkPassword: checkPassword,
@@ -327,6 +448,7 @@
 
     // The auth user (id, email). Synchronous, valid after ready.
     getUser: function () {
+      if (viewing) return session ? { id: viewing.id, email: viewing.email } : null;
       return session ? session.user : null;
     },
 
@@ -403,7 +525,7 @@
       var res = await db
         .from("creatives")
         .select("id", { count: "exact", head: true })
-        .eq("user_id", session.user.id)
+        .eq("user_id", viewing ? viewing.id : session.user.id)
         .eq("status", "pending");
       return res.error ? 0 : res.count || 0;
     },
@@ -429,6 +551,14 @@
       return (await this.pendingCount()) > 0 ? "approvals" : "pricing";
     },
 
+    // During the beta: true while every beta place is taken (beta_seats in
+    // schema.sql). False when no number of places is set, or it can't tell.
+    betaFull: async function () {
+      if (!BETA) return false;
+      var res = await db.rpc("beta_seats");
+      return !res.error && !!res.data && res.data.left <= 0;
+    },
+
     // During the beta: true once this account has applied for a place.
     betaApplied: function () {
       return !!(profile && profile.beta_applied_at);
@@ -439,6 +569,7 @@
     // note is an optional line from the customer, added to the application.
     applyForBeta: async function (note) {
       if (!session) throw new Error("Not signed in.");
+      writable();
       var res = await db.rpc("apply_for_beta", { p_note: note || null });
       if (res.error) throw friendlyError(res.error);
       await loadProfile();
@@ -518,6 +649,7 @@
 
     logOut: async function () {
       remember(RECOVERY_KEY, false);
+      stopViewing();
       await db.auth.signOut();
       session = null;
       profile = null;
@@ -525,6 +657,7 @@
 
     updateProfile: async function (patch) {
       if (!session) throw new Error("Not signed in.");
+      writable();
 
       var res = await db
         .from("profiles")
@@ -620,6 +753,7 @@
     // drops and creatives with it. The caller checks the password first.
     deleteAccount: async function () {
       if (!session) throw new Error("Not signed in.");
+      writable();
       // Stop Paddle billing first - a deleted account must never be charged.
       if (profile && profile.paddle_subscription_id) await billing("cancel_now");
       // Uploaded logo, photos and menu live in Storage, which the cascade

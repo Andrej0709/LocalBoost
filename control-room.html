@@ -186,7 +186,7 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 }
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:48px 0 16px}
 .cal-head .cr-section-label{margin:0}
-.cal-nav{display:flex;align-items:center;gap:6px}
+.cal-nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .cal-nav button{min-height:36px;padding:0 13px;border-radius:9999px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--text-2);font-size:13px;font-family:var(--font);cursor:pointer;transition:border-color .2s ease,color .2s ease,transform .12s ease}
 .cal-nav button:hover{border-color:var(--line-3);color:var(--text)}
 .cal-nav button:active{transform:scale(.95)}
@@ -208,6 +208,29 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 .cal-legend{display:flex;gap:16px;margin-top:12px;font-size:12.5px;color:var(--text-3)}
 .cal-legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:6px;background:var(--acc)}
 .cal-legend span.live::before{background:#9fd7b0}
+.cal-legend span.closed::before{background:repeating-linear-gradient(135deg,rgba(240,168,168,.55) 0 2px,transparent 2px 4px);border:1px solid rgba(240,168,168,.4)}
+.cal-day.is-closed{background:repeating-linear-gradient(135deg,rgba(240,168,168,.05) 0 6px,transparent 6px 12px),var(--surface);border-color:rgba(240,168,168,.25)}
+.cal-closed{font-size:11.5px;color:#f0a8a8;overflow-wrap:anywhere}
+.cal-export-msg{margin:10px 0 0;font-size:13px;color:var(--text-2)}
+/* The days the business is closed (closed-days.js) */
+.cd-card h3{margin:10px 0 6px;font-size:22px}
+.cd-list{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:8px}
+.cd-list li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:10px 14px;border-radius:var(--r);border:1px solid var(--line);background:rgba(255,255,255,.02)}
+.cd-when{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--text)}
+.cd-note{flex:1 1 140px;font-size:13.5px;color:var(--text-2)}
+.cd-form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px}
+.cd-form label{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--text-3)}
+.cd-form label:nth-child(3){flex:1 1 200px}
+.cd-form input{min-height:40px;padding:8px 10px;border-radius:10px;border:1px solid var(--line-2);background:var(--field);color:var(--text);font-family:var(--font);font-size:14px;letter-spacing:0;color-scheme:dark}
+.cd-form input:focus{outline:none;border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(124,198,255,.14)}
+.cd-card .notice{margin-top:14px}
+.cd-clash{color:#f0d9a8}
+/* The quick "never in my ads" picks under Anything to avoid */
+.eh-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.eh-tags button{padding:6px 12px;border-radius:9999px;border:1px solid var(--line-2);background:none;color:var(--text-2);font-family:var(--font);font-size:13px;cursor:pointer;transition:border-color .2s ease,color .2s ease}
+.eh-tags button:hover{color:var(--text);border-color:var(--line-3)}
+.eh-tags button[aria-pressed="true"]{border-color:var(--acc-line);background:var(--acc-soft);color:var(--text)}
+.eh-tags-label{margin:2px 0 8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--text-3)}
 #history-link,#report-link{display:inline-flex;margin-top:16px;font-size:14px;font-weight:500}
 #report-link{margin-left:22px}
 @media (max-width:640px){#report-link{display:flex;margin-left:0;margin-top:10px}}
@@ -309,6 +332,9 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
       <div class="eh-list" id="eh-list"></div>
     </div>
 
+    <!-- The days the business is closed (closed-days.js) -->
+    <section id="closed-days" class="learned cd-card" hidden aria-label="Days you're closed"></section>
+
     <!-- What the customer has told the engine so far: shown once they've
          rejected an ad with a reason or rewritten one (renderLearned) -->
     <section id="learned" class="learned" hidden aria-labelledby="learned-title">
@@ -349,10 +375,12 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
             <div class="cal-range" id="cal-range" aria-live="polite">&mdash;</div>
             <button type="button" id="cal-next" aria-label="Next week">&rarr;</button>
             <button type="button" id="cal-today">This week</button>
+            <button type="button" id="cal-export" title="Download the ads still to post as a calendar file">Add to my calendar</button>
           </div>
         </div>
         <div class="cal-grid" id="cal-grid"></div>
-        <div class="cal-legend"><span>Scheduled</span><span class="live">Live</span></div>
+        <div class="cal-legend"><span>Scheduled</span><span class="live">Live</span><span class="closed">Closed</span></div>
+        <p class="cal-export-msg" id="cal-export-msg" role="status" hidden></p>
       </div>
 
       <div id="scheduled-wrap">
@@ -425,12 +453,14 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 <script src="auth.js"></script>
 <script src="feedback.js"></script>
 <script src="tour.js"></script>
+<script src="closed-days.js"></script>
 <script src="reschedule.js"></script>
 <script src="brand-assets.js"></script>
 <script src="first-week.js"></script>
 <script src="dates-rs.js"></script>
 <script src="referral.js"></script>
 <script src="install-hint.js"></script>
+<script src="push.js"></script>
 <script src="control-room.js"></script>
 </body>
 </html>

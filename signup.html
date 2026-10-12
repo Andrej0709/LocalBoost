@@ -646,8 +646,29 @@
     }
   });
 
-  LBAuth.ready.then(function(){
-    if (!LBAuth.isLoggedIn()) { lbBootDone(); return; }
+  // Every beta place taken (beta_seats in schema.sql): no application form
+  // until one opens. An account that already applied never gets here.
+  function showFull(){
+    document.getElementById("form-view").hidden = true;
+    document.getElementById("activated-view").hidden = false;
+    document.querySelector("#activated-view .su-done-mark").hidden = true;
+    document.getElementById("page-eyebrow").textContent = "BETA · EVERY PLACE TAKEN";
+    document.getElementById("plan-headline").textContent = "The beta is full right now.";
+    document.getElementById("page-sub").textContent = "Every place in this round is taken, so we aren't taking applications.";
+    document.querySelector("#activated-view .mono").textContent = "BETA FULL";
+    document.getElementById("activated-text").textContent = "More places open before the launch in early 2027.";
+    document.getElementById("activated-sub").textContent = "Message us and we'll write to you when a place opens.";
+    var go = document.getElementById("activated-go");
+    go.href = "message-us.html";
+    go.innerHTML = 'Message us<span class="mono">→</span>';
+  }
+
+  LBAuth.ready.then(async function(){
+    if (!LBAuth.isLoggedIn()) {
+      if (BETA && await LBAuth.betaFull()) showFull();
+      lbBootDone();
+      return;
+    }
 
     var profile = LBAuth.getProfile() || {};
 
@@ -673,6 +694,7 @@
       LBGate.go(checkoutUrl());
       return;
     }
+    if (BETA && !LBAuth.betaApplied() && await LBAuth.betaFull()) { showFull(); lbBootDone(); return; }
     showBriefMode(profile);
     lbBootDone();
   }, lbBootDone);

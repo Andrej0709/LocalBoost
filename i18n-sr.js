@@ -2233,7 +2233,87 @@ window.LB_I18N_SR = {
     // The checkout's terms paragraph gained the Paddle sentence after its
     // entry above was written; this is the whole paragraph as it reads now.
     ". You agree that the subscription renews automatically at the amount and date shown in the summary until you cancel, that cancelling takes effect at the end of the period you have paid for, and that part-periods are not refunded. Prices include VAT where it applies; nothing is added on top of the amount shown. Our order process is conducted by our online reseller Paddle.com, who is the Merchant of Record for all our orders and handles billing, tax and invoices. Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.":
-      ". Saglasan si da se pretplata automatski obnavlja po iznosu i datumu prikazanim u pregledu dok je ne otkažeš, da otkazivanje stupa na snagu na kraju perioda koji si platio i da se započeti periodi ne refundiraju. Cene uključuju PDV tamo gde se plaća; ništa se ne dodaje na prikazani iznos. Proces naručivanja vodi naš onlajn preprodavac Paddle.com, koji je Merchant of Record za sve naše porudžbine i brine o naplati, porezu i fakturama. Kreativi su AI-generisani i objavljuju se tek nakon tvog odobrenja — ti ostaješ oglašivač odgovoran za svaki oglas koji odobriš."
+      ". Saglasan si da se pretplata automatski obnavlja po iznosu i datumu prikazanim u pregledu dok je ne otkažeš, da otkazivanje stupa na snagu na kraju perioda koji si platio i da se započeti periodi ne refundiraju. Cene uključuju PDV tamo gde se plaća; ništa se ne dodaje na prikazani iznos. Proces naručivanja vodi naš onlajn preprodavac Paddle.com, koji je Merchant of Record za sve naše porudžbine i brine o naplati, porezu i fakturama. Kreativi su AI-generisani i objavljuju se tek nakon tvog odobrenja — ti ostaješ oglašivač odgovoran za svaki oglas koji odobriš.",
+
+    /* --- Control room: the days the business is closed (closed-days.js) -- */
+    "DAYS YOU'RE CLOSED": "DANI KAD NE RADIŠ",
+    "Days you're closed": "Dani kad ne radiš",
+    "Closed for a holiday or a break?": "Zatvoreno zbog praznika ili odmora?",
+    "Tell us the days and no ad goes out while you're shut, and none tells people to come by. A whole week closed means no ads that week. Your usual day off goes in your opening hours instead.":
+      "Upiši te dane i nijedan oglas neće izaći dok je zatvoreno, niti će zvati ljude da navrate. Ako ne radiš celu nedelju, te nedelje nema oglasa. Redovan neradni dan upiši u radno vreme.",
+    "FIRST DAY": "PRVI DAN",
+    "LAST DAY": "POSLEDNJI DAN",
+    "NOTE (OPTIONAL)": "BELEŠKA (OPCIONO)",
+    "e.g. New Year, family holiday": "npr. Nova godina, porodični odmor",
+    "The last day can't be before the first.": "Poslednji dan ne može da bude pre prvog.",
+    "Add up to three months at a time.": "Dodaj najviše tri meseca odjednom.",
+    "Saved — no ads on those days.": "Sačuvano — tih dana nema oglasa.",
+    "Couldn't save — try again.": "Čuvanje nije uspelo — pokušaj ponovo.",
+    "1 approved ad is set to post while you're closed. Pick another time for it under Scheduled to post.":
+      "Jedan odobren oglas treba da izađe dok ne radiš. Izaberi mu drugo vreme pod „Zakazano za objavu“.",
+    "Each closed stretch needs a first and a last day.": "Za svaki neradni period upiši prvi i poslednji dan.",
+    "The last closed day has to be on or after the first, at most three months later.":
+      "Poslednji neradni dan mora da bude isti ili posle prvog, najviše tri meseca kasnije.",
+    "You marked that day as closed. Pick a day you're open.": "Taj dan si označio kao neradni. Izaberi dan kad radiš.",
+    "Closed": "Ne radi",
+
+    /* --- Control room: the posting calendar as a file --------------------- */
+    "Add to my calendar": "Dodaj u moj kalendar",
+    "Download the ads still to post as a calendar file": "Preuzmi zakazane oglase kao fajl za kalendar",
+    "Ad goes out": "Izlazi oglas",
+    "Closed — no ads": "Ne radi — nema oglasa",
+    "Nothing is scheduled to post yet. Approve some ads, then come back.":
+      "Još ništa nije zakazano. Odobri nekoliko oglasa, pa se vrati.",
+    "Downloaded 1 ad. Open the file to add it to your calendar.":
+      "Preuzet je 1 oglas. Otvori fajl da ga dodaš u kalendar.",
+
+    /* --- Control room: the quick "never in my ads" picks ----------------- */
+    "TAP ANY THAT APPLY": "IZABERI ŠTA VAŽI ZA TEBE",
+    "No emojis": "Bez emotikona",
+    "No prices": "Bez cena",
+    "No sales or discounts": "Bez akcija i popusta",
+    "No people's faces": "Bez lica ljudi",
+    "No alcohol": "Bez alkohola",
+    "No jokes or puns": "Bez šala i igre reči",
+    "No slang": "Bez slenga",
+    "No English words": "Bez engleskih reči",
+    "No other businesses": "Bez pominjanja drugih radnji",
+    "No “last chance” pressure": "Bez pritiska tipa „poslednja šansa“",
+    "Anything else, in your own words — e.g. never show the back kitchen":
+      "Bilo šta drugo, tvojim rečima — npr. nikad ne prikazuj kuhinju iza",
+
+    /* --- Approvals: a reject note onto the "never" list ------------------- */
+    "Never do this again": "Nikad više ovo",
+    "On your “never” list ✓": "Na tvojoj listi „nikad“ ✓",
+    "Adds this note to Anything to avoid in your control room, for every future drop.":
+      "Dodaje ovu belešku u „Šta treba izbegavati“ u kontrolnoj sobi, za svaki sledeći drop.",
+    "Your list is full — tidy it in the control room": "Lista je puna — sredi je u kontrolnoj sobi",
+
+    /* --- Push notifications (push.js) ------------------------------------ */
+    "NEW": "NOVO",
+    "Get a ping on this device when your new ads arrive.": "Dobij obaveštenje na ovom uređaju kad stignu novi oglasi.",
+    "One when they land, one reminder a day later if some are still waiting. Nothing else.":
+      "Jedno kad stignu, i jedan podsetnik dan kasnije ako neki još čekaju. Ništa više.",
+    "Turn on": "Uključi",
+    "Not now": "Ne sada",
+    "Done — you'll get a ping when your next ads arrive.": "Gotovo — javićemo ti kad stignu sledeći oglasi.",
+    "Couldn't turn notifications on. Try again in a minute.": "Obaveštenja nisu uključena. Pokušaj ponovo za minut.",
+    "This browser sent a notification address we can't use.": "Ovaj pregledač je poslao adresu za obaveštenja koju ne možemo da koristimo.",
+
+    /* --- The beta is full (beta.html, signup.html) ----------------------- */
+    "EVERY PLACE TAKEN": "SVA MESTA SU POPUNJENA",
+    "The beta is full right now.": "Beta je trenutno popunjena.",
+    "Every place in this round is taken, so we aren't taking applications. More places open before the launch in early 2027.":
+      "Sva mesta u ovom krugu su popunjena, pa trenutno ne primamo prijave. Nova mesta otvaramo pre lansiranja početkom 2027.",
+    "Want us to keep you in mind?": "Hoćeš da te imamo na umu?",
+    "— we'll write when a place opens.": "— javićemo ti kad se otvori mesto.",
+    "BETA · EVERY PLACE TAKEN": "BETA · SVA MESTA SU POPUNJENA",
+    "Every place in this round is taken, so we aren't taking applications.":
+      "Sva mesta u ovom krugu su popunjena, pa trenutno ne primamo prijave.",
+    "BETA FULL": "BETA JE POPUNJENA",
+    "More places open before the launch in early 2027.": "Nova mesta otvaramo pre lansiranja početkom 2027.",
+    "Message us and we'll write to you when a place opens.": "Piši nam i javićemo ti kad se otvori mesto.",
+    "The beta is full right now - every place is taken.": "Beta je trenutno popunjena — sva mesta su zauzeta."
 
 
   },
@@ -2244,6 +2324,11 @@ window.LB_I18N_SR = {
      "monthly" is translated while a date or a plan name passes through. */
   patterns: [
     [/^(\d+) ads$/, "$1 oglasa"],
+    [/^(\d+) approved ads are set to post while you're closed\. Pick another time for them under Scheduled to post\.$/,
+      "Odobrenih oglasa koji treba da izađu dok ne radiš: $1. Izaberi im drugo vreme pod „Zakazano za objavu“."],
+    [/^Downloaded (\d+) ads\. Open the file to add them to your calendar\.$/,
+      "Preuzeto oglasa: $1. Otvori fajl da ih dodaš u kalendar."],
+    [/^Remove (.+)$/, "Ukloni $1"],
     [/^(\d+) of (\d+) ads you answered about brought people in\.$/,
       "Ljude je dovelo $1 od $2 oglasa za koje si odgovorio."],
     // The demo's heading, when a business's own link names it (demo.js).
