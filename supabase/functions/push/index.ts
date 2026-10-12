@@ -98,8 +98,8 @@ function message(d: Due, lang: string) {
 }
 
 Deno.serve(async (req) => {
-  const secret = Deno.env.get("PUSH_CRON_SECRET");
-  if (!secret || req.headers.get("x-cron-secret") !== secret) {
+  const secret = clean(Deno.env.get("PUSH_CRON_SECRET"));
+  if (!secret || clean(req.headers.get("x-cron-secret") ?? undefined) !== secret) {
     return new Response("Forbidden", { status: 403 });
   }
   const setupError = vapid();
