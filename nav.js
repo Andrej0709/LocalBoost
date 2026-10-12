@@ -75,6 +75,51 @@
     // auth.js loads after this file, so the account name waits for the page.
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", showAccount);
     else showAccount();
+
+    // After the page's own scripts, so one that loads whats-new.js isn't sent it twice.
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", newsStamp);
+    else newsStamp();
+  }
+
+  // "Beta · updated Oct 12" in the footer's bottom line, between the
+  // copyright and the credit: the way to whats-new.html, with a dot while
+  // there's news this device hasn't seen. Only for someone signed in on this
+  // device - the page has nothing for anyone else. whats-new.js is fetched
+  // here on the pages that don't load it themselves.
+  function newsStamp() {
+    var bottom = document.querySelector(".foot-bottom");
+    if (!bottom || !hasStoredSession()) return;
+    var stamp = document.createElement("a");
+    stamp.href = "/whats-new.html";
+    stamp.className = "foot-news";
+    stamp.hidden = true;
+    bottom.insertBefore(stamp, bottom.children[1] || null);
+    var onPage = /(^|\/)whats-new\.html$/.test(location.pathname);
+
+    function render() {
+      var sr = window.LBLang && LBLang.get() === "sr";
+      var day = new Date(LBWhatsNew.entries[0].date + "T00:00:00")
+        .toLocaleDateString(window.LBLang ? LBLang.locale() : "en-US", { month: "short", day: "numeric" });
+      stamp.textContent = (sr ? "BETA · AŽURIRANO " : "BETA · UPDATED ") + day.toUpperCase();
+      var fresh = !onPage && LBWhatsNew.fresh().length > 0;
+      stamp.classList.toggle("is-fresh", fresh);
+      stamp.title = fresh ? (sr ? "Ima novosti — pogledaj šta je novo" : "There's news — see what's new")
+        : (sr ? "Šta je novo u Adronisu" : "What's new in Adronis");
+      stamp.hidden = false;
+    }
+
+    function start() {
+      // fresh() counts from the day the account was made, which needs the profile.
+      (window.LBAuth ? LBAuth.ready : Promise.resolve()).then(render, render);
+      document.addEventListener("lb:langchange", render);
+      document.addEventListener("lb:newsseen", render);
+    }
+
+    if (window.LBWhatsNew) return start();
+    var script = document.createElement("script");
+    script.src = "/whats-new.js";
+    script.onload = start;
+    document.body.appendChild(script);
   }
 
   function showAccount() {

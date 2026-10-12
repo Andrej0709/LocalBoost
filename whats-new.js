@@ -130,6 +130,7 @@
 
     markSeen: function () {
       try { localStorage.setItem(SEEN_KEY, ENTRIES[0].date); } catch (e) {}
+      document.dispatchEvent(new CustomEvent("lb:newsseen"));
     }
   };
 })();
