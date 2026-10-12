@@ -10,7 +10,8 @@
  * the card waits until Adronis is opened from the home screen (install-hint.js
  * says how to put it there).
  *
- * Load it after auth.js (and demo.js) on approvals.html and control-room.html.
+ * Load it after auth.js (and demo.js) on approvals.html, control-room.html
+ * and account.html.
  */
 (function () {
   // The public half of the VAPID key pair. The private half is the push Edge
@@ -65,7 +66,7 @@
   }
 
   function show() {
-    var host = document.querySelector(".section-tight .wrap-wide");
+    var host = document.querySelector(".section-tight .wrap-wide, .section-tight .wrap");
     if (!host || document.getElementById("push-card")) return;
 
     var box = document.createElement("div");
@@ -139,12 +140,22 @@
   }
 
   if (!window.LBAuth) return;
-  LBAuth.ready.then(function () {
+  LBAuth.ready.then(async function () {
     if (window.LBDemo && LBDemo.on) return;
     if (LBAuth.viewingAs && LBAuth.viewingAs()) return;
-    if (!LBAuth.hasActivePlan() || !supported()) return;
+    if (!LBAuth.isLoggedIn() || !supported()) return;
+    // A portal admin gets the card too (on the account page, which is open to
+    // them), so they can try a notification on their own phone - the push
+    // Edge Function's test send. Nothing else is ever sent to an admin: the
+    // weekly ones go only to accounts with a plan on.
+    var admin = false;
+    if (!LBAuth.hasActivePlan()) {
+      var res = await LBAuth.db.rpc("is_portal_admin");
+      admin = !res.error && res.data === true;
+      if (!admin) return;
+    }
     if (Notification.permission === "granted") { refresh(); return; }
-    if (Notification.permission === "denied" || asked()) return;
+    if (Notification.permission === "denied" || (asked() && !admin)) return;
     show();
   });
 })();

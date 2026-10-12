@@ -2273,3 +2273,17 @@ begin
 exception when others then
   raise notice 'Push notifications are not scheduled yet (%). Turn on pg_net and pg_cron in Database -> Extensions and re-run this file.', sqlerrm;
 end $$;
+
+/* To try a notification on your own phone: turn notifications on from the
+   site's account page (or the control room) on that phone, then run this in
+   the SQL editor with that account's email - not as part of this file:
+
+     select net.http_post(
+       url     := 'https://jctvpizlzznabcjaxlgk.supabase.co/functions/v1/push',
+       headers := jsonb_build_object('Content-Type', 'application/json',
+                    'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets
+                                       where name = 'push_cron_secret')),
+       body    := jsonb_build_object('test', 'you@example.com'));
+
+   A few seconds later, what the function answered:
+     select status_code, content from net._http_response order by id desc limit 1; */
