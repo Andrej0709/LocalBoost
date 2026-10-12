@@ -581,7 +581,8 @@
     rating: undefined, // their stars (ratings table): undefined until loaded, null for none
     draft: { stars: 0, comment: "", publish: false },
     rated: false,      // the thank-you after rating, until the page is left
-    referrals: null    // { signed_up, in_beta } through their invite link
+    referrals: null,   // { signed_up, in_beta } through their invite link
+    events: []         // local_events rows from the portal, upcoming ones
   };
   var DISMISSED_KEY = "lb-cr-dismissed";
 
@@ -854,6 +855,13 @@
 
   async function loadCardData() {
     var uid = LBAuth.getUser().id;
+    // Town festivals and matches the team added in the portal, from today.
+    var today = new Date();
+    var events = await LBAuth.db.from("local_events").select("*")
+      .gte("starts_on", today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" +
+        String(today.getDate()).padStart(2, "0"))
+      .order("starts_on").limit(200);
+    if (!events.error) cards.events = events.data || [];   // the table isn't there until schema.sql runs
     var rating = await LBAuth.db.from("ratings").select("*").eq("user_id", uid)
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (!rating.error) cards.rating = rating.data || null;   // the table isn't there until schema.sql runs
@@ -1002,11 +1010,17 @@
   }
 
   // The next date worth an ad, once it's close enough to get into a Monday
-  // drop and still far enough to post ahead of it. The demo shows the next
-  // one whatever the day, so there's always one to try.
+  // drop and still far enough to post ahead of it: the fixed ones and the
+  // business's own town's days (dates-rs.js), and the events the team added
+  // for its town or country (local_events). The demo shows the next one
+  // whatever the day, so there's always one to try.
   function comingUp() {
     var gone = dismissed();
-    return LBDates.between(new Date(), 60).filter(function (d) {
+    var p = cards.demo ? {} : (LBAuth.getProfile() || {});
+    var all = LBDates.between(new Date(), 60, p.city)
+      .concat(LBDates.fromEvents(cards.events, p.country, p.city))
+      .sort(function (a, b) { return a.date - b.date; });
+    return all.filter(function (d) {
       var days = LBDates.daysUntil(d.date);
       return days >= 2 && (cards.demo || days <= d.lead + 7) && gone.indexOf("date-" + d.id) === -1;
     })[0] || null;
@@ -1026,9 +1040,12 @@
     if (!d) return null;
     var locale = window.LBLang ? LBLang.locale() : "en-US";
     var n = LBDates.daysUntil(d.date);
-    var c = card(T("COMING UP · IN " + n + " DAYS", "USKORO · ZA " + n + " " + srDays(n).toUpperCase()));
-    c.body.appendChild(make("div", "crc-title", d.name + " — " +
-      d.date.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })));
+    var c = card(d.local
+      ? T("IN YOUR TOWN · IN " + n + " DAYS", "U TVOM GRADU · ZA " + n + " " + srDays(n).toUpperCase())
+      : T("COMING UP · IN " + n + " DAYS", "USKORO · ZA " + n + " " + srDays(n).toUpperCase()));
+    var when = d.date.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
+    if (d.end) when += " – " + d.end.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
+    c.body.appendChild(make("div", "crc-title", d.name + " — " + when));
     c.body.appendChild(make("p", "crc-text", d.idea));
 
     var actions = make("div", "crc-actions");
@@ -1752,6 +1769,7 @@
         creatives: function () { return allCreatives; },
         onChange: function () { renderCalendar(); }
       });
+      LBWeather.mount(document.getElementById("weather"));
     }
 
     // Uploaded files only add to the score, so the board doesn't wait on them.

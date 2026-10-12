@@ -8,6 +8,12 @@
  * worked out for whichever year is asked. Names and ideas are written in
  * both languages here rather than in i18n-sr.js, so a page can re-render
  * them when the reader switches language.
+ *
+ * A date with a city belongs to that town only (its slava, its day) and is
+ * listed only when the caller names the city. Dates that move from year to
+ * year or that only one town cares about - a beer festival, a match of the
+ * national team - live in the local_events table instead, added from the
+ * portal; fromEvents() turns those rows into the same shape.
  */
 (function () {
   function sr() {
@@ -56,6 +62,28 @@
   function blackFriday(y) {
     var first = new Date(y, 10, 1).getDay();
     return new Date(y, 10, 1 + ((4 - first + 7) % 7) + 21 + 1);
+  }
+
+  // A town's name reduced to one spelling, so "Niš", "nis", "Ниш" and
+  // "NIŠ " match, and Belgrade's English name and its municipalities count
+  // as Belgrade.
+  var CYRILLIC = {
+    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "ђ": "dj", "е": "e", "ж": "z", "з": "z",
+    "и": "i", "ј": "j", "к": "k", "л": "l", "љ": "lj", "м": "m", "н": "n", "њ": "nj", "о": "o",
+    "п": "p", "р": "r", "с": "s", "т": "t", "ћ": "c", "у": "u", "ф": "f", "х": "h", "ц": "c",
+    "ч": "c", "џ": "dz", "ш": "s"
+  };
+  var CITY_ALIAS = {
+    "belgrade": "beograd", "novi beograd": "beograd", "zemun": "beograd",
+    "nish": "nis"
+  };
+  function cityKey(name) {
+    var s = String(name || "").toLowerCase()
+      .replace(/[\u0400-\u04ff]/g, function (c) { return CYRILLIC[c] || c; })
+      .replace(/đ/g, "dj");
+    try { s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); } catch (e) {}
+    s = s.replace(/[^a-z0-9]+/g, " ").trim();
+    return CITY_ALIAS[s] || s;
   }
 
   function fixed(month, day) {
@@ -140,7 +168,18 @@
       sr: ["Oci", "Ponuda za očeve, poslednje nedelje pred Božić."] },
     { key: "new-years-eve", when: fixed(12, 31), lead: 28,
       en: ["New Year's Eve", "Bookings for the night: the menu, the price and how many seats are left. People plan this one weeks ahead."],
-      sr: ["Doček Nove godine", "Rezervacije za doček: meni, cena i koliko je mesta ostalo. Ljudi ovo planiraju nedeljama unapred."] }
+      sr: ["Doček Nove godine", "Rezervacije za doček: meni, cena i koliko je mesta ostalo. Ljudi ovo planiraju nedeljama unapred."] },
+
+    // One town's own days.
+    { key: "novi-sad-day", city: "novi sad", when: fixed(2, 1), lead: 10,
+      en: ["Novi Sad City Day", "The town celebrates its charter: something for locals, a city-day offer, longer hours."],
+      sr: ["Dan grada Novog Sada", "Grad slavi svoj rođendan: nešto za Novosađane, ponuda za Dan grada, duže radno vreme."] },
+    { key: "belgrade-slava", city: "beograd", when: function (y) { return shift(orthodoxEaster(y), 39); }, lead: 10,
+      en: ["Ascension Day, Belgrade's city slava", "The whole town celebrates: a festive offer, or a reason to stop by after the procession."],
+      sr: ["Spasovdan, slava Beograda", "Ceo grad slavi: praznična ponuda ili razlog da se svrati posle litije."] },
+    { key: "nis-slava", city: "nis", when: fixed(6, 3), lead: 10,
+      en: ["Sts. Constantine and Helena, Niš's city slava", "Niš celebrates its own: a festive offer, a table for the family, longer hours."],
+      sr: ["Sveti car Konstantin i carica Jelena, slava Niša", "Niš slavi: praznična ponuda, sto za porodicu, duže radno vreme."] }
   ];
 
   function startOfDay(d) {
@@ -149,12 +188,15 @@
 
   // Every date from `from` for the next `days` days, soonest first, in the
   // reader's language. id is unique per occurrence ("valentines-2027").
-  function between(from, days) {
+  // city: the business's town, to add that town's own days (local: true).
+  function between(from, days, city) {
     var start = startOfDay(from);
     var end = shift(start, days);
+    var here = city ? cityKey(city) : "";
     var out = [];
     for (var y = start.getFullYear() - 1; y <= end.getFullYear(); y++) {
       DATES.forEach(function (x) {
+        if (x.city && x.city !== here) return;
         var date = x.when(y);
         if (date < start || date >= end) return;
         var text = sr() ? x.sr : x.en;
@@ -166,16 +208,52 @@
           idea: text[1],
           lead: x.lead,
           postFrom: shift(date, -x.lead),
-          names: [x.en[0], x.sr[0]]
+          names: [x.en[0], x.sr[0]],
+          local: !!x.city
         });
       });
     }
     return out.sort(function (a, b) { return a.date - b.date; });
   }
 
+  function parseDay(s) {
+    var p = String(s || "").split("-").map(Number);
+    return new Date(p[0], p[1] - 1, p[2]);
+  }
+
+  // local_events rows (from the portal) for this business's country and
+  // town - a row with no city is for the whole country - in the same shape
+  // as between()'s, plus end for an event over several days. Rows written
+  // only in Serbian show in Serbian in English too.
+  function fromEvents(rows, country, city) {
+    var here = cityKey(city);
+    return (rows || []).filter(function (r) {
+      return r && r.starts_on && (!r.country || r.country === country) &&
+        (!r.city || cityKey(r.city) === here);
+    }).map(function (r) {
+      var date = parseDay(r.starts_on);
+      var en = [r.name_en || r.name_sr, r.idea_en || r.idea_sr || ""];
+      var srText = [r.name_sr, r.idea_sr || r.idea_en || ""];
+      var text = sr() ? srText : en;
+      var lead = r.lead_days || 14;
+      return {
+        id: "ev-" + r.id,
+        key: "ev-" + r.id,
+        date: date,
+        end: r.ends_on ? parseDay(r.ends_on) : null,
+        name: text[0],
+        idea: text[1],
+        lead: lead,
+        postFrom: shift(date, -lead),
+        names: [en[0], srText[0]],
+        local: !!r.city
+      };
+    });
+  }
+
   function daysUntil(date) {
     return Math.round((startOfDay(date) - startOfDay(new Date())) / 86400000);
   }
 
-  window.LBDates = { between: between, daysUntil: daysUntil };
+  window.LBDates = { between: between, fromEvents: fromEvents, daysUntil: daysUntil, cityKey: cityKey };
 })();

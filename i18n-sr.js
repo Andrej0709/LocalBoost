@@ -725,6 +725,11 @@ window.LB_I18N_SR = {
     "What you sell": "Šta prodaješ",
     "Typical customer": "Tipična mušterija",
     "Brand vibe": "Atmosfera brenda",
+    "Alphabet for your ads": "Pismo za tvoje oglase",
+    "Latin — latinica": "Latinica",
+    "Cyrillic — ћирилица": "Ćirilica — ћирилица",
+    "Only for ads in Serbian. It changes the letters, never the words.":
+      "Samo za oglase na srpskom. Menja slova, nikad reči.",
     "Save changes": "Sačuvaj izmene",
     "Saved — the next drop renders from these details.":
       "Sačuvano — sledeći drop se pravi od ovih podataka.",
@@ -2270,6 +2275,7 @@ window.LB_I18N_SR = {
       ". Saglasan si da se pretplata automatski obnavlja po iznosu i datumu prikazanim u pregledu dok je ne otkažeš, da otkazivanje stupa na snagu na kraju perioda koji si platio i da se započeti periodi ne refundiraju. Cene uključuju PDV tamo gde se plaća; ništa se ne dodaje na prikazani iznos. Proces naručivanja vodi naš onlajn preprodavac Paddle.com, koji je Merchant of Record za sve naše porudžbine i brine o naplati, porezu i fakturama. Kreativi su AI-generisani i objavljuju se tek nakon tvog odobrenja — ti ostaješ oglašivač odgovoran za svaki oglas koji odobriš.",
 
     /* --- Control room: the days the business is closed (closed-days.js) -- */
+    "Weather and your ads": "Vreme i tvoji oglasi",
     "DAYS YOU'RE CLOSED": "DANI KAD NE RADIŠ",
     "Days you're closed": "Dani kad ne radiš",
     "Closed for a holiday or a break?": "Zatvoreno zbog praznika ili odmora?",

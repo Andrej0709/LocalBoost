@@ -17,6 +17,27 @@
   var ENTRIES = [
     {
       date: "2026-10-12",
+      en: ["Latin or Cyrillic",
+        "Pick the alphabet your ads are written in, under Account → Your business. It changes the letters, never the words."],
+      sr: ["Latinica ili ćirilica",
+        "Izaberi pismo kojim se pišu tvoji oglasi, pod Nalog → Tvoj biznis. Menja slova, nikad reči."]
+    },
+    {
+      date: "2026-10-12",
+      en: ["Ads that fit the weather",
+        "The control room shows the week's forecast for your town, and your ads follow it: something warm when it rains, cold drinks in a heat wave. One switch turns it off."],
+      sr: ["Oglasi koji prate vreme",
+        "Kontrolna soba pokazuje prognozu za tvoj grad za celu nedelju, a oglasi je prate: nešto toplo kad pada kiša, hladna pića po vrućini. Jedan prekidač to isključuje."]
+    },
+    {
+      date: "2026-10-12",
+      en: ["What's on in your town",
+        "\"Coming up\" now includes your town's own days — its slava, its festivals, big matches — so you can plan an ad for them in time."],
+      sr: ["Šta se dešava u tvom gradu",
+        "\"Uskoro\" sada uključuje i dane tvog grada — gradsku slavu, festivale, velike utakmice — da na vreme isplaniraš oglas za njih."]
+    },
+    {
+      date: "2026-10-12",
       en: ["Notifications on your phone",
         "Turn them on in the control room and your phone tells you when new ads arrive, the evening before unanswered ones expire, and when an ad goes live."],
       sr: ["Obaveštenja na telefonu",

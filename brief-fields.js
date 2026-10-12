@@ -13,6 +13,10 @@
    GOOGLE MAPS: optional, but when filled in it has to be a Google Maps link -
    the short one the Share button gives (maps.app.goo.gl) or a full one.
 
+   ALPHABET: which alphabet Serbian ads are written in (profiles.ad_script,
+   'latin' or 'cyrillic'). Asked only for a country where Cyrillic is in
+   everyday use; anywhere else the field hides and saves nothing.
+
    CLEARING THE PROFILES (signup only): whether the owner wants what's already
    on their channels deleted before we start posting. Stored as delete, keep,
    you_decide or other; "Other" opens a box for their own words. */
@@ -287,7 +291,23 @@
     };
   }
 
+  var CYRILLIC_COUNTRIES = ["RS", "BA", "ME"];
+
+  function scriptField(select, wrap, countrySelect) {
+    function sync() {
+      wrap.hidden = CYRILLIC_COUNTRIES.indexOf(codeOf(countrySelect.value)) === -1;
+    }
+    countrySelect.addEventListener("change", sync);
+    sync();
+    return {
+      value: function () { sync(); return wrap.hidden ? null : select.value; },
+      set: function (value) { select.value = value === "cyrillic" ? "cyrillic" : "latin"; sync(); },
+      sync: sync
+    };
+  }
+
   window.LBBriefFields = {
+    scriptField: scriptField,
     countryField: countryField,
     verticalField: verticalField,
     mapsField: mapsField,

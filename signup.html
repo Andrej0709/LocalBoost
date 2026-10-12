@@ -225,6 +225,14 @@
           <option>Local & authentic</option>
         </select>
       </div>
+      <div class="field" id="field-script" hidden>
+        <label for="script">Alphabet for your ads</label>
+        <select id="script" name="script">
+          <option value="latin">Latin — latinica</option>
+          <option value="cyrillic">Cyrillic — ћирилица</option>
+        </select>
+        <span class="field-hint">Only for ads in Serbian. It changes the letters, never the words.</span>
+      </div>
       <div class="field">
         <label for="colors">Brand colors or palette (optional)</label>
         <input id="colors" maxlength="200" name="colors" type="text" placeholder="e.g. Warm oak, matte black, morning light">
@@ -519,6 +527,7 @@
     if (profile.vertical) setVertical(profile.vertical);
     if (profile.profile_cleanup) cleanupField.set(profile.profile_cleanup, profile.profile_cleanup_note);
     if (profile.country) setCountry(profile.country);
+    if (profile.ad_script) scriptField.set(profile.ad_script);
     if (Array.isArray(profile.channels) && profile.channels.length) {
       Array.prototype.forEach.call(
         form.querySelectorAll('input[name="channels"]'),
@@ -546,7 +555,9 @@
 
   var countrySelect = document.getElementById("country");
   var countryField = LBBriefFields.countryField(countrySelect, document.getElementById("city-options"));
-  function setCountry(value){ countryField.set(value); }
+  var scriptField = LBBriefFields.scriptField(
+    document.getElementById("script"), document.getElementById("field-script"), countrySelect);
+  function setCountry(value){ countryField.set(value); scriptField.sync(); }
 
   // GOOGLE MAPS and CLEARING THE PROFILES: see brief-fields.js.
   LBBriefFields.mapsField(document.getElementById("maps"));
@@ -622,6 +633,7 @@
       brand_vibe:       document.getElementById("vibe").value,
       brand_colors:     document.getElementById("colors").value,
       avoid_notes:      document.getElementById("avoid").value,
+      ad_script:        scriptField.value(),
       channels:         checkedChannels(),
       plan:             planKey,
       // Evidence of the contract: stamped from the consent checkbox on this
@@ -640,8 +652,8 @@
     try {
       return await LBAuth.saveBrief(data);
     } catch (err) {
-      if (!/google_maps_url|profile_cleanup/.test(err.message || "")) throw err;
-      ["google_maps_url", "profile_cleanup", "profile_cleanup_note"].forEach(function(k){ delete data[k]; });
+      if (!/google_maps_url|profile_cleanup|ad_script/.test(err.message || "")) throw err;
+      ["google_maps_url", "profile_cleanup", "profile_cleanup_note", "ad_script"].forEach(function(k){ delete data[k]; });
       return LBAuth.saveBrief(data);
     }
   }

@@ -161,6 +161,7 @@
           <div class="acc-row"><div class="acc-row-label">What you sell</div><div class="acc-row-value" id="biz-what">—</div></div>
           <div class="acc-row"><div class="acc-row-label">Typical customer</div><div class="acc-row-value" id="biz-customer">—</div></div>
           <div class="acc-row"><div class="acc-row-label">Brand vibe</div><div class="acc-row-value" id="biz-vibe">—</div></div>
+          <div class="acc-row" id="biz-script-row" hidden><div class="acc-row-label">Alphabet for your ads</div><div class="acc-row-value" id="biz-script">—</div></div>
         </div>
 
         <form id="biz-form" hidden>
@@ -245,6 +246,14 @@
               <option>Premium & elegant</option>
               <option>Local & authentic</option>
             </select>
+          </div>
+          <div class="field" id="biz-field-script" hidden>
+            <label for="biz-in-script">Alphabet for your ads</label>
+            <select id="biz-in-script">
+              <option value="latin">Latin — latinica</option>
+              <option value="cyrillic">Cyrillic — ћирилица</option>
+            </select>
+            <span class="field-hint">Only for ads in Serbian. It changes the letters, never the words.</span>
           </div>
           <div style="display:flex;gap:10px;align-items:center">
             <button type="submit" class="btn-ghost">Save changes</button>

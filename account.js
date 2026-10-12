@@ -164,6 +164,7 @@
   var bizProfile = null;
   var bizVertical = null;
   var bizCountry = null;
+  var bizScript = null;
 
   function renderBusiness(profile) {
     bizProfile = profile;
@@ -185,11 +186,19 @@
     Object.keys(rows).forEach(function (id) {
       $(id).textContent = rows[id] || "—";
     });
+    // The alphabet only means something where ads are written in Serbian.
+    var cyrillicCountry = ["RS", "BA", "ME"].indexOf(LBBriefFields.countryCode(profile.country)) > -1;
+    $("biz-script-row").hidden = !cyrillicCountry || !("ad_script" in profile);
+    var t = function (text) { return window.LBLang ? LBLang.t(text) : text; };
+    $("biz-script").textContent = profile.ad_script === "cyrillic" ? t("Cyrillic — ћирилица")
+      : profile.ad_script === "latin" ? t("Latin — latinica") : "—";
   }
 
   function fillBusinessForm(profile) {
     $("biz-in-name").value = profile.business_name || "";
     bizCountry.set(profile.country || LBBriefFields.guessCountry());
+    bizScript.set(profile.ad_script);
+    if (!("ad_script" in profile)) $("biz-field-script").hidden = true;
     $("biz-in-city").value = profile.city || "";
     $("biz-in-address").value = profile.address || "";
     $("biz-in-hours").value = profile.opening_hours || "";
@@ -212,6 +221,7 @@
     bizVertical = LBBriefFields.verticalField(
       $("biz-in-vertical"), $("biz-field-vertical-other"), $("biz-in-vertical-other"));
     bizCountry = LBBriefFields.countryField($("biz-in-country"), $("biz-city-options"));
+    bizScript = LBBriefFields.scriptField($("biz-in-script"), $("biz-field-script"), $("biz-in-country"));
     LBBriefFields.mapsField($("biz-in-maps"));
 
     function setEditing(on) {
@@ -247,6 +257,7 @@
       // Only once schema.sql has added the column - before that the row
       // simply doesn't have it, and sending it would fail the whole save.
       if ("google_maps_url" in bizProfile) patch.google_maps_url = $("biz-in-maps").value.trim() || null;
+      if ("ad_script" in bizProfile) patch.ad_script = bizScript.value();
       button.disabled = true;
       try {
         var saved = await LBAuth.updateProfile(patch);

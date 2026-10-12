@@ -225,6 +225,26 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 .cd-form input:focus{outline:none;border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(124,198,255,.14)}
 .cd-card .notice{margin-top:14px}
 .cd-clash{color:#f0d9a8}
+/* The week's weather and the switch for fitting ads to it (weather.js) */
+.wx-card h3{margin:10px 0 6px;font-size:22px}
+.wx-switch{margin:0 0 18px;font-size:14.5px}
+.wx-strip{list-style:none;margin:0 0 14px;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wx-day{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:var(--r);border:1px solid var(--line);background:rgba(255,255,255,.02);text-align:center}
+.wx-day.is-rain,.wx-day.is-storm,.wx-day.is-snow,.wx-day.is-cold{border-color:rgba(124,198,255,.3)}
+.wx-day.is-hot,.wx-day.is-nice{border-color:rgba(240,217,168,.35)}
+.wx-wd{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.wx-glyph{font-size:20px;line-height:1.2;color:var(--text)}
+.wx-day.is-rain .wx-glyph,.wx-day.is-storm .wx-glyph,.wx-day.is-snow .wx-glyph,.wx-day.is-cold .wx-glyph{color:var(--acc)}
+.wx-day.is-hot .wx-glyph,.wx-day.is-nice .wx-glyph{color:#f0d9a8}
+.wx-temp{font-size:14px;font-weight:500;color:var(--text)}
+.wx-min{font-size:12px;color:var(--text-3)}
+.wx-tip{margin:0 0 6px;max-width:620px;font-size:14.5px;line-height:1.6;color:var(--text-2)}
+.wx-tip b{font-weight:500;color:var(--text)}
+.wx-hint{margin:0;max-width:620px;font-size:13.5px;line-height:1.6;color:var(--text-3)}
+.wx-credit{margin:12px 0 0;font-size:12px;color:var(--text-3)}
+.wx-credit a{color:var(--text-3)}
+.wx-card .notice{margin-top:14px}
+@media (max-width:520px){.wx-strip{gap:4px}.wx-day{padding:8px 2px}.wx-glyph{font-size:17px}.wx-wd{font-size:9.5px;letter-spacing:.04em}}
 /* The quick "never in my ads" picks under Anything to avoid */
 .eh-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .eh-tags button{padding:6px 12px;border-radius:9999px;border:1px solid var(--line-2);background:none;color:var(--text-2);font-family:var(--font);font-size:13px;cursor:pointer;transition:border-color .2s ease,color .2s ease}
@@ -335,6 +355,9 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 
     <!-- The days the business is closed (closed-days.js) -->
     <section id="closed-days" class="learned cd-card" hidden aria-label="Days you're closed"></section>
+
+    <!-- The week's weather and the switch for fitting ads to it (weather.js) -->
+    <section id="weather" class="learned wx-card" hidden aria-label="Weather and your ads"></section>
 
     <!-- What the customer has told the engine so far: shown once they've
          rejected an ad with a reason or rewritten one (renderLearned) -->
@@ -460,6 +483,7 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 <script src="brand-assets.js"></script>
 <script src="first-week.js"></script>
 <script src="dates-rs.js"></script>
+<script src="weather.js"></script>
 <script src="referral.js"></script>
 <script src="install-hint.js"></script>
 <script src="push.js"></script>

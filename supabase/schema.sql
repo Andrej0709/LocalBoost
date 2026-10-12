@@ -286,6 +286,27 @@ do $$ begin
   );
 exception when duplicate_object then null; end $$;
 
+/* --- Migration for the alphabet and the weather ------------------------------ */
+/* ad_script: which alphabet the engine writes Serbian ads in - 'latin' or      */
+/* 'cyrillic'. Asked only where Cyrillic is in everyday use (Serbia, Bosnia and */
+/* Herzegovina, Montenegro); null means nobody picked, and the engine writes    */
+/* Latin, the one most people read online. It changes the letters, never the   */
+/* words, and says nothing about ads in English.                                */
+/* weather_ads: on unless the customer switches it off in the control room      */
+/* (weather.js). While on, the engine reads the forecast for the business's     */
+/* city when it renders a drop and fits each ad to the weather of the day it    */
+/* posts: something warm on a cold wet day, the terrace and cold drinks in a    */
+/* heat wave, and never "come and sit outside" on a day set to pour. Off, the   */
+/* ads ignore the weather.                                                      */
+alter table public.profiles add column if not exists ad_script   text;
+alter table public.profiles add column if not exists weather_ads boolean not null default true;
+
+do $$ begin
+  alter table public.profiles add constraint profiles_ad_script check (
+    ad_script is null or ad_script in ('latin', 'cyrillic')
+  );
+exception when duplicate_object then null; end $$;
+
 /* Existing paying accounts predate current_period_end - seed it from the trial
    date they already have so finalize_billing_period() has an anchor to work from. */
 update public.profiles
@@ -573,7 +594,7 @@ begin
     address, opening_hours, phone,
     google_maps_url, profile_cleanup, profile_cleanup_note,
     what_you_sell, typical_customer, differentiator, why_us,
-    brand_vibe, brand_colors, avoid_notes, channels, plan,
+    brand_vibe, brand_colors, avoid_notes, ad_script, channels, plan,
     terms_accepted_at, terms_version, referred_by
   )
   values (
@@ -599,6 +620,8 @@ begin
     nullif(new.raw_user_meta_data ->> 'brand_vibe', ''),
     nullif(new.raw_user_meta_data ->> 'brand_colors', ''),
     nullif(new.raw_user_meta_data ->> 'avoid_notes', ''),
+    case when new.raw_user_meta_data ->> 'ad_script' in ('latin', 'cyrillic')
+      then new.raw_user_meta_data ->> 'ad_script' end,
     /* No more channels than the picked plan publishes to (limit null = all). */
     coalesce(
       (select array_agg(value #>> '{}')
@@ -771,6 +794,7 @@ begin
       'Opening hours: ' || nullif(p.opening_hours, ''),
       'Phone: '         || nullif(p.phone, ''),
       'Google Maps: '   || nullif(p.google_maps_url, ''),
+      'Alphabet for Serbian ads: ' || case p.ad_script when 'cyrillic' then 'Cyrillic' when 'latin' then 'Latin' end,
       'Channels: '      || nullif(array_to_string(p.channels, ', '), ''),
       'Clear the old profiles first: ' || case p.profile_cleanup
         when 'delete' then 'yes, delete everything'
@@ -1256,6 +1280,8 @@ begin
   editable.avoid_notes      := new.avoid_notes;
   editable.avoid_tags       := new.avoid_tags;
   editable.closed_days      := new.closed_days;
+  editable.ad_script        := new.ad_script;
+  editable.weather_ads      := new.weather_ads;
   editable.channels         := new.channels;
   editable.next_week_note   := new.next_week_note;
   editable.tours_seen       := new.tours_seen;
@@ -1637,6 +1663,55 @@ alter table public.updates enable row level security;
 drop policy if exists "updates select own" on public.updates;
 create policy "updates select own" on public.updates
   for select to authenticated using (user_id is null or user_id = auth.uid());
+
+/* ------------------------------------------------------------ */
+/* local_events - dates worth an ad that belong to one town, or that move */
+/* from year to year: a beer festival, the town's day, a match of the     */
+/* national team (city null: the whole country). The portal adds them as  */
+/* they're announced (portal-admin.sql gives admins the writes); the      */
+/* control room offers the next one for the customer's own city and       */
+/* country in its "coming up" card, next to the fixed dates in            */
+/* dates-rs.js. Public facts, so anyone may read them.                    */
+/* city and country are stored the way the brief stores them: country by  */
+/* its English name, city as typed ("Novi Sad"); the browser matches the  */
+/* city loosely (case, accents, Cyrillic, Belgrade = Beograd).            */
+/* ------------------------------------------------------------ */
+create table if not exists public.local_events (
+  id         uuid primary key default gen_random_uuid(),
+  country    text not null default 'Serbia',
+  city       text,
+  starts_on  date not null,
+  ends_on    date,
+  name_sr    text not null,
+  name_en    text,
+  idea_sr    text,
+  idea_en    text,
+  lead_days  int not null default 14,
+  created_by text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists local_events_starts_idx on public.local_events (starts_on);
+
+do $$ begin
+  alter table public.local_events add constraint local_events_fields check (
+    char_length(country) between 1 and 100
+    and char_length(coalesce(city, '')) <= 100
+    and char_length(name_sr) between 1 and 120
+    and char_length(coalesce(name_en, '')) <= 120
+    and char_length(coalesce(idea_sr, '')) <= 300
+    and char_length(coalesce(idea_en, '')) <= 300
+    and char_length(coalesce(created_by, '')) <= 100
+    and (ends_on is null or ends_on >= starts_on)
+    and lead_days between 1 and 60
+  );
+exception when duplicate_object then null; end $$;
+
+alter table public.local_events enable row level security;
+
+drop policy if exists "local events select all" on public.local_events;
+create policy "local events select all" on public.local_events
+  for select to anon, authenticated using (true);
 
 /* ------------------------------------------------------------ */
 /* ratings - "would you recommend Adronis?", asked in the control room   */
