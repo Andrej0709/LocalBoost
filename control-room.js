@@ -465,11 +465,32 @@
     var edited = creatives.filter(function (c) { return c.edited_at; })
       .sort(function (a, b) { return new Date(b.edited_at) - new Date(a.edited_at); });
     var answered = creatives.filter(function (c) { return c.outcome; });
+    var loved = creatives.filter(function (c) { return c.loved; })
+      .sort(function (a, b) { return new Date(b.loved_at || 0) - new Date(a.loved_at || 0); });
     var box = document.getElementById("learned");
     var grid = document.getElementById("learned-grid");
     grid.innerHTML = "";
-    box.hidden = !rejected.length && !edited.length && !answered.length;
+    box.hidden = !rejected.length && !edited.length && !answered.length && !loved.length;
     if (box.hidden) return;
+
+    // The ads they put a heart on in Approvals: what the engine leans towards.
+    if (loved.length) {
+      var hearts = learnedItem("ADS YOU LOVED");
+      var lovedCount = document.createElement("p");
+      lovedCount.className = "learned-text";
+      lovedCount.textContent = loved.length === 1
+        ? "1 ad — your next ones lean towards it."
+        : loved.length + " ads — your next ones lean towards them.";
+      hearts.appendChild(lovedCount);
+      loved.slice(0, 3).forEach(function (c) {
+        if (!c.headline) return;
+        var line = document.createElement("p");
+        line.className = "learned-quote";
+        line.textContent = "“" + c.headline + "”";
+        hearts.appendChild(line);
+      });
+      grid.appendChild(hearts);
+    }
 
     // Their answers to "did it bring anyone in?" (the card at the top).
     if (answered.length) {

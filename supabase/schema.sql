@@ -413,6 +413,15 @@ alter table public.creatives add column if not exists auto_approved_at timestamp
 /* expired_at: when expire_unreviewed() let this ad go (status 'expired'). */
 alter table public.creatives add column if not exists expired_at timestamptz;
 
+/* --- Migration for "I love this one" ----------------------------------------- */
+/* loved: the customer's heart on an ad they especially like (Approvals). The   */
+/* engine reads loved ads as the strongest "more like this": their look, tone   */
+/* and kind of offer count for more than an ad that was merely approved, and    */
+/* far more than one approved for them. loved_at is stamped by                  */
+/* protect_creative_fields. A rejected ad is never loved - rejecting clears it. */
+alter table public.creatives add column if not exists loved    boolean not null default false;
+alter table public.creatives add column if not exists loved_at timestamptz;
+
 /* ready_at: when the drop landed in Approvals (its status became               */
 /* awaiting_approval), stamped by drops_stamp_ready below. The 48 hours of      */
 /* auto-approval count from here.                                                */
@@ -1397,6 +1406,7 @@ begin
   editable.caption       := new.caption;
   editable.scheduled_at  := new.scheduled_at;
   editable.outcome       := new.outcome;
+  editable.loved         := new.loved;
   editable.updated_at    := new.updated_at;
 
   if new is distinct from editable then
@@ -1473,6 +1483,14 @@ begin
   if new.status <> 'rejected' then
     new.reject_reason := null;
     new.reject_note   := null;
+  end if;
+
+  /* A heart means "more like this" - it can't sit on an ad they turned down. */
+  if new.status = 'rejected' then
+    new.loved := false;
+  end if;
+  if new.loved is distinct from old.loved then
+    new.loved_at := case when new.loved then now() end;
   end if;
 
   return new;

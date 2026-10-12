@@ -17,6 +17,13 @@
   var ENTRIES = [
     {
       date: "2026-10-12",
+      en: ["A heart for the ones you love",
+        "Tap the heart on an ad in Approvals and your next ads lean towards it — its look, its tone, its kind of offer."],
+      sr: ["Srce za oglase koji ti se baš sviđaju",
+        "Dodirni srce na oglasu u Odobravanjima i sledeći oglasi će ličiti na njega — izgledom, tonom i vrstom ponude."]
+    },
+    {
+      date: "2026-10-12",
       en: ["Latin or Cyrillic",
         "Pick the alphabet your ads are written in, under Account → Your business. It changes the letters, never the words."],
       sr: ["Latinica ili ćirilica",

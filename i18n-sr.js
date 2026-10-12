@@ -2276,6 +2276,13 @@ window.LB_I18N_SR = {
 
     /* --- Control room: the days the business is closed (closed-days.js) -- */
     "Weather and your ads": "Vreme i tvoji oglasi",
+
+    /* --- "I love this one" on an ad (approvals.html, control-room.js) ---- */
+    "I love this one": "Baš mi se sviđa",
+    "You love this one. Tap to take it back.": "Ovaj ti se baš sviđa. Dodirni da povučeš.",
+    "Noted — your next ads will lean towards this one.": "Zapamćeno — sledeći oglasi će ličiti na ovaj.",
+    "ADS YOU LOVED": "OGLASI KOJI SU TI SE BAŠ DOPALI",
+    "1 ad — your next ones lean towards it.": "1 oglas — sledeći će ličiti na njega.",
     "DAYS YOU'RE CLOSED": "DANI KAD NE RADIŠ",
     "Days you're closed": "Dani kad ne radiš",
     "Closed for a holiday or a break?": "Zatvoreno zbog praznika ili odmora?",
@@ -2484,6 +2491,7 @@ window.LB_I18N_SR = {
     [/^7 days free, then (\S+) a year$/, "7 dana besplatno, zatim $1 godišnje"],
     // Uploaded logo, photos and menu (control-room.js).
     [/^(\d+) photos$/, "Fotografija: $1"],
+    [/^(\d+) ads — your next ones lean towards them\.$/, "Oglasa: $1 — sledeći će ličiti na njih."],
     [/^(\d+) of (\d+)$/, "$1 od $2"],
     [/^Remove (.+)$/, "Ukloni $1"],
     [/^Uploaded (\d+) of (\d+)\. (.+)$/, "Otpremljeno $1 od $2. $3"],

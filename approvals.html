@@ -57,6 +57,16 @@
 .approve-toast button{min-height:34px;padding:0 15px;border-radius:9999px;border:1px solid var(--acc-line);background:var(--acc-soft);color:var(--acc-2);font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;white-space:nowrap}
 .creative-card.is-rejected{opacity:1}
 .creative-card.is-rejected .creative-media,.creative-card.is-rejected .headline,.creative-card.is-rejected .caption{opacity:.5}
+/* "I love this one" (creatives.loved), on the image's bottom corner */
+.love-btn{position:absolute;right:12px;bottom:12px;z-index:2;display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(5,6,8,.62);-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);color:var(--text-2);cursor:pointer;transition:color .2s ease,border-color .2s ease,background .2s ease}
+.love-btn svg{width:20px;height:20px;display:block}
+.love-btn:hover{color:var(--text);border-color:rgba(255,255,255,.28)}
+.love-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(124,198,255,.3)}
+.love-btn[aria-pressed="true"]{color:#ff7a93;border-color:rgba(255,122,147,.45);background:rgba(58,14,26,.72)}
+.love-btn[aria-pressed="true"] path{fill:currentColor}
+.love-btn.pop svg{animation:love-pop .4s var(--ease)}
+@keyframes love-pop{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.love-btn.pop svg{animation:none}}
 .creative-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin-top:4px}
 .edited-mark{font-size:10px;letter-spacing:.1em;color:var(--acc)}
 .dropbar-link{align-self:center;padding:9px 6px;font-size:13.5px;font-weight:500;white-space:nowrap}
@@ -697,6 +707,13 @@
     chip.textContent = STATUS_LABEL[creative.status] || String(creative.status).toUpperCase();
     media.appendChild(chip);
 
+    // "I love this one" (creatives.loved): the strongest "more like this" the
+    // engine gets. Any ad still in play can carry it; a rejected one can't.
+    // Hidden until schema.sql has added the column.
+    if (creative.status !== "rejected" && creative.status !== "expired" && (demoMode || "loved" in creative)) {
+      media.appendChild(buildLove(creative, card));
+    }
+
     card.appendChild(media);
 
     var body = document.createElement("div");
@@ -849,6 +866,43 @@
     return card;
   }
 
+  var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.4-4.5-9.2-9C1.6 8.2 3.5 4.6 7 4.6c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.5 0 5.4 3.6 4.2 6.7-1.8 4.5-9.2 9-9.2 9z" ' +
+    'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+  // The ad just hearted, so its card pops once after the page redraws.
+  var justLoved = null;
+
+  function buildLove(creative, card) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "love-btn" + (justLoved === creative.id ? " pop" : "");
+    b.innerHTML = HEART;
+    b.setAttribute("aria-pressed", creative.loved ? "true" : "false");
+    var label = creative.loved ? "You love this one. Tap to take it back." : "I love this one";
+    b.setAttribute("aria-label", label);
+    b.title = label;
+    // The image behind it opens full size; the heart mustn't.
+    b.addEventListener("click", function (event) {
+      event.stopPropagation();
+      toggleLove(creative, card);
+    });
+    b.addEventListener("keydown", function (event) { event.stopPropagation(); });
+    return b;
+  }
+
+  async function toggleLove(creative, card) {
+    var on = !creative.loved;
+    justLoved = on ? creative.id : null;
+    var ok = await saveCreative(creative, { loved: on }, card);
+    justLoved = null;
+    if (!ok || !on) return;
+    var toast = document.getElementById("approve-toast");
+    document.getElementById("approve-toast-msg").textContent = "Noted — your next ads will lean towards this one.";
+    document.getElementById("approve-toast-undo").hidden = true;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 3000);
+  }
+
   async function setStatus(creative, status, card) {
     var previous = creative.status;
     creative.status = status;
@@ -875,6 +929,8 @@
     } else if (status !== "rejected") {
       creative.reject_reason = null;
       creative.reject_note = null;
+    } else {
+      creative.loved = false;
     }
     if (LBDemo.on && (status === "approved" || status === "rejected")) {
       LBDemo.track(status === "approved" ? "approve" : "reject");
