@@ -81,31 +81,74 @@
     else newsStamp();
   }
 
-  // "Beta · updated Oct 12" in the footer's bottom line, between the
-  // copyright and the credit: the way to whats-new.html, with a dot while
-  // there's news this device hasn't seen. Only for someone signed in on this
-  // device - the page has nothing for anyone else. whats-new.js is fetched
-  // here on the pages that don't load it themselves.
+  // The ways to whats-new.html, for someone signed in on this device (the
+  // page has nothing for anyone else):
+  //  - on the app pages, a pill beside the heading's eyebrow: the newest
+  //    change this device hasn't seen, with how many more, or a quiet
+  //    "What's new" once it's caught up;
+  //  - "Beta · updated Oct 12" in the footer's bottom line, between the
+  //    copyright and the credit, with a dot while there's news.
+  // whats-new.js is fetched here on the pages that don't load it themselves.
   function newsStamp() {
-    var bottom = document.querySelector(".foot-bottom");
-    if (!bottom || !hasStoredSession()) return;
-    var stamp = document.createElement("a");
-    stamp.href = "/whats-new.html";
-    stamp.className = "foot-news";
-    stamp.hidden = true;
-    bottom.insertBefore(stamp, bottom.children[1] || null);
+    if (!hasStoredSession()) return;
     var onPage = /(^|\/)whats-new\.html$/.test(location.pathname);
+
+    var bottom = document.querySelector(".foot-bottom");
+    var stamp = null;
+    if (bottom) {
+      stamp = document.createElement("a");
+      stamp.href = "/whats-new.html";
+      stamp.className = "foot-news";
+      stamp.hidden = true;
+      bottom.insertBefore(stamp, bottom.children[1] || null);
+    }
+
+    var eyebrow = onPage ? null : document.querySelector(".page-hero.is-app .eyebrow");
+    var pill = null;
+    if (eyebrow) {
+      pill = document.createElement("a");
+      pill.href = "/whats-new.html";
+      pill.className = "hero-news";
+      pill.hidden = true;
+      eyebrow.insertAdjacentElement("afterend", pill);
+    }
+    if (!stamp && !pill) return;
 
     function render() {
       var sr = window.LBLang && LBLang.get() === "sr";
-      var day = new Date(LBWhatsNew.entries[0].date + "T00:00:00")
-        .toLocaleDateString(window.LBLang ? LBLang.locale() : "en-US", { month: "short", day: "numeric" });
-      stamp.textContent = (sr ? "BETA · AŽURIRANO " : "BETA · UPDATED ") + day.toUpperCase();
-      var fresh = !onPage && LBWhatsNew.fresh().length > 0;
-      stamp.classList.toggle("is-fresh", fresh);
-      stamp.title = fresh ? (sr ? "Ima novosti — pogledaj šta je novo" : "There's news — see what's new")
-        : (sr ? "Šta je novo u Adronisu" : "What's new in Adronis");
-      stamp.hidden = false;
+      var fresh = onPage ? [] : LBWhatsNew.fresh();
+      if (stamp) {
+        var day = new Date(LBWhatsNew.entries[0].date + "T00:00:00")
+          .toLocaleDateString(window.LBLang ? LBLang.locale() : "en-US", { month: "short", day: "numeric" });
+        stamp.textContent = (sr ? "BETA · AŽURIRANO " : "BETA · UPDATED ") + day.toUpperCase();
+        stamp.classList.toggle("is-fresh", fresh.length > 0);
+        stamp.title = fresh.length ? (sr ? "Ima novosti — pogledaj šta je novo" : "There's news — see what's new")
+          : (sr ? "Šta je novo u Adronisu" : "What's new in Adronis");
+        stamp.hidden = false;
+      }
+      if (pill) {
+        pill.textContent = "";
+        pill.classList.toggle("is-fresh", fresh.length > 0);
+        if (fresh.length) {
+          var tag = document.createElement("b");
+          tag.textContent = sr ? "Novo" : "New";
+          pill.appendChild(tag);
+          var title = document.createElement("span");
+          title.className = "hero-news-title";
+          title.textContent = LBWhatsNew.text(fresh[0]).title;
+          pill.appendChild(title);
+          if (fresh.length > 1) {
+            var more = document.createElement("span");
+            more.className = "hero-news-more";
+            more.textContent = "+" + (fresh.length - 1);
+            pill.appendChild(more);
+          }
+        } else {
+          pill.appendChild(document.createTextNode(sr ? "Šta je novo" : "What's new"));
+        }
+        pill.appendChild(document.createTextNode(" →"));
+        pill.hidden = false;
+      }
     }
 
     function start() {
