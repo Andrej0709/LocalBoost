@@ -658,7 +658,9 @@
         var sub = reg && reg.pushManager && await reg.pushManager.getSubscription();
         if (sub && session) await db.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
       } catch (e) {}
-      await db.auth.signOut();
+      // Only this device: the account stays signed in on the customer's
+      // other phones and computers.
+      await db.auth.signOut({ scope: "local" });
       session = null;
       profile = null;
     },
