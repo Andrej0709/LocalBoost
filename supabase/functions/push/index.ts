@@ -11,8 +11,7 @@
 // checked against PUSH_CRON_SECRET instead.
 //
 // Secrets (Supabase > Edge Functions > Secrets):
-//   VAPID_PUBLIC_KEY   the same key as PUBLIC_KEY in the site's push.js
-//   VAPID_PRIVATE_KEY  its private half - never in the site's code
+//   VAPID_PRIVATE_KEY  the private half of PUBLIC_KEY below - never in the site's code
 //   VAPID_SUBJECT      who to contact about the pushes, e.g. mailto:you@gmail.com
 //   PUSH_CRON_SECRET   the same value as the Vault secret 'push_cron_secret'
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase itself.
@@ -28,11 +27,31 @@ const db = createClient(
   { auth: { persistSession: false } },
 );
 
-webpush.setVapidDetails(
-  Deno.env.get("VAPID_SUBJECT") || "mailto:hello@adronis.app",
-  Deno.env.get("VAPID_PUBLIC_KEY")!,
-  Deno.env.get("VAPID_PRIVATE_KEY")!,
-);
+// The public key is public anyway (it is in push.js), so it lives here and not
+// in a secret. Secrets pasted into the dashboard often pick up quotes, spaces
+// or a trailing "=", which web-push refuses - clean() strips those.
+const PUBLIC_KEY = "BMTI2s98ftv2SBWRjOEXqJjcIDFxhVONxaxYixJIDjnWJHN3ebYOkile1NYxrxdZZIXuLbUZsnP_Hb7SUgPOrB0";
+
+function clean(v: string | undefined) {
+  return (v || "").trim().replace(/^["']+|["']+$/g, "").trim();
+}
+
+// Set up on the first call rather than at start-up, so a bad secret comes back
+// as a readable error in net._http_response instead of crashing the function.
+let vapidError: string | null | undefined;
+function vapid() {
+  if (vapidError !== undefined) return vapidError;
+  try {
+    const subject = clean(Deno.env.get("VAPID_SUBJECT")).replace(/^mailto:\s*/i, "mailto:");
+    const privateKey = clean(Deno.env.get("VAPID_PRIVATE_KEY")).replace(/=+$/, "")
+      .replace(/\+/g, "-").replace(/\//g, "_");
+    webpush.setVapidDetails(subject || "mailto:hello@adronis.app", PUBLIC_KEY, privateKey);
+    vapidError = null;
+  } catch (err) {
+    vapidError = "VAPID setup failed: " + (err as Error).message;
+  }
+  return vapidError;
+}
 
 type Due = { kind: "ready" | "reminder"; drop_id: string; user_id: string; waiting: number; auto_approve: boolean };
 
@@ -78,6 +97,8 @@ Deno.serve(async (req) => {
   if (!secret || req.headers.get("x-cron-secret") !== secret) {
     return new Response("Forbidden", { status: 403 });
   }
+  const setupError = vapid();
+  if (setupError) return Response.json({ sent: 0, error: setupError }, { status: 500 });
 
   // A test send: {"test": "someone@example.com"} sends one notification to
   // every device that account turned notifications on for, and nothing else.
