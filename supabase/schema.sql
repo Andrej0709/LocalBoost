@@ -214,6 +214,25 @@ do $$ begin
   ) not valid;
 exception when duplicate_object then null; end $$;
 
+/* --- Migration for the Google Maps link and clearing the old profiles ------ */
+/* google_maps_url: the business on Google Maps, as the Share button gives it   */
+/* (signup and the account page check it is a Maps link). Optional.             */
+/* profile_cleanup: the signup's answer to "should we delete what's on your     */
+/* profiles now, before we start posting?" - 'delete', 'keep', 'you_decide'     */
+/* (we judge it) or 'other', with the customer's own words in                   */
+/* profile_cleanup_note. Rows from before stay null.                            */
+alter table public.profiles add column if not exists google_maps_url      text;
+alter table public.profiles add column if not exists profile_cleanup      text;
+alter table public.profiles add column if not exists profile_cleanup_note text;
+
+do $$ begin
+  alter table public.profiles add constraint profiles_maps_cleanup check (
+    char_length(coalesce(google_maps_url, '')) <= 500
+    and (profile_cleanup is null or profile_cleanup in ('delete', 'keep', 'you_decide', 'other'))
+    and char_length(coalesce(profile_cleanup_note, '')) <= 500
+  );
+exception when duplicate_object then null; end $$;
+
 /* --- Migration for "approve it for me if I don't get to it" ----------------- */
 /* auto_approve: the customer's own switch (account page). While it is on, an   */
 /* ad still waiting 48 hours after its drop landed is approved for them by      */
@@ -552,6 +571,7 @@ begin
   insert into public.profiles (
     id, email, business_name, country, city, vertical, website,
     address, opening_hours, phone,
+    google_maps_url, profile_cleanup, profile_cleanup_note,
     what_you_sell, typical_customer, differentiator, why_us,
     brand_vibe, brand_colors, avoid_notes, channels, plan,
     terms_accepted_at, terms_version, referred_by
@@ -567,6 +587,11 @@ begin
     left(nullif(btrim(new.raw_user_meta_data ->> 'address'), ''), 200),
     left(nullif(btrim(new.raw_user_meta_data ->> 'opening_hours'), ''), 300),
     left(nullif(btrim(new.raw_user_meta_data ->> 'phone'), ''), 40),
+    left(nullif(btrim(new.raw_user_meta_data ->> 'google_maps_url'), ''), 500),
+    case when new.raw_user_meta_data ->> 'profile_cleanup' in ('delete', 'keep', 'you_decide', 'other')
+      then new.raw_user_meta_data ->> 'profile_cleanup' end,
+    case when new.raw_user_meta_data ->> 'profile_cleanup' = 'other'
+      then left(nullif(btrim(new.raw_user_meta_data ->> 'profile_cleanup_note'), ''), 500) end,
     nullif(new.raw_user_meta_data ->> 'what_you_sell', ''),
     nullif(new.raw_user_meta_data ->> 'typical_customer', ''),
     nullif(new.raw_user_meta_data ->> 'differentiator', ''),
@@ -745,7 +770,14 @@ begin
       'Address: '       || nullif(p.address, ''),
       'Opening hours: ' || nullif(p.opening_hours, ''),
       'Phone: '         || nullif(p.phone, ''),
+      'Google Maps: '   || nullif(p.google_maps_url, ''),
       'Channels: '      || nullif(array_to_string(p.channels, ', '), ''),
+      'Clear the old profiles first: ' || case p.profile_cleanup
+        when 'delete' then 'yes, delete everything'
+        when 'keep' then 'no, keep everything'
+        when 'you_decide' then 'up to us'
+        when 'other' then coalesce(p.profile_cleanup_note, 'other')
+      end,
       '',
       'What they sell: '    || p.what_you_sell,
       'Typical customer: '  || p.typical_customer,
@@ -1211,6 +1243,9 @@ begin
   editable.address          := new.address;
   editable.opening_hours    := new.opening_hours;
   editable.phone            := new.phone;
+  editable.google_maps_url  := new.google_maps_url;
+  editable.profile_cleanup  := new.profile_cleanup;
+  editable.profile_cleanup_note := new.profile_cleanup_note;
   editable.auto_approve     := new.auto_approve;
   editable.what_you_sell    := new.what_you_sell;
   editable.typical_customer := new.typical_customer;

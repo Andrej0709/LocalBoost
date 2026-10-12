@@ -229,6 +229,11 @@ input,select,textarea{color-scheme:dark}
 .checkbox-row:has(input:disabled){opacity:.45;cursor:not-allowed}
 .checkbox-row:has(input:disabled):hover{border-color:var(--line-2)}
 .checkbox-row input[type=checkbox]:disabled{cursor:not-allowed}
+.checkbox-row input[type=radio]{flex:none;width:18px;height:18px;margin:0;accent-color:var(--acc);cursor:pointer}
+.field-hint{margin:0;font-size:13px;line-height:1.55;color:var(--text-3)}
+/* One question answered by picking a single option (signup's "clear the profiles first?"). */
+.cleanup-field{margin:28px 0 18px}
+.cleanup-q{margin:0 0 12px;font-size:13.5px;font-weight:500;line-height:1.5;color:var(--text)}
 .channel-hint{margin:12px 0 0;font-size:13px;line-height:1.55;color:var(--text-3)}
 .channel-hint.is-over{color:#f0a8a8}
 /* A consent line is a sentence, not a chip: the text wraps as one block beside the box. */

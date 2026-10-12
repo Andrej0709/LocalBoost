@@ -8,7 +8,14 @@
    type a place that isn't on the list.
 
    BUSINESS TYPE: picking "Other" opens a free-text box, and whatever the
-   customer types there is the business type we store. */
+   customer types there is the business type we store.
+
+   GOOGLE MAPS: optional, but when filled in it has to be a Google Maps link -
+   the short one the Share button gives (maps.app.goo.gl) or a full one.
+
+   CLEARING THE PROFILES (signup only): whether the owner wants what's already
+   on their channels deleted before we start posting. Stored as delete, keep,
+   you_decide or other; "Other" opens a box for their own words. */
 (function () {
 
   var COUNTRY_CODES = ("AD AE AF AG AI AL AM AO AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BW BY BZ " +
@@ -170,6 +177,56 @@
     };
   }
 
+  // Links to a place on Google Maps, with or without https://.
+  var MAPS_LINK = /^(https?:\/\/)?((www\.)?google\.[a-z.]{2,8}\/maps|maps\.google\.[a-z.]{2,8}|maps\.app\.goo\.gl|goo\.gl\/maps|g\.page|g\.co\/kgs)(\/|\?|$)/i;
+
+  function mapsField(input) {
+    function check() {
+      var value = input.value.trim();
+      input.setCustomValidity(value && !MAPS_LINK.test(value)
+        ? (window.LBLang ? LBLang.t : String)("That doesn't look like a Google Maps link. Open the business on Google Maps, tap Share and copy the link.")
+        : "");
+    }
+    // A link pasted without https:// gets it added, so the browser's own URL
+    // check lets it through.
+    input.addEventListener("change", function () {
+      var value = input.value.trim();
+      if (value && !/^https?:\/\//i.test(value) && MAPS_LINK.test(value)) input.value = "https://" + value;
+      check();
+    });
+    input.addEventListener("input", check);
+    check();
+  }
+
+  function cleanupField(group, otherField, otherInput) {
+    function picked() {
+      var box = group.querySelector('input[type="radio"]:checked');
+      return box ? box.value : null;
+    }
+    function sync() {
+      var isOther = picked() === "other";
+      otherField.hidden = !isOther;
+      otherInput.required = isOther;
+      if (!isOther) otherInput.value = "";
+    }
+    group.addEventListener("change", sync);
+    sync();
+
+    return {
+      value: picked,
+      note: function () {
+        return picked() === "other" ? otherInput.value.trim() || null : null;
+      },
+      set: function (value, note) {
+        Array.prototype.forEach.call(group.querySelectorAll('input[type="radio"]'), function (box) {
+          box.checked = box.value === value;
+        });
+        sync();
+        if (value === "other") otherInput.value = note || "";
+      }
+    };
+  }
+
   /* CHANNELS: each plan publishes to a set number of channels — one on Free,
      two on Counter, four on Storefront and Beta, every one on Franchise (null). Mirrors
      channel_limit() in supabase/schema.sql and the pricing section; keep them
@@ -233,6 +290,8 @@
   window.LBBriefFields = {
     countryField: countryField,
     verticalField: verticalField,
+    mapsField: mapsField,
+    cleanupField: cleanupField,
     channelsField: channelsField,
     countryCode: codeOf,
     countryLabel: countryLabel,

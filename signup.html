@@ -184,6 +184,11 @@
         <input id="website" maxlength="300" name="website" type="text" autocomplete="url" placeholder="@yourbusiness or yourbusiness.com">
       </div>
       <div class="field">
+        <label for="maps">Google Maps link (optional)</label>
+        <input id="maps" maxlength="500" name="maps" type="url" inputmode="url" placeholder="e.g. https://maps.app.goo.gl/..." aria-describedby="maps-hint">
+        <p class="field-hint" id="maps-hint">Find your business on Google Maps, tap Share and paste the link here.</p>
+      </div>
+      <div class="field">
         <label for="hours">Opening hours (optional)</label>
         <input id="hours" maxlength="300" name="hours" type="text" placeholder="e.g. Mon–Fri 7–22, Sat 8–23, closed Sunday">
       </div>
@@ -239,6 +244,20 @@
         <label class="checkbox-row"><input type="checkbox" name="channels" value="Pinterest">Pinterest</label>
       </div>
       <p class="channel-hint" id="channel-hint" aria-live="polite"></p>
+
+      <div class="cleanup-field">
+        <p class="cleanup-q" id="cleanup-label">Should we delete everything that's on your profiles now, before we start posting new things?</p>
+        <div class="checkbox-group" id="cleanup-group" role="radiogroup" aria-labelledby="cleanup-label">
+          <label class="checkbox-row"><input type="radio" name="cleanup" value="delete" required>Delete it all</label>
+          <label class="checkbox-row"><input type="radio" name="cleanup" value="keep">Don't delete anything</label>
+          <label class="checkbox-row"><input type="radio" name="cleanup" value="you_decide">You decide</label>
+          <label class="checkbox-row"><input type="radio" name="cleanup" value="other">Other</label>
+        </div>
+      </div>
+      <div class="field" id="field-cleanup-other" hidden>
+        <label for="cleanup-other">Tell us what you'd like</label>
+        <input id="cleanup-other" maxlength="500" name="cleanup_other" type="text" placeholder="e.g. Delete the old posts, but keep the menu photos">
+      </div>
 
       <div class="section-label" id="consent-label">BEFORE YOU START</div>
       <div class="checkbox-group consent-group" role="group" aria-labelledby="consent-label">
@@ -490,13 +509,15 @@
       website: "website", what: "what_you_sell", customer: "typical_customer",
       different: "differentiator", why: "why_us", vibe: "brand_vibe",
       colors: "brand_colors", avoid: "avoid_notes", city: "city",
-      address: "address", hours: "opening_hours", phone: "phone"
+      address: "address", hours: "opening_hours", phone: "phone",
+      maps: "google_maps_url"
     };
     Object.keys(map).forEach(function(id){
       var value = profile[map[id]];
       if (value) document.getElementById(id).value = value;
     });
     if (profile.vertical) setVertical(profile.vertical);
+    if (profile.profile_cleanup) cleanupField.set(profile.profile_cleanup, profile.profile_cleanup_note);
     if (profile.country) setCountry(profile.country);
     if (Array.isArray(profile.channels) && profile.channels.length) {
       Array.prototype.forEach.call(
@@ -526,6 +547,14 @@
   var countrySelect = document.getElementById("country");
   var countryField = LBBriefFields.countryField(countrySelect, document.getElementById("city-options"));
   function setCountry(value){ countryField.set(value); }
+
+  // GOOGLE MAPS and CLEARING THE PROFILES: see brief-fields.js.
+  LBBriefFields.mapsField(document.getElementById("maps"));
+  var cleanupField = LBBriefFields.cleanupField(
+    document.getElementById("cleanup-group"),
+    document.getElementById("field-cleanup-other"),
+    document.getElementById("cleanup-other")
+  );
 
   // Start on the country the browser says the reader is in, if it says.
   setCountry(LBBriefFields.guessCountry());
@@ -583,6 +612,9 @@
       address:          document.getElementById("address").value.trim(),
       opening_hours:    document.getElementById("hours").value.trim(),
       phone:            document.getElementById("phone").value.trim(),
+      google_maps_url:  document.getElementById("maps").value.trim() || null,
+      profile_cleanup:  cleanupField.value(),
+      profile_cleanup_note: cleanupField.note(),
       what_you_sell:    document.getElementById("what").value,
       typical_customer: document.getElementById("customer").value,
       differentiator:   document.getElementById("different").value,
@@ -600,6 +632,20 @@
     };
   }
 
+  // Until schema.sql has been re-run the database has no columns for the
+  // Google Maps link and the clear-the-profiles answer. The brief still saves
+  // without them rather than blocking the application.
+  async function saveBrief(){
+    var data = brief();
+    try {
+      return await LBAuth.saveBrief(data);
+    } catch (err) {
+      if (!/google_maps_url|profile_cleanup/.test(err.message || "")) throw err;
+      ["google_maps_url", "profile_cleanup", "profile_cleanup_note"].forEach(function(k){ delete data[k]; });
+      return LBAuth.saveBrief(data);
+    }
+  }
+
   form.addEventListener("submit", async function(e){
     e.preventDefault();
     if (!consentBox.checked) return;
@@ -609,7 +655,7 @@
     try {
       if (briefOnly) {
         // Save the brief only. The trial starts at checkout, not here.
-        await LBAuth.saveBrief(brief());
+        await saveBrief();
         if (!BETA) say(isFree ? "Brief saved — taking you to your approvals..." : "Brief saved — taking you to checkout...");
         await afterBrief();
         return;
@@ -636,7 +682,7 @@
         // the application fails, the account is already made - a second try
         // must not sign up again ("there's already an account").
         hideAccountFields();
-        await LBAuth.saveBrief(brief());
+        await saveBrief();
         await afterBrief();
       }
     } catch (err) {
@@ -714,7 +760,9 @@
       return !el.closest("[hidden]");
     });
     if (!fields.length) return;
+    // A row of radio buttons is one answer: it counts as done once any is picked.
     var done = fields.filter(function (el) {
+      if (el.type === "radio") return !!form.querySelector('input[name="' + el.name + '"]:checked');
       return el.type === "checkbox" ? el.checked : String(el.value || "").trim() !== "";
     }).length;
     var value = Math.round(done / fields.length * 100);

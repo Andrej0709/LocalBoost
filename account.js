@@ -171,6 +171,7 @@
       "biz-phone": profile.phone,
       "biz-vertical": profile.vertical,
       "biz-website": profile.website,
+      "biz-maps": profile.google_maps_url,
       "biz-what": profile.what_you_sell,
       "biz-customer": profile.typical_customer,
       "biz-vibe": profile.brand_vibe
@@ -189,6 +190,8 @@
     $("biz-in-phone").value = profile.phone || "";
     bizVertical.set(profile.vertical || "Bakery");
     $("biz-in-website").value = profile.website || "";
+    $("biz-in-maps").value = profile.google_maps_url || "";
+    $("biz-in-maps").closest(".field").hidden = !("google_maps_url" in profile);
     $("biz-in-what").value = profile.what_you_sell || "";
     $("biz-in-customer").value = profile.typical_customer || "";
     if (profile.brand_vibe) $("biz-in-vibe").value = profile.brand_vibe;
@@ -203,6 +206,7 @@
     bizVertical = LBBriefFields.verticalField(
       $("biz-in-vertical"), $("biz-field-vertical-other"), $("biz-in-vertical-other"));
     bizCountry = LBBriefFields.countryField($("biz-in-country"), $("biz-city-options"));
+    LBBriefFields.mapsField($("biz-in-maps"));
 
     function setEditing(on) {
       form.hidden = !on;
@@ -234,6 +238,9 @@
         typical_customer: $("biz-in-customer").value.trim(),
         brand_vibe:       $("biz-in-vibe").value
       };
+      // Only once schema.sql has added the column - before that the row
+      // simply doesn't have it, and sending it would fail the whole save.
+      if ("google_maps_url" in bizProfile) patch.google_maps_url = $("biz-in-maps").value.trim() || null;
       button.disabled = true;
       try {
         var saved = await LBAuth.updateProfile(patch);

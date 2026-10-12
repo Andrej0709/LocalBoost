@@ -2203,6 +2203,20 @@ window.LB_I18N_SR = {
     "City": "Grad",
     "What kind of business is it?": "Koji je to tip biznisa?",
     "Website or Instagram handle (optional)": "Sajt ili Instagram nalog (opciono)",
+    "Google Maps link (optional)": "Link do Google Maps-a (opciono)",
+    "e.g. https://maps.app.goo.gl/...": "npr. https://maps.app.goo.gl/...",
+    "Find your business on Google Maps, tap Share and paste the link here.":
+      "Pronađi svoj biznis na Google Maps-u, klikni Podeli i nalepi link ovde.",
+    "That doesn't look like a Google Maps link. Open the business on Google Maps, tap Share and copy the link.":
+      "Ovo ne liči na link sa Google Maps-a. Otvori biznis na Google Maps-u, klikni Podeli i kopiraj link.",
+    "Should we delete everything that's on your profiles now, before we start posting new things?":
+      "Da li želiš da obrišemo sve što je trenutno na tvojim profilima pre nego što počnemo da kačimo nove stvari?",
+    "Delete it all": "Brišite",
+    "Don't delete anything": "Nemojte da brišete",
+    "You decide": "Vi procenite",
+    "Tell us what you'd like": "Napiši nam šta želiš",
+    "e.g. Delete the old posts, but keep the menu photos":
+      "npr. Obrišite stare objave, ali ostavite slike menija",
     "Street address (optional)": "Adresa (opciono)",
     "Opening hours (optional)": "Radno vreme (opciono)",
     "Phone (optional)": "Telefon (opciono)",
