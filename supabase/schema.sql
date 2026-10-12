@@ -2439,6 +2439,259 @@ $$;
 revoke execute on function public.push_due() from public, anon, authenticated;
 
 /* ------------------------------------------------------------ */
+/* 12d. The ad engine - supabase/functions/engine. pg_cron calls it  */
+/*     every 2 minutes (section 13). Each week, from Monday 09:00    */
+/*     Belgrade time, it makes the drop of every account with a      */
+/*     running plan: Claude writes the week's ads from the brief,    */
+/*     the uploaded photos and menu, the forecast, the town's dates  */
+/*     and what the owner approved, loved, edited and turned down    */
+/*     before; Higgsfield makes each image; Claude checks it and a   */
+/*     new one is made when it falls short. Only when every image is */
+/*     done do the ads appear in Approvals, all at once - customers  */
+/*     can read creatives as soon as they exist, so the work in      */
+/*     progress lives in the two tables below until then.           */
+/*                                                                   */
+/*     engine_runs  one row per drop being made: which stage it is   */
+/*                  at, how many ads it gets, the last error.         */
+/*     engine_jobs  one row per ad being made: its text, its image   */
+/*                  prompt, the Higgsfield request, the check.        */
+/*                                                                   */
+/*     Neither is readable or writable from the browser: RLS is on   */
+/*     with no policy, and only the engine (service role) uses them. */
+/*     A missing API key puts the engine in practice mode (see the   */
+/*     function's header), and nothing reaches an account outside    */
+/*     ENGINE_TEST_EMAILS until ENGINE_LIVE is set.                   */
+/* ------------------------------------------------------------ */
+create table if not exists public.engine_runs (
+  drop_id      uuid primary key references public.drops (id) on delete cascade,
+  user_id      uuid not null references public.profiles (id) on delete cascade,
+  stage        text not null default 'copy',
+  planned      int not null,
+  attempts     int not null default 0,
+  practice     boolean not null default false,
+  locked_until timestamptz,
+  last_error   text,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+do $$ begin
+  alter table public.engine_runs add constraint engine_runs_values check (
+    stage in ('copy', 'images', 'delivered', 'failed')
+    and planned between 0 and 60
+  );
+exception when duplicate_object then null; end $$;
+
+create table if not exists public.engine_jobs (
+  id            uuid primary key default gen_random_uuid(),
+  drop_id       uuid not null references public.drops (id) on delete cascade,
+  user_id       uuid not null references public.profiles (id) on delete cascade,
+  /* The creative's id, picked now so its image can be stored under it. */
+  creative_id   uuid not null default gen_random_uuid(),
+  position      int not null,
+  channel       text not null,
+  format        text not null,
+  aspect_ratio  text not null,
+  headline      text,
+  caption       text,
+  idea          text,
+  image_prompt  text not null,
+  scheduled_at  timestamptz,
+  status        text not null default 'queued',
+  hf_request_id text,
+  /* When the current picture was asked for - how long Higgsfield has had it. */
+  submitted_at  timestamptz,
+  attempts      int not null default 0,
+  image_url     text,
+  check_score   int,
+  check_note    text,
+  /* The best image so far, kept when a retry turns out no better. */
+  best_url      text,
+  best_score    int,
+  locked_until  timestamptz,
+  last_error    text,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+  unique (drop_id, position)
+);
+
+do $$ begin
+  alter table public.engine_jobs add constraint engine_jobs_values check (
+    status in ('queued', 'running', 'checking', 'ready', 'failed')
+  );
+exception when duplicate_object then null; end $$;
+
+create index if not exists engine_jobs_drop_idx on public.engine_jobs (drop_id);
+create index if not exists engine_jobs_status_idx on public.engine_jobs (status, locked_until);
+
+alter table public.engine_runs enable row level security;
+alter table public.engine_jobs enable row level security;
+
+drop trigger if exists engine_runs_set_updated_at on public.engine_runs;
+create trigger engine_runs_set_updated_at
+  before update on public.engine_runs
+  for each row execute function public.set_updated_at();
+
+drop trigger if exists engine_jobs_set_updated_at on public.engine_jobs;
+create trigger engine_jobs_set_updated_at
+  before update on public.engine_jobs
+  for each row execute function public.set_updated_at();
+
+/* Which ad a cost row belongs to while the ad is still being made - the
+   creative doesn't exist yet, so creative_id is filled in on delivery. */
+alter table public.generation_costs add column if not exists job_id uuid
+  references public.engine_jobs (id) on delete set null;
+
+/* The finished images. Public, so Approvals, the previews and the channels
+   can load them by address; each sits at <user id>/<drop id>/<creative id>
+   with ids nobody can guess. Only the engine writes here. An account's
+   folder is cleared by the engine once the account is gone. */
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('creatives', 'creatives', true, 15728640,
+        array['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
+on conflict (id) do update
+  set public             = true,
+      file_size_limit    = excluded.file_size_limit,
+      allowed_mime_types = excluded.allowed_mime_types;
+
+/* The portal's Pause button (admin_set_engine_pause in portal-admin.sql)
+   stamps engine_paused_at; the engine makes nothing for a paused account. The
+   portal adds the column too - added here as well so this file runs first. */
+alter table public.profiles add column if not exists engine_paused_at timestamptz;
+
+/* The accounts whose next drop is due now, with the week it is for and how
+   many ads their plan gets. Due means: a running plan (a beta tester's
+   included), not paused from the portal, the brief filled in, and no drop yet for the week. The week's
+   drop is due from Monday 09:00 Belgrade time; an account that has never had
+   one gets its first straight away - for this week if there are days left
+   to post in, for next week from Saturday on. p_only limits it to those
+   emails (practice runs and testing); null means everyone. */
+create or replace function public.engine_due(p_only text[] default null, p_limit int default 5)
+returns table (user_id uuid, week_starting date, ads int)
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  with clock as (
+    select now() at time zone 'Europe/Belgrade' as local,
+           date_trunc('week', now() at time zone 'Europe/Belgrade')::date as monday
+  ),
+  accounts as (
+    select p.id, p.plan::text as plan,
+           not exists (select 1 from public.drops d where d.user_id = p.id) as first
+      from public.profiles p
+     where p.subscription_status in ('trialing', 'active')
+       and p.onboarded_at is not null
+       and p.engine_paused_at is null
+       and (p_only is null or lower(p.email) = any (select lower(e) from unnest(p_only) e))
+  ),
+  wanted as (
+    select a.id,
+           case when a.first and extract(isodow from c.local) >= 6 then c.monday + 7
+                else c.monday end as week,
+           case a.plan when 'storefront' then 12 when 'franchise' then 30 else 4 end as ads,
+           a.first, c.local, c.monday
+      from accounts a cross join clock c
+  )
+  select w.id, w.week, w.ads
+    from wanted w
+   where (w.first or w.local >= w.monday + interval '9 hours')
+     and not exists (select 1 from public.drops d
+                      where d.user_id = w.id and d.week_starting = w.week)
+   order by w.first desc, w.id
+   limit greatest(p_limit, 0);
+$$;
+
+/* Hands out up to p_limit drops at the given stage, or ads with one of the
+   given statuses, that no other run is working on, and holds them for
+   p_hold seconds - so two runs that overlap never work on the same thing. */
+create or replace function public.engine_claim_runs(p_stage text, p_limit int, p_hold int default 240)
+returns setof public.engine_runs
+language sql
+security definer
+set search_path = public, pg_temp
+as $$
+  update public.engine_runs r
+     set locked_until = now() + make_interval(secs => p_hold)
+   where r.drop_id in (select x.drop_id from public.engine_runs x
+                        where x.stage = p_stage
+                          and (x.locked_until is null or x.locked_until < now())
+                        order by x.created_at
+                        limit p_limit
+                        for update skip locked)
+  returning r.*;
+$$;
+
+create or replace function public.engine_claim_jobs(p_statuses text[], p_limit int, p_hold int default 240)
+returns setof public.engine_jobs
+language sql
+security definer
+set search_path = public, pg_temp
+as $$
+  update public.engine_jobs j
+     set locked_until = now() + make_interval(secs => p_hold)
+   where j.id in (select x.id from public.engine_jobs x
+                   where x.status = any (p_statuses)
+                     and (x.locked_until is null or x.locked_until < now())
+                   order by x.updated_at
+                   limit p_limit
+                   for update skip locked)
+  returning j.*;
+$$;
+
+/* Puts a finished drop in Approvals: one creative per ad that has an image,
+   all in one step, then the drop goes to awaiting_approval - which stamps
+   ready_at, lets last week's unreviewed ads expire and sends the "new ads"
+   notification. A posting time already gone by is left to the engine's next
+   good slot (null). Returns how many ads went in. */
+create or replace function public.engine_deliver(p_drop uuid, p_theme text default null)
+returns int
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  n int;
+begin
+  insert into public.creatives (id, drop_id, user_id, channel, format, headline, caption,
+                                image_url, status, scheduled_at)
+  select j.creative_id, j.drop_id, j.user_id, j.channel, j.format, j.headline, j.caption,
+         coalesce(j.image_url, j.best_url), 'pending',
+         case when j.scheduled_at > now() + interval '1 hour' then j.scheduled_at end
+    from public.engine_jobs j
+   where j.drop_id = p_drop
+     and coalesce(j.image_url, j.best_url) is not null
+     and j.status in ('ready', 'failed')
+   order by j.position
+  on conflict (id) do nothing;
+  get diagnostics n = row_count;
+
+  update public.generation_costs g
+     set creative_id = j.creative_id
+    from public.engine_jobs j
+   where g.job_id = j.id
+     and j.drop_id = p_drop
+     and g.creative_id is null
+     and exists (select 1 from public.creatives c where c.id = j.creative_id);
+
+  update public.drops
+     set status = 'awaiting_approval',
+         theme  = coalesce(left(p_theme, 200), theme)
+   where id = p_drop
+     and status = 'rendering';
+
+  update public.engine_runs set stage = 'delivered', locked_until = null where drop_id = p_drop;
+  return n;
+end;
+$$;
+
+revoke execute on function public.engine_due(text[], int) from public, anon, authenticated;
+revoke execute on function public.engine_claim_runs(text, int, int) from public, anon, authenticated;
+revoke execute on function public.engine_claim_jobs(text[], int, int) from public, anon, authenticated;
+revoke execute on function public.engine_deliver(uuid, text) from public, anon, authenticated;
+
+/* ------------------------------------------------------------ */
 /* 13. Scheduled jobs (pg_cron): auto-approval and expiry every 15   */
 /*     minutes (expiry 7 minutes after, so an ad due both ways is    */
 /*     approved), and error reports older than 30 days cleared every */
@@ -2482,6 +2735,52 @@ begin
 exception when others then
   raise notice 'Push notifications are not scheduled yet (%). Turn on pg_net and pg_cron in Database -> Extensions and re-run this file.', sqlerrm;
 end $$;
+
+/* The ad engine (section 12d): every 2 minutes pg_net calls the engine Edge
+   Function, which moves every drop in the making one step on. Like the push
+   function it only answers a call carrying the Vault secret
+   'engine_cron_secret', the same value as its ENGINE_CRON_SECRET. It may work
+   for up to two minutes, so the call waits that long. */
+do $$
+begin
+  create extension if not exists pg_net with schema extensions;
+  perform cron.schedule('adronis-engine', '*/2 * * * *', $job$
+    select net.http_post(
+      url     := 'https://jctvpizlzznabcjaxlgk.supabase.co/functions/v1/engine',
+      headers := jsonb_build_object(
+                   'Content-Type', 'application/json',
+                   'x-cron-secret', coalesce((select decrypted_secret from vault.decrypted_secrets
+                                               where name = 'engine_cron_secret'), '')),
+      body    := '{}'::jsonb,
+      timeout_milliseconds := 120000)
+  $job$);
+exception when others then
+  raise notice 'The ad engine is not scheduled yet (%). Turn on pg_net and pg_cron in Database -> Extensions and re-run this file.', sqlerrm;
+end $$;
+
+/* To make a drop right now for one account - a test account, say - run this
+   in the SQL editor with its email (not as part of this file). It is made
+   for the next week that account has no drop for, and shows up in its
+   Approvals a few minutes later:
+
+     select net.http_post(
+       url     := 'https://jctvpizlzznabcjaxlgk.supabase.co/functions/v1/engine',
+       headers := jsonb_build_object('Content-Type', 'application/json',
+                    'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets
+                                       where name = 'engine_cron_secret')),
+       body    := jsonb_build_object('make', 'you@example.com'),
+       timeout_milliseconds := 120000);
+
+   To see where every drop in the making stands:
+     select r.stage, r.planned, r.practice, r.attempts, r.last_error, p.email, d.week_starting,
+            (select count(*) from public.engine_jobs j where j.drop_id = r.drop_id and j.status = 'ready') as ready
+       from public.engine_runs r
+       join public.drops d on d.id = r.drop_id
+       join public.profiles p on p.id = r.user_id
+      order by r.created_at desc;
+
+   A drop that failed (stage 'failed') is tried again from where it stopped
+   with body := jsonb_build_object('retry', '<drop id>'). */
 
 /* To try a notification on your own phone: turn notifications on from the
    site's account page (or the control room) on that phone, then run this in
