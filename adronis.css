@@ -217,6 +217,7 @@ a.card:active{transform:translateY(-1px) scale(.99);transition-duration:.1s}
 .fb-panel textarea{width:100%;min-height:110px;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--field);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;resize:vertical;outline:none}
 .fb-panel textarea:focus{border-color:var(--acc-line);box-shadow:0 0 0 4px rgba(124,198,255,.14)}
 .fb-note{margin:0;font-size:13px;line-height:1.5;color:var(--text-2)}
+.fb-news{justify-self:center;font-size:13px;font-weight:500}
 @media (max-width:640px){.fb-panel textarea{font-size:16px}}
 @media print{.fb-btn,.fb-panel{display:none}}
 input,select,textarea{color-scheme:dark}

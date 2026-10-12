@@ -12,7 +12,8 @@
     "control-room.html": "Control room",
     "approvals.html": "Approvals",
     "history.html": "Past drops",
-    "account.html": "Account"
+    "account.html": "Account",
+    "whats-new.html": "What's new"
   };
 
   function t(text) {
@@ -39,7 +40,8 @@
       '<label class="fb-label" for="fb-text">What works, what doesn\'t, what\'s missing — anything helps.</label>' +
       '<textarea id="fb-text" required maxlength="4000" rows="5"></textarea>' +
       '<button type="submit" class="btn btn-block">Send</button>' +
-      '<p class="fb-note" role="status" hidden></p>';
+      '<p class="fb-note" role="status" hidden></p>' +
+      (page === "whats-new.html" ? "" : '<a class="fb-news" href="whats-new.html">See what we\'ve changed →</a>');
 
     var text = panel.querySelector("textarea");
     var send = panel.querySelector("button[type=submit]");

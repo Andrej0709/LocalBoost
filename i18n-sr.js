@@ -233,6 +233,24 @@ window.LB_I18N_SR = {
     "Nothing to show yet.": "Još nema šta da se prikaže.",
     "Once your first drop renders and you approve a few creatives, this is where you'll see exactly what's posting and when.":
       "Kad se tvoj prvi drop izrenderuje i odobriš par kreativa, ovde ćeš videti tačno šta izlazi i kada.",
+    "What's changed in Adronis →": "Šta se promenilo u Adronisu →",
+
+    /* --- What's new (whats-new.html; the entries are in whats-new.js) ------- */
+    "What's new — Adronis": "Šta je novo — Adronis",
+    "What's new": "Šta je novo",
+    "What's": "Šta se",
+    "changed": "promenilo",
+    "in Adronis.": "u Adronisu.",
+    "Everything we've added or fixed, newest first. What testers asked for is marked.":
+      "Sve što smo dodali ili popravili, od najnovijeg. Ono što su tražili testeri je označeno.",
+    "Log in to see what's new.": "Prijavi se da vidiš šta je novo.",
+    "Some of the news is written for your business alone — sign in and it loads here.":
+      "Deo novosti je napisan samo za tvoj lokal — prijavi se i učitaće se ovde.",
+    "Missing something, or something gets in your way? Tell us — what testers ask for ends up on this page.":
+      "Nešto ti fali ili ti nešto smeta? Javi nam — ono što testeri traže završi na ovoj stranici.",
+    "Send us a note →": "Pošalji nam poruku →",
+    "Use the Feedback button, bottom left": "Iskoristi dugme Utisak, dole levo",
+    "See what we've changed →": "Pogledaj šta smo promenili →",
 
     /* --- Home page: hero and proof --------------------------------------- */
     "Adronis — weekly ad drops for local business":

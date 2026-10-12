@@ -633,7 +633,7 @@
     if (!cards.on) return;
     var host = document.getElementById("cr-cards");
     host.innerHTML = "";
-    [noteCard(), outcomeCard(), ratingCard(), reportCard(), dateCard(), inviteCard()]
+    [noteCard(), newsCard(), outcomeCard(), ratingCard(), reportCard(), dateCard(), inviteCard()]
       .forEach(function (c) { if (c) host.appendChild(c); });
   }
 
@@ -878,6 +878,34 @@
     var actions = make("div", "crc-actions");
     actions.appendChild(button("btn-ghost", T("Got it", "Važi"), function () {
       dismiss("update-" + u.id);
+      renderCards();
+    }));
+    c.body.appendChild(actions);
+    return c.box;
+  }
+
+  // What changed in Adronis since this device last caught up (whats-new.js):
+  // the three newest, and the page with the rest. Opening the page or "Got
+  // it" counts as caught up.
+  function newsCard() {
+    if (cards.demo || !window.LBWhatsNew) return null;
+    var fresh = LBWhatsNew.fresh();
+    if (!fresh.length) return null;
+    var c = card(T("NEW IN ADRONIS", "NOVO U ADRONISU"));
+    c.body.appendChild(make("div", "crc-title", fresh.length === 1
+      ? T("One change since your last visit", "Jedna promena od tvoje poslednje posete")
+      : T(fresh.length + " changes since your last visit", "Promena od tvoje poslednje posete: " + fresh.length)));
+    var list = make("ul", "crc-news");
+    fresh.slice(0, 3).forEach(function (e) {
+      list.appendChild(make("li", null, LBWhatsNew.text(e).title));
+    });
+    c.body.appendChild(list);
+    var actions = make("div", "crc-actions");
+    var go = make("a", "btn-ghost", T("See what's new", "Pogledaj šta je novo"));
+    go.href = "whats-new.html";
+    actions.appendChild(go);
+    actions.appendChild(button("eh-plain", T("Got it", "Važi"), function () {
+      LBWhatsNew.markSeen();
       renderCards();
     }));
     c.body.appendChild(actions);

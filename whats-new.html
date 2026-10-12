@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="boot-gate.js"></script>
+<script src="errors.js"></script>
+<link rel="icon" type="image/png" sizes="256x256" href="icon-256.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What's new — Adronis</title>
+<meta name="description" content="Every change to Adronis, newest first, with the ones testers asked for marked.">
+<link rel="canonical" href="https://adronis.vercel.app/whats-new.html">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"></noscript>
+<link rel="stylesheet" href="adronis.css">
+<style>
+.wn-list{max-width:720px;margin:0 auto}
+.wn-day{margin:36px 0 12px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--text-2)}
+.wn-day:first-child{margin-top:0}
+.wn-item{position:relative;padding:20px 22px;border-radius:var(--r-lg);border:1px solid var(--line);background:var(--surface);margin-bottom:10px;box-shadow:var(--shadow-card)}
+.wn-item.is-new{border-color:var(--acc-line);background:radial-gradient(90% 140% at 100% 0%,rgba(92,182,247,.1),rgba(92,182,247,0) 60%),var(--surface)}
+.wn-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.wn-tags:empty{display:none}
+.wn-tag{padding:4px 10px;border-radius:9999px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;border:1px solid var(--acc-line);background:var(--acc-soft);color:var(--acc)}
+.wn-tag.is-yours{border-color:rgba(159,215,176,.4);background:rgba(159,215,176,.12);color:#9fd7b0}
+.wn-title{margin:0;font-size:17px;font-weight:600;line-height:1.35;color:var(--text);letter-spacing:-.015em}
+.wn-body{margin:6px 0 0;font-size:14.5px;line-height:1.6;color:var(--text-2);white-space:pre-wrap;overflow-wrap:anywhere}
+.wn-sign{margin-top:8px;font-size:13px;color:var(--text-3)}
+.wn-ask{max-width:720px;margin:40px auto 0;padding:22px;border-radius:var(--r-lg);border:1px dashed var(--line-3);text-align:center}
+.wn-ask p{margin:0;font-size:14.5px;line-height:1.6;color:var(--text-2)}
+.wn-ask a{display:inline-flex;margin-top:10px;font-size:14px;font-weight:500}
+@media (max-width:640px){.wn-item{padding:18px}}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
+  <div class="nav-links">
+    <a href="approvals.html">Approvals</a>
+    <a href="control-room.html">Control room</a>
+    <a href="history.html">Past drops</a>
+    <a href="/#pricing">Pricing</a>
+  </div>
+  <a href="account.html" id="nav-account">Account</a>
+  <a href="login.html" class="nav-cta" id="nav-cta">Log in</a>
+</nav>
+
+<header class="page-hero is-app is-narrow">
+  <div class="page-hero-inner">
+    <div class="eyebrow">What's new</div>
+    <h1 id="page-title">What's <em>changed</em> in Adronis.</h1>
+    <p id="page-sub">Everything we've added or fixed, newest first. What testers asked for is marked.</p>
+  </div>
+</header>
+
+<section class="section-tight">
+  <div class="wrap">
+
+    <!-- Signed out -->
+    <div id="signed-out" class="form-card" hidden style="max-width:460px;margin:0 auto;text-align:center">
+      <div class="label">NOT SIGNED IN</div>
+      <h3 style="margin:14px 0 8px">Log in to see what's new.</h3>
+      <p style="margin:0">Some of the news is written for your business alone — sign in and it loads here.</p>
+      <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <a href="login.html" class="btn">Log in<span class="mono">&rarr;</span></a>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="empty">
+      <div class="mono">LOADING</div>
+    </div>
+
+    <div id="wn" hidden>
+      <div class="wn-list" id="wn-list"></div>
+      <div class="wn-ask" id="wn-ask">
+        <p>Missing something, or something gets in your way? Tell us — what testers ask for ends up on this page.</p>
+        <a href="message-us.html" id="wn-ask-link">Send us a note &rarr;</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand"><img src="logo-128.png" alt="">Adronis</div>
+      <div class="foot-desc">Weekly ad drops for businesses with no marketing department.</div>
+    </div>
+    <div class="foot-col"><div class="foot-col-title">Product</div><a href="/#drop">How it works</a><a href="/#engine">Examples</a><a href="approvals.html">Approvals</a><a href="control-room.html">Control room</a></div>
+    <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="/#pricing">Pricing</a><a href="contact.html">Contact</a><a href="message-us.html">Message us</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+  </div>
+  <div class="foot-bottom"><span>&copy; 2026 ADRONIS</span><span>MADE BY <a href="https://creativesbyandrej.vercel.app" target="_blank" rel="noopener">CREATIVESBYANDREJ</a></span></div>
+</footer>
+
+<!-- The translation loads first so scripts that format a date on load already
+     know the reader's language. nav.js comes before it: its menu copies the nav
+     links, and must copy them before they are translated. -->
+<script src="nav.js"></script>
+<script src="cookies.js"></script>
+<script src="i18n-sr.js"></script>
+<script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="feedback.js"></script>
+<script src="whats-new.js"></script>
+<script>
+/* What's new: the changes in whats-new.js and the team's notes from the
+   portal (the updates table: for everyone, or for this account alone when
+   user_id is set), merged and newest first. The ones newer than the reader's
+   last visit are highlighted, then the visit counts as caught up. */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var notes = [];
+  var fresh = [];
+
+  function T(en, srText) {
+    return window.LBLang && LBLang.get() === "sr" ? srText : en;
+  }
+
+  function make(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function dayLabel(day) {
+    return new Date(day + "T00:00:00").toLocaleDateString(
+      window.LBLang ? LBLang.locale() : "en-US",
+      { weekday: "short", month: "long", day: "numeric", year: "numeric" }
+    ).toUpperCase();
+  }
+
+  // A local YYYY-MM-DD, so a note written late in the evening lands on the
+  // reader's own day.
+  function localDay(value) {
+    var d = new Date(value);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" +
+      String(d.getDate()).padStart(2, "0");
+  }
+
+  function items() {
+    var list = LBWhatsNew.entries.map(function (e) {
+      var t = LBWhatsNew.text(e);
+      return { day: e.date, at: e.date, title: t.title, body: t.body, asked: !!e.asked, isNew: fresh.indexOf(e) > -1 };
+    });
+    notes.forEach(function (n) {
+      list.push({ day: localDay(n.created_at), at: n.created_at, body: n.body, note: n });
+    });
+    // Newest first; on the same day the team's notes come before the list.
+    return list.sort(function (a, b) {
+      if (a.day !== b.day) return a.day < b.day ? 1 : -1;
+      if (!!a.note !== !!b.note) return a.note ? -1 : 1;
+      return 0;
+    });
+  }
+
+  function render() {
+    var host = $("wn-list");
+    host.innerHTML = "";
+    var lastDay = null;
+    items().forEach(function (it) {
+      if (it.day !== lastDay) {
+        host.appendChild(make("div", "wn-day", dayLabel(it.day)));
+        lastDay = it.day;
+      }
+      var box = make("article", "wn-item" + (it.isNew ? " is-new" : ""));
+      var tags = make("div", "wn-tags");
+      if (it.isNew) tags.appendChild(make("span", "wn-tag", T("NEW SINCE YOUR LAST VISIT", "NOVO OD TVOJE POSLEDNJE POSETE")));
+      if (it.note && it.note.user_id) tags.appendChild(make("span", "wn-tag is-yours", T("ON YOUR SUGGESTION", "NA TVOJ PREDLOG")));
+      else if (it.note) tags.appendChild(make("span", "wn-tag", T("FROM THE TEAM", "OD TIMA")));
+      if (it.asked) tags.appendChild(make("span", "wn-tag is-yours", T("ASKED FOR BY TESTERS", "TRAŽILI TESTERI")));
+      box.appendChild(tags);
+      if (it.title) box.appendChild(make("h2", "wn-title", it.title));
+      box.appendChild(make("p", "wn-body", it.body));
+      if (it.note) box.appendChild(make("div", "wn-sign", "— " + (it.note.created_by || "Adronis")));
+      host.appendChild(box);
+    });
+  }
+
+  LBAuth.ready.then(async function () {
+    if (!LBAuth.isLoggedIn()) {
+      $("loading").hidden = true;
+      $("signed-out").hidden = false;
+      return;
+    }
+    var cta = $("nav-cta");
+    cta.textContent = "Approvals";
+    cta.href = "approvals.html";
+
+    // Testers have the Feedback button on this page; point at it instead.
+    if ((LBAuth.getProfile() || {}).plan === "beta") {
+      var ask = $("wn-ask-link");
+      ask.textContent = "Use the Feedback button, bottom left";
+      ask.removeAttribute("href");
+      ask.style.color = "var(--text-3)";
+    }
+
+    fresh = LBWhatsNew.fresh();
+    var res = await LBAuth.db.from("updates").select("*").order("created_at", { ascending: false }).limit(50);
+    if (!res.error) notes = res.data || [];   // the table isn't there until schema.sql is re-run
+
+    $("loading").hidden = true;
+    $("wn").hidden = false;
+    render();
+    // Caught up: the control room stops offering these.
+    LBWhatsNew.markSeen();
+    document.addEventListener("lb:langchange", render);
+  });
+})();
+</script>
+</body>
+</html>

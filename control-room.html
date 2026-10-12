@@ -231,9 +231,10 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 .eh-tags button:hover{color:var(--text);border-color:var(--line-3)}
 .eh-tags button[aria-pressed="true"]{border-color:var(--acc-line);background:var(--acc-soft);color:var(--text)}
 .eh-tags-label{margin:2px 0 8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--text-3)}
-#history-link,#report-link{display:inline-flex;margin-top:16px;font-size:14px;font-weight:500}
-#report-link{margin-left:22px}
-@media (max-width:640px){#report-link{display:flex;margin-left:0;margin-top:10px}}
+#history-link,#report-link,#news-link{display:inline-flex;margin-top:16px;font-size:14px;font-weight:500}
+#report-link,#news-link{margin-left:22px}
+@media (max-width:640px){#report-link,#news-link{display:flex;margin-left:0;margin-top:10px}}
+.crc-news{margin:8px 0 0;padding-left:18px;font-size:14.5px;line-height:1.6;color:var(--text-2)}
 @media (max-width:860px){
   .cal-grid{grid-template-columns:1fr}
   .cal-day{min-height:0;flex-direction:row;flex-wrap:wrap;align-items:center}
@@ -403,6 +404,7 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
         </div>
         <a href="history.html" id="history-link">Every past week, with what you kept and why →</a>
         <a href="report.html" id="report-link">Your monthly report →</a>
+        <a href="whats-new.html" id="news-link">What's changed in Adronis →</a>
       </div>
 
     </div>
@@ -461,6 +463,7 @@ a.eh-toggle,a.eh-toggle:hover{text-decoration:none;color:inherit}
 <script src="referral.js"></script>
 <script src="install-hint.js"></script>
 <script src="push.js"></script>
+<script src="whats-new.js"></script>
 <script src="control-room.js"></script>
 </body>
 </html>

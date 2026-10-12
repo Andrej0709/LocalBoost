@@ -101,6 +101,7 @@
       case "control-room.html":
       case "history.html":
       case "report.html":
+      case "whats-new.html":
       case "login.html":
         return !hint || (BETA && !tester);
       case "signup.html":
