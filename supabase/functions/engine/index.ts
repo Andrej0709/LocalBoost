@@ -633,10 +633,15 @@ async function plan(log: Log) {
 // {"make": "someone@example.com"}: a drop for that account now, for the next
 // week it has none for - whatever the day, in practice mode or not.
 async function makeFor(email: string, log: Log) {
-  const who = await db.from("profiles").select("id, plan, subscription_status, onboarded_at, engine_paused_at").ilike("email", email.trim()).maybeSingle();
+  const who = await db.from("profiles")
+    .select("id, plan, subscription_status, onboarded_at, engine_paused_at, business_name, what_you_sell")
+    .ilike("email", email.trim()).maybeSingle();
   if (who.error || !who.data) return "No account with that email.";
   if (who.data.engine_paused_at) return "That account is paused in the portal's Costs view - resume it first.";
-  if (!who.data.onboarded_at) return "That account hasn't filled in its business brief yet.";
+  // The same test as engine_due: signup's stamp, or the name and what it sells.
+  const briefed = who.data.onboarded_at ||
+    (String(who.data.business_name || "").trim() && String(who.data.what_you_sell || "").trim());
+  if (!briefed) return "That account's brief has no business name or no \"what you sell\" yet.";
   if (!["trialing", "active"].includes(who.data.subscription_status)) {
     return "That account has no running plan - switch the Beta plan on for it in the portal first.";
   }

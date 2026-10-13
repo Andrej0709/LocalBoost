@@ -2561,8 +2561,11 @@ alter table public.profiles add column if not exists engine_paused_at timestampt
 
 /* The accounts whose next drop is due now, with the week it is for and how
    many ads their plan gets. Due means: a running plan (a beta tester's
-   included), not paused from the portal, the brief filled in, and no drop yet for the week. The week's
-   drop is due from Monday 09:00 Belgrade time; an account that has never had
+   included), not paused from the portal, the brief filled in, and no drop yet for the week.
+   The brief counts as filled in once signup stamped onboarded_at, or once
+   the business's name and what it sells are there - a tester whose brief was
+   typed in on the account page never went through signup's last step. The
+   week's drop is due from Monday 09:00 Belgrade time; an account that has never had
    one gets its first straight away - for this week if there are days left
    to post in, for next week from Saturday on. p_only limits it to those
    emails (practice runs and testing); null means everyone. */
@@ -2582,7 +2585,9 @@ as $$
            not exists (select 1 from public.drops d where d.user_id = p.id) as first
       from public.profiles p
      where p.subscription_status in ('trialing', 'active')
-       and p.onboarded_at is not null
+       and (p.onboarded_at is not null
+            or (nullif(btrim(p.business_name), '') is not null
+                and nullif(btrim(p.what_you_sell), '') is not null))
        and p.engine_paused_at is null
        and (p_only is null or lower(p.email) = any (select lower(e) from unnest(p_only) e))
   ),
