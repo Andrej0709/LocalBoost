@@ -49,7 +49,7 @@ Adronis never asks the owner to make anything. No brief queue, no revision calls
 - Name: **Adronis**. Tagline in use: "Weekly ad drops for businesses with no marketing department." Footer credit: "Made by CreativesByAndrej".
 - **English and Serbian are equal.** Every screen must work fully in both (`i18n.js`, `i18n-sr.js`); Serbian, Croatian, Bosnian and Montenegrin browsers get Serbian. Layouts must survive the longer Serbian strings.
 - Voice: plain, direct, respectful of a busy owner's time; no begging, no pressure tactics.
-- Team is described only as "a small team", with no claims about backgrounds. The current About page line about "engineers and former agency creative directors" does not match this and must be changed.
+- Team is described only as "a small team", with no claims about backgrounds. (The About page's old "engineers and former agency creative directors" line was removed on 2026-10-18.)
 - Logo and icons: `logo.png`, `logo-128.png`, `icon-256.png`, `icon-512.png`; Instagram avatar in `instagram/`.
 
 ## Evidence on Hand
