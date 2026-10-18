@@ -44,13 +44,14 @@
 <style>
 .creative-card.kb-focus{outline:2px solid var(--acc);outline-offset:3px;box-shadow:0 0 0 6px rgba(124,198,255,.12),var(--shadow-float)}
 .board-panel{padding:26px;border-radius:var(--r-xl);border:1px solid var(--line);background:rgba(12,14,18,.7);margin-bottom:22px}
-.bulk-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.bulk-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:24px}
 .bulk-actions button{min-height:40px;padding:0 16px;border-radius:9999px;font-size:13.5px;white-space:nowrap}
 #bulk-approve{border-color:var(--ok-line);background:var(--ok-soft);color:var(--ok)}
 #bulk-approve:hover{background:rgba(159,215,176,.2)}
 #bulk-reject:hover{border-color:var(--bad-line);color:var(--bad);background:var(--bad-soft)}
 #filterbar{margin-bottom:10px}
-#kb-hint{margin:6px 0 22px;font-size:11px;letter-spacing:.08em;color:var(--text-3)}
+#dropbar:empty{display:none}
+#kb-hint{margin:6px 0 0;font-size:11px;letter-spacing:.08em;color:var(--text-3)}
 #drop-title{font-size:clamp(24px,2.4vw,32px)}
 .approve-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(10px) scale(.98);z-index:80;display:flex;align-items:center;gap:14px;padding:10px 10px 10px 20px;border-radius:9999px;border:1px solid rgba(255,255,255,.12);background:rgba(20,22,27,.84);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 24px 60px -12px rgba(0,0,0,.8);font-size:14px;color:var(--text);opacity:0;pointer-events:none;visibility:hidden;transition:opacity .2s ease,transform .4s var(--ease),visibility .2s linear}
 .approve-toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1);pointer-events:auto;visibility:visible}
@@ -76,6 +77,7 @@
 .link-btn{background:none;border:none;padding:0;color:var(--text-3);font-size:13px;font-family:var(--font);cursor:pointer;text-decoration:underline;text-decoration-color:var(--line-3);text-underline-offset:3px;transition:color .2s ease}
 .link-btn:hover{color:var(--acc);text-decoration-color:var(--acc-line)}
 .creative-editor{display:flex;flex-direction:column;gap:12px}
+.creative-card.is-editing .creative-actions{display:none}
 .creative-editor label{display:flex;flex-direction:column;gap:6px;font-size:10px;letter-spacing:.1em;color:var(--text-3)}
 .creative-editor input,.creative-editor textarea,.reason-note input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--line-2);background:var(--field);color:var(--text);font-family:var(--font);font-size:14px;letter-spacing:0;line-height:1.5;resize:vertical}
 .creative-editor input:focus,.creative-editor textarea:focus,.reason-note input:focus{outline:none;border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(124,198,255,.14)}
@@ -100,11 +102,13 @@
 .approve-toast .reason-chips button:hover{border-color:var(--bad-line);color:var(--bad)}
 .reason-keys{font-size:10px;color:var(--text-3);margin-left:6px}
 .approve-toast .reason-toast-close{border-color:var(--line-2);background:none;color:var(--text-3)}
+.reason-toast-end{display:flex;gap:8px}
+@media (pointer:coarse){.approve-toast button,.approve-toast .reason-chips button{min-height:44px}}
 .ap-note{font-size:13.5px;color:var(--text-3)}
 .ap-note a{text-decoration:underline;text-underline-offset:3px}
-/* Auto-approval, at the bottom of the panel: the switch, and what it means
-   for this week's waiting ads right now. */
-.ap-auto-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;margin-top:6px;padding-top:18px;border-top:1px solid var(--line)}
+/* Auto-approval, under the ads: the switch, and what it means for this
+   week's waiting ads right now. */
+.ap-auto-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;margin-top:28px;padding:18px 22px;border-radius:var(--r-lg);border:1px solid var(--line);background:rgba(12,14,18,.7)}
 .ap-auto-row .acc-switch{flex:0 1 auto;font-size:14.5px}
 .ap-auto-status{flex:1 1 300px;margin:0;font-size:13.5px;line-height:1.55;color:var(--text-3)}
 .ap-auto-status b{color:var(--text);font-weight:600}
@@ -121,13 +125,23 @@
 @media (max-width:860px){#kb-hint{display:none}.reason-keys{display:none}}
 /* The small text buttons under each ad get a thumb-sized hit area on touch
    screens without moving anything. */
-@media (pointer:coarse){.link-btn{padding:10px 0;margin:-10px 0}}
+@media (pointer:coarse){
+  .link-btn{padding:13px 0;margin:-13px 0}
+  .love-btn{width:44px;height:44px}
+  .bulk-actions button{min-height:44px}
+}
 @media (max-width:640px){
   .board-panel{padding:18px;border-radius:22px}
+  /* Phones: the ads are the page. The filters already carry the same counts,
+     and the intro line is the same every week. */
+  .page-hero.is-app{padding-top:96px}
+  #page-sub,#counts{display:none}
+  .ap-auto-row{padding:16px 18px}
   /* Four fixed filters: wrapped onto two rows they all stay in sight, where
      the scrolling strip cut the last two off the edge. */
   #filterbar{flex-wrap:wrap;overflow:visible;margin:0 0 10px;padding:0}
-  .bulk-actions{justify-content:flex-start}
+  .bulk-actions{justify-content:stretch}
+  .bulk-actions button{flex:1 1 100%}
   .approve-toast{left:16px;right:16px;transform:translateY(10px)}
   .approve-toast.show{transform:translateY(0)}
 }
@@ -191,13 +205,7 @@
             <h2 id="drop-title">Your creatives</h2>
             <div id="drop-meta" class="mono" style="font-size:11px;letter-spacing:.1em;color:var(--text-3);margin-top:10px">&mdash;</div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px">
-            <div class="counts" id="counts"></div>
-            <div id="bulk-actions" class="bulk-actions" hidden>
-              <button type="button" id="bulk-approve" class="btn-ghost">Approve all waiting</button>
-              <button type="button" id="bulk-reject" class="btn-ghost">Reject all waiting</button>
-            </div>
-          </div>
+          <div class="counts" id="counts"></div>
         </div>
 
         <div class="dropbar" id="dropbar"></div>
@@ -217,15 +225,6 @@
           </div>
         </div>
         <div id="kb-hint" class="mono">Y approve &middot; N reject &middot; 1&ndash;5 say why &middot; &larr;&rarr; navigate</div>
-        <!-- Auto-approval: the same switch as on the account page -->
-        <div id="auto-row" class="ap-auto-row" hidden>
-          <label class="acc-switch" for="ap-auto">
-            <input type="checkbox" id="ap-auto" role="switch" aria-describedby="ap-auto-status">
-            <span class="acc-switch-track" aria-hidden="true"></span>
-            <span>Approve what I don't get to within 48 hours</span>
-          </label>
-          <p id="ap-auto-status" class="ap-auto-status" aria-live="polite"></p>
-        </div>
       </div>
 
       <div id="board-notice" class="notice" role="status" hidden style="margin:0 0 20px"></div>
@@ -233,10 +232,28 @@
 
       <div class="creative-grid" id="grid"></div>
 
+      <!-- After the ads, not above them: the owner sees every ad before
+           deciding on whatever is left in one go. -->
+      <div id="bulk-actions" class="bulk-actions" hidden>
+        <button type="button" id="bulk-reject" class="btn-ghost">Reject all waiting</button>
+        <button type="button" id="bulk-approve" class="btn-ghost">Approve all waiting</button>
+      </div>
+
       <div id="empty-filter" class="empty" hidden>
         <div class="mono">NOTHING HERE</div>
         <h3 id="empty-filter-title">All caught up.</h3>
         <p id="empty-filter-text">Nothing in this view right now.</p>
+      </div>
+
+      <!-- Auto-approval: the same switch as on the account page. It sits under
+           the ads, so on a phone the first ad is in sight as soon as the page opens. -->
+      <div id="auto-row" class="ap-auto-row" hidden>
+        <label class="acc-switch" for="ap-auto">
+          <input type="checkbox" id="ap-auto" role="switch" aria-describedby="ap-auto-status">
+          <span class="acc-switch-track" aria-hidden="true"></span>
+          <span>Approve what I don't get to within 48 hours</span>
+        </label>
+        <p id="ap-auto-status" class="ap-auto-status" aria-live="polite"></p>
       </div>
     </div>
 
@@ -266,9 +283,12 @@
 </div>
 
 <div id="reason-toast" class="approve-toast reason-toast" role="group" aria-labelledby="reason-toast-title">
-  <span id="reason-toast-title">Rejected. Why? <span class="mono reason-keys">1–5</span></span>
+  <span id="reason-toast-title" aria-live="polite">Rejected. Why? <span class="mono reason-keys">1–5</span></span>
   <div id="reason-toast-chips" class="reason-chips"></div>
-  <button type="button" id="reason-toast-close" class="reason-toast-close">Skip</button>
+  <div class="reason-toast-end">
+    <button type="button" id="reason-toast-undo">Undo</button>
+    <button type="button" id="reason-toast-close" class="reason-toast-close">Skip</button>
+  </div>
 </div>
 
 <section class="section-tight">
@@ -298,7 +318,7 @@
 <script src="cookies.js"></script>
 <script src="i18n-sr.js"></script>
 <script src="i18n.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script src="brand-assets.js"></script>
@@ -488,7 +508,7 @@
 
     var waiting = count("pending");
     var bulkActions = document.getElementById("bulk-actions");
-    if (waiting > 0) {
+    if (waiting > 0 && (currentFilter === "pending" || currentFilter === "all")) {
       bulkActions.hidden = false;
       document.getElementById("bulk-approve").textContent = "Approve all waiting (" + waiting + ")";
       document.getElementById("bulk-reject").textContent = "Reject all waiting (" + waiting + ")";
@@ -583,7 +603,7 @@
     renderExpiredNotice();
   });
 
-  // The switch at the bottom of the panel - the same one as on the account
+  // The switch under the ads - the same one as on the account
   // page - and one sentence on what it means for the ads waiting right now.
   // The public demo flips it on the page only, like everything else there.
   var autoRow = document.getElementById("auto-row");
@@ -668,6 +688,11 @@
 
     var media = document.createElement("div");
     media.className = "creative-media";
+    // The frame takes the ad's own shape ("9:16 story", "1:1 post"), and the
+    // whole image shows inside it: the owner approves the ad as it will post,
+    // not a crop of it. Formats without a ratio keep the 4:5 default.
+    var ratio = /(\d+)\s*:\s*(\d+)/.exec(creative.format || "");
+    if (ratio) media.style.aspectRatio = ratio[1] + " / " + ratio[2];
     var placeholder = document.createElement("div");
     placeholder.className = "ph";
     placeholder.textContent = creative.image_url ? "LOADING" : "NO IMAGE YET";
@@ -792,7 +817,7 @@
       var auto = document.createElement("span");
       auto.className = "mono edited-mark";
       auto.textContent = "APPROVED FOR YOU";
-      auto.title = "It waited 48 hours, so it was approved for you — the switch is above the ads.";
+      auto.title = "It waited 48 hours, so it was approved for you — the switch is below the ads.";
       tools.appendChild(auto);
     }
     if (creative.status !== "published" && creative.status !== "expired") {
@@ -849,8 +874,10 @@
       no.textContent = "Reject";
       no.addEventListener("click", function () { setStatus(creative, "rejected", card); });
 
-      actions.appendChild(yes);
+      // Reject on the left, Approve under the right thumb - the same sides as
+      // the swipe deck on the home page.
       actions.appendChild(no);
+      actions.appendChild(yes);
     } else {
       var undo = document.createElement("button");
       undo.className = "act-undo";
@@ -906,6 +933,7 @@
   async function setStatus(creative, status, card) {
     var previous = creative.status;
     creative.status = status;
+    card = card || document.createElement("div");
     card.classList.add("is-busy");
     notice.hidden = true;
 
@@ -936,8 +964,38 @@
       LBDemo.track(status === "approved" ? "approve" : "reject");
     }
 
+    // A keyboard user who decided from inside the card keeps their place: the
+    // card that took its spot gets focus, instead of focus falling to <body>.
+    var list = visibleCreatives();
+    var keyboard = false;
+    try { keyboard = card.contains(document.activeElement) && document.activeElement.matches(":focus-visible"); } catch (e) {}
+    var at = list.indexOf(creative);
     renderAll();
+    if (keyboard && at > -1) {
+      var left = visibleCreatives().length;
+      if (left) { focusIndex = Math.min(at, left - 1); applyFocusRing(true); }
+    }
+
+    if (previous !== "pending") return;
     if (status === "rejected") showReasonToast(creative);
+    else if (status === "approved") showDecisionToast(creative);
+  }
+
+  // One ad approved: say so, with a way back for a mis-tap.
+  function showDecisionToast(creative) {
+    hideReasonToast();
+    var toast = document.getElementById("approve-toast");
+    var undo = document.getElementById("approve-toast-undo");
+    document.getElementById("approve-toast-msg").textContent = "Approved.";
+    undo.hidden = false;
+    undo.onclick = function () {
+      clearTimeout(toastTimer);
+      toast.classList.remove("show");
+      if (creative.status === "approved") setStatus(creative, "pending", null);
+    };
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 5000);
   }
 
   // --- Feedback and text edits ---
@@ -1041,6 +1099,9 @@
 
   function openEditor(creative, card, body) {
     body.innerHTML = "";
+    // One pair of buttons at a time: Approve/Reject step aside while the
+    // text is open, and come back when the card is drawn again.
+    card.classList.add("is-editing");
     var form = document.createElement("form");
     form.className = "creative-editor";
 
@@ -1077,8 +1138,8 @@
     cancel.className = "act-no";
     cancel.textContent = "Cancel";
     cancel.addEventListener("click", function () { renderAll(); });
-    row.appendChild(save);
     row.appendChild(cancel);
+    row.appendChild(save);
 
     form.appendChild(hLabel);
     form.appendChild(cLabel);
@@ -1195,12 +1256,12 @@
   }
 
   // Rejecting from the queue drops the card out of view, so the reasons ride
-  // along in a toast for a few seconds — clicks, or keys 1–5.
-  var reasonTimer = null;
+  // along in a toast — clicks, or keys 1–5 — with Undo for a mis-tap. It
+  // stays until it's answered, skipped or undone: a timer would pull it out
+  // from under a thumb that was just reaching for a reason.
   var reasonFor = null;
 
   function hideReasonToast() {
-    clearTimeout(reasonTimer);
     reasonFor = null;
     document.getElementById("reason-toast").classList.remove("show");
   }
@@ -1218,9 +1279,9 @@
       host.appendChild(chip);
     });
     reasonFor = creative;
+    clearTimeout(toastTimer);
+    document.getElementById("approve-toast").classList.remove("show");
     toast.classList.add("show");
-    clearTimeout(reasonTimer);
-    reasonTimer = setTimeout(hideReasonToast, 8000);
   }
 
   function pickReason(key) {
@@ -1239,10 +1300,12 @@
     });
   }
 
-  document.getElementById("reason-toast").addEventListener("focusin", function () {
-    clearTimeout(reasonTimer);
-  });
   document.getElementById("reason-toast-close").addEventListener("click", hideReasonToast);
+  document.getElementById("reason-toast-undo").addEventListener("click", function () {
+    var creative = reasonFor;
+    hideReasonToast();
+    if (creative && creative.status === "rejected") setStatus(creative, "pending", null);
+  });
 
   // Once a drop has nothing left waiting, mark the drop itself approved.
   // Only between those two states — the engine owns every other one, and the
@@ -1348,6 +1411,7 @@
   });
 
   function showUndoToast(ids, appliedStatus) {
+    hideReasonToast();
     var toast = document.getElementById("approve-toast");
     document.getElementById("approve-toast-msg").textContent =
       ids.length + (ids.length === 1 ? " creative " : " creatives ") +

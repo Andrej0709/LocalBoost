@@ -192,7 +192,7 @@ a.card:active{transform:translateY(-1px) scale(.99);transition-duration:.1s}
 .field{display:grid;gap:8px;margin-bottom:18px}
 .field label{font-family:var(--font);font-size:13.5px;font-weight:500;letter-spacing:0;color:var(--text);text-transform:none}
 .field input,.field select,.field textarea{width:100%;min-height:50px;padding:13px 15px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--field);color:var(--text);font-size:15px;font-family:var(--font);outline:none;box-shadow:inset 0 1px 2px rgba(0,0,0,.35);transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
-.field input::placeholder,.field textarea::placeholder{color:var(--text-4)}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-3)}
 .field input:hover,.field select:hover,.field textarea:hover{border-color:var(--line-3)}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--acc-line);background:#0b0e12;box-shadow:0 0 0 4px rgba(124,198,255,.14)}
 .field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible{outline:none;border-color:var(--acc);box-shadow:0 0 0 4px rgba(124,198,255,.22)}
@@ -219,7 +219,7 @@ a.card:active{transform:translateY(-1px) scale(.99);transition-duration:.1s}
 .fb-note{margin:0;font-size:13px;line-height:1.5;color:var(--text-2)}
 .fb-news{justify-self:center;font-size:13px;font-weight:500}
 @media (max-width:640px){.fb-panel textarea{font-size:16px}}
-@media print{.fb-btn,.fb-panel{display:none}}
+@media print{.fb-btn,.fb-panel,.demo-bar{display:none}}
 input,select,textarea{color-scheme:dark}
 
 .checkbox-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:10px}
@@ -280,6 +280,11 @@ input,select,textarea{color-scheme:dark}
 .legal p a:hover,.legal li a:hover{text-decoration-color:var(--acc)}
 .legal strong{color:var(--text)}
 
+/* "Skip to content" (nav.js): off screen until a keyboard user tabs to it. */
+.skip-link{position:fixed;top:12px;left:12px;z-index:200;padding:10px 18px;border-radius:9999px;background:var(--acc);color:var(--ink);font-size:14px;font-weight:600;transform:translateY(-160%);transition:transform .2s var(--ease)}
+.skip-link:focus{transform:none;outline:2px solid var(--acc-2);outline-offset:3px;color:var(--ink)}
+.skip-target:focus{outline:none}
+
 /* ------------------------------------------------------------- footer --- */
 footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transparent}
 .foot-cta{position:relative;max-width:1200px;margin:0 auto 64px;padding:40px;border-radius:var(--r-xl);border:1px solid var(--line);background:radial-gradient(80% 140% at 100% 0%,rgba(92,182,247,.16),rgba(92,182,247,0) 60%),var(--surface);box-shadow:var(--shadow-card);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px;overflow:hidden}
@@ -316,6 +321,17 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
 @media (prefers-reduced-motion:reduce){.hero-news b{animation:none}}
 @media print{.hero-news{display:none}}
 @media (max-width:860px){.foot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.foot-grid>:first-child{grid-column:1/-1}}
+/* Touch screens: footer and logo links get a thumb-sized (44px) hit area.
+   The column gap shrinks by the same amount, so the footer barely grows. */
+@media (pointer:coarse){
+  .foot-col{gap:0}
+  .foot-col-title{margin-bottom:2px}
+  .foot-col a{display:flex;align-items:center;min-height:44px}
+  .foot-bottom a,.foot-bottom .foot-news{display:inline-flex;align-items:center;min-height:44px;margin:-14px 0}
+  .nav-logo{min-height:44px}
+  /* Pills a thumb hits: the filter and week strips, two-way switches. */
+  .dropbar button,.tabswitch button{min-height:44px}
+}
 
 /* ---------------------------------------------------------- empty/load --- */
 .empty{padding:56px 24px;border-radius:var(--r-lg);border:1px dashed var(--line-3);background:rgba(255,255,255,.015);text-align:center}
@@ -381,8 +397,8 @@ footer{position:relative;margin-top:80px;padding:0 24px 40px;background:transpar
 .creative-card.is-rejected{opacity:.5}
 .creative-card.is-busy{opacity:.55;pointer-events:none}
 
-.creative-media{position:relative;aspect-ratio:4/5;background:linear-gradient(135deg,#12151a,#0c0e12);cursor:zoom-in;overflow:hidden}
-.creative-media img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transform:scale(1.02);transition:opacity .45s ease,transform .8s var(--ease)}
+.creative-media{position:relative;aspect-ratio:4/5;max-height:78svh;background:linear-gradient(135deg,#12151a,#0c0e12);cursor:zoom-in;overflow:hidden}
+.creative-media img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;display:block;opacity:0;transform:scale(1.02);transition:opacity .45s ease,transform .8s var(--ease)}
 .creative-media .badge,.creative-media .status-chip{z-index:2}
 .creative-media img.loaded{opacity:1;transform:none}
 .creative-card:hover .creative-media img.loaded{transform:scale(1.025)}

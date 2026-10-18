@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Shown by sw.js when a page can't be reached because the device is offline.
+     It is cached once and served with no network, so everything it needs is
+     inline: no fonts, no adronis.css, no i18n.js. The logo is cached with it. -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No connection — Adronis</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" sizes="256x256" href="/icon-256.png">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:#050608;color:#b3b9c4;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;text-align:center}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(60% 45% at 50% -8%,rgba(92,182,247,.13),rgba(5,6,8,0) 62%),#050608}
+main{width:100%;max-width:380px}
+img{display:block;width:48px;height:48px;margin:0 auto 28px;opacity:.9}
+h1{margin:0 0 10px;color:#f2f4f7;font-size:26px;line-height:1.2;font-weight:650;letter-spacing:-.02em;text-wrap:balance}
+p{margin:0 0 28px;text-wrap:pretty}
+button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 26px;border:0;border-radius:9999px;background:#7cc6ff;color:#03111d;font:inherit;font-weight:600;cursor:pointer;transition:background .2s ease,transform .15s ease}
+button:hover{background:#aadcff}
+button:active{transform:scale(.97)}
+button:focus-visible{outline:2px solid #aadcff;outline-offset:3px}
+.note{margin:18px 0 0;font-size:13px;color:#878d98}
+</style>
+</head>
+<body>
+<main>
+  <img src="/logo-128.png" alt="Adronis" width="48" height="48">
+  <h1 id="t">You're offline</h1>
+  <p id="b">Adronis needs the internet to show your ads. Check your Wi-Fi or mobile data and try again.</p>
+  <button type="button" id="r">Try again</button>
+  <p class="note" id="n" aria-live="polite">The page reloads by itself once you're back online.</p>
+</main>
+<script>
+(function () {
+  // Same choice of language as i18n.js, without its dictionary: the
+  // remembered choice, then the browser's languages and time zone.
+  var sr = false;
+  try {
+    var saved = localStorage.getItem("lb-lang");
+    if (saved === "sr" || saved === "en") sr = saved === "sr";
+    else {
+      var list = navigator.languages || [navigator.language || ""];
+      for (var i = 0; i < list.length; i++) {
+        if (/^(sr|hr|bs|me|sh)\b/.test(String(list[i] || "").toLowerCase())) sr = true;
+      }
+      if (!sr) sr = ["Europe/Belgrade", "Europe/Zagreb", "Europe/Sarajevo", "Europe/Podgorica"]
+        .indexOf(Intl.DateTimeFormat().resolvedOptions().timeZone) > -1;
+    }
+  } catch (e) {}
+
+  if (sr) {
+    document.documentElement.lang = "sr";
+    document.title = "Nema interneta — Adronis";
+    document.getElementById("t").textContent = "Nema interneta";
+    document.getElementById("b").textContent = "Adronisu treba internet da ti pokaže oglase. Proveri Wi-Fi ili mobilne podatke i probaj ponovo.";
+    document.getElementById("r").textContent = "Probaj ponovo";
+    document.getElementById("n").textContent = "Stranica će se sama učitati čim se internet vrati.";
+  }
+
+  function retry() { location.reload(); }
+  document.getElementById("r").addEventListener("click", retry);
+  window.addEventListener("online", retry);
+})();
+</script>
+</body>
+</html>

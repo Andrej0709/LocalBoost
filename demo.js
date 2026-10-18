@@ -204,11 +204,13 @@
     // The strip at the top of a demo page: what this is, the other half of
     // the app, and the way in.
     bar: function () {
-      var host = document.querySelector(".section-tight .wrap-wide");
+      var host = document.querySelector(".section-tight .wrap-wide, .rp-page");
       if (!host || document.getElementById("demo-bar")) return;
       var other = page === "control-room.html"
         ? { href: "approvals.html" + demoQuery, label: "← Back to approvals" }
-        : { href: "control-room.html" + demoQuery, label: "See the control room →" };
+        : page === "report.html"
+          ? null // the report has its own way back to the control room
+          : { href: "control-room.html" + demoQuery, label: "See the control room →" };
 
       var bar = document.createElement("div");
       bar.id = "demo-bar";
@@ -218,7 +220,7 @@
         '<div class="demo-bar-text"><span class="demo-bar-tag">DEMO</span>' +
         '<span id="demo-bar-line">A made-up café, to show how Adronis works. Try anything — nothing here is saved.</span></div>' +
         '<div class="demo-bar-links">' +
-          '<a class="btn-ghost" href="' + other.href + '">' + other.label + "</a>" +
+          (other ? '<a class="btn-ghost" href="' + other.href + '">' + other.label + "</a>" : "") +
           '<a class="btn" href="signup.html">Join the beta<span class="mono">&rarr;</span></a>' +
         "</div>";
       host.insertBefore(bar, host.firstChild);

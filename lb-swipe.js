@@ -106,7 +106,7 @@
     ".sw-done-tally b{margin-left:6px;font-family:'Geist',sans-serif;font-size:15px;color:#f2f4f7}",
     ".sw-done-text{margin:16px 0 0;max-width:30ch;font-size:15px;line-height:1.55;color:#b3b9c4}",
     ".sw-done .btn{margin-top:24px}",
-    ".sw-replay{margin-top:14px;padding:8px 12px;border:none;background:none;color:#878d98;font-family:inherit;font-size:13.5px;cursor:pointer;border-radius:9999px}",
+    ".sw-replay{margin-top:8px;min-height:44px;padding:0 14px;border:none;background:none;color:#878d98;font-family:inherit;font-size:13.5px;cursor:pointer;border-radius:9999px}",
     ".sw-replay:hover{color:#f2f4f7}",
     ".sw-controls{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:22px}",
     ".sw-btn{display:flex;align-items:center;justify-content:center;width:62px;height:62px;border-radius:9999px;cursor:pointer;font-size:22px;line-height:1;",

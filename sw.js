@@ -1,12 +1,65 @@
-/* Adronis service worker - push notifications only.
+/* Adronis service worker - push notifications and the offline page.
  *
- * It caches nothing: every page is still fetched fresh (vercel.json sends
- * no-cache for HTML), so there is no offline copy to go stale. Its one job
- * is to show what the push Edge Function sends (supabase/functions/push) and
- * open the right page when the notification is tapped. Registered by push.js.
+ * Pages are never cached: every one is still fetched fresh (vercel.json sends
+ * no-cache for HTML), so there is no offline copy to go stale. The only things
+ * kept are offline.html and the logo it shows, served in place of a page when
+ * the device has no connection - the installed app would otherwise show the
+ * browser's own error. Everything other than page loads goes straight to the
+ * network, untouched.
+ *
+ * Its other job is to show what the push Edge Function sends
+ * (supabase/functions/push) and open the right page when the notification is
+ * tapped. Registered by auth.js on every app page, and by push.js.
+ *
+ * Changing offline.html or the logo? Bump CACHE so phones fetch the new copy.
  */
-self.addEventListener("install", function () { self.skipWaiting(); });
-self.addEventListener("activate", function (event) { event.waitUntil(self.clients.claim()); });
+var CACHE = "adronis-offline-v1";
+var OFFLINE_URL = "/offline.html";
+
+self.addEventListener("install", function (event) {
+  event.waitUntil(caches.open(CACHE)
+    .then(function (cache) { return cache.addAll([OFFLINE_URL, "/logo-128.png"]); })
+    .then(function () { return self.skipWaiting(); }));
+});
+
+self.addEventListener("activate", function (event) {
+  event.waitUntil(Promise.all([
+    caches.keys().then(function (keys) {
+      return Promise.all(keys.filter(function (k) { return k !== CACHE; })
+        .map(function (k) { return caches.delete(k); }));
+    }),
+    // Lets a page load start on the network while the worker is still waking
+    // up, so the offline fallback costs nothing when there is a connection.
+    self.registration.navigationPreload ? self.registration.navigationPreload.enable() : null
+  ]).then(function () { return self.clients.claim(); }));
+});
+
+self.addEventListener("fetch", function (event) {
+  var request = event.request;
+  if (request.method !== "GET") return;
+  var url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (request.mode === "navigate") {
+    event.respondWith((async function () {
+      try {
+        var preloaded = await event.preloadResponse;
+        return preloaded || await fetch(request);
+      } catch (e) {
+        var cache = await caches.open(CACHE);
+        return (await cache.match(OFFLINE_URL)) || Response.error();
+      }
+    })());
+    return;
+  }
+
+  // The offline page's logo, when the network is gone too.
+  if (url.pathname === "/logo-128.png") {
+    event.respondWith(fetch(request).catch(function () {
+      return caches.match("/logo-128.png").then(function (hit) { return hit || Response.error(); });
+    }));
+  }
+});
 
 self.addEventListener("push", function (event) {
   var data = {};

@@ -26,6 +26,7 @@ window.LB_I18N_SR = {
     "Start free drop": "Pokreni besplatan drop",
     "Account": "Nalog",
     "Menu": "Meni",
+    "Skip to content": "Preskoči na sadržaj",
 
     /* --- Cookie consent card (cookies.js) -------------------------------- */
     "Cookies on this site": "Kolačići na ovom sajtu",
@@ -1778,8 +1779,8 @@ window.LB_I18N_SR = {
     "EDITED BY YOU": "TVOJA IZMENA",
     // Auto-approval on the approvals page.
     "APPROVED FOR YOU": "ODOBRENO UMESTO TEBE",
-    "It waited 48 hours, so it was approved for you — the switch is above the ads.":
-      "Čekao je 48 sati, pa je odobren umesto tebe — prekidač je iznad oglasa.",
+    "It waited 48 hours, so it was approved for you — the switch is below the ads.":
+      "Čekao je 48 sati, pa je odobren umesto tebe — prekidač je ispod oglasa.",
     "Off — ads wait for your yes until next week's arrive, then expire. Switch it on and a busy week won't go by without ads.":
       "Isključeno — oglasi čekaju tvoje odobrenje dok ne stignu novi, a onda ističu. Uključi i nedelja neće proći bez oglasa ni kad ne stigneš.",
     // Expired ads: still waiting when the next week's arrived (approvals, past drops).
@@ -1832,6 +1833,7 @@ window.LB_I18N_SR = {
     "Add a note for the engine (optional)": "Dodaj napomenu za mašinu (nije obavezno)",
     "Save note": "Sačuvaj napomenu",
     "Rejected. Why?": "Odbačeno. Zašto?",
+    "Approved.": "Odobreno.",
     "Skip": "Preskoči",
     "Thanks — the engine will take that into the next drop.":
       "Hvala — mašina će to uzeti u obzir za sledeći drop.",

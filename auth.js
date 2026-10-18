@@ -1,7 +1,8 @@
 // Adronis auth, backed by Supabase.
 //
 // Load order on every page that uses it:
-//   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+//   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-..." crossorigin="anonymous"></script>
+//   (pinned to one version with its hash, the same tag on every page - change them all together)
 //   <script src="supabase-config.js"></script>
 //   <script src="auth.js"></script>
 //
@@ -818,4 +819,13 @@
       return (await billing("portal", { target: target || "overview" })).url;
     }
   };
+
+  // The service worker shows offline.html instead of the browser's error
+  // when the installed app opens with no connection. Registered once the page
+  // has loaded, so it never competes with the page itself.
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").catch(function () {});
+    });
+  }
 })();

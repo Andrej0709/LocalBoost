@@ -181,9 +181,28 @@
     });
   }
 
+  // A "Skip to content" link, first in the page, for keyboard and screen
+  // reader users: it lands on whatever comes straight after the nav. Hidden
+  // until it has focus (adronis.css, .skip-link).
+  function skipLink() {
+    var nav = document.querySelector("nav.nav");
+    if (!nav || document.querySelector(".skip-link")) return;
+    var target = nav.nextElementSibling;
+    while (target && /^(SCRIPT|STYLE|TEMPLATE)$/.test(target.tagName)) target = target.nextElementSibling;
+    if (!target) return;
+    if (!target.id) target.id = "main";
+    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+    target.classList.add("skip-target");
+    var a = document.createElement("a");
+    a.className = "skip-link";
+    a.href = "#" + target.id;
+    a.textContent = "Skip to content";
+    document.body.insertBefore(a, document.body.firstChild);
+  }
+
   // Loaded after the nav and the footer (the end of <body>, on every page), so
   // the menu is built straight away: it copies the nav links, and must copy
   // them before i18n.js, which loads next, translates them.
-  if (document.querySelector("nav.nav")) init();
-  else document.addEventListener("DOMContentLoaded", init);
+  if (document.querySelector("nav.nav")) { skipLink(); init(); }
+  else document.addEventListener("DOMContentLoaded", function () { skipLink(); init(); });
 })();
