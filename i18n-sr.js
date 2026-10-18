@@ -2203,6 +2203,57 @@ window.LB_I18N_SR = {
     "Get ads like these": "Dobijaj ovakve oglase",
     "↺ Try it again": "↺ Probaj ponovo",
 
+    /* --- Home page: persuasion pass (2026-10-18) --------------------------- */
+    "Free beta from early November": "Besplatna beta od početka novembra",
+    "Apply for a free place": "Prijavi se za besplatno mesto",
+    "What kind of business do you run?": "Kakav biznis vodiš?",
+    "Your business type": "Tip tvog biznisa",
+    "Pick one and your application starts with it filled in.": "Izaberi i to će već biti upisano u tvojoj prijavi.",
+    "Pick one and your signup starts with it filled in.": "Izaberi i to će već biti upisano pri registraciji.",
+    "Your ads would be made for:": "Tvoji oglasi bi bili pravljeni za:",
+    "Apply with this": "Prijavi se sa ovim",
+    "Start with this": "Počni sa ovim",
+    "And the weeks you skip cost you too:": "A i nedelje koje preskočiš te koštaju:",
+    "your page goes quiet while the place down the street keeps showing up.":
+      "tvoja stranica utihne, dok se lokal niz ulicu i dalje pojavljuje.",
+    "The beta": "Beta",
+    "Free until launch. Here is the honest reason.": "Besplatno do lansiranja. Evo iskrenog razloga.",
+    "Every ad Adronis makes costs real money to generate. During the beta we pay that, not you — which is also why we can only take a small number of businesses.":
+      "Svaki oglas koji Adronis napravi košta pravi novac da se generiše. Tokom bete to plaćamo mi, ne ti — i zato možemo da primimo samo mali broj biznisa.",
+    "What you give, what you get": "Šta daješ, šta dobijaš",
+    "You get a weekly drop for your business, free until launch. We get honest feedback from a real owner: which ads you approve, which you turn down and why.":
+      "Ti dobijaš nedeljni drop za svoj biznis, besplatno do lansiranja. Mi dobijamo iskrenu povratnu informaciju od pravog vlasnika: koje oglase odobravaš, koje odbacuješ i zašto.",
+    "No card, nothing to pay": "Bez kartice, ništa ne plaćaš",
+    "No contract, leave whenever you like": "Bez ugovora, odlaziš kad god hoćeš",
+    "30% off for 12 months if you stay after launch": "30% popusta 12 meseci ako ostaneš posle lansiranja",
+    "TODAY": "DANAS",
+    "NEXT": "ZATIM",
+    "EARLY NOVEMBER": "POČETKOM NOVEMBRA",
+    "Apply in about ten minutes": "Prijavi se za oko deset minuta",
+    "Tell us what you sell, how you talk to customers and where you are. That is the brief the engine works from.":
+      "Reci nam šta prodaješ, kako pričaš sa mušterijama i gde se nalaziš. Po tom brifu radi mašina.",
+    "We read every application": "Čitamo svaku prijavu",
+    "A person on our small team looks at each one and picks the businesses for the beta.":
+      "Neko iz našeg malog tima pogleda svaku i bira biznise za betu.",
+    "Your first drop lands": "Stiže tvoj prvi drop",
+    "If you are picked, the beta starts for you with your first set of ads, waiting for your OK.":
+      "Ako budeš izabran, beta za tebe počinje prvim oglasima koji čekaju tvoje odobrenje.",
+    "Beta businesses after launch:": "Beta biznisi posle lansiranja:",
+    "/ month for 12 months": "/ mesečno, prvih 12 meseci",
+    "Will my ads look like everyone else's?": "Da li će moji oglasi izgledati kao svi ostali?",
+    "No. Every drop is built from your own brief — what you sell, how you talk to customers, your street and your colours — and fitted to the week: the weather forecast, local events, holidays and the days you're closed.":
+      "Ne. Svaki drop se pravi iz tvog brifa — šta prodaješ, kako pričaš sa mušterijama, tvoja ulica i tvoje boje — i prilagođava se nedelji: vremenskoj prognozi, lokalnim događajima, praznicima i danima kad ne radiš.",
+    "What's the catch with the free beta?": "U čemu je caka sa besplatnom betom?",
+    "There isn't one. We pay for generating your ads during the beta because we want honest feedback from real owners before launch, and you don't need a card. When the beta ends, you decide whether to stay on a paid plan, with 30% off for your first 12 months, or leave.":
+      "Nema je. Tokom bete mi plaćamo pravljenje tvojih oglasa jer želimo iskrenu povratnu informaciju od pravih vlasnika pre lansiranja, a kartica ti ne treba. Kad se beta završi, ti odlučuješ da li ostaješ na plaćenom planu, uz 30% popusta prvih 12 meseci, ili odlaziš.",
+    "Imagine Mondays where the ads are already done.": "Zamisli ponedeljke kad su oglasi već gotovi.",
+    "Applying takes about ten minutes. Places are limited because we pay for every ad during the beta, and it is free until launch.":
+      "Prijava traje oko deset minuta. Broj mesta je ograničen jer tokom bete mi plaćamo svaki oglas, a do lansiranja je besplatno.",
+    "Free beta, limited places": "Besplatna beta, ograničen broj mesta",
+    "Applying takes about ten minutes": "Prijava traje oko deset minuta",
+    "Try Adronis free": "Probaj Adronis besplatno",
+    "No card on the Free plan": "Bez kartice na besplatnom planu",
+
     /* --- 2026 redesign: about, contact, message us, log in -------------- */
     "Drops per year": "Dropova godišnje",
     "Channels supported": "Podržanih kanala",

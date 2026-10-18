@@ -552,6 +552,15 @@
   );
   function verticalValue(){ return verticalField.value(); }
   function setVertical(value){ verticalField.set(value); }
+  // The home page's "What kind of business do you run?" chips send the pick
+  // as ?type=. Only a listed option is taken; a saved brief still wins.
+  (function(){
+    var type = params.get("type");
+    var select = document.getElementById("vertical");
+    if (!type || type === "Other" || select.value) return;
+    var known = Array.prototype.some.call(select.options, function(o){ return o.value === type; });
+    if (known) setVertical(type);
+  })();
 
   var countrySelect = document.getElementById("country");
   var countryField = LBBriefFields.countryField(countrySelect, document.getElementById("city-options"));

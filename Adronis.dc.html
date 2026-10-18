@@ -280,6 +280,11 @@ if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHa
         },
         {
           "@type": "Question",
+          "name": "Will my ads look like everyone else's?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Every drop is built from your own brief — what you sell, how you talk to customers, your street and your colours — and fitted to the week: the weather forecast, local events, holidays and the days you're closed." }
+        },
+        {
+          "@type": "Question",
           "name": "Does anything get posted without my approval?",
           "acceptedAnswer": { "@type": "Answer", "text": "Never. Only ads you approve are scheduled and published. Anything you reject or leave waiting stays with you." }
         },
@@ -302,6 +307,11 @@ if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHa
           "@type": "Question",
           "name": "How does the free trial work?",
           "acceptedAnswer": { "@type": "Answer", "text": "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." }
+        },
+        {
+          "@type": "Question",
+          "name": "What's the catch with the free beta?",
+          "acceptedAnswer": { "@type": "Answer", "text": "There isn't one. We pay for generating your ads during the beta because we want honest feedback from real owners before launch, and you don't need a card. When the beta ends, you decide whether to stay on a paid plan, with 30% off for your first 12 months, or leave." }
         },
         {
           "@type": "Question",
@@ -349,7 +359,7 @@ if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHa
 html.rv-on [data-rv]{opacity:0;transform:translateY(24px);transition:opacity .85s var(--ease),transform .85s var(--ease)}
 html.rv-on.rv-made [data-rv="made"],html.rv-on.rv-why [data-rv="why"],html.rv-on.rv-how [data-rv="how"],
 html.rv-on.rv-ex [data-rv="ex"],html.rv-on.rv-ctl [data-rv="ctl"],html.rv-on.rv-price [data-rv="price"],
-html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:1;transform:none}
+html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"],html.rv-on.rv-beta [data-rv="beta"]{opacity:1;transform:none}
 
 /* ------------------------------------------------------------------ hero */
 .hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:128px 24px 72px}
@@ -379,11 +389,19 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 
 /* ------------------------------------------------------------- made for */
 .made{position:relative;padding:8px 0 20px}
-.made-title{margin:0 auto;padding:0 24px;text-align:center;font-size:15px;font-weight:500;color:var(--text-3)}
+.made-title{margin:0 auto;padding:0 24px;text-align:center;font-size:17px;font-weight:500;color:var(--text-2)}
 .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:980px;margin:24px auto 0;padding:0 24px}
 .vchip{display:inline-flex;align-items:center;gap:10px;padding:11px 18px 11px 14px;border-radius:9999px;border:1px solid var(--line-2);background:rgba(255,255,255,.03);font-size:15px;font-weight:500;color:var(--text);white-space:nowrap;transition:transform .35s var(--ease),border-color .35s ease,box-shadow .35s ease,color .35s ease}
 .vchip:hover{transform:translateY(-3px);border-color:rgba(124,198,255,.6);color:#fff;box-shadow:0 14px 34px rgba(0,0,0,.5),0 0 0 1px rgba(124,198,255,.18),0 0 32px rgba(124,198,255,.22)}
 .vchip::before{content:"";width:6px;height:6px;border-radius:9999px;background:var(--acc);opacity:.8}
+/* The chips are a question: picking one carries the business type into signup. */
+button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
+.vchip.is-on{border-color:var(--acc-line);background:var(--acc-soft);color:#fff;box-shadow:0 0 0 1px rgba(124,198,255,.25)}
+.vchip.is-on::before{opacity:1;box-shadow:0 0 10px var(--acc)}
+.vchip:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.made-pick{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;min-height:52px;margin:22px auto 0;padding:0 24px;font-size:15px;color:var(--text-2);text-align:center}
+.made-pick b{color:var(--text);font-weight:600}
+.made-pick a{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--acc-2)}
 @media (prefers-reduced-motion:reduce){
   .vchip{transition:none}
 }
@@ -403,6 +421,22 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 .why-col.is-us .why-foot{color:var(--acc-2);border-top-color:rgba(124,198,255,.2)}
 .why-logo{display:flex;align-items:center;gap:10px}
 .why-logo img{width:26px;height:26px;border-radius:7px}
+.why-cost{max-width:62ch;margin:40px auto 0;font-size:16px;line-height:1.6;color:var(--text-3);text-align:center}
+.why-cost b{color:var(--text);font-weight:500}
+
+/* --------------------------------------------------------------- beta */
+.beta-grid{margin-top:56px;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:16px;align-items:stretch}
+.beta-why{display:flex;flex-direction:column;padding:32px 30px;border-radius:var(--r-xl);border:1px solid var(--acc-line);background:radial-gradient(130% 70% at 0% 0%,rgba(92,182,247,.16),rgba(92,182,247,0) 60%),#0c0f14}
+.beta-why h3{margin:0;font-size:22px;letter-spacing:-.02em}
+.beta-why p{margin:14px 0 0;font-size:15.5px;line-height:1.65;color:var(--text-2)}
+.beta-why ul{list-style:none;margin:auto 0 0;padding:24px 0 0;display:grid;gap:12px}
+.beta-why li{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text)}
+.beta-steps{list-style:none;margin:0;padding:8px 30px;border-radius:var(--r-xl);border:1px solid var(--line);background:rgba(12,14,18,.92)}
+.beta-step{display:grid;grid-template-columns:112px minmax(0,1fr);gap:20px;padding:22px 0}
+.beta-step+.beta-step{border-top:1px solid var(--line)}
+.beta-when{padding-top:3px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--acc)}
+.beta-step h3{margin:0;font-size:18px;letter-spacing:-.015em}
+.beta-step p{margin:6px 0 0;font-size:15px;line-height:1.6;color:var(--text-2)}
 
 /* ---------------------------------------------------------------- how */
 .how-grid{margin-top:64px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
@@ -566,6 +600,18 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 .final-card .lede{position:relative;margin:24px auto 0;max-width:44ch}
 .final-card .hero-ctas{position:relative;justify-content:center}
 .final-alt{position:relative;margin-top:18px;font-size:14px;color:var(--text-3)}
+.final .hero-assure{justify-content:center}
+
+/* ------------------------------------------------- phone: sticky apply bar */
+.mbar{display:none}
+@media (max-width:860px){
+  .mbar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;gap:12px;padding:10px 10px 10px 18px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);background:rgba(16,18,23,.82);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 20px 50px -12px rgba(0,0,0,.9);transform:translateY(calc(100% + 24px));opacity:0;pointer-events:none;transition:transform .45s var(--ease),opacity .3s ease}
+  .mbar.is-on{transform:none;opacity:1;pointer-events:auto}
+  .mbar-text{min-width:0;flex:1;font-size:13px;line-height:1.35;color:var(--text-2)}
+  .mbar-text b{display:block;font-size:14px;font-weight:600;color:var(--text)}
+  .mbar .btn{flex:none;min-height:46px;padding:0 20px;font-size:14.5px}
+}
+@media (max-width:860px) and (prefers-reduced-motion:reduce){.mbar{transition:none}}
 
 /* ------------------------------------------------------------- footer */
 .home footer{margin-top:40px}
@@ -587,6 +633,10 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 }
 @media (max-width:860px){
   .why-grid,.how-grid{grid-template-columns:minmax(0,1fr);max-width:560px;margin-left:auto;margin-right:auto}
+  .beta-grid{grid-template-columns:minmax(0,1fr);max-width:560px;margin-top:44px}
+  .beta-why{padding:26px 22px}
+  .beta-steps{padding:4px 22px}
+  .beta-step{grid-template-columns:minmax(0,1fr);gap:8px;padding:20px 0}
   .step-vis{height:236px}
   /* The examples become a row you flick through, one card at a time. */
   .showcase{display:flex;gap:12px;margin:48px -24px 0;padding:0 24px 8px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -656,11 +706,11 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 <section id="top" class="hero">
   <div class="hero-grid">
     <div class="hero-copy">
-      <div class="eyebrow" data-in="1">Weekly ads for local businesses</div>
+      <div class="eyebrow" data-in="1">{{ heroEyebrow }}</div>
       <h1 data-in="1" style="animation-delay:.06s">We make your ads. You just say <em>yes</em>.</h1>
       <p class="hero-sub" data-in="1" style="animation-delay:.14s">Every Monday you get ready-to-post ads made for your business and sized for Instagram, Facebook and more. Approve them in about two minutes and we publish them for you.</p>
       <div class="hero-ctas" data-in="1" style="animation-delay:.22s">
-        <a href="signup.html" class="btn btn-lg">{{ mainCta }}<span class="mono" aria-hidden="true">→</span></a>
+        <a href="{{ signupHref }}" class="btn btn-lg">{{ mainCta }}<span class="mono" aria-hidden="true">→</span></a>
         <a href="#drop" class="btn-ghost btn-lg">See how it works</a>
       </div>
       <ul class="hero-assure" data-in="1" style="animation-delay:.3s">
@@ -687,9 +737,13 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 </section>
 
 <section id="operators" class="made" aria-label="Who it's for">
-  <p class="made-title" data-rv="made">Made for local businesses with no time for marketing.</p>
-  <div class="chips" data-rv="made" style="transition-delay:.1s">
-    <sc-for list="{{ verticals }}" as="v" hint-placeholder-count="12"><span class="vchip">{{ v }}</span></sc-for>
+  <p class="made-title" data-rv="made">What kind of business do you run?</p>
+  <div class="chips" data-rv="made" style="transition-delay:.1s" role="group" aria-label="Your business type">
+    <sc-for list="{{ verticals }}" as="v" hint-placeholder-count="12"><button type="button" class="{{ v.cls }}" aria-pressed="{{ v.pressed }}" onClick="{{ v.pick }}">{{ v.label }}</button></sc-for>
+  </div>
+  <div class="made-pick" data-rv="made" aria-live="polite">
+    <sc-if value="{{ noPick }}" hint-placeholder-val="{{ true }}"><span>{{ pickHint }}</span></sc-if>
+    <sc-if value="{{ hasPick }}" hint-placeholder-val="{{ false }}"><span><span>Your ads would be made for:</span> <b>{{ pickLabel }}</b></span><a href="{{ signupHref }}">{{ pickCta }}<span class="mono" aria-hidden="true">→</span></a></sc-if>
   </div>
 </section>
 
@@ -733,6 +787,7 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
         <div class="why-foot">From €0 a month</div>
       </div>
     </div>
+    <p class="why-cost" data-rv="why">And the weeks you skip cost you too: <b>your page goes quiet while the place down the street keeps showing up.</b></p>
   </div>
 </section>
 
@@ -878,6 +933,43 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
   </div>
 </section>
 
+<sc-if value="{{ beta }}" hint-placeholder-val="{{ false }}">
+<section id="beta" class="sec">
+  <div class="sec-in">
+    <div class="sec-head" data-rv="beta">
+      <div class="eyebrow">The beta</div>
+      <h2>Free until launch. Here is the honest reason.</h2>
+      <p class="lede">Every ad Adronis makes costs real money to generate. During the beta we pay that, not you — which is also why we can only take a small number of businesses.</p>
+    </div>
+    <div class="beta-grid">
+      <div class="beta-why" data-rv="beta" style="transition-delay:.05s">
+        <h3>What you give, what you get</h3>
+        <p>You get a weekly drop for your business, free until launch. We get honest feedback from a real owner: which ads you approve, which you turn down and why.</p>
+        <ul>
+          <li><span class="tick" aria-hidden="true">✓</span>No card, nothing to pay</li>
+          <li><span class="tick" aria-hidden="true">✓</span>No contract, leave whenever you like</li>
+          <li><span class="tick" aria-hidden="true">✓</span>30% off for 12 months if you stay after launch</li>
+        </ul>
+      </div>
+      <ol class="beta-steps" data-rv="beta" style="transition-delay:.12s">
+        <li class="beta-step">
+          <div class="beta-when">TODAY</div>
+          <div><h3>Apply in about ten minutes</h3><p>Tell us what you sell, how you talk to customers and where you are. That is the brief the engine works from.</p></div>
+        </li>
+        <li class="beta-step">
+          <div class="beta-when">NEXT</div>
+          <div><h3>We read every application</h3><p>A person on our small team looks at each one and picks the businesses for the beta.</p></div>
+        </li>
+        <li class="beta-step">
+          <div class="beta-when">EARLY NOVEMBER</div>
+          <div><h3>Your first drop lands</h3><p>If you are picked, the beta starts for you with your first set of ads, waiting for your OK.</p></div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+</sc-if>
+
 <section id="pricing" class="sec">
   <div class="sec-in" style="text-align:center">
     <div class="sec-head is-center" data-rv="price">
@@ -916,6 +1008,7 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
             <sc-if value="{{ pl.showPerAd }}" hint-placeholder-val="{{ false }}"><span class="perad"><b>≈ {{ pl.perAd }}</b> <span>per ad</span></span></sc-if>
             <sc-if value="{{ pl.showYearly }}" hint-placeholder-val="{{ false }}"><span>{{ pl.yearly }} <span>billed yearly</span></span></sc-if>
             <sc-if value="{{ pl.showSave }}" hint-placeholder-val="{{ false }}"><span class="save"><span>You save</span> <b>{{ pl.save }}</b> <span>a year</span></span></sc-if>
+            <sc-if value="{{ pl.showFounder }}" hint-placeholder-val="{{ false }}"><span class="save"><span>Beta businesses after launch:</span> <b>{{ pl.founder }}</b> <span>/ month for 12 months</span></span></sc-if>
           </div>
           <div class="plan-line"></div>
           <div class="plan-feats">
@@ -964,8 +1057,13 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
     <h2>{{ finalTitle }}</h2>
     <p class="lede">{{ finalLede }}</p>
     <div class="hero-ctas">
-      <a href="signup.html" class="btn btn-lg">{{ mainCta }}<span class="mono" aria-hidden="true">→</span></a>
+      <a href="{{ signupHref }}" class="btn btn-lg">{{ mainCta }}<span class="mono" aria-hidden="true">→</span></a>
     </div>
+    <ul class="hero-assure">
+      <sc-for list="{{ assure }}" as="a" hint-placeholder-count="3">
+        <li><span class="tick" aria-hidden="true">✓</span>{{ a.text }}</li>
+      </sc-for>
+    </ul>
     <sc-if value="{{ notBeta }}" hint-placeholder-val="{{ true }}">
     <div class="final-alt"><a href="signup.html?plan=free">Or start on the Free plan</a> — <span>no card needed.</span></div>
     </sc-if>
@@ -973,6 +1071,11 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 </section>
 
 </main>
+
+<div class="{{ mbarCls }}" aria-hidden="{{ mbarHidden }}">
+  <span class="mbar-text"><b>{{ mbarTitle }}</b>{{ mbarSub }}</span>
+  <a href="{{ signupHref }}" class="btn" tabindex="{{ mbarTab }}">{{ mbarCta }}</a>
+</div>
 
 <footer>
   <div class="foot-grid">
@@ -993,7 +1096,7 @@ html.rv-on.rv-faq [data-rv="faq"],html.rv-on.rv-final [data-rv="final"]{opacity:
 // The short version of the home page. The original, longer page lives on
 // unchanged in Adronis-full.html (served at /full).
 class Component extends DCLogic {
-  state = { billing: "monthly", navOpen: false, freeNote: null, onFree: false, promoCopied: false, signedIn: false };
+  state = { billing: "monthly", navOpen: false, freeNote: null, onFree: false, promoCopied: false, signedIn: false, pick: this.storedPick(), mbar: false };
   root = React.createRef();
   // The public promo code shown in the pricing section. Paddle holds the same
   // code as a discount, and checkout checks it there.
@@ -1018,10 +1121,18 @@ class Component extends DCLogic {
 
     // The thin glowing line down the right edge fills as the page is read.
     this.bar = r.querySelector("[data-progress]");
+    this.hero = r.querySelector("#top");
+    this.finalSec = r.querySelector("#finalcta");
     this.onScroll = () => {
       const doc = document.documentElement;
       const p = doc.scrollTop / Math.max(1, doc.scrollHeight - window.innerHeight);
       this.bar.style.height = (Math.min(1, Math.max(0, p)) * 100).toFixed(2) + "%";
+      // On a phone the apply button scrolls away with the hero, so a small bar
+      // keeps it in reach - until the closing section, which has its own.
+      const vh = window.innerHeight;
+      const show = !!this.hero && this.hero.getBoundingClientRect().bottom < vh * 0.35 &&
+        !(this.finalSec && this.finalSec.getBoundingClientRect().top < vh * 0.85);
+      if (show !== this.state.mbar) this.setState({ mbar: show });
     };
     window.addEventListener("scroll", this.onScroll, { passive: true });
     window.addEventListener("resize", this.onScroll, { passive: true });
@@ -1060,6 +1171,22 @@ class Component extends DCLogic {
         if (LBAuth.isOnFreePlan()) this.loadFreeNote();
       });
     }
+  }
+
+  // The business type picked from the chips under the hero, remembered for the
+  // visit so the choice survives a reload. Its value is the matching option in
+  // signup.html's business-type select, which reads it from ?type=.
+  storedPick() {
+    try { return sessionStorage.getItem("lb-pick") || null; } catch (e) { return null; }
+  }
+
+  setPick(value) {
+    const next = this.state.pick === value ? null : value;
+    try {
+      if (next) sessionStorage.setItem("lb-pick", next);
+      else sessionStorage.removeItem("lb-pick");
+    } catch (e) {}
+    this.setState({ pick: next });
   }
 
   // "#7cc6ff" -> "rgba(124,198,255,.12)", for the accent's soft fill.
@@ -1186,6 +1313,23 @@ class Component extends DCLogic {
       { channel: "Google", name: "Pristine Car Wash", initial: "P", tint: "#a8c6f0", img: "examples/carwash.jpg", alt: "Example ad for a car wash: Your car deserves better!", caption: "Fast, detailed cleaning and polishing. Drive in, shine out." }
     ];
 
+    // value is the matching option in signup.html's business-type select.
+    const verticals = [
+      { label: "Cafés", value: "Café" },
+      { label: "Restaurants & pizzerias", value: "Restaurant" },
+      { label: "Bakeries", value: "Bakery" },
+      { label: "Hair & beauty salons", value: "Hair salon" },
+      { label: "Barbershops", value: "Barbershop" },
+      { label: "Nail studios", value: "Nail studio" },
+      { label: "Gyms & studios", value: "Gym / studio" },
+      { label: "Dental clinics", value: "Dental clinic" },
+      { label: "Physiotherapy", value: "Physiotherapy" },
+      { label: "Florists", value: "Florist" },
+      { label: "Auto detailers", value: "Auto detailer" },
+      { label: "Wine bars", value: "Wine bar" }
+    ];
+    const picked = verticals.find((v) => v.value === this.state.pick) || null;
+
     const annual = this.state.billing === "annual";
     // During the beta (BETA in boot-gate.js) there is no Free plan, no trial
     // and no checkout: every button applies for a beta place, and the plan
@@ -1246,6 +1390,9 @@ class Component extends DCLogic {
         perAd: p.perWeek ? cents(monthly / (p.perWeek * WEEKS_PER_MONTH)) : "",
         showSave: annual && p.base > 0,
         save: euro(p.base * 12 * 0.2),
+        // FOUNDER30: beta venues get 30% off a monthly plan for 12 months.
+        showFounder: beta && paidTrial,
+        founder: cents(p.base * 0.7),
         after: beta && paidTrial ? "Free during the beta"
           : paidTrial
           ? "7 days free, then " + (annual ? euro(monthly * 12) + " a year" : euro(monthly) + " a month")
@@ -1261,7 +1408,7 @@ class Component extends DCLogic {
       beta,
       notBeta: !beta,
       navCta: beta ? "Join the beta" : "Try it free",
-      mainCta: beta ? "Apply for the beta" : "Try it free",
+      mainCta: beta ? "Apply for a free place" : "Try it free",
       assure: (beta
         ? ["Free during the beta", "No card needed", "Limited places"]
         : ["Free plan, no card needed", "7-day trial on paid plans", "Cancel any time"]
@@ -1270,11 +1417,32 @@ class Component extends DCLogic {
         ? "These are the prices from launch in Q1 2027. Until then, Adronis is free for the businesses picked for the beta."
         : "Start free, or try any paid plan free for 7 days.",
       plansCls: "plans" + (beta ? " is-three" : ""),
-      finalTitle: beta ? "Be one of the first businesses on Adronis." : "Your first ads can be ready this week.",
+      finalTitle: beta ? "Imagine Mondays where the ads are already done." : "Your first ads can be ready this week.",
       finalLede: beta
-        ? "Applying takes about ten minutes. Places are limited, and it is free until launch."
+        ? "Applying takes about ten minutes. Places are limited because we pay for every ad during the beta, and it is free until launch."
         : "Sign up in about ten minutes. No contract, no meeting, cancel any time.",
-      verticals: ["Cafés", "Restaurants & pizzerias", "Bakeries", "Hair & beauty salons", "Barbershops", "Nail studios", "Gyms & studios", "Dental clinics", "Physiotherapy", "Florists", "Auto detailers", "Wine bars"],
+      verticals: verticals.map((v) => {
+        const on = this.state.pick === v.value;
+        return {
+          label: v.label,
+          cls: "vchip" + (on ? " is-on" : ""),
+          pressed: on ? "true" : "false",
+          pick: () => this.setPick(v.value)
+        };
+      }),
+      hasPick: !!picked,
+      noPick: !picked,
+      pickLabel: picked ? picked.label : "",
+      pickHint: beta ? "Pick one and your application starts with it filled in." : "Pick one and your signup starts with it filled in.",
+      pickCta: beta ? "Apply with this" : "Start with this",
+      signupHref: "signup.html" + (picked ? "?type=" + encodeURIComponent(picked.value) : ""),
+      heroEyebrow: beta ? "Free beta from early November" : "Weekly ads for local businesses",
+      mbarCls: "mbar" + (this.state.mbar ? " is-on" : ""),
+      mbarHidden: this.state.mbar ? "false" : "true",
+      mbarTab: this.state.mbar ? "0" : "-1",
+      mbarTitle: beta ? "Free beta, limited places" : "Try Adronis free",
+      mbarSub: beta ? "Applying takes about ten minutes" : "No card on the Free plan",
+      mbarCta: beta ? "Join the beta" : "Try it free",
       signedIn: this.state.signedIn,
       planetAccent: this.props.accent || "#7cc6ff",
       planetGlow: this.props.planetGlow == null ? 0.8 : this.props.planetGlow,
@@ -1294,11 +1462,13 @@ class Component extends DCLogic {
       faqs: [
         { q: "What exactly do I get each week?", a: "A drop of finished ads — image, headline and caption — already sized for every channel you picked. How many depends on your plan, from 4 a week on Counter to 30 on Franchise." },
         { q: "Do I need to take photos or write anything?", a: "No. You tell us about your business once when you sign up, which takes about ten minutes. The engine takes it from there. You can add more detail later in your control room, but none of it is required." },
+        { q: "Will my ads look like everyone else's?", a: "No. Every drop is built from your own brief — what you sell, how you talk to customers, your street and your colours — and fitted to the week: the weather forecast, local events, holidays and the days you're closed." },
         { q: "Does anything get posted without my approval?", a: "Never. Only ads you approve are scheduled and published. Anything you reject or leave waiting stays with you." },
         { q: "What if I don't like an ad?", a: "Reject it and pick a reason — wrong tone, wrong facts or price, the image doesn't fit. The engine takes that into your next drop. You can also change the text of any ad before you approve it." },
         { q: "Which networks can Adronis post to?", a: "Instagram, Facebook, TikTok, Google Business, LinkedIn and Pinterest. How many you connect at once depends on your plan: one on Free, two on Counter, up to four on Storefront and any number on Franchise." },
         { q: "Are the ads made with AI?", a: "Yes. Every image is generated for your business rather than taken from a stock library, and nothing is published until you approve it. On the Franchise plan a real designer also checks your ads." },
         { q: "How does the free trial work?", a: "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." },
+        { q: "What's the catch with the free beta?", a: "There isn't one. We pay for generating your ads during the beta because we want honest feedback from real owners before launch, and you don't need a card. When the beta ends, you decide whether to stay on a paid plan, with 30% off for your first 12 months, or leave." },
         { q: "Can I cancel any time?", a: "Yes, from your account page, in one click. Cancelling takes effect at the end of the period you have already paid for. Annual plans are billed 12 months upfront and unused months are not refunded." }
       ],
       setMonthly: () => this.setState({ billing: "monthly" }),
