@@ -1,0 +1,1188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>Adronis launch film</title>
+<!--
+  Adronis — 15-second launch film, 1920x1080.
+  Every style is computed from time inside window.seek(t): no CSS animations,
+  no timers, no state carried between frames. ?lang=sr renders the Serbian cut,
+  ?debug=1 shows the clock. window.renderSoundtrack() renders the music (WAV).
+-->
+<style>
+@font-face{font-family:'Geist';font-style:normal;font-weight:100 900;font-display:block;src:url(__FONT_LATIN__) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Geist';font-style:normal;font-weight:100 900;font-display:block;src:url(__FONT_LATINEXT__) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;background:#050608;overflow:hidden}
+body{font-family:'Geist',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01" on,"cv11" on;color:#f2f4f7}
+#frame{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:#050608}
+#world{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+.scene{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+
+/* Big type: the site's headline cut (Geist 600, tight tracking). */
+.big{position:absolute;font-weight:600;letter-spacing:-.05em;line-height:.94;white-space:nowrap;color:#f2f4f7}
+.big .ln{display:block}
+.m{display:inline-block;overflow:hidden;vertical-align:top;padding:.05em .07em .21em;margin:-.05em -.07em -.21em}
+.w{display:inline-block;transform-origin:50% 50%}
+.key{color:#7cc6ff}
+.pp{display:inline-block;opacity:0}
+.bl{display:inline-block;width:0;height:0;vertical-align:baseline}
+
+/* Eyebrow pill (adronis.css .eyebrow, scaled for the frame) */
+.eyebrow{position:absolute;display:flex;align-items:center;height:68px;padding:0 32px 0 25px;border-radius:34px;border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);font-size:31px;font-weight:500;color:#b3b9c4;white-space:nowrap}
+.eyebrow .eb-dot{width:15px;height:15px;border-radius:50%;margin-right:17px;flex:none}
+
+/* Step 01 brief form (Adronis.dc.html .mk, x2.7) */
+.mk{position:absolute;width:810px;border-radius:49px;border:2.5px solid rgba(255,255,255,.1);background:#12141a;padding:44px;box-shadow:0 64px 130px -56px rgba(0,0,0,.85)}
+.mk-row+.mk-row{margin-top:32px}
+.mk-l{display:block;font-size:31px;font-weight:500;line-height:1.3;color:#878d98}
+.mk-v{position:relative;display:flex;align-items:center;margin-top:16px;height:97px;padding:0 32px;border-radius:27px;border:2.5px solid rgba(255,255,255,.1);background:#090b0e;font-size:36px;color:#f2f4f7;white-space:nowrap}
+.mk-v.is-target{border-color:transparent}
+.mk-chips{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px}
+.mk-chips span{padding:15px 27px;border-radius:999px;border:2.5px solid rgba(255,255,255,.1);font-size:32px;line-height:1.2;color:#878d98;white-space:nowrap}
+
+/* Hero float chip "Drop ready" (Adronis.dc.html .float-chip, x2.4) */
+.fchip{position:absolute;display:flex;align-items:center;gap:26px;padding:24px 40px 24px 24px;border-radius:43px;border:2.4px solid rgba(255,255,255,.1);background:#101217;font-size:33px;font-weight:500;color:#f2f4f7;white-space:nowrap;box-shadow:0 56px 120px -40px rgba(0,0,0,.9)}
+.fchip .ic{width:82px;height:82px;flex:none}
+.fchip small{display:block;margin-top:6px;font-size:25px;font-weight:500;letter-spacing:.08em;color:#878d98}
+.adc{position:absolute;width:240px;height:247px;border-radius:26px;overflow:hidden;border:2px solid rgba(255,255,255,.12);background:#15171b;box-shadow:0 40px 80px -30px rgba(0,0,0,.9)}
+.adc img{display:block;width:100%;height:100%;object-fit:cover}
+
+/* Step 03 schedule row (Adronis.dc.html .ms-row, x2.8) */
+.msrow{position:absolute;display:flex;align-items:center;gap:31px;width:840px;padding:25px 28px;border-radius:39px;border:2.5px solid rgba(255,255,255,.1);background:#12141a;box-shadow:0 56px 120px -46px rgba(0,0,0,.9)}
+.msrow img{display:block;width:106px;height:106px;border-radius:25px;object-fit:cover;flex:none}
+.msrow b{display:block;font-size:37px;font-weight:600;line-height:1.25;color:#f2f4f7}
+.msrow small{display:block;margin-top:4px;font-size:29px;font-weight:500;letter-spacing:.06em;color:#878d98}
+.pillph{flex:none;height:64px;padding:0 26px;font-size:27px;font-weight:500;letter-spacing:.08em;line-height:64px;visibility:hidden;white-space:nowrap}
+.msrow .pillph{margin-left:auto}
+
+/* Swipe card (lb-swipe.js .sw-card, x1.25) */
+.swc{position:absolute;width:462px;border-radius:32px;overflow:hidden;border:1.5px solid rgba(255,255,255,.1);background:#101217;box-shadow:0 38px 88px -30px rgba(0,0,0,.85),0 15px 30px -15px rgba(0,0,0,.6)}
+.swc .hd{display:flex;align-items:center;gap:12.5px;padding:16px 17.5px}
+.swc .av{display:flex;align-items:center;justify-content:center;flex:none;width:37.5px;height:37.5px;border-radius:50%;color:#16130f;font-size:16px;font-weight:700}
+.swc .nm{font-size:17.5px;font-weight:600;letter-spacing:-.01em;color:#f2f4f7;white-space:nowrap}
+.swc .ch{margin-left:auto;flex:none;padding:5px 12.5px;border-radius:999px;border:1.5px solid rgba(255,255,255,.12);font-size:14.4px;color:#b3b9c4}
+.swc .md{position:relative;height:475.5px;background:#15171b;overflow:hidden}
+.swc .md img{display:block;width:100%;height:100%;object-fit:cover}
+.swc .cp{padding:15px 20px 5px;font-size:16.9px;line-height:1.5;color:#b3b9c4;height:96px}
+.swc .ft{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 19px}
+.swc .slot{display:inline-flex;align-items:center;gap:9px;font-size:13.75px;font-weight:500;letter-spacing:.08em;color:#878d98}
+.swc .slot i{display:block;width:7.5px;height:7.5px;flex:none}
+.swc .wt{font-size:13.1px;font-weight:500;letter-spacing:.1em;color:#878d98}
+.swc .stamp{position:absolute;top:82px;left:20px;padding:9px 17.5px;border-radius:15px;border:2.5px solid rgba(242,244,247,.9);font-size:17.5px;font-weight:600;letter-spacing:.14em;color:#f2f4f7;background:rgba(5,6,8,.55);transform-origin:0 50%}
+
+/* End card */
+.name{position:absolute;font-weight:600;letter-spacing:-.045em;line-height:1;white-space:nowrap;color:#f2f4f7}
+.endl{position:absolute;left:0;width:1920px;text-align:center;white-space:nowrap}
+
+/* Through-line object */
+#tlo{position:absolute;left:0;top:0;overflow:hidden}
+#tlo > *{position:absolute}
+#tlo-caret{background:#7cc6ff}
+#tlo-star{overflow:visible}
+#tlo-txt{left:0;top:0;width:100%;height:100%}
+#tlo-txt span{position:absolute;left:0;top:0;width:100%;text-align:center;font-weight:500;letter-spacing:.08em;color:#7cc6ff;white-space:nowrap}
+#tlo-mark{left:0;top:0;width:100%;height:100%}
+
+/* Cursor (screen space) */
+#cursor{position:absolute;left:0;top:0;width:34px;height:50px;transform-origin:0 0}
+#hud{position:absolute;right:20px;top:16px;font:500 22px 'Geist';color:#5d626c;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div id="frame">
+  <div id="world">
+    <div class="scene" id="s0">
+      <div class="eyebrow" id="h-pill"><span class="eb-dot" id="h-pilldot"></span><span class="m" id="h-pillm"><span class="w" id="h-pilltext"></span></span></div>
+      <div class="big" id="h-text"></div>
+    </div>
+    <div class="scene" id="s1">
+      <div class="mk" id="mk">
+        <div class="mk-row"><span class="mk-l" id="mk-l1"></span><span class="mk-v" id="mk-v1"></span></div>
+        <div class="mk-row"><span class="mk-l" id="mk-l2"></span><span class="mk-v is-target" id="mk-field"><span id="mk-typed"></span></span></div>
+        <div class="mk-row"><span class="mk-l" id="mk-l3"></span><span class="mk-chips"><span id="mk-chip1"></span><span id="mk-chip2"></span></span></div>
+      </div>
+      <div class="big" id="cap1"></div>
+    </div>
+    <div class="scene" id="s2">
+      <div id="fan"></div>
+      <div class="fchip" id="fchip"><span class="ic" id="fchip-ic"></span><span id="fchip-txt"><span id="fchip-t"></span><small id="fchip-s"></small></span></div>
+      <div class="big" id="cap2"></div>
+    </div>
+    <div class="scene" id="s3">
+      <div class="msrow" id="msrow"><img id="ms-img" alt=""><div><b id="ms-b"></b><small id="ms-s"></small></div><span class="pillph" id="ms-pill"></span></div>
+      <span class="pillph" id="ms-pill2" style="position:absolute;left:0;top:0"></span>
+      <div class="big" id="cap3"></div>
+    </div>
+    <div class="scene" id="s4">
+      <div id="deck"></div>
+      <div class="big" id="pay"></div>
+    </div>
+    <div class="scene" id="s5">
+      <div id="e-logo-ph" style="position:absolute;width:166px;height:166px"></div>
+      <div class="name" id="e-name"></div>
+      <div class="endl" id="e-ms"></div>
+      <div class="endl" id="e-ty"></div>
+      <div class="endl" id="e-url"></div>
+    </div>
+    <div id="tlo">
+      <div id="tlo-caret"></div>
+      <svg id="tlo-star" viewBox="-50 -50 100 100"><path fill="#7cc6ff" d="M0-46C3.2-15 15-3.2 46 0 15 3.2 3.2 15 0 46-3.2 15-15 3.2-46 0-15-3.2-3.2-15 0-46Z"/></svg>
+      <div id="tlo-txt"><span id="tlo-t1"></span><span id="tlo-t2"></span></div>
+      <svg id="tlo-mark" viewBox="0 0 438 438">
+        <defs>
+          <clipPath id="cl-mut"><rect id="cr-mut" x="0" y="0" width="438" height="0"/></clipPath>
+          <clipPath id="cl-dark"><rect id="cr-dark" x="0" y="0" width="438" height="0"/></clipPath>
+          <clipPath id="cl-bar"><rect id="cr-bar" x="0" y="0" width="0" height="438"/></clipPath>
+        </defs>
+        <polygon clip-path="url(#cl-mut)" fill="#38607e" points="209.3,123 247.3,123 320.1,317 276,317"/>
+        <polygon clip-path="url(#cl-dark)" fill="#08111a" points="191.1,180 228.7,180 178.9,317 117.4,317"/>
+        <polygon clip-path="url(#cl-bar)" fill="#08111a" points="156.1,245 261.9,245 273.5,276 139.4,276"/>
+      </svg>
+    </div>
+  </div>
+  <svg id="cursor" viewBox="0 0 34 50"><path d="M3 3 L3 37.5 L11.2 29.8 L16.6 42.6 L22.4 40.1 L17.1 27.6 L28.2 27.6 Z" fill="#fff" stroke="#000" stroke-width="2.3" stroke-linejoin="round"/></svg>
+  <div id="hud"></div>
+</div>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="mb-tlo" color-interpolation-filters="sRGB"><feGaussianBlur id="mbg-tlo" stdDeviation="0 0"/></filter>
+    <filter id="mb-cur" color-interpolation-filters="sRGB" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur id="mbg-cur" stdDeviation="0 0"/></filter>
+    <filter id="mb-c0" color-interpolation-filters="sRGB" x="-60%" y="-30%" width="220%" height="160%"><feGaussianBlur id="mbg-c0" stdDeviation="0 0"/></filter>
+    <filter id="mb-c1" color-interpolation-filters="sRGB" x="-60%" y="-30%" width="220%" height="160%"><feGaussianBlur id="mbg-c1" stdDeviation="0 0"/></filter>
+  </defs>
+</svg>
+<script>
+(function () {
+'use strict';
+var Q = new URLSearchParams(location.search);
+var LANG = Q.get('lang') === 'sr' ? 'sr' : 'en';
+var DEBUG = Q.has('debug');
+document.documentElement.lang = LANG;
+
+var IMG = { pizza: '__IMG_PIZZA__', bakery: '__IMG_BAKERY__', cafe: '__IMG_CAFE__', salon: '__IMG_SALON__', carwash: '__IMG_CARWASH__', fitness: '__IMG_FITNESS__' };
+
+// Every string is the site's own copy (Adronis.dc.html, lb-swipe.js, i18n-sr.js).
+var STR = {
+  en: {
+    eyebrow: 'Weekly ads for local businesses',
+    hookSize: 200,
+    hook: [[{ t: 'Posting', g: 0 }, { t: 'is a', g: 1 }], [{ t: 'second job.', g: 2, strike: true }]],
+    bizL: 'Business name', biz: 'Marko Pizza', sellL: 'What you sell', sell: 'Pizza, pasta and salads',
+    vibeL: 'Brand vibe', vibe1: 'Warm & cozy', vibe2: 'Bold & energetic',
+    cap1: ['Tell us', 'once.'],
+    drop: 'Drop ready', mon: 'MON', tue: 'TUE', wed: 'WED',
+    cap2: ['New ads', 'every Monday.'],
+    row: 'Facebook · Feed', sched: 'SCHEDULED', pub: 'PUBLISHED',
+    cap3: ['We post', 'them.'],
+    c1cap: 'No ideas for dinner? Fresh pizza, hot from the oven tonight.',
+    c2cap: 'Fresh out of the oven at 7am. Grab one on your way to work.',
+    waiting: 'WAITING', approve: 'APPROVE',
+    pay: [['You', 'just'], ['say', 'yes']],
+    milestone: 'Beta starts early November.', thanks: 'Thank you.', url: 'adronis.vercel.app'
+  },
+  sr: {
+    eyebrow: 'Nedeljni oglasi za lokalne biznise',
+    hookSize: 190,
+    hook: [[{ t: 'Objavljivanje', g: 0 }], [{ t: 'je', g: 1 }, { t: 'drugi posao.', g: 2, strike: true }]],
+    bizL: 'Naziv biznisa', biz: 'Marko Pizza', sellL: 'Šta prodaješ', sell: 'Pica, pasta i salate',
+    vibeL: 'Atmosfera brenda', vibe1: 'Toplo i prijatno', vibe2: 'Odvažno i energično',
+    cap1: ['Jednom', 'opišeš.'],
+    drop: 'Drop je spreman', mon: 'PON', tue: 'UTO', wed: 'SRE',
+    cap2: ['Ponedeljkom', 'novi oglasi.'],
+    row: 'Facebook · Feed', sched: 'ZAKAZANO', pub: 'OBJAVLJENO',
+    cap3: ['Mi ih', 'objavljujemo.'],
+    c1cap: 'Nemaš ideju za večeru? Sveža pica, večeras vruća iz peći.',
+    c2cap: 'Sveže iz rerne u 7h. Uzmi jedno usput do posla.',
+    waiting: 'NA ČEKANJU', approve: 'ODOBRI',
+    pay: [['Ti', 'samo'], ['kažeš', 'da']],
+    milestone: 'Beta počinje početkom novembra.', thanks: 'Hvala.', url: 'adronis.vercel.app'
+  }
+};
+var S = STR[LANG];
+
+/* ------------------------------------------------------------ math --- */
+var TAU = Math.PI * 2;
+function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+function lerp(a, b, k) { return a + (b - a) * k; }
+// Damped spring step response: 0 before t=0, settles at 1. r = response (s),
+// z = damping ratio. z 0.8+ keeps the overshoot near 1%.
+function spring(t, r, z) {
+  if (t <= 0) return 0;
+  r = r || 0.45; z = z || 0.82;
+  var w = TAU / r;
+  if (z >= 1) { var e = Math.exp(-w * t); return 1 - e * (1 + w * t); }
+  var wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t));
+}
+// Spring from x0 with initial velocity v0 towards x1.
+function springIV(t, x0, v0, x1, r, z) {
+  if (t <= 0) return x0 + v0 * t;
+  var w = TAU / r, A = x0 - x1;
+  if (z >= 1) { var B = v0 + w * A; return x1 + (A + B * t) * Math.exp(-w * t); }
+  var wd = w * Math.sqrt(1 - z * z);
+  var B2 = (v0 + z * w * A) / wd;
+  return x1 + Math.exp(-z * w * t) * (A * Math.cos(wd * t) + B2 * Math.sin(wd * t));
+}
+// Exponential ease-out over d seconds.
+function expo(t, d, k) {
+  if (t <= 0) return 0; if (t >= d) return 1;
+  k = k || 6.5;
+  return (1 - Math.exp(-k * t / d)) / (1 - Math.exp(-k));
+}
+// Exponential ease-in (for exits that leave the frame).
+function expoIn(t, d) { if (t <= 0) return 0; if (t >= d) return 1; var k = 5; return (Math.exp(k * t / d) - 1) / (Math.exp(k) - 1); }
+// A track is a list of [time, value, response?, damping?]: each key retargets
+// a spring, and the springs superpose (exactly what a linear spring does).
+function track(keys) {
+  return function (t) {
+    var v = keys[0][1];
+    for (var i = 1; i < keys.length; i++) {
+      var k = keys[i];
+      v += (k[1] - keys[i - 1][1]) * spring(t - k[0], k[2] || 0.45, k[3] || 0.82);
+    }
+    return v;
+  };
+}
+function on(t, a, b) { return t >= a && t < b; }
+
+/* ------------------------------------------------------------ time --- */
+var BEAT = 0.5;
+function beat(n) { return (n - 1) * BEAT; }
+var DUR = 15;
+// Camera push: 1.00 -> 1.04 across every scene, each scene starting where the last ended.
+var KNOTS = [0, 2, 4, 6, 8, 11, 15];
+function push(t) {
+  var u;
+  if (t <= 0) u = 0;
+  else if (t >= 15) u = 6;
+  else {
+    for (var i = 0; i < KNOTS.length - 1; i++) {
+      if (t < KNOTS[i + 1]) { u = i + (t - KNOTS[i]) / (KNOTS[i + 1] - KNOTS[i]); break; }
+    }
+  }
+  return Math.pow(1.04, u);
+}
+// Each scene is laid out in screen pixels for the push at its middle.
+var SD = [push(1.0), push(3.0), push(5.0), push(7.0), push(9.5), push(13.0)];
+
+/* ------------------------------------------------------------ DOM ---- */
+function $(id) { return document.getElementById(id); }
+function el(tag, cls, parent, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function mword(parent, text, cls) {
+  var m = el('span', 'm', parent);
+  var w = el('span', 'w' + (cls ? ' ' + cls : ''), m, text);
+  return { m: m, w: w };
+}
+function bigLines(box, lines, keyLast) {
+  var words = [];
+  lines.forEach(function (line, li) {
+    var ln = el('div', 'ln', box);
+    line.forEach(function (wd, wi) {
+      if (wi > 0) ln.appendChild(document.createTextNode(' '));
+      var o = mword(ln, typeof wd === 'string' ? wd : wd.t, null);
+      if (typeof wd === 'object') { o.g = wd.g; o.strike = !!wd.strike; }
+      o.line = li; words.push(o);
+    });
+  });
+  return words;
+}
+
+// Hook
+$('h-pilltext').textContent = S.eyebrow;
+var hookBox = $('h-text');
+hookBox.style.fontSize = S.hookSize + 'px';
+var hookWords = bigLines(hookBox, S.hook);
+var strikeWord = hookWords.filter(function (w) { return w.strike; })[0];
+var strikeBL = el('span', 'bl', strikeWord.w);
+
+// Brief
+$('mk-l1').textContent = S.bizL; $('mk-v1').textContent = S.biz;
+$('mk-l2').textContent = S.sellL; $('mk-l3').textContent = S.vibeL;
+$('mk-chip1').textContent = S.vibe1; $('mk-chip2').textContent = S.vibe2;
+var cap1Words = bigLines($('cap1'), [[S.cap1[0]], [S.cap1[1]]]);
+
+// Drop
+$('fchip-t').textContent = S.drop;
+$('fchip-s').textContent = S.mon + ' 09:00';
+var fanImgs = ['cafe', 'bakery', 'salon', 'carwash'];
+var fanCards = fanImgs.map(function (k) { var c = el('div', 'adc', $('fan')); var im = el('img', null, c); im.src = IMG[k]; im.alt = ''; return c; });
+var cap2Words = bigLines($('cap2'), [[S.cap2[0]], [S.cap2[1]]]);
+
+// Post
+$('ms-img').src = IMG.bakery; $('ms-b').textContent = S.row; $('ms-s').textContent = S.wed + ' 12:00';
+$('ms-pill').textContent = S.sched; $('ms-pill2').textContent = S.pub;
+$('tlo-t1').textContent = S.sched; $('tlo-t2').textContent = S.pub;
+var cap3Words = bigLines($('cap3'), [[S.cap3[0]], [S.cap3[1]]]);
+
+// Payoff deck (lb-swipe.js CARDS[0], CARDS[1])
+function card(d) {
+  var c = el('div', 'swc', $('deck'));
+  var hd = el('div', 'hd', c);
+  var av = el('div', 'av', hd, d.initial); av.style.background = d.tint;
+  el('div', 'nm', hd, d.name); el('div', 'ch', hd, d.channel);
+  var md = el('div', 'md', c); var im = el('img', null, md); im.src = d.img; im.alt = '';
+  var st = el('div', 'stamp', md, S.approve);
+  el('p', 'cp', c, d.caption);
+  var ft = el('div', 'ft', c);
+  var slot = el('span', 'slot', ft); var dot = el('i', null, slot); slot.appendChild(document.createTextNode(d.day + ' ' + d.time));
+  el('span', 'wt', ft, S.waiting);
+  return { node: c, stamp: st, dot: dot };
+}
+var cards = [
+  card({ img: IMG.pizza, name: 'Marko Pizza', initial: 'M', tint: '#f2b27a', channel: 'Instagram', day: S.mon, time: '18:30', caption: S.c1cap }),
+  card({ img: IMG.bakery, name: 'The Corner Bakery', initial: 'C', tint: '#e8d5b8', channel: 'Facebook', day: S.tue, time: '07:00', caption: S.c2cap })
+];
+// The card on top is drawn last.
+$('deck').insertBefore(cards[1].node, cards[0].node);
+
+var payWords = [];
+(function () {
+  var box = $('pay');
+  S.pay.forEach(function (line, li) {
+    var ln = el('div', 'ln', box);
+    line.forEach(function (w, wi) {
+      if (wi > 0) ln.appendChild(document.createTextNode(' '));
+      var isKey = li === S.pay.length - 1 && wi === line.length - 1;
+      var o = mword(ln, w, isKey ? 'key' : null); o.key = isKey; payWords.push(o);
+      if (isKey) { var pp = el('span', 'pp', ln, '.'); el('span', 'bl', pp); o.pp = pp; }
+    });
+  });
+})();
+var payKey = payWords[payWords.length - 1];
+
+// End card
+$('e-name').textContent = 'Adronis';
+var msWord = mword($('e-ms'), S.milestone); var tyWord = mword($('e-ty'), S.thanks); var urlWord = mword($('e-url'), S.url);
+
+/* ------------------------------------------------------ static layout --- */
+// Positions are in each scene's own screen pixels (at that scene's mid-push).
+function place(e, x, y) { e.style.left = x + 'px'; e.style.top = y + 'px'; }
+place($('h-pill'), 150, 292);
+place(hookBox, 146, 414);
+place($('mk'), 962, 0);
+place($('cap1'), 146, 0);
+place($('fchip'), 1297, 196);
+place($('cap2'), 146, 0);
+place($('msrow'), 930, 0);
+place($('cap3'), 146, 0);
+place($('deck'), 0, 0);
+place($('pay'), 146, 0);
+var CARD_X = 1268, CARD_Y = 0;
+
+var L = {}; // measured layout, world px
+var READY = false;
+
+function sceneMatrix(k) {
+  // design -> world: scaled about the frame centre
+  var s = 1 / SD[k];
+  return 'translate(960px,540px) scale(' + s + ') translate(-960px,-540px)';
+}
+function toWorld(k, x, y) { return [960 + (x - 960) / SD[k], 540 + (y - 540) / SD[k]]; }
+
+function layout() {
+  // vertical centring of the captions and the form, measured in design px
+  ['cap1', 'cap2', 'cap3'].forEach(function (id) { var e = $(id); e.style.fontSize = '128px'; e.style.top = Math.round(540 - e.offsetHeight / 2 + 6) + 'px'; });
+  var mk = $('mk'); mk.style.top = Math.round(540 - mk.offsetHeight / 2) + 'px';
+  var row = $('msrow'); row.style.top = Math.round(540 - row.offsetHeight / 2) + 'px';
+  var pay = $('pay'); pay.style.fontSize = '200px'; pay.style.top = Math.round(540 - pay.offsetHeight / 2 + 4) + 'px';
+  // the deck: two cards stacked at the same spot
+  cards.forEach(function (c) { place(c.node, CARD_X, 0); });
+  var ch = cards[0].node.offsetHeight; CARD_Y = Math.round(540 - ch / 2);
+  cards.forEach(function (c) { place(c.node, CARD_X, CARD_Y); });
+  // fan
+  var chip = $('fchip');
+  // end card
+  var name = $('e-name'); name.style.fontSize = '150px';
+  var lw = 166 + 50 + name.offsetWidth;
+  var lx = Math.round(960 - lw / 2);
+  L.lockLeft = lx; L.nameW = name.offsetWidth;
+  place($('e-logo-ph'), lx, 392); place(name, lx + 166 + 50, 0);
+  name.style.top = Math.round(392 + 83 - name.offsetHeight / 2 + 4) + 'px';
+  var ms = $('e-ms'); ms.style.fontSize = '58px'; ms.style.fontWeight = '500'; ms.style.letterSpacing = '-.02em'; ms.style.color = '#f2f4f7'; ms.style.top = '616px';
+  var ty = $('e-ty'); ty.style.fontSize = '58px'; ty.style.fontWeight = '500'; ty.style.letterSpacing = '-.02em'; ty.style.color = '#878d98'; ty.style.top = '694px';
+  var ur = $('e-url'); ur.style.fontSize = '30px'; ur.style.fontWeight = '500'; ur.style.letterSpacing = '.02em'; ur.style.color = '#5d626c'; ur.style.top = '870px';
+
+  for (var k = 0; k < 6; k++) $('s' + k).style.transform = sceneMatrix(k);
+  $('world').style.transform = 'none';
+
+  function R(e) { var r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, cx: r.left + r.width / 2, cy: r.top + r.height / 2, r: r.right, b: r.bottom }; }
+  // Hook
+  L.pillDot = R($('h-pilldot'));
+  L.pill = R($('h-pill'));
+  var sw = R(strikeWord.w), bl = R(strikeBL);
+  var fsH = S.hookSize / SD[0];
+  L.hookFs = fsH;
+  L.strike = { x0: sw.x - 0.03 * fsH, x1: sw.r + 0.05 * fsH, y: bl.y - 0.547 * fsH * 0.5, h: 0.082 * fsH };
+  // Brief
+  L.field = R($('mk-field'));
+  L.mk = R($('mk'));
+  var fieldDesign = { x: $('mk-field').offsetLeft, y: $('mk-field').offsetTop };
+  // typed widths
+  var typed = $('mk-typed');
+  L.typedW = [];
+  for (var i = 0; i <= S.sell.length; i++) { typed.textContent = S.sell.slice(0, i); L.typedW.push(typed.getBoundingClientRect().width); }
+  typed.textContent = '';
+  L.typedX = typed.getBoundingClientRect().left;
+  L.chip1 = R($('mk-chip1'));
+  // Drop
+  L.fchip = R($('fchip')); L.fic = R($('fchip-ic'));
+  // Post
+  L.row = R($('msrow')); L.pill1 = R($('ms-pill'));
+  var p2 = $('ms-pill2'); L.pill2w = p2.getBoundingClientRect().width;
+  // Payoff
+  L.card = R(cards[0].node); L.slot = R(cards[0].dot);
+  L.cardDesign = { x: CARD_X, y: CARD_Y, w: cards[0].node.offsetWidth, h: cards[0].node.offsetHeight };
+  L.slotLocal = { x: (L.slot.cx - L.card.x) * SD[4], y: (L.slot.cy - L.card.y) * SD[4] };
+  var ppr = R(payKey.pp), ppb = R(payKey.pp.querySelector('.bl'));
+  var fsP = 200 / SD[4];
+  L.period = { cx: ppr.x + (0.03125 + 0.078) * fsP, cy: ppb.y - 0.0703 * fsP, s: 0.148 * fsP };
+  L.payKey = R(payKey.w);
+  L.pay = R($('pay'));
+  function loc(k, outer, inner) { var a = outer.getBoundingClientRect(), b = inner.getBoundingClientRect(); return { x: (b.left - a.left) * SD[k], y: (b.top - a.top) * SD[k], w: b.width * SD[k], h: b.height * SD[k] }; }
+  var pr0 = $('h-pill').getBoundingClientRect(), pd = loc(0, $('h-pill'), $('h-pilldot'));
+  L.pillLocal = { w: pr0.width * SD[0], h: pr0.height * SD[0], dx: pd.x + pd.w / 2 };
+  var mr = $('mk').getBoundingClientRect(), fl = loc(1, $('mk'), $('mk-field'));
+  L.mkLocal = { w: mr.width * SD[1], h: mr.height * SD[1], fx: fl.x, fy: fl.y, fw: fl.w, fh: fl.h, cx: (L.typedX - mr.left) * SD[1] + 8, ex: (L.typedX + L.typedW[L.typedW.length - 1] - mr.left) * SD[1] + 30 };
+  var cr0 = $('fchip').getBoundingClientRect(), il = loc(2, $('fchip'), $('fchip-ic'));
+  L.chipLocal = { w: cr0.width * SD[2], h: cr0.height * SD[2], ix: il.x, iy: il.y, iw: il.w, x: $('fchip').offsetLeft, y: $('fchip').offsetTop };
+  var rr0 = $('msrow').getBoundingClientRect(), pl = loc(3, $('msrow'), $('ms-pill'));
+  L.rowLocal = { w: rr0.width * SD[3], h: rr0.height * SD[3], px: pl.x, py: pl.y, pw: pl.w, ph: pl.h };
+  L.mbc = {};
+  ['h-text', 'h-pill', 'mk', 'cap1', 'fchip', 'cap2', 'msrow', 'cap3', 'pay', 'e-name', 'e-ms', 'e-ty', 'e-url'].forEach(function (id) { var r = R($(id)); L.mbc[id] = [r.cx, r.cy]; });
+  var fr = R($('fchip')); L.mbc['fan'] = [fr.cx, fr.cy + 330 / SD[2]];
+  // End
+  L.logo = R($('e-logo-ph'));
+  L.name = R($('e-name'));
+  L.ms = R($('e-ms'));
+  L.cardFull = R(cards[0].node);
+}
+
+/* ------------------------------------------------------------- the dot --- */
+var ACC = [124, 198, 255], LOGO = [111, 195, 255];
+var TL = {}; // TLO tracks
+function buildTLO() {
+  var d0 = 18 / SD[0];             // traveling dot, ~18 screen px
+  var keys = [];
+  function K(t, o, r, z) { o.t = t; o.r_ = r || 0.42; o.z_ = z || 0.82; keys.push(o); }
+  var s = L.strike;
+  // 0.00 eyebrow dot
+  var dp = L.pillDot.w;
+  K(0, { cx: L.pillDot.cx, cy: L.pillDot.cy, w: dp, h: dp, rad: dp / 2, fill: 1, bw: 0, ba: 0, ring: 0, col: 0, star: 0, txt: 0, flip: 0, caret: 0, sq: 0 });
+  // 1.40 drops onto the second line, 1.50 stretches into the strike
+  K(beat(4) - 0.1, { cx: s.x0 + s.h / 2, cy: s.y, w: s.h, h: s.h, rad: s.h / 2 }, 0.22, 0.9);
+  K(beat(4), { cx: (s.x0 + s.x1) / 2, w: s.x1 - s.x0 }, 0.3, 0.8);
+  // 2.06 snaps back into a dot at its right end
+  K(beat(5) + 0.06, { cx: s.x1 - s.h / 2, w: s.h }, 0.22, 0.88);
+  // 2.14 to the field's caret, 2.34 unfolds into the focus ring
+  var f = L.field, cx0 = L.typedX + 2 / SD[1];
+  K(beat(5) + 0.14, { cx: cx0 + d0 / 2, cy: f.cy, w: d0, h: d0, rad: d0 / 2 }, 0.28, 0.88);
+  var ringR = 27 / SD[1];
+  K(beat(5) + 0.34, { cx: f.cx, cy: f.cy, w: f.w, h: f.h, rad: ringR, bw: 3 / SD[1], ba: 1, ring: 9 / SD[1] }, 0.36, 0.84);
+  K(beat(5) + 0.35, { fill: 0 }, 0.12, 1);
+  K(beat(5) + 0.44, { caret: 1 }, 0.1, 1);
+  // 3.50 the ring collapses into the dot at the end of the text
+  var endX = L.typedX + L.typedW[L.typedW.length - 1] + 30 / SD[1];
+  K(beat(8), { cx: endX, cy: f.cy, w: d0, h: d0, rad: d0 / 2, fill: 1, bw: 0, ba: 0, ring: 0, caret: 0 }, 0.26, 0.9);
+  // 3.64 travels to the drop chip
+  var ic = L.fic;
+  K(beat(8) + 0.14, { cx: ic.cx, cy: ic.cy }, 0.34, 0.86);
+  // 4.00 becomes the tile
+  K(beat(9), { w: ic.w, h: ic.h, rad: 26 / SD[2], fill: 0.14, bw: 2.4 / SD[2], ba: 0.32, star: 1 }, 0.36, 0.8);
+  // 5.50 back to a dot
+  K(beat(12), { w: d0, h: d0, rad: d0 / 2, fill: 1, bw: 0, ba: 0, star: 0 }, 0.26, 0.9);
+  // 5.60 travels to the schedule chip
+  var p1 = L.pill1;
+  K(beat(12) + 0.14, { cx: p1.cx, cy: p1.cy }, 0.34, 0.86);
+  // 6.00 stretches into the SCHEDULED pill
+  K(beat(13), { w: p1.w, h: p1.h, rad: p1.h / 2, fill: 0.12, bw: 2.5 / SD[3], ba: 0.36, txt: 1 }, 0.36, 0.8);
+  // 7.00 flips to PUBLISHED (right edge stays put)
+  K(beat(15), { w: L.pill2w, cx: p1.r - L.pill2w / 2, flip: 1 }, 0.36, 0.84);
+  // 7.50 back to a dot
+  K(beat(16), { w: d0, h: d0, rad: d0 / 2, fill: 1, bw: 0, ba: 0, txt: 0, cx: p1.r - L.pill2w / 2 }, 0.26, 0.9);
+  // 7.58 travels to the card's slot
+  var sl = L.slot;
+  K(beat(16) + 0.14, { cx: sl.cx, cy: sl.cy }, 0.34, 0.86);
+  // 8.00 becomes the slot dot
+  K(beat(17), { w: sl.w, h: sl.h, rad: sl.w / 2 }, 0.3, 0.86);
+  // 10.00 flies to the period after the key word, turns square
+  var pr = L.period;
+  K(beat(21) + 0.02, { cx: pr.cx, cy: pr.cy, w: pr.s, h: pr.s, rad: pr.s * 0.02, sq: 1 }, 0.3, 0.84);
+  // 11.04 glides to the middle of the frame
+  var lg = L.logo;
+  var ctrX = 960 + (960 - 960) / SD[5];
+  K(beat(23) + 0.04, { cx: ctrX, cy: lg.cy }, 0.42, 0.88);
+  // 11.50 grows into the logo's rounded square
+  K(beat(24), { w: lg.w, h: lg.h, rad: lg.w * 0.2009, col: 1 }, 0.4, 0.82);
+  // 13.00 slides left to make room for the name
+  K(beat(27), { cx: lg.cx }, 0.45, 0.86);
+
+  var PROPS = ['cx', 'cy', 'w', 'h', 'rad', 'fill', 'bw', 'ba', 'ring', 'col', 'star', 'txt', 'flip', 'caret', 'sq'];
+  PROPS.forEach(function (p) {
+    var ks = [];
+    keys.forEach(function (k) { if (k[p] !== undefined) ks.push([k.t, k[p], k.r_, k.z_]); });
+    TL[p] = track(ks);
+  });
+}
+
+/* ------------------------------------------------------------ payoff --- */
+var GRAB = [beat(18), beat(20)], THROW = [beat(19), beat(21)];
+var DRAG = 205; // design px before the flick
+function cardState(i, t) {
+  // returns design-space offsets for card i
+  var st = { x: 0, y: 0, rot: 0, op: 1, stamp: 0, level: i, vis: 1 };
+  // level: card 1 sits under card 0 until card 0 is thrown
+  if (i === 1) st.level = 1 - spring(t - THROW[0], 0.45, 1);
+  var g = GRAB[i] + 0.06, T = THROW[i];
+  var D = DRAG;
+  if (t >= g && t < T) {
+    var u = (t - g) / (T - g); st.x = D * u * u; st.y = -6 * u;
+  } else if (t >= T) {
+    var v0 = 2 * D / (T - g);
+    st.x = springIV(t - T, D, v0, 1700, 0.62, 1); st.y = -6 - 40 * expo(t - T, 0.5);
+  }
+  st.rot = clamp(st.x * 0.044, -22, 22);
+  var W = L.cardDesign.w;
+  st.op = 1 - clamp((Math.abs(st.x) - W * 0.55) / (W * 0.7), 0, 1);
+  st.stamp = clamp(st.x / 112, 0, 1);
+  if (i === 0 && t > T + 0.8) st.vis = 0;
+  if (i === 1 && t > T + 0.8) st.vis = 0;
+  return st;
+}
+// where a point of card i (card-local design px) sits in world space
+function cardPoint(i, t, lx, ly) {
+  var st = cardState(i, t);
+  var W = L.cardDesign.w, H = L.cardDesign.h;
+  var lv = Math.max(0, st.level);
+  var sc = 1 - lv * 0.055, ty = lv * 16 * 1.25;
+  // transform about the card centre: translate(x, y+ty) rotate(rot) scale(sc)
+  var dx = (lx - W / 2) * sc, dy = (ly - H / 2) * sc;
+  var a = st.rot * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+  var X = L.cardDesign.x + W / 2 + st.x + dx * ca - dy * sa;
+  var Y = L.cardDesign.y + H / 2 + st.y + ty + dx * sa + dy * ca;
+  return toWorld(4, X, Y);
+}
+
+/* ------------------------------------------------------------ camera --- */
+var CAM = {};
+function buildCamera() {
+  function w(k, x, y) { return toWorld(k, x, y); }
+  var keys = [];
+  function K(t, k, x, y, f, r, z) { var p = w(k, x, y); keys.push([t, p[0], p[1], f, r || 0.8, z || 0.92]); }
+  function D(k, wx, wy) { return [960 + (wx - 960) * SD[k], 540 + (wy - 540) * SD[k]]; } // world -> design
+  // one smooth, critically damped move per scene: into the dot's transformation,
+  // then back out for the caption. Slow enough that 3 blended subframes read as blur.
+  K(0, 0, 960, 540, 1);
+  K(1.15, 0, 990, 600, 1.04, 1.0, 1);
+  var fd = D(1, L.field.cx, L.field.cy);
+  K(beat(5) - 0.05, 1, fd[0] - 120, fd[1], 1.2, 0.9, 1);
+  K(beat(6) + 0.1, 1, 960, 540, 1.0, 0.9, 1);
+  var ic = D(2, L.fic.cx, L.fic.cy);
+  K(beat(8), 2, ic[0] + 110, ic[1] + 60, 1.24, 0.9, 1);
+  K(beat(10) - 0.05, 2, 960, 540, 1.0, 0.9, 1);
+  var pl = D(3, L.pill1.cx, L.pill1.cy);
+  K(beat(12), 3, pl[0] - 200, pl[1], 1.22, 0.9, 1);
+  K(beat(13) + 0.1, 3, 960, 540, 1.0, 0.9, 1);
+  var cd = D(4, L.card.cx, L.card.cy);
+  K(beat(16), 4, cd[0] - 60, cd[1] + 40, 1.18, 0.9, 1);
+  K(beat(17) + 0.15, 4, 960, 540, 1.0, 0.9, 1);
+  var yk = D(4, L.payKey.cx, L.payKey.cy);
+  K(beat(21), 4, (yk[0] + 960) / 2 - 60, (yk[1] + 540) / 2, 1.04, 0.9, 1);
+  K(beat(22), 4, yk[0], yk[1] - 20, 1.12, 0.95, 1);
+  var lgc = D(5, L.logo.cx, L.logo.cy);
+  K(beat(23), 5, 960, lgc[1], 1.24, 0.9, 1);
+  K(beat(26) + 0.05, 5, 960, 560, 1.0, 1.0, 1);
+  CAM.x = track(keys.map(function (k) { return [k[0], k[1], k[4], k[5]]; }));
+  CAM.y = track(keys.map(function (k) { return [k[0], k[2], k[4], k[5]]; }));
+  CAM.f = track(keys.map(function (k) { return [k[0], k[3], k[4], k[5]]; }));
+}
+function camera(t) { return { x: CAM.x(t), y: CAM.y(t), s: push(t) * CAM.f(t) }; }
+function toScreen(c, x, y) { return [(x - c.x) * c.s + 960, (y - c.y) * c.s + 540]; }
+
+/* ------------------------------------------------------------ cursor --- */
+// Segments: from time t the cursor springs to point p (world px).
+var CUR = [];
+function buildCursor() {
+  function P(k, x, y) { return toWorld(k, x, y); }
+  var f = L.field;
+  var off = function (t) { var c = camera(t); return [c.x + (2080 - 960) / c.s, c.y + (1240 - 540) / c.s]; };
+  var chip1 = L.chip1, ic = L.fchip;
+  var seg = [];
+  seg.push({ t: -1, p: off(0), r: 0.5 });
+  seg.push({ t: beat(5) + 0.06, p: [L.typedX + 60 / SD[1], f.cy + 14 / SD[1]], r: 0.26 });
+  seg.push({ t: beat(5) + 0.5, p: [L.typedX + 140 / SD[1], f.b + 70 / SD[1]], r: 0.5 });
+  seg.push({ t: beat(7) - 0.24, p: [chip1.cx + 10 / SD[1], chip1.cy + 6 / SD[1]], r: 0.26 });
+  seg.push({ t: beat(7) + 0.22, p: [chip1.cx + 70 / SD[1], chip1.b + 90 / SD[1]], r: 0.6 });
+  seg.push({ t: beat(10) - 0.32, p: [ic.r - 34 / SD[2], ic.cy + 16 / SD[2]], r: 0.3 });
+  seg.push({ t: beat(10) + 0.2, p: [ic.r + 40 / SD[2], ic.b + 150 / SD[2]], r: 0.6 });
+  // hands off while the posts go out: the cursor leaves before the schedule appears
+  seg.push({ t: beat(12), p: off(beat(12) + 0.45), r: 0.5 });
+  // payoff: grab points on the image area of the top card
+  var gp = cardPoint(0, beat(17), L.cardDesign.w * 0.56, L.cardDesign.h * 0.42);
+  seg.push({ t: beat(17) + 0.1, p: gp, r: 0.3 });
+  seg.push({ t: GRAB[0], drag: 0 });
+  seg.push({ t: THROW[0] + 0.02, p: cardPoint(1, beat(21) - 0.3, L.cardDesign.w * 0.56, L.cardDesign.h * 0.42), r: 0.3 });
+  seg.push({ t: GRAB[1], drag: 1 });
+  seg.push({ t: THROW[1] + 0.04, p: off(beat(22) + 0.2), r: 0.55 });
+  CUR = seg;
+}
+function cursorPos(t) {
+  var pos = CUR[0].p.slice();
+  for (var i = 1; i < CUR.length; i++) {
+    var s = CUR[i], next = CUR[i + 1];
+    if (t < s.t) break;
+    var end = next ? Math.min(t, next.t) : t;
+    if (s.drag !== undefined) {
+      // locked to the grab point on the card while dragging
+      var gx = L.cardDesign.w * 0.56, gy = L.cardDesign.h * 0.42;
+      pos = cardPoint(s.drag, Math.min(end, THROW[s.drag]), gx, gy);
+      if (end > THROW[s.drag]) { /* hand stops at release */ }
+    } else {
+      var k = spring(end - s.t, s.r, 0.92);
+      pos = [pos[0] + (s.p[0] - pos[0]) * k, pos[1] + (s.p[1] - pos[1]) * k];
+    }
+    if (next && t < next.t) break;
+  }
+  return pos;
+}
+var CLICKS = [beat(5) + 0.34, beat(7), beat(10)];
+var TYPE0 = beat(6), TYPE1 = beat(7) - 0.1;
+function cursorPress(t) {
+  var p = 0;
+  CLICKS.forEach(function (c) { p = Math.max(p, spring(t - c + 0.04, 0.08, 1) - spring(t - c - 0.07, 0.2, 0.92)); });
+  for (var i = 0; i < 2; i++) p = Math.max(p, spring(t - GRAB[i] + 0.03, 0.1, 1) - spring(t - THROW[i], 0.16, 1));
+  return clamp(p, 0, 1);
+}
+
+/* ------------------------------------------------------------ helpers --- */
+function rise(w, t, tin, tout, dirOut, resp) {
+  // a word rising from behind its mask, and sinking out later
+  var y = 132 * (1 - spring(t - tin, resp || 0.42, 0.86));
+  if (tout != null && t >= tout) y += (dirOut || 1) * 142 * expo(t - tout, 0.34);
+  w.style.transform = 'translateY(' + y.toFixed(2) + '%)';
+  w.parentNode.style.visibility = (t < tin - 0.001 || (tout != null && t > tout + 0.4)) ? 'hidden' : 'visible';
+}
+function setVis(e, v) { e.style.visibility = v ? 'visible' : 'hidden'; }
+function setScene(id, v) { $(id).style.display = v ? 'block' : 'none'; }
+function insetClip(e, top, right, bottom, left, rad) {
+  e.style.clipPath = 'inset(' + top.toFixed(2) + 'px ' + right.toFixed(2) + 'px ' + bottom.toFixed(2) + 'px ' + left.toFixed(2) + 'px round ' + rad.toFixed(2) + 'px)';
+}
+function mix(a, b, k) { return [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)]; }
+function rgba(c, a) { return 'rgba(' + Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]) + ',' + clamp(a, 0, 1).toFixed(3) + ')'; }
+function blurTo(id, sx, sy) { $(id).setAttribute('stdDeviation', sx.toFixed(2) + ' ' + sy.toFixed(2)); }
+// Motion blur that follows on-screen speed and direction. Each blurred element
+// gets its own SVG filter (an x/y gaussian sized from its velocity).
+var MB_K = 0.0042, MB_MIN = 0.6, MB_MAX = 40, HV = 1 / 240;
+var MBF = {};
+function mbFilter(key) {
+  if (MBF[key]) return MBF[key];
+  var NS = 'http://www.w3.org/2000/svg', defs = document.querySelector('svg defs');
+  var f = document.createElementNS(NS, 'filter');
+  f.setAttribute('id', 'mbx-' + key); f.setAttribute('filterUnits', 'userSpaceOnUse');
+  f.setAttribute('x', '-1500'); f.setAttribute('y', '-1500'); f.setAttribute('width', '5000'); f.setAttribute('height', '5000');
+  f.setAttribute('color-interpolation-filters', 'sRGB');
+  var g = document.createElementNS(NS, 'feGaussianBlur'); g.setAttribute('stdDeviation', '0 0');
+  f.appendChild(g); defs.appendChild(f);
+  MBF[key] = g; return g;
+}
+// screen velocity of a world-space point function pt(t) -> [x, y]
+function screenVel(t, pt) {
+  var a = pt(t - HV), b = pt(t + HV);
+  var sa = toScreen(camera(t - HV), a[0], a[1]), sb = toScreen(camera(t + HV), b[0], b[1]);
+  return [(sb[0] - sa[0]) / (2 * HV), (sb[1] - sa[1]) / (2 * HV)];
+}
+// returns the CSS filter string for an element in scene k (local px = screen px * SD[k] / S)
+function mbCss(key, k, v, S) {
+  var sx = Math.min(MB_MAX, Math.abs(v[0]) * MB_K), sy = Math.min(MB_MAX, Math.abs(v[1]) * MB_K);
+  if (sx < MB_MIN && sy < MB_MIN) return '';
+  var sc = (k == null ? 1 : SD[k]) / S;
+  mbFilter(key).setAttribute('stdDeviation', (sx * sc).toFixed(2) + ' ' + (sy * sc).toFixed(2));
+  return 'url(#mbx-' + key + ')';
+}
+function mbStatic(id, k, t, S) {
+  var e = $(id), cw = L.mbc[id];
+  e.style.filter = mbCss(id, k, screenVel(t, function () { return cw; }), S);
+}
+
+/* -------------------------------------------------------------- seek --- */
+function tloState(t) {
+  var o = {};
+  for (var p in TL) o[p] = TL[p](t);
+  // riding the dragged card during the payoff
+  for (var i = 0; i < 2; i++) {
+    var g = GRAB[i], T = THROW[i];
+    if (t >= g) {
+      var rest = cardPoint(i, g, L.slotLocal.x, L.slotLocal.y);
+      var tt = Math.min(t, T);
+      var on1 = cardPoint(i, tt, L.slotLocal.x, L.slotLocal.y);
+      var dx = on1[0] - rest[0], dy = on1[1] - rest[1];
+      var k = t < T ? 1 : (i === 0 ? 1 - spring(t - T, 0.3, 0.86) : 1 - spring(t - T - 0.02, 0.3, 0.84));
+      o.cx += dx * k; o.cy += dy * k;
+    }
+  }
+  return o;
+}
+
+function seek(t) {
+  if (!READY) return;
+  t = clamp(t, 0, DUR);
+  var c = camera(t);
+  $('world').style.transform = 'translate(960px,540px) scale(' + c.s.toFixed(5) + ') translate(' + (-c.x).toFixed(3) + 'px,' + (-c.y).toFixed(3) + 'px)';
+
+  /* ---------------- scene 0: hook ---------------- */
+  var s0 = on(t, 0, beat(5) + 0.45); setScene('s0', s0);
+  if (s0) {
+    // eyebrow pill unfolds out of the dot, folds back when the dot leaves
+    var pill = $('h-pill'), pw = L.pillLocal.w, ph = L.pillLocal.h, dcx = L.pillLocal.dx;
+    var open = clamp(spring(t - 0.02, 0.55, 0.86) - spring(t - beat(4) - 0.02, 0.26, 0.95), 0, 1);
+    var vo = clamp(open * 1.8, 0, 1);
+    insetClip(pill, lerp(ph / 2 - 8, 0, vo), lerp(pw - dcx - 8, 0, open), lerp(ph / 2 - 8, 0, vo), lerp(dcx - 8, 0, vo), ph / 2);
+    pill.style.visibility = open > 0.002 ? 'visible' : 'hidden';
+    var ptx = $('h-pilltext');
+    ptx.style.transform = 'translateX(' + (-28 * (1 - spring(t - 0.08, 0.5, 0.86))).toFixed(2) + 'px)';
+    // words
+    hookWords.forEach(function (w) {
+      var tin = beat(1 + w.g) + (w.g === 0 ? 0.04 : 0);
+      if (w.strike) {
+        rise(w.w, t, tin, null);
+        // squeezed into the strike line: a band closing on the line, under the bar
+        var sq = expo(t - SQUEEZE, 0.16);
+        w.w.style.transformOrigin = '50% ' + strikeOrigin + 'px';
+        w.w.style.transform += ' scaleY(' + (1 - 0.86 * sq).toFixed(4) + ')';
+        var band = lerp(Math.max(strikeMLocal, L.mH - strikeMLocal), L.strike.h * SD[0] * 0.3, sq);
+        w.m.style.clipPath = 'inset(' + Math.max(0, strikeMLocal - band).toFixed(2) + 'px -40px ' + Math.max(0, L.mH - strikeMLocal - band).toFixed(2) + 'px -40px)';
+        w.m.style.visibility = (t < tin || sq > 0.98) ? 'hidden' : 'visible';
+      } else {
+        rise(w.w, t, tin, beat(5) + 0.01, 1);
+      }
+    });
+  }
+
+  if (s0) { mbStatic('h-text', 0, t, c.s); mbStatic('h-pill', 0, t, c.s); }
+
+  /* ---------------- scene 1: brief ---------------- */
+  var s1 = on(t, beat(5), beat(9) + 0.1); setScene('s1', s1);
+  if (s1) {
+    var mk = $('mk'), mw = L.mkLocal.w, mh = L.mkLocal.h;
+    var fx = L.mkLocal.fx, fy = L.mkLocal.fy, fw = L.mkLocal.fw, fh = L.mkLocal.fh;
+    var a1 = spring(t - (beat(5) + 0.34), 0.36, 0.84) - spring(t - (beat(8) + 0.02), 0.22, 0.92);
+    var a2 = spring(t - (beat(5) + 0.40), 0.5, 0.86) - spring(t - (beat(8) - 0.04), 0.3, 0.92);
+    a1 = clamp(a1, 0, 1); a2 = clamp(a2, 0, 1);
+    // stage 1: a point at the caret -> the field; stage 2: the field -> the whole card
+    var ccx = t < beat(8) ? L.mkLocal.cx : L.mkLocal.ex, ccy = fy + fh / 2;
+    var t1 = lerp(ccy, fy, a1), l1 = lerp(ccx, fx, a1), r1 = lerp(mw - ccx, mw - fx - fw, a1), b1 = lerp(mh - ccy, mh - fy - fh, a1);
+    insetClip(mk, lerp(t1, 0, a2), lerp(r1, 0, a2), lerp(b1, 0, a2), lerp(l1, 0, a2), lerp(27, 49, a2));
+    setVis(mk, t < beat(8) ? a1 > 0.002 : a1 > 0.06);
+    // rows rise a touch as the card opens
+    // typing
+    var n = 0, ts = TYPE0, te = TYPE1;
+    if (t >= ts) n = Math.min(S.sell.length, 1 + Math.floor((t - ts) / ((te - ts) / S.sell.length)));
+    $('mk-typed').textContent = S.sell.slice(0, n);
+    // chip 1 selected on click
+    var sel = spring(t - beat(7) - 0.02, 0.3, 0.9);
+    var ch1 = $('mk-chip1');
+    ch1.style.borderColor = 'rgba(255,255,255,' + lerp(0.1, 0.42, sel).toFixed(3) + ')';
+    ch1.style.background = 'rgba(255,255,255,' + lerp(0, 0.08, sel).toFixed(3) + ')';
+    ch1.style.color = rgba(mix([135, 141, 152], [242, 244, 247], sel), 1);
+    var press = (t > beat(7) - 0.02) ? (1 - 0.05 * (spring(t - beat(7) + 0.02, 0.1, 1) - spring(t - beat(7) - 0.08, 0.22, 0.86))) : 1;
+    ch1.style.transform = 'scale(' + press.toFixed(4) + ')';
+    cap1Words.forEach(function (w, i) { rise(w.w, t, beat(7) + i * 0.07, beat(8) + 0.3 + i * 0.04, 1); });
+  }
+
+  if (s1) { mbStatic('mk', 1, t, c.s); mbStatic('cap1', 1, t, c.s); }
+
+  /* ---------------- scene 2: drop ---------------- */
+  var s2 = on(t, beat(9) - 0.05, beat(13) + 0.1); setScene('s2', s2);
+  if (s2) {
+    var chip = $('fchip'), cw = L.chipLocal.w, chh = L.chipLocal.h;
+    var ix = L.chipLocal.ix, iy = L.chipLocal.iy, iw = L.chipLocal.iw;
+    var b1o = clamp(spring(t - beat(9), 0.36, 0.8) - spring(t - (beat(12) + 0.02), 0.22, 0.92), 0, 1);
+    var b2o = clamp(spring(t - (beat(9) + 0.06), 0.46, 0.84) - spring(t - (beat(12) - 0.04), 0.3, 0.92), 0, 1);
+    var icx = ix + iw / 2, icy = iy + iw / 2;
+    var tt1 = lerp(icy, iy, b1o), ll1 = lerp(icx, ix, b1o), rr1 = lerp(cw - icx, cw - ix - iw, b1o), bb1 = lerp(chh - icy, chh - iy - iw, b1o);
+    insetClip(chip, lerp(tt1, 0, b2o), lerp(rr1, 0, b2o), lerp(bb1, 0, b2o), lerp(ll1, 0, b2o), lerp(26, 43, b2o));
+    setVis(chip, t < beat(12) ? b1o > 0.002 : b1o > 0.06);
+    $('fchip-txt').style.transform = 'translateX(' + (-30 * (1 - b2o)).toFixed(2) + 'px)';
+    var cp = (t > beat(10) - 0.02) ? (1 - 0.035 * (spring(t - beat(10) + 0.02, 0.1, 1) - spring(t - beat(10) - 0.08, 0.22, 0.86))) : 1;
+    chip.style.transform = 'scale(' + cp.toFixed(4) + ')';
+    // the fan: four ads come out from behind the chip
+    var ccxD = L.chipLocal.x + icx, ccyD = L.chipLocal.y + icy;
+    var FAN = [[-255, 326, -8], [-85, 302, -2.6], [85, 302, 2.6], [255, 326, 8]];
+    var baseX = 1468, baseY = 318;
+    fanCards.forEach(function (fc, i) {
+      var p = spring(t - (beat(10) + 0.03 + i * 0.05), 0.5, 0.8) - spring(t - (beat(12) - 0.1 + (3 - i) * 0.02), 0.3, 0.92);
+      p = clamp(p, -0.05, 1.03);
+      var tx = baseX + FAN[i][0], ty = baseY + FAN[i][1];
+      var x = lerp(ccxD, tx, p), y = lerp(ccyD, ty, p);
+      var sc = lerp(0.22, 1, clamp(p, 0, 1.03)), rot = FAN[i][2] * p;
+      fc.style.left = (x - 120) + 'px'; fc.style.top = (y - 123.5) + 'px';
+      fc.style.transform = 'rotate(' + rot.toFixed(2) + 'deg) scale(' + sc.toFixed(4) + ')';
+      fc.style.visibility = p > 0.01 ? 'visible' : 'hidden';
+    });
+    cap2Words.forEach(function (w, i) { rise(w.w, t, beat(11) + i * 0.07, beat(12) + 0.3 + i * 0.04, 1); });
+  }
+
+  if (s2) { mbStatic('fchip', 2, t, c.s); mbStatic('cap2', 2, t, c.s); $('fan').style.filter = mbCss('fan', 2, screenVel(t, function () { return L.mbc.fan; }), c.s); }
+
+  /* ---------------- scene 3: post ---------------- */
+  var s3 = on(t, beat(13) - 0.05, beat(17) + 0.1); setScene('s3', s3);
+  if (s3) {
+    var row = $('msrow'), rw = L.rowLocal.w, rh = L.rowLocal.h;
+    var px = L.rowLocal.px, py = L.rowLocal.py, pw2 = L.rowLocal.pw, ph2 = L.rowLocal.ph;
+    var c1o = clamp(spring(t - beat(13), 0.36, 0.8) - spring(t - (beat(16) + 0.02), 0.22, 0.92), 0, 1);
+    var c2o = clamp(spring(t - (beat(13) + 0.06), 0.5, 0.84) - spring(t - (beat(16) - 0.04), 0.3, 0.92), 0, 1);
+    var pcx = t < beat(16) ? px + pw2 / 2 : px + pw2 - L.pill2w * SD[3] / 2, pcy = py + ph2 / 2;
+    var q1 = lerp(pcy, py, c1o), q2 = lerp(rw - pcx, rw - px - pw2, c1o), q3 = lerp(rh - pcy, rh - py - ph2, c1o), q4 = lerp(pcx, px, c1o);
+    insetClip(row, lerp(q1, 0, c2o), lerp(q2, 0, c2o), lerp(q3, 0, c2o), lerp(q4, 0, c2o), lerp(ph2 / 2, 39, c2o));
+    setVis(row, t < beat(16) ? c1o > 0.002 : c1o > 0.06);
+    cap3Words.forEach(function (w, i) { rise(w.w, t, beat(14) + i * 0.07, beat(16) + 0.3 + i * 0.04, 1); });
+  }
+
+  if (s3) { mbStatic('msrow', 3, t, c.s); mbStatic('cap3', 3, t, c.s); }
+
+  /* ---------------- scene 4: payoff ---------------- */
+  var s4 = on(t, beat(17) - 0.05, beat(24) + 0.2); setScene('s4', s4);
+  if (s4) {
+    cards.forEach(function (cd, i) {
+      var st = cardState(i, t);
+      var lv = Math.max(0, st.level);
+      var sc = 1 - lv * 0.055, ty = lv * 16 * 1.25;
+      cd.node.style.transform = 'translate(' + st.x.toFixed(2) + 'px,' + (st.y + ty).toFixed(2) + 'px) rotate(' + st.rot.toFixed(3) + 'deg) scale(' + sc.toFixed(4) + ')';
+      cd.node.style.opacity = st.op.toFixed(3);
+      cd.node.style.filter = (lv > 0.001 ? 'brightness(' + (1 - Math.min(lv, 2) * 0.16).toFixed(3) + ')' : '');
+      // revealed by a circle growing out of the slot dot
+      var tr = beat(17) + (i === 0 ? 0.0 : 0.08);
+      var R0 = Math.hypot(L.cardDesign.w, L.cardDesign.h) + 40;
+      var rr = R0 * expo(t - tr, 0.5, 5.5);
+      if (rr < R0 - 0.5) cd.node.style.clipPath = 'circle(' + rr.toFixed(2) + 'px at ' + (L.slotLocal.x).toFixed(1) + 'px ' + (L.slotLocal.y).toFixed(1) + 'px)';
+      else cd.node.style.clipPath = 'none';
+      cd.node.style.visibility = (t >= tr && st.vis) ? 'visible' : 'hidden';
+      cd.stamp.style.opacity = st.stamp.toFixed(3);
+      cd.stamp.style.transform = 'rotate(-10deg) scale(' + lerp(0.7, 1, st.stamp).toFixed(4) + ')';
+    });
+    // the words, one per beat; the key word lands on the big beat
+    payWords.forEach(function (w, i) {
+      var tin = beat(18 + i);
+      var tout = w.key ? beat(23) : beat(22);
+      rise(w.w, t, tin + (w.key ? 0.0 : 0.02), tout, 1, w.key ? 0.36 : 0.42);
+    });
+  }
+
+  if (s4) mbStatic('pay', 4, t, c.s);
+
+  /* ---------------- scene 5: end card ---------------- */
+  var s5 = on(t, beat(23), 15.01); setScene('s5', s5);
+  if (s5) {
+    var nm = $('e-name');
+    var ot = tloState(t);
+    // the square's right edge, in end-scene design px
+    var tileR = 960 + ((ot.cx + ot.w / 2) - 960) * SD[5];
+    var travel = clamp(spring(t - beat(27), 0.45, 0.86), 0, 1.02);
+    var shift = -70 * (1 - travel);
+    var nameL = L.lockLeft + 166 + 50 + shift;
+    var cut = Math.max(0, tileR + 14 - nameL);
+    nm.style.transform = 'translateX(' + shift.toFixed(2) + 'px)';
+    nm.style.clipPath = 'inset(-30px -40px -50px ' + cut.toFixed(2) + 'px)';
+    setVis(nm, t >= beat(27) && cut < L.nameW);
+    rise(msWord.w, t, beat(28), null);
+    rise(tyWord.w, t, beat(29), null);
+    rise(urlWord.w, t, beat(30), null);
+  }
+
+  if (s5) { ['e-ms', 'e-ty', 'e-url'].forEach(function (id) { mbStatic(id, 5, t, c.s); }); }
+
+  /* ---------------- the dot ---------------- */
+  var o = tloState(t);
+  var col = mix(ACC, LOGO, clamp(o.col, 0, 1));
+  var tlo = $('tlo');
+  var W = Math.max(0.5, o.w), H = Math.max(0.5, o.h);
+  tlo.style.left = (o.cx - W / 2).toFixed(3) + 'px';
+  tlo.style.top = (o.cy - H / 2).toFixed(3) + 'px';
+  tlo.style.width = W.toFixed(3) + 'px';
+  tlo.style.height = H.toFixed(3) + 'px';
+  var rad = Math.max(0, Math.min(o.rad, Math.min(W, H) / 2));
+  tlo.style.borderRadius = rad.toFixed(3) + 'px';
+  tlo.style.background = rgba(col, o.fill);
+  var bw = Math.max(0, o.bw);
+  var sh = [];
+  if (bw > 0.01) sh.push('inset 0 0 0 ' + bw.toFixed(3) + 'px ' + rgba(col, o.ba));
+  if (o.ring > 0.01) sh.push('0 0 0 ' + o.ring.toFixed(3) + 'px ' + rgba(col, 0.12));
+  tlo.style.boxShadow = sh.length ? sh.join(',') : 'none';
+  // caret inside the field
+  var cr = $('tlo-caret');
+  var showCaret = o.caret > 0.5 && t < beat(8);
+  if (showCaret) {
+    var typedN = 0, ts2 = TYPE0, te2 = TYPE1;
+    if (t >= ts2) typedN = Math.min(S.sell.length, 1 + Math.floor((t - ts2) / ((te2 - ts2) / S.sell.length)));
+    var blink = (t > te2 + 0.05) ? (((t - te2) % 0.6) < 0.32 ? 1 : 0) : 1;
+    var chh2 = 44 / SD[1];
+    cr.style.left = (L.typedX + L.typedW[typedN] + 3 / SD[1] - (o.cx - W / 2)).toFixed(2) + 'px';
+    cr.style.top = (o.h / 2 - chh2 / 2).toFixed(2) + 'px';
+    cr.style.width = (3 / SD[1]).toFixed(2) + 'px'; cr.style.height = chh2.toFixed(2) + 'px';
+    cr.style.visibility = blink ? 'visible' : 'hidden';
+  } else cr.style.visibility = 'hidden';
+  // star
+  var star = $('tlo-star'), ss = clamp(o.star, 0, 1.2);
+  if (ss > 0.01) {
+    var sz = Math.min(W, H) * 0.46 * ss;
+    star.style.left = (W / 2 - sz / 2).toFixed(2) + 'px'; star.style.top = (H / 2 - sz / 2).toFixed(2) + 'px';
+    star.style.width = sz.toFixed(2) + 'px'; star.style.height = sz.toFixed(2) + 'px';
+    star.style.transform = 'rotate(' + (45 * (1 - clamp(o.star, 0, 1))).toFixed(2) + 'deg)';
+    star.style.visibility = 'visible';
+  } else star.style.visibility = 'hidden';
+  // pill text
+  var tx = clamp(o.txt, 0, 1), fl = clamp(o.flip, 0, 1.05);
+  var t1e = $('tlo-t1'), t2e = $('tlo-t2');
+  if (tx > 0.01) {
+    var fsz = 27 / SD[3];
+    [t1e, t2e].forEach(function (e) { e.style.fontSize = fsz.toFixed(3) + 'px'; e.style.lineHeight = H.toFixed(3) + 'px'; e.style.height = H.toFixed(3) + 'px'; });
+    var up = H * 1.0;
+    t1e.style.transform = 'translateY(' + (up * (1 - tx) - up * fl).toFixed(3) + 'px)';
+    t2e.style.transform = 'translateY(' + (up * (1 - fl)).toFixed(3) + 'px)';
+    t1e.style.visibility = 'visible'; t2e.style.visibility = fl > 0.01 ? 'visible' : 'hidden';
+  } else { t1e.style.visibility = 'hidden'; t2e.style.visibility = 'hidden'; }
+  // the logo's A builds itself inside the square
+  var mark = $('tlo-mark');
+  var legs = spring(t - beat(25), 0.42, 0.86), bar = spring(t - beat(26), 0.36, 0.86);
+  if (t >= beat(25)) {
+    mark.style.visibility = 'visible';
+    $('cr-mut').setAttribute('height', (123 + 194 * clamp(legs, 0, 1)).toFixed(2));
+    var dk = clamp(spring(t - beat(25) - 0.06, 0.42, 0.86), 0, 1);
+    $('cr-dark').setAttribute('y', (317 - 137 * dk).toFixed(2)); $('cr-dark').setAttribute('height', (137 * dk + 1).toFixed(2));
+    $('cr-bar').setAttribute('x', '130'); $('cr-bar').setAttribute('width', (150 * clamp(bar, 0, 1)).toFixed(2));
+  } else mark.style.visibility = 'hidden';
+
+  // motion blur on the dot: follows speed and direction
+  var h = HV;
+  var oa = tloState(t - h), ob = tloState(t + h), ca = camera(t - h), cb = camera(t + h);
+  function edgeV(pa, pb) { // on-screen velocities of two opposite edges; blur only if both move the same way
+    var va = (pb[0] - pa[0]) / (2 * h), vb = (pb[1] - pa[1]) / (2 * h);
+    if (va * vb <= 0) return 0;
+    return Math.min(Math.abs(va), Math.abs(vb));
+  }
+  var vx = edgeV([toScreen(ca, oa.cx - oa.w / 2, oa.cy)[0], toScreen(ca, oa.cx + oa.w / 2, oa.cy)[0]], [toScreen(cb, ob.cx - ob.w / 2, ob.cy)[0], toScreen(cb, ob.cx + ob.w / 2, ob.cy)[0]]);
+  var vy = edgeV([toScreen(ca, oa.cx, oa.cy - oa.h / 2)[1], toScreen(ca, oa.cx, oa.cy + oa.h / 2)[1]], [toScreen(cb, ob.cx, ob.cy - ob.h / 2)[1], toScreen(cb, ob.cx, ob.cy + ob.h / 2)[1]]);
+  var sx = Math.min(30, vx * 0.0042), sy = Math.min(30, vy * 0.0042);
+  if (sx > 0.35 || sy > 0.35) {
+    var fsx = sx / c.s, fsy = sy / c.s;
+    var f = $('mb-tlo');
+    var padX = (3 * fsx + 4) / W, padY = (3 * fsy + 4) / H;
+    f.setAttribute('x', (-padX).toFixed(3)); f.setAttribute('y', (-padY).toFixed(3));
+    f.setAttribute('width', (1 + 2 * padX).toFixed(3)); f.setAttribute('height', (1 + 2 * padY).toFixed(3));
+    blurTo('mbg-tlo', fsx, fsy);
+    tlo.style.filter = 'url(#mb-tlo)';
+  } else tlo.style.filter = 'none';
+
+  /* ---------------- cursor ---------------- */
+  var cp0 = cursorPos(t), sp = toScreen(c, cp0[0], cp0[1]);
+  var pr = cursorPress(t);
+  var cur = $('cursor');
+  var cs = 1.0 - 0.14 * pr;
+  cur.style.transform = 'translate(' + (sp[0] - 3).toFixed(2) + 'px,' + (sp[1] - 3).toFixed(2) + 'px) scale(' + cs.toFixed(4) + ')';
+  var cA = toScreen(ca, cursorPos(t - h)[0], cursorPos(t - h)[1]), cB = toScreen(cb, cursorPos(t + h)[0], cursorPos(t + h)[1]);
+  var cvx = (cB[0] - cA[0]) / (2 * h), cvy = (cB[1] - cA[1]) / (2 * h);
+  var csx = Math.min(16, Math.abs(cvx) * 0.0035), csy = Math.min(16, Math.abs(cvy) * 0.0035);
+  if (csx > 0.35 || csy > 0.35) { blurTo('mbg-cur', csx, csy); cur.style.filter = 'url(#mb-cur) drop-shadow(0 3px 5px rgba(0,0,0,.45))'; }
+  else cur.style.filter = 'drop-shadow(0 3px 5px rgba(0,0,0,.45))';
+  cur.style.visibility = (sp[0] > -60 && sp[0] < 1980 && sp[1] > -80 && sp[1] < 1140) ? 'visible' : 'hidden';
+
+  // motion blur on the thrown cards
+  if (s4) {
+    cards.forEach(function (cd, i) {
+      var v = screenVel(t, function (tt) { return cardPoint(i, tt, L.cardDesign.w / 2, L.cardDesign.h / 2); });
+      var bx = Math.min(36, Math.abs(v[0]) * MB_K), by = Math.min(36, Math.abs(v[1]) * MB_K);
+      if (bx > MB_MIN || by > MB_MIN) {
+        blurTo('mbg-c' + i, bx * SD[4] / c.s, by * SD[4] / c.s);
+        var lv = Math.max(0, cardState(i, t).level);
+        cd.node.style.filter = 'url(#mb-c' + i + ')' + (lv > 0.001 ? ' brightness(' + (1 - Math.min(lv, 2) * 0.16).toFixed(3) + ')' : '');
+      }
+    });
+  }
+
+  if (DEBUG) { var bn = Math.floor(t / BEAT) + 1; $('hud').textContent = t.toFixed(3) + 's  beat ' + bn; }
+}
+
+var strikeOrigin = 0, strikeMLocal = 0;
+var SQUEEZE = beat(5) - 0.02;
+function init() {
+  layout();
+  // strike origin inside the struck word (local px of the .w box)
+  var wr = strikeWord.w.getBoundingClientRect();
+  strikeOrigin = (L.strike.y - wr.top) * SD[0];
+  var mr2 = strikeWord.m.getBoundingClientRect();
+  strikeMLocal = (L.strike.y - mr2.top) * SD[0];
+  L.mH = mr2.height * SD[0];
+  buildTLO();
+  buildCamera();
+  buildCursor();
+  READY = true;
+  seek(0);
+  window.__ready = true;
+}
+
+window.seek = seek;
+window.__meta = { duration: DUR, bpm: 120, lang: LANG };
+var imgs = Array.prototype.slice.call(document.images);
+// decode on paint, never later: a scene that comes back from display:none must
+// show its pictures in the very first frame
+imgs.forEach(function (im) { im.decoding = 'sync'; });
+Promise.all([document.fonts.ready].concat(imgs.map(function (im) { return im.decode ? im.decode().catch(function () {}) : Promise.resolve(); })))
+  .then(function () { requestAnimationFrame(init); });
+
+/* ------------------------------------------------------- soundtrack --- */
+// 120 BPM. A kick on every beat, a hit on every scene change, the biggest
+// hit at 10.0 s where "yes" lands. Rendered offline, returned as a WAV.
+window.renderSoundtrack = function () {
+  var SR = 48000, LEN = 15;
+  var ctx = new OfflineAudioContext(2, SR * LEN, SR);
+  var out = ctx.createGain(); out.gain.value = 0.7;
+  var comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -15; comp.knee.value = 9; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.2;
+  out.connect(comp); comp.connect(ctx.destination);
+  var seed = 7; function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+  var nb = ctx.createBuffer(1, SR * 3, SR), nd = nb.getChannelData(0);
+  for (var i = 0; i < nd.length; i++) nd[i] = rnd() * 2 - 1;
+  var irLen = Math.round(SR * 2.2), ir = ctx.createBuffer(2, irLen, SR);
+  for (var ch = 0; ch < 2; ch++) { var d = ir.getChannelData(ch); for (var j = 0; j < irLen; j++) { var x = j / irLen; d[j] = (rnd() * 2 - 1) * Math.pow(1 - x, 3.4) * Math.min(1, j / 240); } }
+  var verb = ctx.createConvolver(); verb.buffer = ir; var vg = ctx.createGain(); vg.gain.value = 0.28; verb.connect(vg); vg.connect(out);
+  function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  function env(g, t, a, peak, dcy) { g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + dcy); }
+  function noise(t, dur) { var s = ctx.createBufferSource(); s.buffer = nb; s.start(t, rnd() * 1.5, dur); return s; }
+  function send(node, amt) { var g = ctx.createGain(); g.gain.value = amt; node.connect(g); g.connect(verb); }
+  function kick(t, a) {
+    var o = ctx.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(170, t); o.frequency.exponentialRampToValueAtTime(54, t + 0.06); o.frequency.exponentialRampToValueAtTime(43, t + 0.32);
+    var g = ctx.createGain(); env(g, t, 0.002, a, 0.4); o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.48);
+    var n = noise(t, 0.03), hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2000;
+    var ng = ctx.createGain(); env(ng, t, 0.0005, 0.16 * a, 0.014); n.connect(hp); hp.connect(ng); ng.connect(out);
+  }
+  function hat(t, a, len, pan) {
+    var n = noise(t, len + 0.05), hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 8000;
+    var g = ctx.createGain(); env(g, t, 0.001, a, len); var p = ctx.createStereoPanner(); p.pan.value = pan;
+    n.connect(hp); hp.connect(g); g.connect(p); p.connect(out);
+  }
+  function snare(t, a) {
+    var n = noise(t, 0.3), bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2000; bp.Q.value = 0.55;
+    var g = ctx.createGain(); env(g, t, 0.001, a, 0.17); n.connect(bp); bp.connect(g); g.connect(out); send(g, 0.3);
+    var o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.setValueAtTime(230, t); o.frequency.exponentialRampToValueAtTime(165, t + 0.08);
+    var og = ctx.createGain(); env(og, t, 0.001, a * 0.55, 0.08); o.connect(og); og.connect(out); o.start(t); o.stop(t + 0.14);
+  }
+  function stab(t, notes, a, dcy, c0, c1, rv) {
+    var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.8;
+    lp.frequency.setValueAtTime(c0, t); lp.frequency.exponentialRampToValueAtTime(c1, t + dcy * 0.75);
+    var g = ctx.createGain(); env(g, t, 0.005, a, dcy); lp.connect(g); g.connect(out); send(g, rv);
+    notes.forEach(function (m) { [-8, 8].forEach(function (cents) {
+      var o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = mtof(m); o.detune.value = cents;
+      var p = ctx.createStereoPanner(); p.pan.value = cents > 0 ? 0.3 : -0.3; o.connect(p); p.connect(lp); o.start(t); o.stop(t + dcy + 0.1);
+    }); });
+  }
+  function bass(t, m, dcy, a) {
+    var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 1.6;
+    lp.frequency.setValueAtTime(1000, t); lp.frequency.exponentialRampToValueAtTime(240, t + dcy);
+    var g = ctx.createGain(); env(g, t, 0.004, a, dcy);
+    var o1 = ctx.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = mtof(m);
+    var o2 = ctx.createOscillator(); o2.type = 'sine'; o2.frequency.value = mtof(m - 12);
+    var g2 = ctx.createGain(); g2.gain.value = 0.8;
+    o1.connect(lp); lp.connect(g); o2.connect(g2); g2.connect(g); g.connect(out);
+    o1.start(t); o2.start(t); o1.stop(t + dcy + 0.05); o2.stop(t + dcy + 0.05);
+  }
+  function pad(t0, t1, notes, a, cut) {
+    var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = cut; lp.Q.value = 0.4;
+    var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(a, t0 + 0.16);
+    g.gain.setValueAtTime(a, Math.max(t0 + 0.16, t1 - 0.1)); g.gain.linearRampToValueAtTime(0.0001, t1 + 0.08);
+    lp.connect(g); g.connect(out); send(g, 0.55);
+    notes.forEach(function (m) { [-10, 0, 10].forEach(function (cents) {
+      var o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = mtof(m); o.detune.value = cents; o.connect(lp); o.start(t0); o.stop(t1 + 0.12);
+    }); });
+  }
+  function riser(t0, t1, a) {
+    var n = noise(t0, t1 - t0 + 0.05), bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.3;
+    bp.frequency.setValueAtTime(320, t0); bp.frequency.exponentialRampToValueAtTime(6800, t1);
+    var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(a, t1 - 0.03); g.gain.linearRampToValueAtTime(0.0001, t1);
+    n.connect(bp); bp.connect(g); g.connect(out);
+  }
+  function crash(t, a, dcy) {
+    var n = noise(t, dcy + 0.1), hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 4600;
+    var g = ctx.createGain(); env(g, t, 0.002, a, dcy); n.connect(hp); hp.connect(g); g.connect(out); send(g, 0.35);
+  }
+  function sub(t, a, dcy, f) {
+    var o = ctx.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.7, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.1);
+    var g = ctx.createGain(); env(g, t, 0.003, a, dcy); o.connect(g); g.connect(out); o.start(t); o.stop(t + dcy + 0.1);
+  }
+  function tick(t, a, f) {
+    var o = ctx.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * 0.55, t + 0.03);
+    var g = ctx.createGain(); env(g, t, 0.001, a, 0.035); o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.07);
+  }
+  function swish(t, a, dcy, f0, f1) {
+    var n = noise(t, dcy + 0.05), bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.9;
+    bp.frequency.setValueAtTime(f0, t); bp.frequency.exponentialRampToValueAtTime(f1, t + dcy);
+    var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(a, t + dcy * 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t + dcy);
+    n.connect(bp); bp.connect(g); g.connect(out);
+  }
+
+  var CH = { Am: { n: [57, 60, 64, 69], b: 45 }, F: { n: [57, 60, 65, 69], b: 41 }, C: { n: [55, 60, 64, 67], b: 48 }, G: { n: [55, 59, 62, 67], b: 43 } };
+  var PROG = [[0, 2, 'Am'], [2, 4, 'F'], [4, 6, 'C'], [6, 8, 'G'], [8, 9, 'F'], [9, 10, 'G'], [10, 12, 'C'], [12, 13, 'F'], [13, 14, 'G'], [14, 15, 'C']];
+  function chordAt(t) { for (var i = 0; i < PROG.length; i++) if (t >= PROG[i][0] && t < PROG[i][1]) return PROG[i][2]; return 'C'; }
+  var HITS = [2, 4, 6, 8, 11, 12];
+  // kick on every beat
+  for (var b = 0; b < 30; b++) { var tb = b * 0.5; kick(tb, tb === 10 ? 1.15 : (HITS.indexOf(tb) >= 0 ? 0.98 : 0.84)); }
+  // pads under everything, brighter from the big beat
+  // pads under everything, brighter from the big beat; the last eighth before it drops out
+  PROG.forEach(function (p) { var e = p[1] === 10 ? 9.74 : p[1]; pad(p[0], e, CH[p[2]].n, p[0] >= 10 && p[0] < 12 ? 0.032 : 0.022, p[0] >= 10 ? 1800 : 1000); });
+  // groove from bar 2: off-beat hats and bass, backbeat snares (silent just before 10.0)
+  for (var th = 2.25; th < 14.9; th += 0.5) { if (th > 9.7 && th < 10) continue; hat(th, 0.06, 0.05, 0.18); bass(th, CH[chordAt(th)].b, 0.2, 0.2); }
+  for (var ts = 2.5; ts < 14.9; ts += 1.0) snare(ts, 0.14);
+  // the build into the big beat
+  for (var t16 = 8.125; t16 < 9.7; t16 += 0.25) hat(t16, 0.035, 0.03, -0.2);
+  riser(9.0, 10.0, 0.11);
+  for (var r = 0; r < 8; r++) snare(9.5 + r * 0.0625, 0.03 + r * 0.016);
+  // a hit on every scene change
+  HITS.forEach(function (th2) { var cn = chordAt(th2 + 0.01); stab(th2, CH[cn].n.map(function (m) { return m + 12; }), 0.05, 0.42, 5200, 700, 0.45); crash(th2, 0.035, 0.6); });
+  // the biggest beat: "yes"
+  sub(10.0, 0.85, 1.4, 49); crash(10.0, 0.26, 2.4); snare(10.0, 0.28);
+  stab(10.0, CH.C.n.concat([72, 76]), 0.12, 1.3, 7600, 900, 0.75);
+  (function () { // a low thump under the big beat
+    var n = noise(10.0, 0.7), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 180;
+    var g = ctx.createGain(); env(g, 10.0, 0.004, 0.5, 0.6); n.connect(lp); lp.connect(g); g.connect(out);
+  })();
+  // interface sounds
+  swish(1.5, 0.07, 0.28, 4800, 900); tick(1.63, 0.035, 1800);
+  [2.30, 3.0, 4.5].forEach(function (tc) { tick(tc, 0.05, 2500); });
+  tick(7.0, 0.035, 2100);
+  swish(9.0, 0.08, 0.3, 3600, 500); swish(10.0, 0.09, 0.32, 3600, 500);
+  // the last chord resolves under the thank-you
+  stab(14.0, CH.C.n.map(function (m) { return m + 12; }), 0.05, 0.95, 4200, 800, 0.6);
+
+  return ctx.startRendering().then(function (buf) {
+    var L = buf.length, chs = [buf.getChannelData(0), buf.getChannelData(1)];
+    var peak = 0; chs.forEach(function (a) { for (var i = 0; i < L; i++) peak = Math.max(peak, Math.abs(a[i])); });
+    var drive = 2.2, norm = 1 / Math.tanh(drive);
+    function shape(x) { return Math.tanh(drive * x / peak) * norm; } // soft limiter, peak -> 1
+    var gain = 0.891; // -1 dBFS after shaping
+    var fade = Math.round(0.06 * SR);
+    var dv = new DataView(new ArrayBuffer(44 + L * 4));
+    function str(o, s) { for (var i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); }
+    str(0, 'RIFF'); dv.setUint32(4, 36 + L * 4, true); str(8, 'WAVE'); str(12, 'fmt ');
+    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 2, true); dv.setUint32(24, SR, true);
+    dv.setUint32(28, SR * 4, true); dv.setUint16(32, 4, true); dv.setUint16(34, 16, true); str(36, 'data'); dv.setUint32(40, L * 4, true);
+    var o = 44;
+    for (var i2 = 0; i2 < L; i2++) {
+      var f = i2 > L - fade ? (L - i2) / fade : 1;
+      for (var c2 = 0; c2 < 2; c2++) { var v = clamp(shape(chs[c2][i2]) * gain * f, -1, 1); dv.setInt16(o, v < 0 ? v * 32768 : v * 32767, true); o += 2; }
+    }
+    var bytes = new Uint8Array(dv.buffer), s = '';
+    for (var k = 0; k < bytes.length; k += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(k, k + 0x8000));
+    return { wav: btoa(s), peak: peak };
+  });
+};
+})();
+</script>
+</body>
+</html>
