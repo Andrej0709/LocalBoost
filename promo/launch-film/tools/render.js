@@ -81,7 +81,11 @@ async function shoot(page, t, file) {
     const t0 = Date.now();
     let done = chunks.length - queue.length;
     await Promise.all(Array.from({ length: Number(extra || 4) }, async () => {
-      const page = await open(browser, lang);
+      // one browser per worker: a single browser process encodes every screenshot
+      // and becomes the bottleneck
+      const own = await chromium.launch({ args: ['--font-render-hinting=none', '--disable-lcd-text'] });
+      const page = await open(own, lang);
+      const cdp = await page.context().newCDPSession(page);
       while (queue.length) {
         const c = queue.shift(), tmp = name(c) + '.tmp.mp4';
         const ff = spawn('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS * SUB), '-c:v', 'png', '-i', '-',
@@ -91,8 +95,9 @@ async function shoot(page, t, file) {
         const closed = new Promise((res, rej) => ff.on('close', (code) => (code === 0 ? res() : rej(new Error('ffmpeg exit ' + code)))));
         for (let k = c * CH * SUB; k < Math.min(OUTF, (c + 1) * CH) * SUB; k++) {
           await page.evaluate((tt) => window.seek(tt), k / (FPS * SUB));
-          const buf = await page.screenshot({ type: 'png', clip: { x: 0, y: 0, width: 1920, height: 1080 } });
-          if (!ff.stdin.write(buf)) await new Promise((r) => ff.stdin.once('drain', r));
+          // same pixels as page.screenshot(), with faster PNG compression
+          const shot = await cdp.send('Page.captureScreenshot', { format: 'png', optimizeForSpeed: true, clip: { x: 0, y: 0, width: 1920, height: 1080, scale: 1 } });
+          if (!ff.stdin.write(Buffer.from(shot.data, 'base64'))) await new Promise((r) => ff.stdin.once('drain', r));
         }
         ff.stdin.end();
         await closed;
@@ -100,6 +105,7 @@ async function shoot(page, t, file) {
         done++;
         console.log(`chunk ${c} (${done}/${chunks.length})  ${((Date.now() - t0) / 1000).toFixed(0)}s`);
       }
+      await own.close();
     }));
     const list = path.join(work, 'list.txt');
     fs.writeFileSync(list, chunks.map((c) => `file '${path.basename(name(c))}'`).join('\n') + '\n');
