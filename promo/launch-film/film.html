@@ -53,9 +53,9 @@ body{font-family:'Geist',sans-serif;color:#f4f6f8;-webkit-font-smoothing:antiali
 .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .thumb.more{display:flex;align-items:center;justify-content:center;background:#12151a;font-size:34px;font-weight:600;color:#b3b9c4;letter-spacing:.02em}
 /* counter */
-.reel{position:relative;display:inline-block;height:1.3em;width:.64em;overflow:hidden;vertical-align:top;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 13%,#000 87%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 13%,#000 87%,transparent 100%)}
-.reel .strip{position:absolute;left:0;top:.15em;width:100%;text-align:center}
-.reel .strip div{height:1em;line-height:1em}
+.reel{position:relative;display:inline-block;height:1.3em;width:.74em;margin:0 -.05em;overflow:hidden;vertical-align:top;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 13%,#000 87%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 13%,#000 87%,transparent 100%)}
+.reel .strip{position:absolute;left:0;top:0;width:100%;text-align:center}
+.reel .strip div{height:1.3em;line-height:1.3em}
 .cell{position:absolute;width:26px;height:26px;border-radius:7px;background:#14171c;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.06)}
 /* phone */
 .phone{position:absolute;width:440px;height:900px;border-radius:78px;background:#0e0f12;box-shadow:inset 0 0 0 3px #2c2f35,inset 0 0 0 9px #0a0b0d,0 80px 160px -50px rgba(0,0,0,.95),0 0 0 1.5px rgba(255,255,255,.05)}
@@ -101,12 +101,6 @@ body{font-family:'Geist',sans-serif;color:#f4f6f8;-webkit-font-smoothing:antiali
   <canvas id="fx" width="1920" height="1080"></canvas>
   <div id="hud"></div>
 </div>
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <filter id="vb0" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur id="vbg0" stdDeviation="0 0"/></filter>
-    <filter id="vb1" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur id="vbg1" stdDeviation="0 0"/></filter>
-  </defs>
-</svg>
 <script>
 (function () {
 'use strict';
@@ -654,15 +648,16 @@ function seek(t) {
     var p6 = B.pill6; show(p6, t, 19.1, .6); p6.style.left = (960 - p6.offsetWidth / 2) + 'px'; p6.style.top = '214px';
     var u6 = sat((t - 19.4) / 3.6), n = 52 * eio(u6);
     var nd = 52 * (eio(sat((t + 1 / 240 - 19.4) / 3.6)) - eio(sat((t - 1 / 240 - 19.4) / 3.6))) * 120; // counts per second
-    var units = n % 10, tens = Math.floor(n / 10) + Math.max(0, units - 9);
-    B.reels[1].strip.style.transform = 'translateY(' + (-units) + 'em)';
-    B.reels[0].strip.style.transform = 'translateY(' + (-tens) + 'em)';
+    // a slow count rolls; a fast one snaps from number to number and blurs, like a ticker
+    var fl = Math.floor(n + 1e-9), fr = n - fl;
+    var w = nd > 7 ? 7 / nd : 1;                       // share of each count spent rolling
+    var roll = w >= 1 ? fr : sat((fr - (1 - w)) / w);
+    var units = fl % 10 + roll, tens = Math.floor(fl / 10) + (fl % 10 === 9 ? roll : 0);
+    B.reels[1].strip.style.transform = 'translateY(' + (-units * 1.3).toFixed(4) + 'em)';
+    B.reels[0].strip.style.transform = 'translateY(' + (-tens * 1.3).toFixed(4) + 'em)';
     B.reels[0].style.color = n < 10 ? '#262a31' : '#f4f6f8';
-    var vbU = Math.min(26, nd * .9), vbT = Math.min(18, nd * .09 * (units > 9 ? 10 : 0));
-    document.getElementById('vbg1').setAttribute('stdDeviation', '0 ' + vbU.toFixed(2));
-    document.getElementById('vbg0').setAttribute('stdDeviation', '0 ' + vbT.toFixed(2));
-    B.reels[1].style.filter = vbU > .3 ? 'url(#vb1)' : 'none';
-    B.reels[0].style.filter = vbT > .3 ? 'url(#vb0)' : 'none';
+    var bl = Math.min(8, Math.max(0, (nd - 4) * .3));
+    B.reels[1].style.filter = bl > .05 ? 'blur(' + bl.toFixed(2) + 'px)' : 'none';
     var kn = show(B.num, t, 19.2, .5);
     var gIn = sat((t - 23.0) / .35);
     B.numG.style.opacity = gIn.toFixed(3);
