@@ -40,22 +40,19 @@ html.lb-booted #lb-boot{display:none}
 <meta name="twitter:image" content="https://adronis.vercel.app/og-image.jpg">
 <!-- Fonts and the shared design system load here, in the head, so they are
      already in hand when the runtime paints the page. -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <!-- A Serbian reader sees the page only once i18n.js has translated it, so its
      dictionary is fetched first, not after everything else in <body>. -->
 <link rel="preload" as="script" href="i18n-sr.js">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="adronis.css">
-<!-- support.js pulls React from unpkg only after it has downloaded and run, so the
+<!-- support.js pulls React from vendor/ only after it has downloaded and run, so the
      browser can't start those requests early. Preload them now, with the exact
      URL/integrity/CORS mode support.js uses, so they download in parallel.
      Keep in sync with REACT_URL / REACT_DOM_URL in support.js. -->
-<link rel="preload" as="script" href="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous">
-<link rel="preload" as="script" href="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous">
+<link rel="preload" as="script" href="vendor/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous">
+<link rel="preload" as="script" href="vendor/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous">
 <script src="./support.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
+<script src="vendor/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
 <script src="./supabase-config.js"></script>
 <script src="./auth.js"></script>
 <script>
@@ -306,7 +303,7 @@ if (!lbAlreadyBooted && !location.hash && window.LBAuth && (lbStandalone || lbHa
         {
           "@type": "Question",
           "name": "How does the free trial work?",
-          "acceptedAnswer": { "@type": "Answer", "text": "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." }
+          "acceptedAnswer": { "@type": "Answer", "text": "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. From launch there is also a Free plan with 3 ads a month on one network, which needs no card at all." }
         },
         {
           "@type": "Question",
@@ -853,7 +850,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
     <div class="sec-head" data-rv="ex">
       <div class="eyebrow">Examples</div>
       <h2>This is what lands in your approvals.</h2>
-      <p class="lede">Posts for a few local businesses, the way they show up on each network. Yours are made for your business.</p>
+      <p class="lede">Posts for made-up local businesses, the way they would show up on each network. Yours are made for your business.</p>
     </div>
 
     <div class="showcase" data-rv="ex" style="transition-delay:.1s">
@@ -1085,7 +1082,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
     </a>
     <div class="foot-col"><div class="foot-col-title">Product</div><a href="#drop">How it works</a><a href="#engine">Examples</a><a href="approvals.html">Approvals</a><sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}"><a href="control-room.html">Control room</a></sc-if></div>
     <div class="foot-col"><div class="foot-col-title">Company</div><a href="about.html">About</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="message-us.html">Contact us</a></div>
-    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Company details</a></div>
+    <div class="foot-col"><div class="foot-col-title">Legal</div><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="ai-disclosure.html">AI disclosure</a><a href="terms.html#company">Who runs Adronis</a></div>
   </div>
   <div class="foot-bottom"><span>© 2026 ADRONIS</span><span>MADE BY <a href="https://creativesbyandrej.vercel.app" target="_blank" rel="noopener">CREATIVESBYANDREJ</a></span></div>
 </footer>
@@ -1094,7 +1091,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#7cc6ff&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#7cc6ff&quot;,&quot;#a8c6f0&quot;,&quot;#c9a5f0&quot;,&quot;#8fe0c8&quot;],&quot;section&quot;:&quot;Look&quot;},&quot;planetGlow&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.8,&quot;min&quot;:0,&quot;max&quot;:2,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;},&quot;planetDensity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:5000,&quot;step&quot;:200,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Planet&quot;}}">
 // The short version of the home page. The original, longer page lives on
-// unchanged in Adronis-full.html (served at /full).
+// unchanged in Adronis-full.html (no longer served: /full redirects home).
 class Component extends DCLogic {
   state = { billing: "monthly", navOpen: false, freeNote: null, onFree: false, promoCopied: false, signedIn: false, pick: this.storedPick(), mbar: false };
   root = React.createRef();
@@ -1414,7 +1411,7 @@ class Component extends DCLogic {
         : ["Free plan, no card needed", "7-day trial on paid plans", "Cancel any time"]
       ).map((text) => ({ text })),
       pricingLede: beta
-        ? "These are the prices from launch in Q1 2027. Until then, Adronis is free for the businesses picked for the beta."
+        ? "These are the prices from launch in Q1 2027, alongside a Free plan with 3 ads a month on one network and no card needed. Until then, Adronis is free for the businesses picked for the beta."
         : "Start free, or try any paid plan free for 7 days.",
       plansCls: "plans" + (beta ? " is-three" : ""),
       finalTitle: beta ? "Imagine Mondays where the ads are already done." : "Your first ads can be ready this week.",
@@ -1467,7 +1464,7 @@ class Component extends DCLogic {
         { q: "What if I don't like an ad?", a: "Reject it and pick a reason — wrong tone, wrong facts or price, the image doesn't fit. The engine takes that into your next drop. You can also change the text of any ad before you approve it." },
         { q: "Which networks can Adronis post to?", a: "Instagram, Facebook, TikTok, Google Business, LinkedIn and Pinterest. How many you connect at once depends on your plan: one on Free, two on Counter, up to four on Storefront and any number on Franchise." },
         { q: "Are the ads made with AI?", a: "Yes. Every image is generated for your business rather than taken from a stock library, and nothing is published until you approve it. On the Franchise plan a real designer also checks your ads." },
-        { q: "How does the free trial work?", a: "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all." },
+        { q: "How does the free trial work?", a: "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. From launch there is also a Free plan with 3 ads a month on one network, which needs no card at all." },
         { q: "What's the catch with the free beta?", a: "There isn't one. We pay for generating your ads during the beta because we want honest feedback from real owners before launch, and you don't need a card. When the beta ends, you decide whether to stay on a paid plan, with 30% off for your first 12 months, or leave." },
         { q: "Can I cancel any time?", a: "Yes, from your account page, in one click. Cancelling takes effect at the end of the period you have already paid for. Annual plans are billed 12 months upfront and unused months are not refunded." }
       ],

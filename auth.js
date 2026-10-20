@@ -1,8 +1,9 @@
 // Adronis auth, backed by Supabase.
 //
 // Load order on every page that uses it:
-//   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-..." crossorigin="anonymous"></script>
-//   (pinned to one version with its hash, the same tag on every page - change them all together)
+//   <script src="vendor/supabase.js" integrity="sha384-..." crossorigin="anonymous"></script>
+//   (supabase-js 2.117.2 served from this site, not a CDN, so no visitor IP leaves for a third party;
+//   pinned with its hash, the same tag on every page - change them all together)
 //   <script src="supabase-config.js"></script>
 //   <script src="auth.js"></script>
 //
@@ -441,7 +442,7 @@
     // Bump this whenever terms.html / privacy.html change materially, so the
     // stored acceptance points at the wording the customer actually saw.
     // Every form with the terms box (signup, login's sign-up tab) sends it.
-    termsVersion: "2026-10-08",
+    termsVersion: "2026-10-20",
 
     isLoggedIn: function () {
       return !!session;

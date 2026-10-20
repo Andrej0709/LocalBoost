@@ -47,7 +47,7 @@ window.LB_I18N_SR = {
     "Terms": "Uslovi",
     "Privacy": "Privatnost",
     "AI disclosure": "AI obaveštenje",
-    "Company details": "Podaci o firmi",
+    "Who runs Adronis": "Ko vodi Adronis",
     "MADE BY": "NAPRAVIO",
     "EMAIL": "EMAIL",
     "BUSINESS NAME": "NAZIV BIZNISA",
@@ -900,8 +900,8 @@ window.LB_I18N_SR = {
        convenience, so this copy is a reading aid and not a second contract. */
     "Terms of Service — Adronis": "Uslovi korišćenja — Adronis",
     "TERMS": "USLOVI",
-    "Last updated October 8, 2026. These terms form a binding agreement between you and Adronis. Headings are for readability — the wording of each clause governs.":
-      "Poslednja izmena 8. oktobra 2026. Ovi uslovi čine obavezujući ugovor između tebe i Adronisa. Naslovi služe radi preglednosti — merodavan je tekst svake klauzule.",
+    "Last updated October 20, 2026. These terms form a binding agreement between you and Adronis. Headings are for readability — the wording of each clause governs.":
+      "Poslednja izmena 20. oktobra 2026. Ovi uslovi čine obavezujući ugovor između tebe i Adronisa. Naslovi služe radi preglednosti — merodavan je tekst svake klauzule.",
     "6A. The beta": "6A. Beta",
     "Until the public launch, planned for the first quarter of 2027, Adronis runs as a closed beta. This clause applies to every account on the Beta plan and, for as long as the beta lasts, takes precedence over any other clause it conflicts with.":
       "Do javnog lansiranja, planiranog za prvi kvartal 2027, Adronis radi kao zatvorena beta. Ova klauzula važi za svaki nalog na Beta planu i, dok beta traje, ima prednost nad svakom drugom klauzulom sa kojom je u suprotnosti.",
@@ -922,8 +922,8 @@ window.LB_I18N_SR = {
     "1. Who you are contracting with": "1. Sa kim zaključuješ ugovor",
     "Adronis (\"Adronis\", \"we\", \"us\") is a software service operated by":
       "Adronis („Adronis“, „mi“, „nas“) je softverska usluga koju pruža",
-    ", a company registered in [COUNTRY] under company registration number [REGISTRATION NUMBER], VAT identification number [VAT NUMBER], with its registered office at [REGISTERED ADDRESS].":
-      ", privredno društvo registrovano u [COUNTRY] pod matičnim brojem [REGISTRATION NUMBER], PIB [VAT NUMBER], sa sedištem na adresi [REGISTERED ADDRESS].",
+    ", a private individual resident in [CITY], Republic of Serbia, who runs Adronis as a freelancer. Adronis is not a registered company, so it has no company registration number or VAT number. Paid plans are sold and invoiced by Paddle.com as Merchant of Record (clause 5).":
+      ", fizičko lice sa prebivalištem u mestu [GRAD], Republika Srbija, koje Adronis vodi kao frilenser. Adronis nije registrovano privredno društvo, pa nema matični broj ni PIB. Plaćene planove prodaje i fakturiše Paddle.com kao prodavac (Merchant of Record) (klauzula 5).",
     "Contractual and general legal questions:": "Ugovorna i opšta pravna pitanja:",
     "Privacy and data requests:": "Privatnost i zahtevi za podatke:",
     "Copyright and IP complaints:": "Prijave zbog autorskih prava i intelektualne svojine:",
@@ -941,7 +941,7 @@ window.LB_I18N_SR = {
     "Adronis generates advertising creative using generative AI models on a recurring schedule (\"a drop\"), based on the brand brief and reference material you provide, and — where you connect a channel and approve a creative — publishes that creative to the channel on your behalf. Output volume, formats and channel count depend on your plan.":
       "Adronis generiše oglasne kreative pomoću generativnih AI modela po ponavljajućem rasporedu („drop“), na osnovu brifa brenda i referentnog materijala koji dostaviš, i — kada povežeš kanal i odobriš kreativ — objavljuje taj kreativ na kanalu u tvoje ime. Količina, formati i broj kanala zavise od tvog plana.",
     "Adronis is a creative production and publishing tool. It is not an advertising agency, a legal adviser or a media buyer, and it does not buy paid placement on your behalf.":
-      "Adronis je alat za produkciju i objavljivanje kreativa. Nije oglasna agencija, pravni savetnik ni medija baer, i ne kupuje plaćeni prostor u tvoje ime.",
+      "Adronis je alat za produkciju i objavljivanje kreativa. Nije oglasna agencija, pravni savetnik ni zakupac medijskog prostora, i ne kupuje plaćeni prostor u tvoje ime.",
     "4. Your account": "4. Tvoj nalog",
     "You must give accurate business information and keep it current. You are responsible for keeping your login credentials secure and for everything done under your account — approvals, rejections, briefs and channel connections — including by anyone you give access to. Tell us promptly at":
       "Dužan si da daš tačne podatke o biznisu i da ih održavaš ažurnim. Odgovoran si za bezbednost svojih pristupnih podataka i za sve što se uradi sa tvog naloga — odobrenja, odbijanja, brifove i povezivanje kanala — uključujući i ono što uradi bilo ko kome daš pristup. Javi nam bez odlaganja na",
@@ -953,15 +953,15 @@ window.LB_I18N_SR = {
     "include VAT where it applies": "uključuju PDV tamo gde se plaća",
     ". The price shown is the total you pay; the VAT share for the country you select is shown at checkout and on the invoice.":
       ". Prikazana cena je ukupan iznos koji plaćaš; deo koji otpada na PDV za zemlju koju izabereš prikazuje se na naplati i na računu.",
-    "If you supply a valid VAT identification number for an EU business outside our country of establishment, the invoice is issued under the reverse-charge mechanism, shows no VAT and you account for the VAT. The price you pay does not change. You are responsible for the accuracy of the VAT number you enter.":
-      "Ako dostaviš važeći PDV identifikacioni broj za biznis iz EU izvan zemlje našeg sedišta, račun se izdaje po mehanizmu obrnutog obračunavanja, bez PDV-a, i PDV obračunavaš ti. Cena koju plaćaš se ne menja. Odgovoran si za tačnost PDV broja koji uneseš.",
+    "If you supply a valid business VAT identification number at checkout, Paddle applies the VAT treatment the law requires for a business purchase, such as the reverse-charge mechanism, and shows it on the invoice. You are responsible for the accuracy of the VAT number you enter.":
+      "Ako na plaćanju uneseš važeći PDV identifikacioni broj biznisa, Paddle primenjuje PDV tretman koji zakon propisuje za kupovinu biznisa, na primer obrnuto obračunavanje, i to prikazuje na računu. Odgovoran si za tačnost PDV broja koji uneseš.",
     "Our order process is conducted by our online reseller Paddle.com. Paddle.com is the Merchant of Record for all our orders: it takes the payment, issues the invoice and handles VAT, returns and billing questions, under its own buyer terms. Card details are entered on Paddle's systems; we never receive or store full card numbers.":
       "Porudžbinu obrađuje naš online preprodavac Paddle.com. Paddle.com je prodavac (Merchant of Record) za sve naše porudžbine: naplaćuje, izdaje račun i vodi PDV, povraćaje i pitanja o naplati, po sopstvenim uslovima za kupce. Podaci o kartici unose se u Paddle sisteme; mi nikada ne primamo niti čuvamo pune brojeve kartica.",
     "We may change plan prices on at least 30 days' notice by email. A change takes effect at your next renewal, and you may cancel before that renewal if you do not accept it.":
       "Cene planova možemo menjati uz obaveštenje emailom najmanje 30 dana unapred. Promena stupa na snagu na tvoje sledeće obnavljanje, a ako je ne prihvataš, možeš otkazati pre tog obnavljanja.",
     "6. Free plan and free trial": "6. Besplatni plan i besplatni probni period",
-    "The Free plan needs no card and gives the monthly allowance described on the pricing page. We may change or withdraw the Free plan on 30 days' notice.":
-      "Besplatni plan ne traži karticu i daje mesečnu kvotu opisanu na stranici sa cenama. Besplatni plan možemo izmeniti ili povući uz obaveštenje 30 dana unapred.",
+    "From the public launch, the Free plan needs no card and gives 3 ads a month on one network. We may change or withdraw the Free plan on 30 days' notice.":
+      "Od javnog lansiranja, besplatni plan ne traži karticu i daje 3 oglasa mesečno na jednoj mreži. Besplatni plan možemo izmeniti ili povući uz obaveštenje 30 dana unapred.",
     "Paid plans include a": "Plaćeni planovi uključuju",
     "7-day free trial, limited to one trial per account and per business":
       "besplatni probni period od 7 dana, ograničen na jednu probu po nalogu i po biznisu",
@@ -1091,8 +1091,8 @@ window.LB_I18N_SR = {
     "We email active accounts at least 14 days before a material change takes effect and update the date at the top of this page. If you do not accept a change, cancel before it takes effect; continued use afterwards means you accept the updated terms.":
       "Aktivnim nalozima šaljemo email najmanje 14 dana pre nego što bitna izmena stupi na snagu i ažuriramo datum na vrhu ove stranice. Ako izmenu ne prihvataš, otkaži pre nego što stupi na snagu; nastavak korišćenja posle toga znači da prihvataš ažurirane uslove.",
     "20. Governing law and disputes": "20. Merodavno pravo i sporovi",
-    "This agreement and any dispute arising out of it are governed by the law of [GOVERNING LAW COUNTRY], excluding its conflict-of-law rules and the UN Convention on Contracts for the International Sale of Goods. The courts of [COMPETENT COURT / CITY] have exclusive jurisdiction, except that either party may seek injunctive relief in any competent court. Where mandatory law in your country gives you the right to bring proceedings elsewhere, that right is unaffected.":
-      "Na ovaj ugovor i svaki spor koji iz njega proizlazi primenjuje se pravo [GOVERNING LAW COUNTRY], uz isključenje njegovih kolizionih pravila i Konvencije UN o ugovorima o međunarodnoj prodaji robe. Isključivo su nadležni sudovi u [COMPETENT COURT / CITY], s tim što svaka strana može tražiti privremenu meru pred bilo kojim nadležnim sudom. Ako ti prinudni propisi tvoje zemlje daju pravo da postupak pokreneš drugde, to pravo ostaje netaknuto.",
+    "This agreement and any dispute arising out of it are governed by the law of the Republic of Serbia, excluding its conflict-of-law rules and the UN Convention on Contracts for the International Sale of Goods. The competent court in [CITY], Republic of Serbia, has exclusive jurisdiction, except that either party may seek injunctive relief in any competent court. Where mandatory law in your country gives you the right to bring proceedings elsewhere, that right is unaffected.":
+      "Na ovaj ugovor i svaki spor koji iz njega proizlazi primenjuje se pravo Republike Srbije, uz isključenje njegovih kolizionih pravila i Konvencije UN o ugovorima o međunarodnoj prodaji robe. Isključivo je nadležan stvarno nadležni sud u mestu [GRAD], Republika Srbija, s tim što svaka strana može tražiti privremenu meru pred bilo kojim nadležnim sudom. Ako ti prinudni propisi tvoje zemlje daju pravo da postupak pokreneš drugde, to pravo ostaje netaknuto.",
     "Before starting proceedings, please write to": "Pre pokretanja postupka, piši na",
     "so we can try to resolve the matter directly.":
       "kako bismo pokušali da stvar rešimo neposredno.",
@@ -1127,17 +1127,15 @@ window.LB_I18N_SR = {
     /* --- Privacy policy --------------------------------------------------- */
     "Privacy Policy — Adronis": "Politika privatnosti — Adronis",
     "PRIVACY": "PRIVATNOST",
-    "Last updated September 21, 2026. What we collect, why we are allowed to, who else sees it, how long we keep it, and how you get it back or deleted.":
-      "Poslednja izmena 21. septembra 2026. Šta prikupljamo, po kom osnovu smemo, ko to još vidi, koliko dugo čuvamo i kako to možeš dobiti nazad ili obrisati.",
+    "Last updated October 20, 2026. What we collect, why we are allowed to, who else sees it, how long we keep it, and how you get it back or deleted.":
+      "Poslednja izmena 20. oktobra 2026. Šta prikupljamo, po kom osnovu smemo, ko to još vidi, koliko dugo čuvamo i kako to možeš dobiti nazad ili obrisati.",
     "1. Who is responsible for your data": "1. Ko je odgovoran za tvoje podatke",
     "The controller of the personal data described here is":
       "Rukovalac ličnim podacima opisanim ovde je",
-    ", registered in [COUNTRY] under company registration number [REGISTRATION NUMBER], registered office [REGISTERED ADDRESS] — the company that operates Adronis. Full company details are on our":
-      ", registrovano u [COUNTRY] pod matičnim brojem [REGISTRATION NUMBER], sa sedištem na adresi [REGISTERED ADDRESS] — društvo koje upravlja Adronisom. Potpuni podaci o firmi su ovde:",
+    ", a private individual resident in [CITY], Republic of Serbia, who operates Adronis as a freelancer. Adronis is not a registered company. More about who you are dealing with is on our":
+      ", fizičko lice sa prebivalištem u mestu [GRAD], Republika Srbija, koje Adronis vodi kao frilenser. Adronis nije registrovano privredno društvo. Više o tome s kim posluješ piše ovde:",
     "terms page": "stranica sa uslovima",
     "Data protection contact:": "Kontakt za zaštitu podataka:",
-    ". [If required, name your EU / UK representative here.]":
-      ". [Ako je potrebno, ovde navedi svog predstavnika za EU / UK.]",
     "2. Two different roles": "2. Dve različite uloge",
     "For your account, your billing data and your use of the product, we are the":
       "Za tvoj nalog, podatke o naplati i korišćenje proizvoda mi smo",
@@ -1208,6 +1206,8 @@ window.LB_I18N_SR = {
       "Koristimo samo ono što je neophodno za rad proizvoda: sesiju sačuvanu u tvom pregledaču da ostaneš prijavljen i skladište za osnovna podešavanja interfejsa.",
     "We do not use analytics, advertising or tracking cookies, and there are no third-party trackers on this site.":
       "Ne koristimo analitičke, oglasne ni prateće kolačiće, i na ovom sajtu nema pratilaca trećih lica.",
+    "Our fonts and scripts are served from our own site, so opening a page does not send your IP address to Google or to any other font or script service.":
+      "Fontove i skripte služimo sa sopstvenog sajta, pa otvaranje stranice ne šalje tvoju IP adresu Google-u ni bilo kom drugom servisu za fontove ili skripte.",
     "On your first visit we ask you to confirm your choice, and we remember it in your browser. If we ever introduce analytics or any non-essential cookie, we will ask for your consent again and update this section before it is switched on.":
       "Pri prvoj poseti tražimo da potvrdiš svoj izbor i pamtimo ga u tvom pregledaču. Ako ikada uvedemo analitiku ili bilo koji kolačić koji nije neophodan, ponovo ćemo tražiti tvoju saglasnost i ažurirati ovaj odeljak pre nego što se uključi.",
     "Cookie settings": "Podešavanja kolačića",
@@ -1225,6 +1225,16 @@ window.LB_I18N_SR = {
       "— AI usluge koje renderuju kreative iz tvog brifa i referentnog materijala. Aktuelan spisak provajdera u upotrebi dostupan je na zahtev.",
     "Email delivery provider": "Provajder za isporuku emaila",
     "— for service and account emails.": "— za servisne emailove i emailove o nalogu.",
+    "Two services get a small amount of data straight from your browser, under their own terms and privacy policies:":
+      "Dva servisa dobijaju malo podataka direktno iz tvog pregledača, po sopstvenim uslovima i politikama privatnosti:",
+    "— the weather forecast in your control room. Your browser sends it your business's town and, like any web request, your IP address; nothing else about you or your account.":
+      "— vremenska prognoza u tvojoj kontrolnoj sobi. Tvoj pregledač mu šalje grad tvog biznisa i, kao kod svakog zahteva na internetu, tvoju IP adresu; ništa drugo o tebi ni o tvom nalogu.",
+    "Your browser's push service":
+      "Servis za obaveštenja tvog pregledača",
+    "(Apple, Google or Mozilla, depending on your device) — only if you switch on notifications, to deliver them to your device. The message content is encrypted on its way through.":
+      "(Apple, Google ili Mozilla, zavisno od uređaja) — samo ako uključiš obaveštenja, da bi ih isporučio na tvoj uređaj. Sadržaj poruke je šifrovan dok prolazi kroz njega.",
+    "[FULL NAME]":
+      "[IME I PREZIME]",
     "Platforms you connect yourself": "Platforme koje sam povežeš",
     "— Instagram, Facebook, TikTok, Google Business, LinkedIn, Pinterest. We exchange data with them to publish creatives you approved and to read back performance metrics. They handle that data under their own privacy policies, as independent controllers.":
       "— Instagram, Facebook, TikTok, Google Business, LinkedIn, Pinterest. Sa njima razmenjujemo podatke da bismo objavili kreative koje si odobrio i očitali metrike rezultata. Oni tim podacima rukuju po sopstvenim politikama privatnosti, kao samostalni rukovaoci.",
@@ -1983,8 +1993,8 @@ window.LB_I18N_SR = {
     "A week of posts for a neighbourhood café, the way they show up on each network. Yours are made for your business.":
       "Nedelja objava za kafić iz kraja, onako kako izgledaju na svakoj mreži. Tvoje se prave za tvoj biznis.",
     "Corner Café": "Kafić na uglu",
-    "Posts for a few local businesses, the way they show up on each network. Yours are made for your business.":
-      "Objave za nekoliko lokalnih biznisa, onako kako izgledaju na svakoj mreži. Tvoje se prave za tvoj biznis.",
+    "Posts for made-up local businesses, the way they would show up on each network. Yours are made for your business.":
+      "Objave za izmišljene lokalne biznise, onako kako bi izgledale na svakoj mreži. Tvoje se prave za tvoj biznis.",
     "No ideas for dinner?": "Nemaš ideju za večeru?",
     "Posted to Instagram and Facebook": "Objavljeno na Instagramu i Facebooku",
     "Fresh out of the oven at 7am. Grab one on your way to work.": "Sveže iz rerne u 7h. Uzmi jedno usput do posla.",
@@ -2082,15 +2092,15 @@ window.LB_I18N_SR = {
     "Join the beta": "Prijavi se za betu",
     "Free during the beta": "Besplatno tokom bete",
     "Limited places": "Ograničen broj mesta",
-    "These are the prices from launch in Q1 2027. Until then, Adronis is free for the businesses picked for the beta.":
-      "Ovo su cene od lansiranja u prvom kvartalu 2027. Do tada je Adronis besplatan za biznise izabrane za beta testiranje.",
+    "These are the prices from launch in Q1 2027, alongside a Free plan with 3 ads a month on one network and no card needed. Until then, Adronis is free for the businesses picked for the beta.":
+      "Ovo su cene od lansiranja u prvom kvartalu 2027, uz besplatni plan sa 3 oglasa mesečno na jednoj mreži, bez kartice. Do tada je Adronis besplatan za biznise izabrane za beta testiranje.",
     "Free until launch for the businesses we pick — and 30% off a monthly plan for your first 12 months after that.":
       "Besplatno do lansiranja za biznise koje izaberemo — a posle toga 30% popusta na mesečni plan prvih 12 meseci.",
     "Be one of the first businesses on Adronis.": "Budi među prvim biznisima na Adronisu.",
     "Applying takes about ten minutes. Places are limited, and it is free until launch.":
       "Prijava traje oko deset minuta. Broj mesta je ograničen, a do lansiranja je besplatno.",
-    "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. The Free plan needs no card at all.":
-      "Tokom bete Adronis je besplatan za biznise koje izaberemo: bez kartice, bez plaćanja. Od lansiranja u prvom kvartalu 2027. plaćeni planovi počinju sa 7 dana besplatne probe, jednom po nalogu. Potrebna je kartica, tokom probe se ništa ne naplaćuje, a plan se posle automatski obnavlja dok ga ne otkažeš. Za besplatni plan kartica uopšte nije potrebna.",
+    "During the beta, Adronis is free for the businesses we pick: no card, nothing to pay. From launch in Q1 2027, paid plans start with a 7-day free trial, one per account. A card is required, nothing is charged during the trial, and the plan renews automatically unless you cancel. From launch there is also a Free plan with 3 ads a month on one network, which needs no card at all.":
+      "Tokom bete Adronis je besplatan za biznise koje izaberemo: bez kartice, bez plaćanja. Od lansiranja u prvom kvartalu 2027. plaćeni planovi počinju sa 7 dana besplatne probe, jednom po nalogu. Potrebna je kartica, tokom probe se ništa ne naplaćuje, a plan se posle automatski obnavlja dok ga ne otkažeš. Od lansiranja postoji i besplatni plan sa 3 oglasa mesečno na jednoj mreži, za koji kartica uopšte nije potrebna.",
     "Drop ready": "Drop je spreman",
     "Posted to Instagram": "Objavljeno na Instagramu",
     "Try it: this is your Monday": "Probaj: ovako izgleda tvoj ponedeljak",
