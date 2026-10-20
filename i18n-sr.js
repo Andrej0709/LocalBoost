@@ -82,23 +82,23 @@ window.LB_I18N_SR = {
     "ABOUT ADRONIS": "O ADRONISU",
     "We built the marketing department most local businesses can't afford to hire.":
       "Napravili smo marketing odeljenje koje većina lokalnih biznisa ne može sebi da priušti.",
-    "Adronis renders, approves and publishes a fresh batch of ads every week for owners who are too busy running the shop to run a feed.":
-      "Adronis svake nedelje renderuje, propušta kroz odobravanje i objavljuje novu turu oglasa za vlasnike koji su previše zauzeti vođenjem radnje da bi vodili i profil.",
-    "The problem we kept seeing": "Problem koji smo stalno viđali",
+    "Every week Adronis makes a fresh batch of ads, sends them to you to approve and publishes the ones you keep, for owners who are too busy running the shop to run a feed.":
+      "Svake nedelje Adronis napravi novu turu oglasa, pošalje ti ih na odobrenje i objavi one koje zadržiš, za vlasnike koji su previše zauzeti radnjom da bi vodili i profil.",
+    "The problem we kept seeing": "Problem na koji smo stalno nailazili",
     "Every operator we talked to had the same story: they knew they should be posting, they had no time to shoot, write or schedule anything, and the one week they skipped turned into a quiet quarter. Not because the coffee got worse — because nobody was telling anyone it existed.":
-      "Svaki vlasnik sa kojim smo razgovarali imao je istu priču: znali su da bi trebalo da objavljuju, nisu imali vremena da bilo šta snime, napišu ili zakažu, a jedna preskočena nedelja pretvorila se u tih kvartal. Ne zato što je kafa postala lošija — nego zato što niko nikome nije govorio da postoji.",
+      "Svaki vlasnik sa kojim smo pričali imao je istu priču: zna da bi trebalo da objavljuje, ali nema vremena da slika, piše i zakazuje, a jedna preskočena nedelja pretvori se u tri tiha meseca. Ne zato što je kafa postala lošija, nego zato što niko nikome nije rekao da postoji.",
     "Agencies wanted retainers built for brands with a marketing budget line item. Freelancers needed briefs, and writing a good brief takes almost as long as making the ad yourself. So the shop went quiet, and stayed quiet.":
-      "Agencije su tražile mesečne paušale skrojene za brendove koji u budžetu imaju stavku za marketing. Frilenserima je trebao brif, a pisanje dobrog brifa traje skoro koliko i da sam napraviš oglas. Tako je radnja utihnula, i ostala tiha.",
+      "Agencije traže mesečni paušal kakav plaćaju brendovi sa posebnim budžetom za marketing. Frilenseru treba brif, a dobar brif se piše skoro koliko i sam oglas. I tako radnja utihne, i ostane tiha.",
     "What Adronis does instead": "Šta Adronis radi umesto toga",
     "We brief the engine once — your voice, your palette, your street — and it renders a full week of photoreal, on-brand creative every Monday morning. You spend two minutes swiping to approve. Everything that survives gets resized, captioned and published to the channels where your customers already are.":
-      "Mašinu brifujemo jednom — tvoj ton, tvoja paleta, tvoja ulica — i ona svakog ponedeljka ujutru renderuje celu nedelju fotorealističnih kreativa u duhu tvog brenda. Ti potrošiš dva minuta na prevlačenje i odobravanje. Sve što prođe dobija formate, opise i objavu na kanalima gde su tvoje mušterije ionako već tu.",
+      "Jednom nam opišeš biznis — kako pričaš, koje su ti boje, u kojoj si ulici — i mašina svakog ponedeljka ujutru napravi celu nedelju fotorealističnih oglasa u tvom stilu. Ti ih za dva minuta prevučeš i odobriš. Ono što zadržiš dobija prave formate i opise i izlazi na mrežama na kojima su tvoje mušterije već tu.",
     "Why it's built this way": "Zašto je napravljen baš ovako",
     "Adronis is built on one assumption: you will never reliably have time to make the ads yourself. So the product never asks you to. No brief queue, no revision calls, no monthly strategy meeting — just a drop that lands whether or not you had a good week.":
-      "Adronis počiva na jednoj pretpostavci: nikad nećeš pouzdano imati vremena da sam praviš oglase. Zato proizvod to od tebe nikad i ne traži. Bez reda brifova, bez poziva za korekcije, bez mesečnog sastanka o strategiji — samo drop koji stiže bez obzira na to kakvu si nedelju imao.",
+      "Adronis polazi od jedne pretpostavke: nikad nećeš imati vremena da redovno sam praviš oglase. Zato te to ni ne traži. Nema brifova na čekanju, poziva za izmene ni mesečnih sastanaka o strategiji — samo drop koji stigne, kakva god da ti je nedelja bila.",
     "DROPS PER YEAR": "DROPOVA GODIŠNJE",
     "Who's behind it": "Ko stoji iza toga",
     "Adronis is built by a small team that got tired of watching good local businesses lose to silence, not competition. We'd rather ship a better engine than a bigger sales team.":
-      "Adronis gradi mali tim kome je dosadilo da gleda kako dobri lokalni biznisi gube od tišine, a ne od konkurencije. Radije ćemo isporučiti bolju mašinu nego veći prodajni tim.",
+      "Adronis pravi mali tim kome je dosadilo da gleda kako dobri lokalni biznisi gube od tišine, a ne od konkurencije. Radije pravimo bolju mašinu nego veći prodajni tim.",
     "Talk to us": "Razgovarajmo",
     "Talk to us →": "Razgovarajmo →",
     "Several locations? Franchise is set up with us directly.":
@@ -107,13 +107,13 @@ window.LB_I18N_SR = {
       "Franchise dogovaramo direktno — javi nam se preko stranice za kontakt.",
 
     /* --- Contact --------------------------------------------------------- */
-    "Contact Adronis — Talk to Sales": "Kontakt — razgovor sa prodajom",
+    "Contact Adronis — Talk to Sales": "Kontakt — Adronis",
     "CONTACT": "KONTAKT",
     "TALK TO US": "RAZGOVARAJMO",
     "Tell us about the shop. We'll tell you what the first drop looks like.":
       "Ispričaj nam o radnji. Mi ćemo ti reći kako izgleda prvi drop.",
     "Franchise and multi-location accounts get a human on the other end before the engine ever renders a frame.":
-      "Nalozi za franšize i više lokacija dobijaju živog čoveka sa druge strane pre nego što mašina renderuje i jedan kadar.",
+      "Kod franšiza i biznisa sa više lokacija prvo razgovaraš sa čovekom, a tek onda mašina pravi prvi oglas.",
     "YOUR NAME": "TVOJE IME",
     "PLAN INTEREST": "PLAN KOJI TE ZANIMA",
     "Not sure yet": "Još nisam siguran",
@@ -2271,13 +2271,13 @@ window.LB_I18N_SR = {
     "What happens next": "Šta sledi",
     "You send a few lines": "Pošalješ nam par rečenica",
     "Number of locations, the channels you're on, anything we should know.":
-      "Broj lokacija, kanali na kojima si, sve što treba da znamo.",
+      "Broj lokacija, mreže na kojima si i sve što treba da znamo.",
     "A real person reads it": "Pravi čovek to pročita",
     "Every message here gets a reply within one business day.":
       "Na svaku poruku odavde odgovaramo u roku od jednog radnog dana.",
     "We come back with a plan": "Vraćamo ti se sa planom",
     "For your locations and channels, before the engine renders a thing.":
-      "Za tvoje lokacije i kanale, pre nego što mašina išta renderuje.",
+      "Za tvoje lokacije i mreže, pre nego što mašina napravi ijedan oglas.",
     "Just want to see it work first?": "Želiš prvo da vidiš kako radi?",
     "Start on the Free plan": "Počni sa besplatnim planom",
     "— no card needed.": "— bez kartice.",

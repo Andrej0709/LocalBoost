@@ -195,7 +195,9 @@
           status: live ? "published" : "approved",
           scheduled_at: when,
           published_at: live ? when : null,
-          post_url: live ? "https://www.instagram.com/" : null,
+          // A made-up café has no real post to open, so no link: a demo link to
+          // Instagram's home page (even for a Google post) read as broken.
+          post_url: null,
           channel: x[3], format: x[4], headline: x[5], image_url: x[6]
         };
       });

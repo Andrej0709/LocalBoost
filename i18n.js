@@ -221,6 +221,8 @@
     ".nav-sheet .lb-lang-btn{min-width:44px;min-height:40px;padding:0 10px}",
     "@media (max-width:900px){#lb-lang-switch{display:none}}",
     "@media (min-width:901px){.nav-sheet .lb-lang{display:none}}",
+    // Keep the footer's last line clear of the floating pill on a desktop.
+    "@media (min-width:901px){.foot-bottom{padding-right:104px}}",
     "@media print{.lb-lang{display:none}}"
   ].join("");
 

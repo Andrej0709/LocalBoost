@@ -560,7 +560,12 @@
     // --- Next month
     var next = new Date(start.getFullYear(), start.getMonth() + 1, 1);
     var nextEnd = new Date(start.getFullYear(), start.getMonth() + 2, 1);
-    var dates = LBDates.between(running ? now : next, Math.round((nextEnd - (running ? now : next)) / 86400000)).slice(0, 4);
+    // An older month's "coming up" must not list dates already behind us:
+    // start from today when next month has begun, and look a month ahead
+    // when it is already over.
+    var from = running || next < now ? now : next;
+    var until = nextEnd > from ? nextEnd : new Date(from.getTime() + 30 * 86400000);
+    var dates = LBDates.between(from, Math.ceil((until - from) / 86400000)).slice(0, 4);
     if (dates.length) {
       var ns = section(T("COMING UP", "ŠTA DOLAZI"), T("Dates worth an ad", "Datumi vredni oglasa"),
         T("Put the ones that fit you in your note for next week, in the control room.",

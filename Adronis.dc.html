@@ -1383,7 +1383,9 @@ class Component extends DCLogic {
         per: p.base ? "/ month, incl. VAT" : "/ month",
         showYearly: annual && p.base > 0,
         yearly: euro(monthly * 12),
-        showPerAd: p.perWeek > 0,
+        // Franchise pays for a designer and personal support, not volume, so
+        // a per-ad figure would make it look like the worst deal of the three.
+        showPerAd: p.perWeek > 0 && p.name !== "Franchise",
         perAd: p.perWeek ? cents(monthly / (p.perWeek * WEEKS_PER_MONTH)) : "",
         showSave: annual && p.base > 0,
         save: euro(p.base * 12 * 0.2),

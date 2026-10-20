@@ -273,8 +273,9 @@ input,select,textarea{color-scheme:dark}
 /* Terms, privacy and the AI disclosure: long reading, so a calm column, clear
    section breaks, and links that look like links. */
 .legal{max-width:760px}
-.legal>h3{margin:56px 0 14px;padding-top:28px;border-top:1px solid var(--line);font-size:clamp(20px,1.8vw,24px);letter-spacing:-.025em;scroll-margin-top:100px}
-.legal>h3:first-child{margin-top:8px;padding-top:0;border-top:none}
+/* Section headings are h2 (the page title is the h1) but keep the old h3 look. */
+.legal>h2{margin:56px 0 14px;padding-top:28px;border-top:1px solid var(--line);font-size:clamp(20px,1.8vw,24px);line-height:1.3;letter-spacing:-.025em;scroll-margin-top:100px}
+.legal>h2:first-child{margin-top:8px;padding-top:0;border-top:none}
 .legal p,.legal li{font-size:16px;line-height:1.75}
 .legal p a,.legal li a{text-decoration:underline;text-decoration-color:rgba(124,198,255,.35);text-underline-offset:3px}
 .legal p a:hover,.legal li a:hover{text-decoration-color:var(--acc)}
