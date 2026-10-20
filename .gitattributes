@@ -1,0 +1,4 @@
+# Third-party files are pinned by their sha384 hash in the pages that load
+# them, so they must stay byte-for-byte as downloaded on every checkout.
+vendor/** -text
+fonts/** binary
