@@ -537,12 +537,12 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
 .promo{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;width:fit-content;max-width:100%;margin:22px auto 0;padding:10px 10px 10px 18px;border-radius:18px;border:1px dashed rgba(159,215,176,.45);background:rgba(159,215,176,.06)}
 .promo-tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ok)}
 .promo-text{font-size:14.5px;line-height:1.5;color:var(--text)}
-.promo-code{display:inline-flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;border-radius:12px;border:1px solid rgba(159,215,176,.35);background:#08100c;color:#fff;font-family:var(--mono);font-size:15px;letter-spacing:.14em;cursor:pointer;transition:border-color .2s ease,transform .12s ease}
+.promo-code{display:inline-flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;border-radius:12px;border:1px solid rgba(159,215,176,.35);background:#08100c;color:#fff;font-family:var(--mono);font-size:15px;letter-spacing:.05em;cursor:pointer;transition:border-color .2s ease,transform .12s ease}
 .promo-code:hover{border-color:rgba(159,215,176,.75)}
 .promo-code:active{transform:scale(.97)}
 .promo-code .copy{padding:6px 11px;border-radius:8px;background:var(--ok);color:#06110a;font-family:var(--font);font-size:12.5px;font-weight:600;letter-spacing:0}
 .free-note{max-width:720px;margin:26px auto 0;padding:15px 20px;border-radius:16px;border:1px solid var(--acc-line);background:rgba(124,198,255,.06);font-size:14.5px;line-height:1.6;color:var(--text);text-align:left}
-.free-note .mono{margin-right:10px;font-size:10.5px;letter-spacing:.12em;color:var(--acc)}
+.free-note .mono{margin-right:10px;font-size:11px;letter-spacing:.12em;color:var(--acc)}
 .plans{max-width:1200px;margin:64px auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;align-items:stretch}
 .plans.is-three{grid-template-columns:repeat(3,minmax(0,1fr));max-width:1000px}
 .plan{position:relative;display:flex;flex-direction:column;padding:32px 28px 28px;border-radius:var(--r-xl);border:1px solid var(--line);background:rgba(12,14,18,.94);text-align:left;transition:transform .45s var(--ease),border-color .3s ease,box-shadow .45s var(--ease)}
@@ -581,8 +581,8 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
 .faq-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,6vw,96px);align-items:start}
 .faq-side{position:sticky;top:120px}
 .faq-side p{margin:22px 0 0;max-width:36ch;font-size:16px;color:var(--text-2)}
-.faq-list{border-top:1px solid var(--line)}
 .faq-item{border-bottom:1px solid var(--line)}
+.faq-item:first-child{border-top:1px solid var(--line)}
 .faq-item summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 2px;cursor:pointer;font-size:clamp(17px,1.5vw,19px);font-weight:500;line-height:1.4;letter-spacing:-.01em;color:var(--text);transition:color .2s ease}
 .faq-item summary::-webkit-details-marker{display:none}
 .faq-item summary:hover{color:var(--acc-2)}
