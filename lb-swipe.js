@@ -89,7 +89,7 @@
     ".sw-cap{margin:0;padding:12px 16px 4px;font-size:13.5px;line-height:1.5;color:#b3b9c4;min-height:52px}",
     ".sw-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px 15px}",
     ".sw-slot{display:inline-flex;align-items:center;gap:7px;font-family:'Geist Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:#878d98}",
-    ".sw-slot::before{content:'';width:6px;height:6px;border-radius:9999px;background:var(--acc,#7cc6ff);box-shadow:0 0 10px rgba(124,198,255,.8)}",
+    ".sw-slot::before{content:'';width:6px;height:6px;border-radius:9999px;background:var(--acc,#7cc6ff);box-shadow:0 0 6px rgba(124,198,255,.45)}",
     ".sw-wait{font-family:'Geist Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;color:#f0c878}",
     ".sw-stamp{position:absolute;top:66px;padding:7px 14px;border-radius:12px;border:2px solid;font-family:'Geist Mono',ui-monospace,monospace;font-size:14px;font-weight:600;letter-spacing:.14em;opacity:0;pointer-events:none;",
     "background:rgba(5,6,8,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}",
