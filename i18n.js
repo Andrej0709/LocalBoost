@@ -203,16 +203,16 @@
   var STYLE = [
     ".lb-lang{position:fixed;right:18px;bottom:18px;z-index:45;",
     "display:inline-flex;align-items:center;gap:5px;",
-    "padding:8px 13px;border-radius:980px;border:1px solid rgba(255,255,255,.08);",
-    "background:rgba(29,29,31,.8);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);",
-    "box-shadow:none;",
+    "padding:8px 13px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);",
+    "background:rgba(16,18,23,.72);-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);",
+    "box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 30px rgba(0,0,0,.5);",
     "font-family:'Geist Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em}",
-    ".lb-lang-btn{padding:2px;border:none;background:none;cursor:pointer;color:#86868b;",
+    ".lb-lang-btn{padding:2px;border:none;background:none;cursor:pointer;color:#8a8f98;",
     "font:inherit;letter-spacing:inherit;line-height:1;transition:color .18s ease}",
-    ".lb-lang-btn:hover{color:#f5f5f7}",
-    ".lb-lang-btn.is-on{color:var(--acc,#2997ff)}",
-    ".lb-lang-btn:focus-visible{outline:2px solid var(--acc,#2997ff);outline-offset:3px;border-radius:4px}",
-    ".lb-lang-sep{color:#424245}",
+    ".lb-lang-btn:hover{color:#f2f4f7}",
+    ".lb-lang-btn.is-on{color:var(--acc,#7cc6ff)}",
+    ".lb-lang-btn:focus-visible{outline:2px solid var(--acc,#7cc6ff);outline-offset:3px;border-radius:4px}",
+    ".lb-lang-sep{color:#2f333a}",
     // On a phone a floating pill sits on top of whatever is under it - a
     // form field, the approve button - so there the switch lives in the menu
     // sheet instead (same breakpoint as the burger in adronis.css).
