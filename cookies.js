@@ -56,7 +56,7 @@
     "transition:filter .18s ease,background .18s ease,border-color .18s ease,color .18s ease,transform .12s ease}",
     ".lb-consent-btn:active{transform:scale(.97)}",
     ".lb-consent-accept{border:none;background:linear-gradient(180deg,#9dd6ff,#6ec2ff);color:#03111d;",
-    "box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 8px 22px -10px rgba(110,194,255,.8)}",
+    "box-shadow:inset 0 1px 0 rgba(255,255,255,.55)}",
     ".lb-consent-accept:hover{filter:brightness(1.07)}",
     ".lb-consent-essential{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#f2f4f7;font-weight:500}",
     ".lb-consent-essential:hover{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.08)}",

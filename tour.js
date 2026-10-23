@@ -55,7 +55,7 @@
     ".lbt-actions button{padding:9px 16px;border-radius:9999px;font-size:13.5px;font-family:inherit;cursor:pointer;white-space:nowrap}",
     ".lbt-back{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.03);color:#b3b9c4}",
     ".lbt-back:hover{border-color:rgba(255,255,255,.28);color:#f2f4f7}",
-    ".lbt-next{border:none;background:linear-gradient(180deg,#9dd6ff,#6ec2ff);color:#03111d;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 8px 20px -10px rgba(110,194,255,.8)}",
+    ".lbt-next{border:none;background:linear-gradient(180deg,#9dd6ff,#6ec2ff);color:#03111d;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,.55)}",
     ".lbt-next:hover{filter:brightness(1.07)}",
     ".lbt-card button:focus-visible{outline:2px solid var(--acc,#7cc6ff);outline-offset:2px}",
     ".lbt-replay{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;margin-top:22px;padding:7px 14px;",
