@@ -6,5 +6,20 @@
       "maxFindings": 5,
       "maxChars": 8000
     }
+  },
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "Adronis.dc.html"
+        ],
+        "createdAt": "2026-10-23T15:01:54.064Z",
+        "reason": "Claude: the static scan assumes a #ffffff background, but the page background is #000/#1d1d1f from adronis.css; a live in-browser contrast check on 2026-10-23 found 14 real misses, all fixed"
+      }
+    ]
   }
 }

@@ -2024,7 +2024,7 @@ window.LB_I18N_SR = {
     "Ads for holidays and local events": "Oglasi za praznike i lokalne događaje",
     "Learns which ads work best for you": "Uči koji oglasi ti najbolje prolaze",
     // Tag on a plan feature that isn't built yet (home, signup, checkout).
-    "Soon": "Uskoro",
+    "Soon": "uskoro",
     "Choose Storefront": "Izaberi Storefront",
     "30 ads every Monday": "30 oglasa svakog ponedeljka",
     "Any number of networks and locations": "Neograničen broj mreža i lokacija",
@@ -2263,6 +2263,60 @@ window.LB_I18N_SR = {
     "Applying takes about ten minutes": "Prijava traje oko deset minuta",
     "Try Adronis free": "Probaj Adronis besplatno",
     "No card on the Free plan": "Bez kartice na besplatnom planu",
+
+    /* --- Home page: the Apple look (2026-10-23) ----------------------------
+       Short headlines in two parts (the second half is grey and is its own
+       string), the terms said once under the button, no "honest" or "catch". */
+    "Beta · starts early November": "Beta · počinje početkom novembra",
+    "We make your ads.": "Mi pravimo tvoje oglase.",
+    "You just say": "Ti samo kažeš",
+    "A new set of ads for your business every Monday. Approve them in about two minutes. We take care of posting.":
+      "Svakog ponedeljka nov set oglasa za tvoj lokal. Odobriš ih za oko dva minuta. Objavu preuzimamo mi.",
+    "Request a place": "Zatraži mesto",
+    "Free during the beta. No card needed.": "Besplatno tokom bete. Bez kartice.",
+    "Free plan with no card. Cancel any time.": "Besplatan plan, bez kartice. Otkaži kad god želiš.",
+    "Posting is a second job.": "Objavljivanje je drugi posao.",
+    "You already have one.": "Ti već imaš jedan.",
+    "You know you should post more.": "Znaš da bi trebalo češće da objavljuješ.",
+    "But photos, captions, design and scheduling eat the hours your business needs. So we take the whole job.":
+      "Ali slikanje, pisanje, dizajn i zakazivanje pojedu sate koji trebaju tvom lokalu. Zato ceo posao preuzimamo mi.",
+    "About two minutes.": "Oko dva minuta.",
+    "Once a week.": "Jednom nedeljno.",
+    "You do two things.": "Ti radiš dve stvari.",
+    "Describe your business once, then approve the ads each week. We do the rest.":
+      "Jednom nam opišeš svoj lokal, a zatim svake nedelje odobravaš oglase. Ostalo radimo mi.",
+    "Monday, 9:00.": "Ponedeljak, 09:00.",
+    "Your drop is waiting.": "Tvoj drop te čeka.",
+    "Posts for made-up local businesses,": "Objave za izmišljene lokale,",
+    "the way they would show up on each network. Yours are made for your business.":
+      "onako kako bi izgledale na svakoj mreži. Tvoje se prave za tvoj lokal.",
+    "Every image is made with AI for the business it's for. Never a stock photo with a logo on top.":
+      "Svaka slika je napravljena uz pomoć veštačke inteligencije, za lokal kome je namenjena. Nikad stok fotografija sa logom preko.",
+    "The final say is always yours.": "Poslednja reč je uvek tvoja.",
+    "Adronis does the work, but every ad waits for you first.": "Adronis radi posao, ali svaki oglas prvo čeka tebe.",
+    "Change anything before it posts, or turn it down and tell us why.":
+      "Promeni šta god želiš pre objave, ili ga odbaci i reci nam zašto.",
+    "A small number of places.": "Mali broj mesta.",
+    "On purpose.": "Namerno.",
+    "Every ad Adronis makes costs real money to generate.": "Svaki oglas koji Adronis napravi košta pravi novac da se generiše.",
+    "During the beta we cover that, not you, so we can only take a small number of businesses.":
+      "Tokom bete taj trošak snosimo mi, ne ti, pa možemo da primimo samo mali broj lokala.",
+    "You get a weekly drop for your business, free until launch. We get real feedback from a real owner: which ads you approve, which you turn down and why.":
+      "Ti dobijaš nedeljni drop za svoj lokal, besplatno do lansiranja. Mi dobijamo pravu povratnu informaciju od pravog vlasnika: koje oglase odobravaš, koje odbacuješ i zašto.",
+    "Clear prices.": "Jasne cene.",
+    "No contract.": "Bez ugovora.",
+    "Questions before you apply.": "Pitanja pre prijave.",
+    "Questions before you sign up.": "Pitanja pre registracije.",
+    "Why is the beta free?": "Zašto je beta besplatna?",
+    "Because we want real feedback from real owners before launch, so during the beta we pay for generating your ads and you don't need a card. When the beta ends, you decide whether to stay on a paid plan, with 30% off for your first 12 months, or leave.":
+      "Zato što pre lansiranja želimo pravu povratnu informaciju od pravih vlasnika, pa tokom bete mi plaćamo pravljenje tvojih oglasa, a kartica ti ne treba. Kad se beta završi, ti odlučuješ da li ostaješ na plaćenom planu, uz 30% popusta prvih 12 meseci, ili odlaziš.",
+    "Monday.": "Ponedeljak.",
+    "The ads are already done.": "Oglasi su već gotovi.",
+    "Your first ads": "Tvoji prvi oglasi",
+    "can be ready this week.": "mogu biti gotovi ove nedelje.",
+    "Applying takes about ten minutes. Places are limited because we pay for every ad during the beta.":
+      "Prijava traje oko deset minuta. Broj mesta je ograničen jer tokom bete mi plaćamo svaki oglas.",
+    "Beta · limited places": "Beta · ograničen broj mesta",
 
     /* --- 2026 redesign: about, contact, message us, log in -------------- */
     "Drops per year": "Dropova godišnje",

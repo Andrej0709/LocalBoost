@@ -18,7 +18,7 @@
     // beta place, so the nav's "Try it free" says so.
     if (window.LBGate && LBGate.beta) {
       Array.prototype.forEach.call(nav.querySelectorAll(".nav-cta"), function (a) {
-        if (/(^|\/)signup\.html$/.test(a.getAttribute("href") || "")) a.textContent = "Join the beta";
+        if (/(^|\/)signup\.html$/.test(a.getAttribute("href") || "")) a.textContent = "Request a place";
       });
     }
 

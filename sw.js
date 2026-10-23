@@ -13,7 +13,7 @@
  *
  * Changing offline.html or the logo? Bump CACHE so phones fetch the new copy.
  */
-var CACHE = "adronis-offline-v1";
+var CACHE = "adronis-offline-v2";
 var OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", function (event) {
