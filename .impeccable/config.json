@@ -19,6 +19,18 @@
         ],
         "createdAt": "2026-10-23T15:01:54.064Z",
         "reason": "Claude: the static scan assumes a #ffffff background, but the page background is #000/#1d1d1f from adronis.css; a live in-browser contrast check on 2026-10-23 found 14 real misses, all fixed"
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist",
+        "createdAt": "2026-10-23T15:03:42.788Z",
+        "reason": "Claude: Geist is the site's existing self-hosted brand face (fonts.css), in use before 2026-10-23; changing it was not part of the Apple-look task"
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist mono",
+        "createdAt": "2026-10-23T15:03:43.116Z",
+        "reason": "Claude: Geist Mono is the site's existing self-hosted mono face for timestamps and labels; not part of the Apple-look task"
       }
     ]
   }
