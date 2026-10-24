@@ -1040,6 +1040,10 @@ async function submit(job: Job, log: Log) {
   log.submitted++;
 }
 
+// Written onto a job just before its text is drawn, and cleared once the picture
+// is stored. Still there on the next go means that call died drawing it.
+const COMPOSE_MARK = "drawing the text";
+
 async function poll(job: Job) {
   const out = await hf(`requests/${job.hf_request_id}/status`);
   if (out.status === "queued" || out.status === "in_progress") {
@@ -1067,14 +1071,22 @@ async function poll(job: Job) {
   let type = (img.headers.get("content-type") || "image/png").split(";")[0].trim();
   let bytes = new Uint8Array(await img.arrayBuffer());
   let overlayError: string | null = null;
-  try {
-    // The headline and the button go onto the photo. If that fails the plain
-    // photo still goes out; the reason is kept in last_error.
-    const ad = await composeAd(job, bytes, type);
-    if (ad) { bytes = ad; type = "image/png"; }
-  } catch (err) {
-    overlayError = "Text not added to the picture: " + (err as Error).message;
-    console.error(overlayError);
+  if (job.last_error === COMPOSE_MARK) {
+    // The last call died while drawing the text on this picture (out of CPU
+    // or memory). Trying again would die the same way every 2 minutes, so the
+    // plain photo goes out instead.
+    overlayError = "Text not added to the picture: the function ran out of resources drawing it.";
+  } else {
+    await db.from("engine_jobs").update({ last_error: COMPOSE_MARK }).eq("id", job.id);
+    try {
+      // The headline and the button go onto the photo. If that fails the plain
+      // photo still goes out; the reason is kept in last_error.
+      const ad = await composeAd(job, bytes, type);
+      if (ad) { bytes = ad; type = "image/png"; }
+    } catch (err) {
+      overlayError = "Text not added to the picture: " + (err as Error).message;
+      console.error(overlayError);
+    }
   }
   const url = await store(job, bytes, type);
   // Logged once the picture is safely ours, so a retried fetch isn't counted twice.
@@ -1085,7 +1097,7 @@ async function poll(job: Job) {
   });
   await updateJob(job, {
     image_url: url, status: claude ? "checking" : "ready", hf_request_id: null,
-    ...(overlayError ? { last_error: overlayError.slice(0, 1000) } : {}),
+    last_error: overlayError ? overlayError.slice(0, 1000) : null,
   });
   return "done";
 }
@@ -1200,7 +1212,7 @@ async function imageStep(log: Log, started: number) {
       }
     }
   })();
-  return { worked: jobs.length > 0, waiting };
+  return { worked: jobs.length > 0, waiting, heavy };
 }
 
 /* ------------------------------------------------------------------ */
@@ -1282,6 +1294,9 @@ Deno.serve(async (req) => {
       worked = worked || images.worked;
       waiting = images.waiting;
       await deliverStep(log);
+      // A call has about 2 seconds of CPU in all; drawing one ad's text uses most
+      // of it. The next picture waits for the next call (2 minutes later).
+      if (images.heavy) break;
     } catch (err) {
       log.errors.push((err as Error).message);
       break;
