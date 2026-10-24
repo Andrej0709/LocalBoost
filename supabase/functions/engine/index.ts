@@ -12,7 +12,8 @@
 //               turned down in the last weeks. One engine_jobs row per ad.
 //   3. images   Higgsfield makes each image; it is copied into the public
 //               "creatives" bucket, and Claude looks at it. One that falls
-//               short is made again from a better prompt, up to three times;
+//               short is made again from a better prompt, up to
+//               IMAGE_ATTEMPTS times (one for now - every try is paid);
 //               the best one so far is kept.
 //   4. deliver  once every image is done, engine_deliver() puts all the ads
 //               in Approvals at once and the drop becomes awaiting_approval
@@ -65,7 +66,9 @@ const LAST_CHECK_MS = 80_000;
 
 const ADS_PER_CALL = 4;
 const COPY_ATTEMPTS = 3;
-const IMAGE_ATTEMPTS = 3;
+// One go per picture: every try is paid for, and a weak picture is still
+// better than a second bill during the beta.
+const IMAGE_ATTEMPTS = 1;
 const PASS_SCORE = 7;
 // Claude refuses pictures over 5 MB; a bigger one goes out unchecked.
 const CHECK_MAX_BYTES = 5 * 1024 * 1024;
@@ -852,6 +855,22 @@ async function imageFailed(job: Job, reason: string) {
   }
 }
 
+// The cheapest resolution of each model, and 3:4 where 4:5 isn't offered
+// (none of these models offers it).
+function hfBody(job: Job) {
+  const aspect_ratio = job.aspect_ratio === "4:5" ? "3:4" : job.aspect_ratio;
+  if (HF_MODEL.startsWith("marketing-studio/")) {
+    return { prompt: job.image_prompt, aspect_ratio, resolution: "1k", enhance_prompt: false };
+  }
+  if (HF_MODEL.startsWith("higgsfield-ai/soul/")) {
+    return { prompt: job.image_prompt, aspect_ratio, resolution: "720p", enhance_prompt: false, batch_size: 1 };
+  }
+  if (HF_MODEL.startsWith("z-image/")) {
+    return { prompt: job.image_prompt, aspect_ratio, resolution: "1k" };
+  }
+  return { prompt: job.image_prompt, aspect_ratio, resolution: "1K", num_images: 1 };
+}
+
 async function submit(job: Job, log: Log) {
   const attempts = job.attempts + 1;
   if (!higgsfield) {
@@ -863,10 +882,7 @@ async function submit(job: Job, log: Log) {
   const out = await hf(HF_MODEL, {
     method: "POST",
     headers: { "Idempotency-Key": `${job.id}-${attempts}` },
-    body: JSON.stringify(HF_MODEL.startsWith("marketing-studio/")
-      // Marketing Studio: lowercase resolution, no num_images, 4:5 isn't offered (3:4 is closest).
-      ? { prompt: job.image_prompt, aspect_ratio: job.aspect_ratio === "4:5" ? "3:4" : job.aspect_ratio, resolution: "2k", enhance_prompt: false }
-      : { prompt: job.image_prompt, aspect_ratio: job.aspect_ratio, resolution: "2K", num_images: 1 }),
+    body: JSON.stringify(hfBody(job)),
   });
   if (!out?.request_id) throw new Error("Higgsfield gave no request id.");
   await updateJob(job, {
