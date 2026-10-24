@@ -1162,15 +1162,18 @@ async function imageStep(log: Log, started: number) {
   const jobs: Job[] = claimed.data || [];
   const profiles = new Map<string, Profile>();
   let waiting = false;
-  // One at a time: drawing the text onto a photo is heavy, and three at once ran the function out of memory.
+  // Drawing the text onto a photo is heavy and a call has a small compute budget, so
+  // only one finished picture is handled per call; the others are let go for the next.
+  let heavy = false;
   for (const job of jobs) await (async () => {
+    if (heavy) return void (await db.from("engine_jobs").update({ locked_until: null }).eq("id", job.id));
     try {
       if (job.status === "queued") {
         await submit(job, log);
         waiting = waiting || higgsfield;
       } else if (job.status === "running") {
         if (!higgsfield) return await updateJob(job, { status: "queued", hf_request_id: null });
-        if ((await poll(job)) === "waiting") waiting = true;
+        if ((await poll(job)) === "waiting") waiting = true; else heavy = true;
       } else if (job.status === "checking") {
         if (!claude) return await updateJob(job, { status: "ready" });
         if (!profiles.has(job.user_id)) {
