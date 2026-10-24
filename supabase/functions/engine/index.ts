@@ -860,7 +860,10 @@ async function submit(job: Job, log: Log) {
   const out = await hf(HF_MODEL, {
     method: "POST",
     headers: { "Idempotency-Key": `${job.id}-${attempts}` },
-    body: JSON.stringify({ prompt: job.image_prompt, aspect_ratio: job.aspect_ratio, resolution: "2K", num_images: 1 }),
+    body: JSON.stringify(HF_MODEL.startsWith("marketing-studio/")
+      // Marketing Studio: lowercase resolution, no num_images, 4:5 isn't offered (3:4 is closest).
+      ? { prompt: job.image_prompt, aspect_ratio: job.aspect_ratio === "4:5" ? "3:4" : job.aspect_ratio, resolution: "2k", enhance_prompt: false }
+      : { prompt: job.image_prompt, aspect_ratio: job.aspect_ratio, resolution: "2K", num_images: 1 }),
   });
   if (!out?.request_id) throw new Error("Higgsfield gave no request id.");
   await updateJob(job, {
