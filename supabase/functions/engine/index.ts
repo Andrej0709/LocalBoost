@@ -37,8 +37,9 @@
 //   ENGINE_TEST_EMAILS        comma-separated emails that get ads while testing
 //   ENGINE_LIVE               "true" to make ads for every account with a running plan
 //   ANTHROPIC_API_KEY         Claude; missing = practice texts
-//   HIGGSFIELD_API_KEY_ID     Higgsfield key id     } missing = practice images
-//   HIGGSFIELD_API_KEY_SECRET Higgsfield key secret }
+//   HIGGSFIELD_API_KEY        Higgsfield key (open.higgsfield.ai, one string)
+//   HIGGSFIELD_API_KEY_ID     older keys: key id     } used when HIGGSFIELD_API_KEY
+//   HIGGSFIELD_API_KEY_SECRET older keys: key secret } is not set; none = practice images
 // Optional:
 //   CLAUDE_MODEL              default claude-opus-5-5
 //   CLAUDE_EFFORT             default high (the copy); the image check runs at low
@@ -85,12 +86,14 @@ const CLAUDE_MODEL = secret("CLAUDE_MODEL") || "claude-opus-5-5";
 const CLAUDE_EFFORT = (secret("CLAUDE_EFFORT") || "high") as "low" | "medium" | "high" | "xhigh" | "max";
 const HF_ID = secret("HIGGSFIELD_API_KEY_ID");
 const HF_SECRET = secret("HIGGSFIELD_API_KEY_SECRET");
+// The newer keys from open.higgsfield.ai are one string, sent as "Key <key>".
+const HF_KEY = secret("HIGGSFIELD_API_KEY") || (HF_ID && HF_SECRET ? `${HF_ID}:${HF_SECRET}` : "");
 const HF_MODEL = (secret("HIGGSFIELD_MODEL") || "higgsfield-ai/soul/standard").replace(/^\/+/, "");
 const HF_PRICE = Number(secret("HIGGSFIELD_USD_PER_IMAGE")) || 0;
 const WEATHER = secret("WEATHER").toLowerCase() !== "off";
 
 const claude = CLAUDE_KEY ? new Anthropic({ apiKey: CLAUDE_KEY, maxRetries: 2 }) : null;
-const higgsfield = !!(HF_ID && HF_SECRET);
+const higgsfield = !!HF_KEY;
 const practice = !claude || !higgsfield;
 
 // USD per million tokens. Cache writes are the 5-minute kind.
@@ -788,7 +791,7 @@ async function hf(path: string, init: RequestInit = {}) {
   const res = await fetch(HF_API + "/" + path.replace(/^\/+/, ""), {
     ...init,
     headers: {
-      "Authorization": `Key ${HF_ID}:${HF_SECRET}`,
+      "Authorization": `Key ${HF_KEY}`,
       "Content-Type": "application/json",
       "Accept": "application/json",
       ...(init.headers || {}),
