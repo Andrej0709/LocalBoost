@@ -2521,6 +2521,10 @@ do $$ begin
   );
 exception when duplicate_object then null; end $$;
 
+/* What is written onto the photo: the button text, where the text goes (top or
+   bottom), the accent colour and the business's name. */
+alter table public.engine_jobs add column if not exists overlay jsonb not null default '{}'::jsonb;
+
 create index if not exists engine_jobs_drop_idx on public.engine_jobs (drop_id);
 create index if not exists engine_jobs_status_idx on public.engine_jobs (status, locked_until);
 

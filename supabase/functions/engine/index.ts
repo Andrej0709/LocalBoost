@@ -10,8 +10,10 @@
 //               brief, the uploaded logo, photos and menu, the forecast, the
 //               town's dates and what the owner approved, loved, edited and
 //               turned down in the last weeks. One engine_jobs row per ad.
-//   3. images   Higgsfield makes each image; it is copied into the public
-//               "creatives" bucket, and Claude looks at it. One that falls
+//   3. images   Higgsfield makes each photo (with no text in it); the headline,
+//               the call-to-action button and the business's name are written
+//               onto it here, it is copied into the public "creatives" bucket,
+//               and Claude looks at it. One that falls
 //               short is made again from a better prompt, up to
 //               IMAGE_ATTEMPTS times (one for now - every try is paid);
 //               the best one so far is kept.
@@ -52,6 +54,7 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 import Anthropic from "npm:@anthropic-ai/sdk@0.133.0";
+import { Resvg, initWasm } from "npm:@resvg/resvg-wasm@2.6.2";
 
 const TZ = "Europe/Belgrade";
 const BUCKET = "creatives";
@@ -460,14 +463,17 @@ const COPY_SYSTEM = `You write the weekly social media ads for one small local b
 What makes an ad work here:
 - It is about this business and this week, never generic. Use the real products, the real street, the real opening hours, the weather on the day it posts, and the dates people care about.
 - One idea per ad, said plainly, the way the owner would say it to a regular. Warm, specific, local. No marketing clichés, no hashtag walls, no "Discover", "Elevate", "Unleash".
-- The headline is short (at most 6-8 words) and could stand on its own. The caption is 1-4 short sentences and ends with something to do: come by, book, order, call - when it fits. At most 3 hashtags, only when they help locally (the town, the street).
+- The words are written ON the picture by our design system, in the business's name and colours: the headline as the one big line, and a call-to-action button under it. So the headline is a hook of 3-7 words that works at a glance in a feed: the specific product, the time, the weather or the reason ("Burek je vruć do 14h"), never a slogan or a mood. The cta is the button: 2-4 words, one action tied to what this business really does (come, order, book, call, try) and, when it fits, to the day or the hour. Never repeat the headline in the cta, and never invent an offer, deadline or price for it.
+- The caption is posted under the picture, so it adds what the picture can't say - the details, the hours, the street - in 1-4 short sentences, without repeating the headline or the cta. At most 3 hashtags, only when they help locally (the town, the street).
 - The ads of one week differ from each other: a product up close, the place itself, a reason to come today, a date coming up, the people behind it, a habit worth starting.
 - Respect every rule under "Never in these ads". The owner's own words there win.
 - What the owner loved, approved, rewrote and turned down before is the best guide to what they want. Do more of what they loved, write the way they rewrote, avoid what they turned down and why.
 - Never invent facts that matter: no prices, offers, discounts, awards or events the brief doesn't give. If the brief has no offer, the ad needs none.
 - Write in the language the brief names. Serbian ads in the alphabet it names, with correct diacritics.
 
-The image prompt is for a photo generator, in English. Describe one photorealistic photo that would make this ad stop a thumb: the subject, the setting, the light, the angle, the mood, and the brand colours as accents where they fit naturally. If photos of the place or products were attached, describe what is really there so the picture looks like this business. Never ask for text, letters, words, logos, signs with writing or watermarks in the picture - the words go in the caption. Avoid hands holding things up close and crowds of faces; they come out wrong.
+The image prompt is for a photo generator, in English. It describes one specific scene, never a general mood: name the exact item this ad is about (the burek, the flat white, the croissant with sour cherry), what is around it, the place (the counter, the window table, the street outside), the light (side light from the window, warm evening bulbs), the angle and the small imperfections that make a photo real (crumbs, a half-finished cup, a dusting of flour). The style is honest documentary food and lifestyle photography, the way a good local photographer would shoot it on a 35mm lens: natural colour, shallow depth of field, not glossy, not over-saturated, not a stock photo, no fantasy light. Skip the clichés - a lone cup of tea on a wooden table, a bokeh café, steam swirls - unless the ad is exactly that. If photos of the place or products were attached, describe what is really there so the picture looks like this business, and use the brand colours only where they fit naturally.
+Leave one third of the frame calm - a soft wall, a table surface, a blurred background - because the headline and the button are laid over it, and put the subject in the rest of the frame. Say in text_position whether that calm third is at the top or at the bottom. Never ask the generator for text, letters, words, numbers, logos, menus, signs with writing or watermarks: the words are added afterwards. Avoid hands holding things up close and crowds of faces; they come out wrong.
+accent_color is the one colour of the button and the small line above the headline: a hex like #E8742A taken from the brand's colours when the brief gives them, otherwise a warm colour that suits the business. It must be light or bright enough to stand out on a dark photo.
 
 Pick a posting time on one of the given days that suits the ad and the channel: breakfast and coffee in the morning, lunch around noon, evenings for dinner and going out, weekends for families - always inside the opening hours, never on a closed day. Spread the ads over the week.`;
 
@@ -484,16 +490,19 @@ function copySchema(channels: string[], days: string[]) {
         items: {
           type: "object",
           additionalProperties: false,
-          required: ["channel", "format", "post_on", "post_time", "idea", "headline", "caption", "image_prompt"],
+          required: ["channel", "format", "post_on", "post_time", "idea", "headline", "cta", "caption", "image_prompt", "text_position", "accent_color"],
           properties: {
             channel: { type: "string", enum: [...new Set(channels)] },
             format: { type: "string", enum: formats },
             post_on: { type: "string", enum: days },
             post_time: { type: "string", description: "HH:MM, 24-hour, local time." },
             idea: { type: "string", description: "Why this ad, this day - one line in English, for the team." },
-            headline: { type: "string" },
+            headline: { type: "string", description: "3-7 words, written on the picture." },
+            cta: { type: "string", description: "The button: 2-4 words." },
             caption: { type: "string" },
             image_prompt: { type: "string" },
+            text_position: { type: "string", enum: ["top", "bottom"], description: "Where the calm third of the picture is." },
+            accent_color: { type: "string", description: "Hex colour like #E8742A." },
           },
         },
       },
@@ -755,6 +764,12 @@ async function writeCopy(run: Run, log: Log) {
       caption: String(a.caption || "").slice(0, 2200),
       idea: String(a.idea || "").slice(0, 500),
       image_prompt: String(a.image_prompt || "").slice(0, 2000) || `A photorealistic photo for a ${p.vertical || "local business"}, no text.`,
+      overlay: {
+        name: String(p.business_name || "").slice(0, 60),
+        cta: String(a.cta || "").slice(0, 40),
+        position: a.text_position === "top" ? "top" : "bottom",
+        accent: /^#[0-9a-f]{6}$/i.test(a.accent_color || "") ? a.accent_color : null,
+      },
       scheduled_at: localToUtc(day, time).toISOString(),
     };
   });
@@ -832,6 +847,139 @@ ${lines.map((l, i) => `<text x="64" y="${Math.round(top + i * 92)}" font-family=
 </svg>`;
   return new TextEncoder().encode(svg);
 }
+
+/* ------------------------------------------------------------------ */
+/* The words on the picture. Higgsfield makes a clean photo; the        */
+/* headline, the call-to-action button and the business's name are      */
+/* written onto it here, so the spelling, the diacritics and the colours */
+/* are always right.                                                    */
+/* ------------------------------------------------------------------ */
+
+// --- overlay:start
+const OVERLAY_WASM = "https://unpkg.com/@resvg/resvg-wasm@2.6.2/index_bg.wasm";
+const OVERLAY_FONT = "https://cdn.jsdelivr.net/npm/@expo-google-fonts/inter@0.2.3/Inter_700Bold.ttf";
+const OVERLAY_WIDTH = 1080;
+
+let overlayWasm: Promise<void> | null = null;
+let overlayFont: Promise<Uint8Array> | null = null;
+
+function overlayEngine() {
+  if (!overlayWasm) {
+    overlayWasm = fetch(OVERLAY_WASM)
+      .then((r) => { if (!r.ok) throw new Error("renderer " + r.status); return r.arrayBuffer(); })
+      .then((buf) => initWasm(buf))
+      .catch((err) => { overlayWasm = null; throw err; });
+  }
+  if (!overlayFont) {
+    overlayFont = fetch(OVERLAY_FONT)
+      .then((r) => { if (!r.ok) throw new Error("font " + r.status); return r.arrayBuffer(); })
+      .then((buf) => new Uint8Array(buf))
+      .catch((err) => { overlayFont = null; throw err; });
+  }
+  return Promise.all([overlayWasm, overlayFont]).then(([, font]) => font);
+}
+
+function xml(s: string) {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&apos;" }[c]!));
+}
+
+function base64(bytes: Uint8Array) {
+  let out = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) out += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(out);
+}
+
+// Inter Bold is about 0.6 em wide per character; wide enough to be safe.
+function wrapLines(text: string, size: number, maxWidth: number) {
+  const lines: string[] = [];
+  for (const word of text.split(/\s+/).filter(Boolean)) {
+    const last = lines[lines.length - 1];
+    if (last && (last + " " + word).length * size * 0.6 <= maxWidth) lines[lines.length - 1] = last + " " + word;
+    else lines.push(word);
+  }
+  return lines;
+}
+
+function fitHeadline(text: string, maxWidth: number) {
+  for (let size = 108; size >= 56; size -= 4) {
+    const lines = wrapLines(text, size, maxWidth);
+    if (lines.length <= 3 && lines.every((l) => l.length * size * 0.6 <= maxWidth)) return { size, lines };
+  }
+  return { size: 56, lines: wrapLines(text, 56, maxWidth).slice(0, 4) };
+}
+
+function inkOn(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 150 ? "#111111" : "#ffffff";
+}
+
+function overlaySvg(o: {
+  photo: string; ratio: [number, number]; headline: string; cta: string; name: string;
+  position: "top" | "bottom"; accent: string;
+}) {
+  const w = OVERLAY_WIDTH;
+  const h = Math.round((w * o.ratio[1]) / o.ratio[0]);
+  const tall = h / w > 1.7; // stories: keep clear of the app's own buttons
+  const margin = 72;
+  const safeTop = tall ? 270 : 72;
+  const safeBottom = tall ? 360 : 84;
+  const { size, lines } = fitHeadline(o.headline, w - margin * 2);
+  const lineH = Math.round(size * 1.1);
+  const headH = (lines.length - 1) * lineH + Math.round(size * 1.05);
+  const bar = 8, barGap = 30, ctaGap = 46, pillH = 92, ctaSize = 40;
+  const groupH = bar + barGap + headH + (o.cta ? ctaGap + pillH : 0);
+  const top = o.position === "top";
+  const groupTop = top ? safeTop : h - safeBottom - groupH;
+  const headTop = groupTop + bar + barGap;
+  const pillW = Math.round(o.cta.length * ctaSize * 0.6 + 96);
+  const pillY = headTop + headH + ctaGap;
+  const nameY = top ? h - safeBottom : safeTop - 14;
+  const name = o.name.length > 30 ? o.name.slice(0, 29) + "…" : o.name;
+
+  const scrimMain = top
+    ? `<rect x="0" y="0" width="${w}" height="${Math.round(h * 0.62)}" fill="url(#shadeTop)"/>`
+    : `<rect x="0" y="${Math.round(h * 0.38)}" width="${w}" height="${Math.round(h * 0.62)}" fill="url(#shadeBottom)"/>`;
+  const scrimName = top
+    ? `<rect x="0" y="${h - 300}" width="${w}" height="300" fill="url(#shadeBottom)" opacity="0.55"/>`
+    : `<rect x="0" y="0" width="${w}" height="${safeTop + 120}" fill="url(#shadeTop)" opacity="0.55"/>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+<defs>
+<linearGradient id="shadeBottom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.55" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0.84"/></linearGradient>
+<linearGradient id="shadeTop" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.55" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0.84"/></linearGradient>
+</defs>
+<image href="${o.photo}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/>
+${scrimMain}
+${scrimName}
+<rect x="${margin}" y="${groupTop}" width="104" height="${bar}" rx="${bar / 2}" fill="${o.accent}"/>
+${lines.map((l, i) => `<text x="${margin}" y="${headTop + Math.round(size * 0.86) + i * lineH}" font-family="Inter" font-weight="700" font-size="${size}" fill="#ffffff">${xml(l)}</text>`).join("\n")}
+${o.cta ? `<rect x="${margin}" y="${pillY}" width="${pillW}" height="${pillH}" rx="${pillH / 2}" fill="${o.accent}"/>
+<text x="${margin + pillW / 2}" y="${pillY + Math.round(pillH / 2 + ctaSize * 0.36)}" text-anchor="middle" font-family="Inter" font-weight="700" font-size="${ctaSize}" fill="${inkOn(o.accent)}">${xml(o.cta)}</text>` : ""}
+${name ? `<text x="${margin}" y="${nameY}" font-family="Inter" font-weight="700" font-size="30" letter-spacing="5" fill="#ffffff" fill-opacity="0.92">${xml(name.toUpperCase())}</text>` : ""}
+</svg>`;
+}
+
+// The finished ad as a PNG, or null when there is nothing to write on it.
+async function composeAd(job: Job, photo: Uint8Array, type: string) {
+  const headline = String(job.headline || "").trim();
+  if (!headline) return null;
+  const o = job.overlay || {};
+  const [aw, ah] = String(job.aspect_ratio).split(":").map(Number);
+  const accent = /^#[0-9a-f]{6}$/i.test(o.accent || "") ? o.accent : "#F5A524";
+  const svg = overlaySvg({
+    photo: `data:${type};base64,${base64(photo)}`,
+    ratio: [aw || 4, ah || 5],
+    headline,
+    cta: String(o.cta || "").trim(),
+    name: String(o.name || "").trim(),
+    position: o.position === "top" ? "top" : "bottom",
+    accent,
+  });
+  const font = await overlayEngine();
+  const resvg = new Resvg(svg, { font: { fontBuffers: [font], defaultFontFamily: "Inter", loadSystemFonts: false } });
+  return resvg.render().asPng();
+}
+// --- overlay:end
 
 async function store(job: Job, bytes: Uint8Array, type: string) {
   const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/svg+xml": "svg" }[type] || "png";
@@ -916,21 +1064,37 @@ async function poll(job: Job) {
   }
   const img = await fetch(src);
   if (!img.ok) throw new Error(`fetching the image: ${img.status}`);
-  const type = (img.headers.get("content-type") || "image/png").split(";")[0].trim();
-  const url = await store(job, new Uint8Array(await img.arrayBuffer()), type);
+  let type = (img.headers.get("content-type") || "image/png").split(";")[0].trim();
+  let bytes = new Uint8Array(await img.arrayBuffer());
+  let overlayError: string | null = null;
+  try {
+    // The headline and the button go onto the photo. If that fails the plain
+    // photo still goes out; the reason is kept in last_error.
+    const ad = await composeAd(job, bytes, type);
+    if (ad) { bytes = ad; type = "image/png"; }
+  } catch (err) {
+    overlayError = "Text not added to the picture: " + (err as Error).message;
+    console.error(overlayError);
+  }
+  const url = await store(job, bytes, type);
   // Logged once the picture is safely ours, so a retried fetch isn't counted twice.
   await logCost({
     user_id: job.user_id, drop_id: job.drop_id, job_id: job.id, provider: "higgsfield", model: HF_MODEL,
     step: "image", units: 1, cost_usd: HF_PRICE,
     note: HF_PRICE ? `request ${job.hf_request_id}` : `request ${job.hf_request_id}; price not set (HIGGSFIELD_USD_PER_IMAGE)`,
   });
-  await updateJob(job, { image_url: url, status: claude ? "checking" : "ready", hf_request_id: null });
+  await updateJob(job, {
+    image_url: url, status: claude ? "checking" : "ready", hf_request_id: null,
+    ...(overlayError ? { last_error: overlayError.slice(0, 1000) } : {}),
+  });
   return "done";
 }
 
 const CHECK_SYSTEM = `You check the pictures made for a small local business's social media ads before the owner sees them. Be the owner's critical eye: would they be glad to post this?
 
-Score 1-10. Below ${PASS_SCORE} means it should be made again. Mark it down hard for: any text, letters, logos or watermarks in the picture; warped hands, faces, food or objects; anything that breaks the business's rules; a picture that doesn't fit the business or the ad; a cheap stock-photo look; anything unappetising or unsafe. When it falls short, write a better prompt for the photo generator that fixes what's wrong while keeping the idea.`;
+The picture is a finished ad: the headline, a call-to-action button and the business's name were written onto the photo afterwards, and they are meant to be there. Read them: they must match the words you are given, be spelled right and be easy to read.
+
+Score 1-10. Below ${PASS_SCORE} means it should be made again. Mark it down hard for: any other text, letters, numbers, logos or watermarks that the photo itself shows; the headline or button hard to read or covering the main subject; warped hands, faces, food or objects; anything that breaks the business's rules; a photo that doesn't fit the business or the ad; a cheap stock-photo look; anything unappetising or unsafe. When it falls short, write a better prompt for the photo generator (a prompt for the photo only, never asking for text) that fixes what's wrong while keeping the idea.`;
 
 const CHECK_SCHEMA = {
   type: "object",
@@ -958,7 +1122,9 @@ async function check(job: Job, p: Profile, log: Log) {
         {
           type: "text",
           text: `Business: ${p.business_name || ""}, a ${p.vertical || "local business"} in ${p.city || "town"}. Sells: ${p.what_you_sell || ""}.` +
-            `\nAd for ${job.channel} (${job.format}): "${job.headline}" - ${job.caption}` +
+            `\nAd for ${job.channel} (${job.format}). Headline on the picture: "${job.headline}"` +
+            (job.overlay?.cta ? `, button: "${job.overlay.cta}"` : "") +
+            `. Caption under it: ${job.caption}` +
             `\nThe idea: ${job.idea || ""}\nThe prompt that made it: ${job.image_prompt}` +
             (rules.length ? `\nThe business's rules: ${rules.join(" ")}` : ""),
         },
