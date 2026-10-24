@@ -1157,12 +1157,13 @@ async function check(job: Job, p: Profile, log: Log) {
 async function imageStep(log: Log, started: number) {
   // Too late in this call for a check: those wait for the next one.
   const statuses = Date.now() - started > LAST_CHECK_MS ? ["queued", "running"] : ["queued", "running", "checking"];
-  const claimed = await db.rpc("engine_claim_jobs", { p_statuses: statuses, p_limit: 8, p_hold: 180 });
+  const claimed = await db.rpc("engine_claim_jobs", { p_statuses: statuses, p_limit: 4, p_hold: 180 });
   if (claimed.error) throw new Error(claimed.error.message);
   const jobs: Job[] = claimed.data || [];
   const profiles = new Map<string, Profile>();
   let waiting = false;
-  await Promise.all(jobs.map(async (job) => {
+  // One at a time: drawing the text onto a photo is heavy, and three at once ran the function out of memory.
+  for (const job of jobs) await (async () => {
     try {
       if (job.status === "queued") {
         await submit(job, log);
@@ -1195,7 +1196,7 @@ async function imageStep(log: Log, started: number) {
         await db.from("engine_jobs").update({ locked_until: null, last_error: msg.slice(0, 1000) }).eq("id", job.id);
       }
     }
-  }));
+  })();
   return { worked: jobs.length > 0, waiting };
 }
 
