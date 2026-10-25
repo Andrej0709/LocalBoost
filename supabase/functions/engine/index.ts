@@ -572,7 +572,7 @@ function channelPlan(p: Profile, count: number, offset: number) {
   return out;
 }
 
-function briefText(p: Profile, week: string, days: string[], weather: string[] | null, dates: string[], liked: string[]) {
+function briefText(p: Profile, look: BrandLook, week: string, days: string[], weather: string[] | null, dates: string[], liked: string[]) {
   const note = p.next_week_note && p.next_week_note_at &&
       Date.now() - new Date(p.next_week_note_at).getTime() < 14 * 86400000
     ? p.next_week_note : null;
@@ -605,6 +605,7 @@ function briefText(p: Profile, week: string, days: string[], weather: string[] |
       p.brand_colors && `Colours: ${p.brand_colors}`,
       `Language of the ads: ${language}`,
     ]),
+    lookText(look, serbian(p)),
     section("Never in these ads", [...avoid, p.avoid_notes && `In the owner's own words (wins over the rest): ${p.avoid_notes}`]),
     section("This week", [
       `Week starting Monday ${week}.`,
@@ -616,6 +617,316 @@ function briefText(p: Profile, week: string, days: string[], weather: string[] |
     dates.length ? section("Dates worth an ad around now", dates) : "",
     liked.length ? section("What the owner made of earlier ads (newest first)", liked) : "",
   ].filter(Boolean).join("\n\n");
+}
+
+/* ------------------------------------------------------------------ */
+/* The brand look. Each business gets its own way its ads look - a      */
+/* photo style, a font pair, its colours, a voice and the layouts that   */
+/* suit it - chosen once from its logo, photos and brief and kept in     */
+/* profiles.brand_look, so its ads look like its own week after week     */
+/* and two businesses in the same town don't look like the same agency.  */
+/* It is made again only when the logo, colours, vibe or type change.    */
+/* ------------------------------------------------------------------ */
+
+const PHOTO_STYLES: Record<string, { label: string; brief: string }> = {
+  bright_airy: { label: "Svetlo i prozračno",
+    brief: "Bright and airy: soft diffused daylight, white and pale surfaces (light marble, white linen, pale wood), lots of clean space, gentle pastel tones, light soft shadows." },
+  warm_rustic: { label: "Toplo i rustično",
+    brief: "Warm and rustic: warm wood, stone, linen and earthenware, golden late-afternoon window light from the side, rich earthy browns, creams and terracotta." },
+  dark_moody: { label: "Tamno i dramatično",
+    brief: "Dark and moody: deep dark backgrounds (slate, dark wood, charcoal), one low directional light, deep shadows and glowing highlights - chiaroscuro, like a fine-dining menu shoot." },
+  clean_modern: { label: "Čisto i moderno",
+    brief: "Clean and modern: a seamless solid backdrop in one of the brand's colours or a soft neutral, crisp hard light with graphic shadows, one or two props at most, a design-magazine look." },
+  bold_color: { label: "Jake boje",
+    brief: "Bold and colourful: saturated colour-blocked backdrops in the brand's colours, a complementary second colour, bright hard light, cheerful and graphic, pop-art energy." },
+  documentary: { label: "Pravo mesto, prirodno",
+    brief: "Real and documentary: the real place as it is - the counter, the terrace, the window, the street outside - natural available light, candid and lived-in but tidy, a little film grain, like a good photographer's own Instagram rather than a studio." },
+  fresh_natural: { label: "Sveže i prirodno",
+    brief: "Fresh and natural: by a window or outdoors with green plants, raw fresh ingredients around the product, dappled daylight, greens and natural tones, crisp and healthy." },
+  quiet_luxury: { label: "Tihi luksuz",
+    brief: "Quiet luxury: travertine, stone and neutral linen, a soft window shadow falling across the set, very few objects, a lot of empty space, a muted refined palette." },
+};
+
+const VOICES: Record<string, { label: string; brief: string }> = {
+  neighbourly: { label: "Komšijski i topao", brief: "warm and neighbourly - like the owner talking to a regular across the counter" },
+  witty: { label: "Duhovit", brief: "light and witty - a small wink or a play on words, never forced" },
+  refined: { label: "Elegantan i miran", brief: "calm and refined - few words, well chosen, nothing loud" },
+  direct: { label: "Direktan", brief: "short and direct - what, when, where, no fuss" },
+  youthful: { label: "Mladalački", brief: "young and casual - the way their younger customers text each other" },
+  homely: { label: "Domaćinski", brief: "homely and traditional - like grandma's kitchen, proud of how things were always made" },
+};
+
+type BrandLook = {
+  key: string;            // what it was made from; a change makes a new one
+  made: "claude" | "practice";
+  photo_style: string;
+  photo_direction: string; // this business's own set, surfaces, props and light
+  fonts: string;
+  palette: string[];      // the brand's colours, the strongest first
+  accent: string;
+  paper: string;          // the light card's background
+  paper_ink: string;      // the text on it
+  voice: string;
+  voice_notes: string;
+  address: "ti" | "vi";   // Serbian: speaks to people as "ti" or "Vi"
+  layouts: string[];
+  summary: string;        // one line for the team
+  at: string;
+  tried?: string;         // when Claude last failed to make it
+};
+
+// What the look is made from. When this changes, the look is made again.
+function lookKey(p: Profile, files: { kind: string; path: string }[]) {
+  const logo = files.find((f) => f.kind === "logo")?.path.split("/").pop() || "";
+  return [p.vertical, p.brand_vibe, p.brand_colors, logo].map((x) => String(x || "").trim().toLowerCase()).join("|");
+}
+
+// The other businesses of the same kind in the same town, and their looks, so
+// a new look can be told apart from them.
+async function neighbourLooks(p: Profile, userId: string) {
+  if (!p.city) return [];
+  const res = await db.from("profiles").select("id, city, vertical, brand_look")
+    .neq("id", userId).not("brand_look", "is", null).limit(400);
+  const here = cityKey(p.city);
+  return (res.data || [])
+    .filter((r) => cityKey(r.city || "") === here && r.brand_look)
+    .sort((a, b) => Number(b.vertical === p.vertical) - Number(a.vertical === p.vertical))
+    .slice(0, 12)
+    .map((r) => ({ vertical: r.vertical, ...(r.brand_look as BrandLook) }));
+}
+
+function hashOf(s: string) {
+  let h = 2166136261;
+  for (const ch of s) { h ^= ch.codePointAt(0)!; h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+
+// Colours written in the brief: hex codes, or plain colour words in Serbian and English.
+const COLOUR_WORDS: [RegExp, string][] = [
+  [/bordo|burgund|maroon|wine/, "#7A1F2B"], [/crven|red\b/, "#C8372D"], [/narand|orang/, "#E8742A"],
+  [/žut|zut|yellow/, "#E9B526"], [/zlat|gold/, "#C9A045"], [/maslin|olive/, "#6B7A3A"],
+  [/tamnozelen|dark green|forest/, "#1F4D3A"], [/zelen|green/, "#3E8E5A"], [/tirkiz|teal|turquo/, "#1F8A8A"],
+  [/teget|navy/, "#1D2B4F"], [/plav|blue/, "#2F6FDE"], [/ljubič|ljubic|purple|violet|lila/, "#6E4BA8"],
+  [/roze|pink|rozi/, "#E58BA8"], [/braon|smeđ|smedj|brown|čokolad|cokolad|chocolate|kafen/, "#6B4430"],
+  [/bež|bez\b|beige|krem|cream/, "#E8DCC6"], [/crn|black/, "#1A1A1A"], [/bel[aoi]?\b|white/, "#FFFFFF"],
+  [/siv|grey|gray/, "#7C7C7C"],
+];
+
+function briefColours(text: string | null | undefined) {
+  const s = String(text || "").toLowerCase();
+  const out: string[] = [];
+  for (const m of s.matchAll(/#[0-9a-f]{6}\b/g)) out.push(m[0].toUpperCase());
+  for (const [re, hex] of COLOUR_WORDS) if (re.test(s) && !out.includes(hex)) out.push(hex);
+  return out;
+}
+
+// The colour to draw small touches in: the strongest colour that isn't
+// nearly white, black or grey.
+function vividOnes(palette: string[]) {
+  return palette.filter((c) => {
+    const [r, g, b] = rgb(c);
+    return Math.max(r, g, b) - Math.min(r, g, b) > 40 && luma(c) > 40 && luma(c) < 225;
+  });
+}
+function pickAccent(palette: string[]) {
+  return vividOnes(palette)[0] || "#C9822B";
+}
+
+// The light card: a soft tint of the brand colour, or a deep one for a dark brand.
+function cardColours(palette: string[], style: string) {
+  const accent = pickAccent(palette);
+  if (style === "dark_moody" || (style === "quiet_luxury" && luma(palette[0] || "#fff") < 60)) {
+    const paper = mix(palette.find((c) => luma(c) < 70) || "#1A1714", "#000000", 0.2);
+    return { paper, paper_ink: "#F7F2EA" };
+  }
+  return { paper: mix(accent, "#FFFFFF", 0.9), paper_ink: mix(accent, "#000000", 0.78) };
+}
+
+// Without a Claude key: a look picked by rule from the type of business, the
+// brief's colours and words, and a hash of the account, steering clear of
+// the neighbours' combinations.
+function practiceLook(p: Profile, key: string, taken: { photo_style: string; fonts: string }[]): BrandLook {
+  const text = `${p.vertical || ""} ${p.brand_vibe || ""} ${p.what_you_sell || ""}`.toLowerCase();
+  const pick = (rules: [RegExp, string[]][], fallback: string[]) => {
+    for (const [re, list] of rules) if (re.test(text)) return list;
+    return fallback;
+  };
+  const styles = pick([
+    [/luks|luxur|fine|elegan|vino|wine/, ["quiet_luxury", "dark_moody"]],
+    [/grill|roštilj|rostilj|burger|pizza|street|brza|fast/, ["dark_moody", "bold_color", "documentary"]],
+    [/sladoled|ice cream|slatk|candy|deč|dec|kids|bubble/, ["bold_color", "bright_airy"]],
+    [/zdrav|health|juice|sok|vegan|salat|organ/, ["fresh_natural", "clean_modern", "bright_airy"]],
+    [/pekar|bakery|hleb|bread|burek|pit[ae]|domać|domac|tradic|kafan/, ["warm_rustic", "documentary"]],
+    [/torte|kolač|kolac|cake|poslast|patiss|pastry/, ["bright_airy", "quiet_luxury", "warm_rustic"]],
+    [/kaf|coffee|café|cafe|kafić|kafic/, ["documentary", "warm_rustic", "clean_modern", "bright_airy"]],
+    [/salon|frizer|beauty|kozmet|nail|barber|berber/, ["clean_modern", "quiet_luxury"]],
+  ], Object.keys(PHOTO_STYLES));
+  const pairs = pick([
+    [/luks|luxur|fine|elegan|vino|wine/, ["elegant", "heritage"]],
+    [/grill|roštilj|rostilj|burger|pizza|street|brza|fast|barber|berber/, ["bold", "modern"]],
+    [/sladoled|ice cream|slatk|candy|deč|dec|kids|bubble/, ["playful", "handmade"]],
+    [/zdrav|health|juice|sok|vegan|salat|organ|salon|beauty|gym|teretan/, ["modern", "elegant"]],
+    [/pekar|bakery|hleb|bread|burek|pit[ae]|domać|domac|tradic|kafan/, ["traditional", "warm"]],
+    [/torte|kolač|kolac|cake|poslast|patiss|pastry/, ["handmade", "elegant", "warm"]],
+    [/kaf|coffee|café|cafe|kafić|kafic/, ["classic", "warm", "modern", "heritage"]],
+  ], Object.keys(FONT_PAIRS));
+  const h = hashOf(String(p.id || p.email || key));
+  // The first combination, from this account's own starting point, that no neighbour has.
+  let photo_style = styles[h % styles.length], fonts = pairs[(h >> 4) % pairs.length];
+  outer: for (let i = 0; i < styles.length; i++) {
+    for (let j = 0; j < pairs.length; j++) {
+      const s = styles[(h + i) % styles.length], f = pairs[((h >> 4) + j) % pairs.length];
+      if (!taken.some((t) => t.photo_style === s && t.fonts === f)) { photo_style = s; fonts = f; break outer; }
+    }
+  }
+  const found = briefColours(p.brand_colors);
+  const palette = found.length ? found.slice(0, 4) : [["#C9822B", "#2F6FDE", "#3E8E5A", "#C8372D", "#6E4BA8"][h % 5]];
+  const voice = /luks|luxur|fine|elegan/.test(text) ? "refined"
+    : /tradic|domać|domac|kafan|pekar|bakery/.test(text) ? "homely"
+    : /mlad|young|student|street/.test(text) ? "youthful"
+    : ["neighbourly", "witty", "direct"][(h >> 8) % 3];
+  const all = DROP_LAYOUTS;
+  const layouts = [all[h % 4], all[(h + 1) % 4], all[(h + 2) % 4]];
+  return {
+    key, made: "practice", photo_style, fonts,
+    photo_direction: "", palette, accent: pickAccent(palette), ...cardColours(palette, photo_style),
+    voice, voice_notes: "", address: "vi", layouts,
+    summary: `${PHOTO_STYLES[photo_style].label}, ${FONT_PAIRS[fonts].label}, ${VOICES[voice].label.toLowerCase()} (practice)`,
+    at: new Date().toISOString(),
+  };
+}
+
+const LOOK_SYSTEM = `You are the art director of a small agency that makes the weekly social media ads for local businesses - cafés, bakeries, restaurants, shops, salons - in the Balkans. Before the first ad, you set each business's own look: the way all its ads will look and sound, week after week, so they feel like this business and nobody else.
+
+Look hard at what you are given: the logo, the owner's photos of the place and the products, the photos from their website, the menu and the brief. The look must come from what is really there - the colours of the logo and the interior, the crockery they really use, the tiles, the wood, the light in the room, the kind of customer - not from what is usual for the type of business.
+
+Choose:
+- photo_style: the one photo style that suits this business best.
+- photo_direction: 2-4 sentences for the photographer, specific to this business: the surfaces, the materials and the colours of their real place (as seen in their photos), the props that belong there, the light and the mood. Use it to make their photos unmistakably theirs. In English.
+- fonts: the typeface pair that suits their logo and their character.
+- palette: 2-4 hex colours of the brand, the strongest first - taken from the logo and the place itself (and the colours the brief names). Never invent colours that aren't theirs; a logo that is black on white gets black plus one colour of the place.
+- accent: the one colour for small touches (a thin line, an arrow), from the palette - one that reads on a photo.
+- paper and paper_ink: the light card the headline sometimes sits on (a soft tint that suits the brand, or a deep one for a dark brand) and the text colour on it, with strong contrast.
+- voice and voice_notes: how the ads talk. voice_notes says in 1-2 sentences in English how they speak - the words they would use, how short, how playful - based on the brief, their website and menu.
+- address: whether Serbian ads say "ti" or "Vi" to people. Young, casual, street places say "ti"; refined places, pharmacies, family restaurants and most others say "Vi".
+- layouts: 2 or 3 of the text layouts that suit the brand.
+- summary: one line in English for the team, naming what makes this look theirs.
+
+Two businesses of the same kind in the same town must not look alike. You are told the looks the neighbours already have: give this business a different combination of photo style and fonts, and a clearly different feel, unless nothing else would fit it at all.`;
+
+function lookSchema() {
+  return {
+    type: "object",
+    additionalProperties: false,
+    required: ["photo_style", "photo_direction", "fonts", "palette", "accent", "paper", "paper_ink", "voice", "voice_notes", "address", "layouts", "summary"],
+    properties: {
+      photo_style: { type: "string", enum: Object.keys(PHOTO_STYLES) },
+      photo_direction: { type: "string" },
+      fonts: { type: "string", enum: Object.keys(FONT_PAIRS) },
+      palette: { type: "array", items: { type: "string", description: "Hex like #2F6FDE." } },
+      accent: { type: "string", description: "Hex like #E8742A." },
+      paper: { type: "string", description: "Hex." },
+      paper_ink: { type: "string", description: "Hex." },
+      voice: { type: "string", enum: Object.keys(VOICES) },
+      voice_notes: { type: "string" },
+      address: { type: "string", enum: ["ti", "vi"] },
+      layouts: { type: "array", items: { type: "string", enum: DROP_LAYOUTS } },
+      summary: { type: "string" },
+    },
+  };
+}
+
+// The look Claude chose, made safe: every value one the engine can draw.
+function cleanLook(out: any, key: string, fallback: BrandLook): BrandLook {
+  const hex = (x: any) => HEX.test(String(x || "")) ? String(x).toUpperCase() : null;
+  const palette = (Array.isArray(out.palette) ? out.palette : []).map(hex).filter(Boolean).slice(0, 4) as string[];
+  const pal = palette.length ? palette : fallback.palette;
+  const style = PHOTO_STYLES[out.photo_style] ? out.photo_style : fallback.photo_style;
+  const card = cardColours(pal, style);
+  let paper = hex(out.paper) || card.paper, paperInk = hex(out.paper_ink) || card.paper_ink;
+  if (Math.abs(luma(paper) - luma(paperInk)) < 110) { paper = card.paper; paperInk = card.paper_ink; }
+  const layouts = [...new Set((Array.isArray(out.layouts) ? out.layouts : []).filter((l: string) => DROP_LAYOUTS.includes(l)))] as string[];
+  return {
+    key, made: "claude",
+    photo_style: style,
+    photo_direction: String(out.photo_direction || "").slice(0, 900),
+    fonts: FONT_PAIRS[out.fonts] ? out.fonts : fallback.fonts,
+    palette: pal,
+    accent: hex(out.accent) || pickAccent(pal),
+    paper, paper_ink: paperInk,
+    voice: VOICES[out.voice] ? out.voice : fallback.voice,
+    voice_notes: String(out.voice_notes || "").slice(0, 500),
+    address: out.address === "ti" ? "ti" : "vi",
+    layouts: layouts.length >= 2 ? layouts : fallback.layouts,
+    summary: String(out.summary || "").slice(0, 300),
+    at: new Date().toISOString(),
+  };
+}
+
+// The business's look: the one kept on the profile while it still fits the
+// brief, otherwise a new one (Claude's when there is a key, else by rule).
+// files are the brand files already signed for this drop.
+async function brandLook(p: Profile, userId: string, files: { kind: string; url: string; pdf: boolean; path: string }[], cost: Record<string, unknown>) {
+  const key = lookKey(p, files);
+  const held = p.brand_look as BrandLook | null;
+  // A practice look is replaced by Claude's as soon as there is a key; one
+  // Claude couldn't make waits a week before the next try.
+  const waiting = held?.tried && Date.now() - new Date(held.tried).getTime() < 7 * 86400000;
+  if (held && held.key === key && (held.made === "claude" || !claude || waiting)) return { look: held, made: false };
+  const neighbours = await neighbourLooks(p, userId);
+  const fallback = practiceLook(p, key, neighbours);
+  let look = fallback, made = false;
+  if (claude) {
+    try {
+      const content: any[] = [];
+      for (const f of files) {
+        content.push({ type: "text", text: f.kind === "logo" ? "Their logo:" : f.kind === "menu" ? "Their menu:" : f.kind === "site" ? "From their website:" : "The owner's own photo:" });
+        content.push(f.pdf ? { type: "document", source: { type: "url", url: f.url }, title: "Menu" } : { type: "image", source: { type: "url", url: f.url } });
+      }
+      content.push({ type: "text", text: [
+        `Business: ${p.business_name || "(no name)"}, a ${p.vertical || "local business"} in ${p.city || "(town not given)"}.`,
+        `What they sell: ${p.what_you_sell || "(not given)"}`,
+        p.typical_customer && `Typical customer: ${p.typical_customer}`,
+        p.differentiator && `What makes them different: ${p.differentiator}`,
+        p.brand_vibe && `The vibe the owner wants: ${p.brand_vibe}`,
+        p.brand_colors && `The colours the owner named: ${p.brand_colors}`,
+        p.website && `Website / Instagram: ${p.website}`,
+        "",
+        "Photo styles:", ...Object.entries(PHOTO_STYLES).map(([k, s]) => `- ${k}: ${s.brief}`),
+        "", "Font pairs:", ...Object.entries(FONT_PAIRS).map(([k, s]) => `- ${k}: ${s.when}`),
+        "", "Voices:", ...Object.entries(VOICES).map(([k, s]) => `- ${k}: ${s.brief}`),
+        "", "Text layouts:", ...DROP_LAYOUTS.map((k) => `- ${k}: ${LAYOUTS[k].when}`),
+        "",
+        neighbours.length
+          ? "Looks other businesses in the same town already have (the same kind first) - make this one different:\n" +
+            neighbours.map((n) => `- a ${n.vertical || "business"}: ${n.photo_style}, ${n.fonts}, ${n.voice}, colours ${(n.palette || []).join(" ")}`).join("\n")
+          : "No other business in this town has a look yet.",
+      ].filter((x) => typeof x === "string").join("\n") });
+      const out = await askClaude({ system: LOOK_SYSTEM, content, schema: lookSchema(), effort: "medium", maxTokens: 6000, cost, step: "copy" });
+      look = cleanLook(out, key, fallback);
+      made = true;
+    } catch (err) {
+      // The ads still go out this week, in the look made by rule; Claude's is tried next week.
+      console.error("brand look: " + (err as Error).message);
+      look = { ...fallback, tried: new Date().toISOString() };
+    }
+  }
+  const res = await db.from("profiles").update({ brand_look: look }).eq("id", userId);
+  // Not saved (the column isn't there yet): use it for this drop and go on to
+  // the ads in the same call, so it isn't paid for again on every call.
+  if (res.error) { console.error("brand look not saved: " + res.error.message); made = false; }
+  return { look, made };
+}
+
+function lookText(look: BrandLook, sr: boolean) {
+  return [
+    "## The brand look (keep every ad inside it - it is what makes this business's ads its own)",
+    `Photo style: ${PHOTO_STYLES[look.photo_style]?.brief || ""}`,
+    look.photo_direction && `Their own set: ${look.photo_direction}`,
+    `Voice: ${VOICES[look.voice]?.brief || ""}.${look.voice_notes ? " " + look.voice_notes : ""}`,
+    sr ? `Speak to people as "${look.address === "ti" ? "ti" : "Vi"}"${look.address === "vi" ? " (with a capital V)" : ""} in every ad, the same way every time.` : null,
+    `Brand colours: ${look.palette.join(", ")}.`,
+  ].filter(Boolean).join("\n");
 }
 
 /* ------------------------------------------------------------------ */
@@ -638,26 +949,31 @@ What makes an ad work here:
 The image prompt is for a photo generator, in English. Write it the way a top advertising agency's art director briefs a commercial food and product photographer for a paid campaign: one specific, deliberate scene, never a general mood.
 - The hero: name the exact item this ad is about (the burek, the flat white, the croissant with sour cherry) and make it the one clear focal point, filling a good part of the frame, fresh and at its very best - glossy where it should shine, golden where it should be baked, a full cup with clean foam, a just-poured juice.
 - Every piece of food is whole, perfect and untouched. Nothing is bitten, torn, broken, squashed, crumbled or half-eaten; no bite marks, no ragged pieces. When the inside matters (the layers of a burek, the crumb of a loaf, the filling of a pastry), show it with one clean, precise knife cut next to the whole piece, the way a stylist would.
-- The set: a styled, tidy, deliberate composition - a clean surface that suits the business (marble, light linen, warm wood, the café counter), at most two or three props that belong with the product (a linen napkin folded neatly, a few raw ingredients arranged with intent, a matching ceramic plate), real ceramic plates, cups and glassware - never paper plates or plastic cups unless the business really serves takeaway. A harmonious colour palette that suits the brand.
+- The look: every image follows the business's own photo style and set under "The brand look" - its surfaces, materials, colours, props, light and mood. That look is what makes this business's ads recognisably its own and different from every other business's, so never fall back on a generic look (the same marble and linen for everyone). Inside it, vary the scene from ad to ad.
+- The set: a styled, tidy, deliberate composition in that look, at most two or three props that belong with the product and the place, real plates, cups and glassware - never paper plates or plastic cups unless the business really serves takeaway.
 - Nothing used, spilled or left over: no used napkins or tissues, no spills, drips or stains, no stray crumbs, no dirty dishes, no wrappers, no tea bag tags, no receipts, no phones, no clutter.
-- Camera and light: name the angle (a low three-quarter hero angle, straight-on at table height, or a clean overhead flat lay), the lens look (85mm or 100mm macro, shallow depth of field, sharp focus on the product, softly blurred background) and the light (soft directional window light or a large softbox, gentle shadows, a subtle rim light on the product). Colours true and appetising, crisp texture detail, high-end magazine and billboard quality.
+- Camera and light: name the angle (a low three-quarter hero angle, straight-on at table height, a clean overhead flat lay, a wider shot of the place), the lens look and the light - all as the photo style asks (a dark moody style gets one low hard light, a bright airy one soft daylight, a documentary one the light that is really there). Colours true and appetising, crisp texture detail, high-end magazine quality.
 - It is still a real photograph of this real business: believable, not CGI, not plastic, not over-saturated, not a generic stock photo. Skip the clichés - a lone cup on a wooden table, a bokeh café, steam swirls - unless the ad is exactly that.
 - If photos of the place or products were attached, describe what is really there so the picture looks like this business, and use the brand colours only where they fit naturally.
 The generator makes up letters on anything that could carry print, and they come out as nonsense words (a cup that says "Laffe"). So say that every cup, glass, plate, bag, box and bottle is plain and unbranded with nothing printed on it, and keep menus, signs, boards, labels, packaging with writing, books, newspapers and screens out of the frame - except the real product from a reference photo, which keeps its own real packaging.
 Leave one third of the frame calm - a soft wall, a table surface, a blurred background - because a few small words are laid over it, and put the subject in the rest of the frame. Say in text_position whether that calm third is at the top or at the bottom. Never ask the generator for text, letters, words, numbers, logos, menus, signs with writing or watermarks: the words are added afterwards. Avoid hands holding things up close and crowds of faces; they come out wrong.
 
 product_photo: when the ad is about one product that is shown in one of the business's own photos (labelled P1, P2... above the brief - from their website or what they uploaded), give that label. The real photo then goes to the generator, which places that exact product into your scene, so it looks the same as in real life. Pick it only when the photo clearly shows that one product well and the ad is about it; otherwise leave it empty. With a product_photo, the image prompt describes the scene, the set, the light and the angle around "the product from the reference photo" - never re-describe the product's look, so the generator keeps it as it really is. Use the real product photos in most of the week's ads when they fit.
-accent_color is the one small touch of colour in the layout (the arrow, a thin line): a hex like #E8742A taken from the brand's colours when the brief gives them, otherwise a warm colour that suits the business.
+own_photo: the business's own photo used as the picture itself, with no generator at all - the realest ad there is. Give the label of one of the owner's uploaded photos (only those marked "uploaded by the owner") when it is sharp, well lit, well framed, shows the place, the people or the product at its best, and has a calm part for the words; then the image prompt is not used, so just describe the photo in it. Use one or two of the owner's own photos a week when they are that good, never a blurry, dark, cluttered or badly framed one, and never the same photo two weeks running. Leave it empty otherwise.
+
+accent_color is the one small touch of colour in the layout (the arrow, a thin line), from the brand's colours.
+
+The voice: every headline, cta and caption speaks in the brand's voice under "The brand look", and Serbian ads always say "ti" or "Vi" to people as it says.
 
 Pick a posting time on one of the given days that suits the ad and the channel: breakfast and coffee in the morning, lunch around noon, evenings for dinner and going out, weekends for families - always inside the opening hours, never on a closed day. Spread the ads over the week.`;
 
 // The layouts Claude picks from, read when the prompt is sent (they are defined further down).
 function layoutGuide() {
-  return "\n\nlayout is how the words sit on the picture. Pick the one that suits the ad, and give the ads of one week different layouts:\n" +
+  return "\n\nlayout is how the words sit on the picture. Pick, from the layouts this brand uses, the one that suits the ad, and give the ads of one week different layouts:\n" +
     DROP_LAYOUTS.map((k) => `- ${k}: ${LAYOUTS[k].when}`).join("\n");
 }
 
-function copySchema(channels: string[], days: string[]) {
+function copySchema(channels: string[], days: string[], look: BrandLook, ownLabels: string[]) {
   const formats = [...new Set(channels.flatMap((c) => FORMATS[c].map((f) => f.format)))];
   return {
     type: "object",
@@ -670,7 +986,7 @@ function copySchema(channels: string[], days: string[]) {
         items: {
           type: "object",
           additionalProperties: false,
-          required: ["channel", "format", "post_on", "post_time", "idea", "headline", "cta", "caption", "image_prompt", "text_position", "layout", "accent_color"],
+          required: ["channel", "format", "post_on", "post_time", "idea", "headline", "cta", "caption", "image_prompt", "text_position", "layout", "accent_color", "product_photo", "own_photo"],
           properties: {
             channel: { type: "string", enum: [...new Set(channels)] },
             format: { type: "string", enum: formats },
@@ -682,8 +998,10 @@ function copySchema(channels: string[], days: string[]) {
             caption: { type: "string" },
             image_prompt: { type: "string" },
             text_position: { type: "string", enum: ["top", "bottom"], description: "Where the calm third of the picture is." },
-            layout: { type: "string", enum: DROP_LAYOUTS, description: "How the words are laid out on the picture." },
-            accent_color: { type: "string", description: "Hex colour like #E8742A." },
+            layout: { type: "string", enum: look.layouts, description: "How the words are laid out on the picture." },
+            accent_color: { type: "string", enum: [...new Set([look.accent, ...vividOnes(look.palette)])] },
+            product_photo: { type: "string", description: "P1, P2... or empty." },
+            own_photo: { type: "string", enum: ["", ...ownLabels], description: "The owner's own photo used as the picture, or empty." },
           },
         },
       },
@@ -896,17 +1214,29 @@ async function writeCopy(run: Run, log: Log) {
   let ads: any[];
   // The business's own product photos Claude may put into an ad, by label.
   const refs = new Map<string, string>();
+  // The owner's own photos that can be the picture itself (JPEG and PNG: the
+  // renderer reads no WebP).
+  const own: string[] = [];
+  // Once per drop: fresh product photos from the business's website.
+  if (claude && !written.length) await siteProducts(run.user_id, p.website).catch((e) => console.error("website: " + e.message));
+  const files = await brandFiles(run.user_id);
+  // The business's look, made once. A new one made by Claude takes a call of
+  // its own; the week's ads are written on the next go, inside it.
+  const { look, made } = await brandLook(p, run.user_id, files, cost);
+  if (made) {
+    await db.from("engine_runs").update({ locked_until: null }).eq("drop_id", run.drop_id);
+    return;
+  }
   if (claude) {
-    // Once per drop: fresh product photos from the business's website.
-    if (!written.length) await siteProducts(run.user_id, p.website).catch((e) => console.error("website: " + e.message));
-    const [weather, dates, liked, files] = await Promise.all([
-      forecast(p, days), datesAhead(p, days), feedback(run.user_id, run.drop_id), brandFiles(run.user_id),
+    const [weather, dates, liked] = await Promise.all([
+      forecast(p, days), datesAhead(p, days), feedback(run.user_id, run.drop_id),
     ]);
     const content: any[] = [];
     for (const f of files) {
       if (f.kind === "photos" || f.kind === "site") {
         const label = `P${refs.size + 1}`;
         refs.set(label, f.path);
+        if (f.kind === "photos" && /\.(jpe?g|png)$/i.test(f.path)) own.push(label);
         const named = f.kind === "site" ? f.path.split("/").pop()!.replace(/^\d+-|\.[a-z]+$/g, "") : "";
         content.push({ type: "text", text: `${label} - ${f.kind === "site" ? `from their website (file name "${named}")` : "uploaded by the owner"}:` });
       }
@@ -918,7 +1248,7 @@ async function writeCopy(run: Run, log: Log) {
       content.push({ type: "text", text: `Above: the business's own ${[...new Set(files.map((f) => f.kind === "site" ? "photos from their website" : f.kind))].join(", ")} - look at what is really there and what they really sell.` +
         (refs.size ? ` P1-P${refs.size} can go into an ad as product_photo when one clearly shows the product the ad is about; a picture of the place, a person, a logo or a banner can't.` : "") });
     }
-    content.push({ type: "text", text: briefText(p, drop.data.week_starting, days, weather, dates, liked), cache_control: { type: "ephemeral" } });
+    content.push({ type: "text", text: briefText(p, look, drop.data.week_starting, days, weather, dates, liked), cache_control: { type: "ephemeral" } });
     const tally: Record<string, number> = {};
     channels.forEach((c) => { tally[c] = (tally[c] || 0) + 1; });
     content.push({
@@ -929,7 +1259,7 @@ async function writeCopy(run: Run, log: Log) {
           : ""),
     });
     const out = await askClaude({
-      system: COPY_SYSTEM + layoutGuide(), content, schema: copySchema(channels, days), effort: CLAUDE_EFFORT,
+      system: COPY_SYSTEM + layoutGuide(), content, schema: copySchema(channels, days, look, own), effort: CLAUDE_EFFORT,
       maxTokens: 16000, cost, step: "copy",
     });
     theme = out.theme || null;
@@ -941,6 +1271,8 @@ async function writeCopy(run: Run, log: Log) {
   if (!ads.length) throw new Error("No ads came back.");
 
   const rows = ads.map((a, i) => {
+    const ownLabel = String(a.own_photo || "").trim().toUpperCase();
+    const ownPath = own.includes(ownLabel) ? refs.get(ownLabel) || null : null;
     const channel = FORMATS[a.channel] ? a.channel : channels[i];
     const format = FORMATS[channel].find((f) => f.format === a.format) || FORMATS[channel][0];
     const day = days.includes(a.post_on) ? a.post_on : days[i % days.length];
@@ -960,10 +1292,14 @@ async function writeCopy(run: Run, log: Log) {
         name: String(p.business_name || "").slice(0, 60),
         cta: String(a.cta || "").slice(0, 40),
         position: a.text_position === "top" ? "top" : "bottom",
-        layout: DROP_LAYOUTS.includes(a.layout) ? a.layout : DROP_LAYOUTS[(written.length + i) % DROP_LAYOUTS.length],
-        accent: /^#[0-9a-f]{6}$/i.test(a.accent_color || "") ? a.accent_color : null,
+        layout: look.layouts.includes(a.layout) ? a.layout : look.layouts[(written.length + i) % look.layouts.length],
+        accent: HEX.test(a.accent_color || "") ? a.accent_color : look.accent,
+        // The business's look: its typefaces and the light card's colours.
+        fonts: look.fonts, paper: look.paper, paper_ink: look.paper_ink,
         // The owner's own photo of the product, placed into the scene by the generator.
-        ref: refs.get(String(a.product_photo || "").trim().toUpperCase()) || null,
+        ref: ownPath ? null : refs.get(String(a.product_photo || "").trim().toUpperCase()) || null,
+        // The owner's own photo used as the picture itself, with no generator.
+        own: ownPath,
       },
       scheduled_at: localToUtc(day, time).toISOString(),
     };
@@ -1033,8 +1369,10 @@ function practiceImage(job: Job) {
     else lines.push(word);
   }
   const top = height / 2 - (lines.length * 92) / 2;
+  // In the brand's own colour, so practice drops already show each business's look.
+  const accent = HEX.test(job.overlay?.accent || "") ? job.overlay.accent : "#57405F";
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b2432"/><stop offset="1" stop-color="#57405f"/></linearGradient></defs>
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${mix(accent, "#000000", 0.75)}"/><stop offset="1" stop-color="${mix(accent, "#000000", 0.35)}"/></linearGradient></defs>
 <rect width="100%" height="100%" fill="url(#g)"/>
 <text x="64" y="104" font-family="Helvetica, Arial, sans-serif" font-size="30" letter-spacing="4" fill="#ffffff" fill-opacity="0.6">${escapeXml(job.channel.toUpperCase())} · ${escapeXml(job.format.toUpperCase())}</text>
 ${lines.map((l, i) => `<text x="64" y="${Math.round(top + i * 92)}" font-family="Helvetica, Arial, sans-serif" font-size="78" font-weight="700" fill="#ffffff">${escapeXml(l)}</text>`).join("\n")}
@@ -1057,26 +1395,118 @@ ${lines.map((l, i) => `<text x="64" y="${Math.round(top + i * 92)}" font-family=
 
 const OVERLAY_WASM = "https://unpkg.com/@resvg/resvg-wasm@2.6.2/index_bg.wasm";
 const OVERLAY_FONT_CDN = "https://cdn.jsdelivr.net/npm/@expo-google-fonts";
-// Static Google Fonts with Latin, Serbian diacritics and Cyrillic.
+// Static Google Fonts. Every one has Serbian Latin (č ć š ž đ) and Serbian
+// Cyrillic (ђ ћ џ љ њ); checked October 2026.
+const fontUrl = (pkg: string, file: string) => `${OVERLAY_FONT_CDN}/${pkg}@0.2.3/${file}.ttf`;
 const OVERLAY_FONTS: Record<string, string> = {
-  "Inter 400": `${OVERLAY_FONT_CDN}/inter@0.2.3/Inter_400Regular.ttf`,
-  "Inter 600": `${OVERLAY_FONT_CDN}/inter@0.2.3/Inter_600SemiBold.ttf`,
-  "Inter 700": `${OVERLAY_FONT_CDN}/inter@0.2.3/Inter_700Bold.ttf`,
-  "Playfair 400i": `${OVERLAY_FONT_CDN}/playfair-display@0.2.3/PlayfairDisplay_400Regular_Italic.ttf`,
-  "Playfair 600": `${OVERLAY_FONT_CDN}/playfair-display@0.2.3/PlayfairDisplay_600SemiBold.ttf`,
+  "Inter 600": fontUrl("inter", "Inter_600SemiBold"),
+  "Inter 700": fontUrl("inter", "Inter_700Bold"),
+  "Playfair 400i": fontUrl("playfair-display", "PlayfairDisplay_400Regular_Italic"),
+  "Playfair 600": fontUrl("playfair-display", "PlayfairDisplay_600SemiBold"),
+  "Manrope 500": fontUrl("manrope", "Manrope_500Medium"),
+  "Manrope 600": fontUrl("manrope", "Manrope_600SemiBold"),
+  "Manrope 700": fontUrl("manrope", "Manrope_700Bold"),
+  "Manrope 800": fontUrl("manrope", "Manrope_800ExtraBold"),
+  "Nunito 600": fontUrl("nunito", "Nunito_600SemiBold"),
+  "Nunito 700": fontUrl("nunito", "Nunito_700Bold"),
+  "Nunito 800": fontUrl("nunito", "Nunito_800ExtraBold"),
+  "Lora 400i": fontUrl("lora", "Lora_400Regular_Italic"),
+  "Lora 600": fontUrl("lora", "Lora_600SemiBold"),
+  "Montserrat 500": fontUrl("montserrat", "Montserrat_500Medium"),
+  "Montserrat 600": fontUrl("montserrat", "Montserrat_600SemiBold"),
+  "Cormorant 500i": fontUrl("cormorant-garamond", "CormorantGaramond_500Medium_Italic"),
+  "Cormorant 600": fontUrl("cormorant-garamond", "CormorantGaramond_600SemiBold"),
+  "Rubik 500": fontUrl("rubik", "Rubik_500Medium"),
+  "Rubik 600": fontUrl("rubik", "Rubik_600SemiBold"),
+  "Oswald 500": fontUrl("oswald", "Oswald_500Medium"),
+  "Oswald 600": fontUrl("oswald", "Oswald_600SemiBold"),
+  "Comfortaa 700": fontUrl("comfortaa", "Comfortaa_700Bold"),
+  "PT Sans 700": fontUrl("pt-sans", "PTSans_700Bold"),
+  "PT Serif 400i": fontUrl("pt-serif", "PTSerif_400Regular_Italic"),
+  "PT Serif 700": fontUrl("pt-serif", "PTSerif_700Bold"),
+  "Raleway 600": fontUrl("raleway", "Raleway_600SemiBold"),
+  "Raleway 700": fontUrl("raleway", "Raleway_700Bold"),
+  "Caveat 600": fontUrl("caveat", "Caveat_600SemiBold"),
+  "Caveat 700": fontUrl("caveat", "Caveat_700Bold"),
+  "EB Garamond 500i": fontUrl("eb-garamond", "EBGaramond_500Medium_Italic"),
+  "EB Garamond 600": fontUrl("eb-garamond", "EBGaramond_600SemiBold"),
 };
 const OVERLAY_WIDTH = 1080;
 
-type Face = { font: string; family: string; weight: number; italic?: boolean; cap: number };
-const FACE: Record<string, Face> = {
-  text: { font: "Inter 400", family: "Inter", weight: 400, cap: 0.73 },
-  semi: { font: "Inter 600", family: "Inter", weight: 600, cap: 0.73 },
-  bold: { font: "Inter 700", family: "Inter", weight: 700, cap: 0.73 },
-  serif: { font: "Playfair 600", family: "Playfair Display", weight: 600, cap: 0.71 },
-  italic: { font: "Playfair 400i", family: "Playfair Display", weight: 400, italic: true, cap: 0.71 },
-};
+// cap is the height of a capital letter as a share of the size, read from the
+// font file when it is loaded. scale makes a face that looks small at the same
+// size (a script, a light Garamond) as big as the others.
+type Face = { font: string; family: string; weight: number; italic?: boolean; cap: number; scale?: number };
+// The roles a layout writes in: semi for small words (the name, the call to
+// action, a quiet headline), bold for a punchy one, serif and italic for the
+// display headline of the card and the magazine layouts.
+type Role = "semi" | "bold" | "serif" | "italic";
+const mkFace = (key: string, family: string, weight: number, extra: Partial<Face> = {}): Face =>
+  ({ font: key, family, weight, cap: 0.72, ...extra });
 
-type Metrics = { upm: number; advance: (cp: number) => number };
+// Each business gets one of these pairs and keeps it, so its ads look like its
+// own, and two businesses side by side don't share a typeface.
+const FONT_PAIRS: Record<string, { label: string; when: string; faces: Record<Role, Face> }> = {
+  classic: {
+    label: "Klasika (Inter + Playfair)",
+    when: "a classic serif headline over a clean sans: cafés, patisseries, all-round places that want to feel good-looking and timeless",
+    faces: { semi: mkFace("Inter 600", "Inter", 600), bold: mkFace("Inter 700", "Inter", 700),
+      serif: mkFace("Playfair 600", "Playfair Display", 600), italic: mkFace("Playfair 400i", "Playfair Display", 400, { italic: true }) },
+  },
+  modern: {
+    label: "Moderno (Manrope)",
+    when: "one modern geometric sans for everything: specialty coffee, juice and health bars, salons, gyms, design shops",
+    faces: { semi: mkFace("Manrope 600", "Manrope", 600), bold: mkFace("Manrope 800", "Manrope", 800),
+      serif: mkFace("Manrope 700", "Manrope", 700), italic: mkFace("Manrope 500", "Manrope", 500) },
+  },
+  warm: {
+    label: "Toplo (Nunito + Lora)",
+    when: "a soft rounded sans with a warm bookish serif: family bakeries, pastry shops, breakfast places, neighbourhood cafés",
+    faces: { semi: mkFace("Nunito 600", "Nunito", 600), bold: mkFace("Nunito 800", "Nunito", 800),
+      serif: mkFace("Lora 600", "Lora", 600), italic: mkFace("Lora 400i", "Lora", 400, { italic: true }) },
+  },
+  elegant: {
+    label: "Elegantno (Montserrat + Cormorant)",
+    when: "a fine high-contrast serif with a wide sans: wine bars, fine dining, cake ateliers, florists, beauty",
+    faces: { semi: mkFace("Montserrat 500", "Montserrat", 500), bold: mkFace("Montserrat 600", "Montserrat", 600),
+      serif: mkFace("Cormorant 600", "Cormorant Garamond", 600, { scale: 1.16 }),
+      italic: mkFace("Cormorant 500i", "Cormorant Garamond", 500, { italic: true, scale: 1.16 }) },
+  },
+  bold: {
+    label: "Snažno (Rubik + Oswald)",
+    when: "a tall condensed headline with a sturdy sans: burgers, grills, pizza, street food, sports bars, barbers",
+    faces: { semi: mkFace("Rubik 500", "Rubik", 500), bold: mkFace("Rubik 600", "Rubik", 600),
+      serif: mkFace("Oswald 600", "Oswald", 600, { scale: 1.08 }), italic: mkFace("Oswald 500", "Oswald", 500, { scale: 1.08 }) },
+  },
+  playful: {
+    label: "Razigrano (Nunito + Comfortaa)",
+    when: "round friendly letters: ice cream, sweets, kids' places, bubble tea, colourful and cheerful brands",
+    faces: { semi: mkFace("Nunito 700", "Nunito", 700), bold: mkFace("Nunito 800", "Nunito", 800),
+      serif: mkFace("Comfortaa 700", "Comfortaa", 700, { scale: 0.94 }), italic: mkFace("Comfortaa 700", "Comfortaa", 700, { scale: 0.94 }) },
+  },
+  traditional: {
+    label: "Tradicionalno (PT Sans + PT Serif)",
+    when: "a sturdy traditional serif: kafanas, bakeries with a long history, butchers, family restaurants, local produce",
+    faces: { semi: mkFace("PT Sans 700", "PT Sans", 700), bold: mkFace("PT Sans 700", "PT Sans", 700),
+      serif: mkFace("PT Serif 700", "PT Serif", 700), italic: mkFace("PT Serif 400i", "PT Serif", 400, { italic: true }) },
+  },
+  handmade: {
+    label: "Ručno (Raleway + Caveat)",
+    when: "a handwritten headline with a light sans: home-made cakes, small craft shops, cosy cafés, brunch places",
+    faces: { semi: mkFace("Raleway 600", "Raleway", 600), bold: mkFace("Raleway 700", "Raleway", 700),
+      serif: mkFace("Caveat 700", "Caveat", 700, { scale: 1.32 }), italic: mkFace("Caveat 600", "Caveat", 600, { scale: 1.32 }) },
+  },
+  heritage: {
+    label: "Nasleđe (Manrope + EB Garamond)",
+    when: "a classic book Garamond with a clean sans: delis, wine shops, old-town restaurants, bookshops, quiet premium places",
+    faces: { semi: mkFace("Manrope 600", "Manrope", 600), bold: mkFace("Manrope 800", "Manrope", 800),
+      serif: mkFace("EB Garamond 600", "EB Garamond", 600, { scale: 1.1 }),
+      italic: mkFace("EB Garamond 500i", "EB Garamond", 500, { italic: true, scale: 1.1 }) },
+  },
+};
+const DEFAULT_PAIR = "classic";
+
+type Metrics = { upm: number; cap: number; advance: (cp: number) => number };
 type LoadedFont = { bytes: Uint8Array; metrics: Metrics };
 
 let overlayWasm: Promise<void> | null = null;
@@ -1148,8 +1578,12 @@ function fontMetrics(bytes: Uint8Array): Metrics {
     return 0;
   };
   const seen = new Map<number, number>();
+  // OS/2 version 2 and up says how tall a capital letter is.
+  const os2 = tables["OS/2"];
+  const capUnits = os2 && v.getUint16(os2) >= 2 ? v.getInt16(os2 + 88) : 0;
   return {
     upm,
+    cap: capUnits > 0 ? capUnits / upm : 0.72,
     advance: (cp: number) => {
       let a = seen.get(cp);
       if (a === undefined) {
@@ -1204,6 +1638,8 @@ type Ctx = {
   w: number; h: number; tall: boolean; margin: number; safeTop: number; safeBottom: number;
   top: boolean; dark: boolean; ink: string;
   headline: string; cta: string; name: string; accent: string;
+  // The business's own typefaces, and the light card's paper and ink.
+  f: Record<Role, Face>; paper: string; paperInk: string; muted: string;
   width: (face: Face, text: string, size: number, spacing?: number) => number;
 };
 
@@ -1220,6 +1656,8 @@ function wrapText(c: Ctx, face: Face, text: string, size: number, maxW: number, 
 // The biggest size from max down to min that fits in maxLines, with the lines
 // evened out so no word is left alone on the last one.
 function fitText(c: Ctx, face: Face, text: string, max: number, min: number, maxW: number, maxLines: number, spacing = 0) {
+  const k = face.scale || 1;
+  max = Math.round(max * k / 2) * 2; min = Math.round(min * k / 2) * 2;
   let size = min, lines = wrapText(c, face, text, min, maxW, spacing);
   for (let s = max; s >= min; s -= 2) {
     const l = wrapText(c, face, text, s, maxW, spacing);
@@ -1256,8 +1694,17 @@ function shade(c: Ctx, height: number, strength: number) {
     : `<rect x="0" y="${c.h - hgt}" width="${c.w}" height="${hgt}" fill="url(#fadeUp)" opacity="${strength}"/>`;
 }
 
+// The call to action with a small drawn arrow after it (drawn, so it looks the
+// same in every typeface - most of them have no arrow of their own).
 function arrowCta(c: Ctx, face: Face, size: number, x: number, y: number, fill: string, arrow: string, extra = "") {
-  return textEl(face, size, x, y, fill, `${xml(c.cta)}<tspan dx="${Math.round(size * 0.4)}" fill="${arrow}">→</tspan>`, extra);
+  const ax = x + c.width(face, c.cta, size) + size * 0.42, ay = y - size * face.cap * 0.5;
+  const len = size * 0.78, head = size * 0.26, sw = Math.max(2, size * 0.085);
+  const path = `<path d="M${r(ax)} ${r(ay)}H${r(ax + len)}M${r(ax + len - head)} ${r(ay - head)}L${r(ax + len)} ${r(ay)}L${r(ax + len - head)} ${r(ay + head)}" ` +
+    `fill="none" stroke="${arrow}" stroke-width="${r(sw)}" stroke-linecap="round" stroke-linejoin="round"${extra}/>`;
+  return textEl(face, size, x, y, fill, xml(c.cta), extra) + "\n" + path;
+}
+function arrowWidth(size: number) {
+  return size * 1.2;
 }
 
 /* Layouts. Each one draws over a 1080-wide photo and returns the SVG on top. */
@@ -1266,13 +1713,13 @@ type Layout = {
   label: string;      // the name in the lab
   hint: string;       // when to use it, for the lab
   when: string;       // when to use it, for Claude
-  fonts: string[];
+  roles: Role[];      // the typefaces it writes in
   draw: (c: Ctx) => string;
 };
 
 // A small headline and a quiet line under it, in a corner.
 function drawQuiet(c: Ctx) {
-  const face = FACE.semi;
+  const face = c.f.semi;
   const head = fitText(c, face, c.headline, 50, 38, 640, 2);
   const lh = Math.round(head.size * 1.14);
   const headH = (head.lines.length - 1) * lh + head.size * face.cap;
@@ -1284,36 +1731,36 @@ function drawQuiet(c: Ctx) {
   return [
     c.dark ? shade(c, edge + 220, 0.45) : "",
     linesEl(face, head.size, head.lines, c.margin, y0 + head.size * face.cap, lh, c.ink, lift),
-    c.cta ? arrowCta(c, FACE.semi, ctaSize, c.margin, y0 + headH + gap + ctaH, c.ink, readable(c.accent, c.dark), lift) : "",
+    c.cta ? arrowCta(c, c.f.semi, ctaSize, c.margin, y0 + headH + gap + ctaH, c.ink, readable(c.accent, c.dark), lift) : "",
   ].join("\n");
 }
 
 // A light card in a corner, like a label on a menu.
 function drawCard(c: Ctx) {
-  const pad = 44, inkC = "#1C1915", muted = "#8C8378";
+  const pad = 44, inkC = c.paperInk, muted = c.muted;
   const maxText = Math.min(c.w * 0.62, 620) - pad * 2;
   const nameSize = 21, nameSp = 3.5, ctaSize = 28;
   const name = c.name.toUpperCase();
-  const head = fitText(c, FACE.serif, c.headline, 46, 34, maxText, 2);
+  const head = fitText(c, c.f.serif, c.headline, 46, 34, maxText, 2);
   const lh = Math.round(head.size * 1.16);
-  const headH = (head.lines.length - 1) * lh + head.size * FACE.serif.cap;
-  const nameW = name ? c.width(FACE.semi, name, nameSize, nameSp) : 0;
-  const ctaW = c.cta ? c.width(FACE.semi, c.cta + " →", ctaSize) + ctaSize * 0.4 : 0;
+  const headH = (head.lines.length - 1) * lh + head.size * c.f.serif.cap;
+  const nameW = name ? c.width(c.f.semi, name, nameSize, nameSp) : 0;
+  const ctaW = c.cta ? c.width(c.f.semi, c.cta, ctaSize) + ctaSize * 0.42 + arrowWidth(ctaSize) : 0;
   const cardW = Math.max(320, Math.min(maxText, Math.max(head.widest, nameW, ctaW))) + pad * 2;
-  const nameH = name ? nameSize * FACE.semi.cap + 26 : 0;
-  const ctaH = c.cta ? 34 + ctaSize * FACE.semi.cap : 0;
+  const nameH = name ? nameSize * c.f.semi.cap + 26 : 0;
+  const ctaH = c.cta ? 34 + ctaSize * c.f.semi.cap : 0;
   const cardH = pad + nameH + headH + ctaH + pad + 4;
   const x = c.margin, y = c.top ? c.safeTop : c.h - c.safeBottom - cardH;
   const tx = x + pad;
   let ty = y + pad;
-  const out = [`<rect x="${x}" y="${r(y)}" width="${r(cardW)}" height="${r(cardH)}" rx="26" fill="#FBF8F2" fill-opacity="0.9" filter="url(#float)"/>`];
+  const out = [`<rect x="${x}" y="${r(y)}" width="${r(cardW)}" height="${r(cardH)}" rx="26" fill="${c.paper}" fill-opacity="0.92" filter="url(#float)"/>`];
   if (name) {
-    out.push(textEl(FACE.semi, nameSize, tx, ty + nameSize * FACE.semi.cap, muted, xml(name), ` letter-spacing="${nameSp}"`));
+    out.push(textEl(c.f.semi, nameSize, tx, ty + nameSize * c.f.semi.cap, muted, xml(name), ` letter-spacing="${nameSp}"`));
     ty += nameH;
   }
-  out.push(linesEl(FACE.serif, head.size, head.lines, tx, ty + head.size * FACE.serif.cap, lh, inkC));
+  out.push(linesEl(c.f.serif, head.size, head.lines, tx, ty + head.size * c.f.serif.cap, lh, inkC));
   ty += headH;
-  if (c.cta) out.push(arrowCta(c, FACE.semi, ctaSize, tx, ty + 34 + ctaSize * FACE.semi.cap, inkC, readable(c.accent, false)));
+  if (c.cta) out.push(arrowCta(c, c.f.semi, ctaSize, tx, ty + 34 + ctaSize * c.f.semi.cap, inkC, readable(c.accent, false)));
   return out.join("\n");
 }
 
@@ -1322,17 +1769,17 @@ function drawEditorial(c: Ctx) {
   const cx = c.w / 2, mid = ` text-anchor="middle"`;
   const lift = c.dark ? LIFT : "";
   const name = c.name.toUpperCase(), nameSize = 22, nameSp = 6;
-  const head = fitText(c, FACE.italic, c.headline, 62, 44, c.w * 0.74, 2);
+  const head = fitText(c, c.f.italic, c.headline, 62, 44, c.w * 0.74, 2);
   const lh = Math.round(head.size * 1.1);
-  const headH = (head.lines.length - 1) * lh + head.size * FACE.italic.cap;
+  const headH = (head.lines.length - 1) * lh + head.size * c.f.italic.cap;
   const ctaSize = 24, ctaSp = 4.5;
   // Each part with the space under it.
   const parts: { h: number; gap: number; draw: (y: number) => string }[] = [];
-  if (name) parts.push({ h: nameSize * FACE.semi.cap, gap: 30, draw: (y) => textEl(FACE.semi, nameSize, cx, y + nameSize * FACE.semi.cap, c.ink, xml(name), `${mid} letter-spacing="${nameSp}" fill-opacity="0.85"${lift}`) });
-  parts.push({ h: headH, gap: 34, draw: (y) => linesEl(FACE.italic, head.size, head.lines, cx, y + head.size * FACE.italic.cap, lh, c.ink, mid + lift) });
+  if (name) parts.push({ h: nameSize * c.f.semi.cap, gap: 30, draw: (y) => textEl(c.f.semi, nameSize, cx, y + nameSize * c.f.semi.cap, c.ink, xml(name), `${mid} letter-spacing="${nameSp}" fill-opacity="0.85"${lift}`) });
+  parts.push({ h: headH, gap: 34, draw: (y) => linesEl(c.f.italic, head.size, head.lines, cx, y + head.size * c.f.italic.cap, lh, c.ink, mid + lift) });
   if (c.cta) {
     parts.push({ h: 2, gap: 30, draw: (y) => `<rect x="${cx - 32}" y="${r(y)}" width="64" height="2" fill="${readable(c.accent, c.dark)}"/>` });
-    parts.push({ h: ctaSize * FACE.semi.cap, gap: 0, draw: (y) => textEl(FACE.semi, ctaSize, cx, y + ctaSize * FACE.semi.cap, c.ink, xml(c.cta.toUpperCase()), `${mid} letter-spacing="${ctaSp}"${lift}`) });
+    parts.push({ h: ctaSize * c.f.semi.cap, gap: 0, draw: (y) => textEl(c.f.semi, ctaSize, cx, y + ctaSize * c.f.semi.cap, c.ink, xml(c.cta.toUpperCase()), `${mid} letter-spacing="${ctaSp}"${lift}`) });
   }
   parts[parts.length - 1].gap = 0;
   const blockH = parts.reduce((s, p) => s + p.h + p.gap, 0);
@@ -1345,12 +1792,12 @@ function drawEditorial(c: Ctx) {
 
 // A small coloured label with the headline, for short punchy news.
 function drawTag(c: Ctx) {
-  const face = FACE.bold, padX = 30, padY = 24;
+  const face = c.f.bold, padX = 30, padY = 24;
   const head = fitText(c, face, c.headline, 42, 30, Math.min(c.w * 0.58, 600), 2);
   const lh = Math.round(head.size * 1.16);
   const boxW = head.widest + padX * 2;
   const boxH = (head.lines.length - 1) * lh + head.size * face.cap + padY * 2;
-  const ctaSize = 28, ctaGap = 30, ctaH = c.cta ? ctaGap + ctaSize * FACE.semi.cap : 0;
+  const ctaSize = 28, ctaGap = 30, ctaH = c.cta ? ctaGap + ctaSize * c.f.semi.cap : 0;
   const x = c.margin, y = c.top ? c.safeTop : c.h - c.safeBottom - boxH - ctaH;
   const lift = c.dark ? LIFT : "";
   const edge = c.top ? y + boxH + ctaH : c.h - y;
@@ -1358,7 +1805,7 @@ function drawTag(c: Ctx) {
     c.dark && c.cta ? shade(c, edge + 180, 0.4) : "",
     `<rect x="${x}" y="${r(y)}" width="${r(boxW)}" height="${r(boxH)}" rx="16" fill="${c.accent}"/>`,
     linesEl(face, head.size, head.lines, x + padX, y + padY + head.size * face.cap, lh, inkOn(c.accent)),
-    c.cta ? arrowCta(c, FACE.semi, ctaSize, x + 4, y + boxH + ctaH, c.ink, c.ink, lift) : "",
+    c.cta ? arrowCta(c, c.f.semi, ctaSize, x + 4, y + boxH + ctaH, c.ink, c.ink, lift) : "",
   ].join("\n");
 }
 
@@ -1366,14 +1813,14 @@ function drawTag(c: Ctx) {
 function drawBand(c: Ctx) {
   const inset = c.tall ? c.margin : 0;
   const barW = c.w - inset * 2, padX = c.tall ? 44 : c.margin, padY = c.tall ? 36 : 44;
-  const bg = c.dark ? "#15120F" : "#FBF8F2", fg = c.dark ? "#FFFFFF" : "#1C1915";
+  const bg = c.dark ? "#15120F" : c.paper, fg = c.dark ? "#FFFFFF" : c.paperInk;
   const ctaSize = 28, pillH = 68;
-  const pillW = c.cta ? c.width(FACE.semi, c.cta, ctaSize) + 56 : 0;
+  const pillW = c.cta ? c.width(c.f.semi, c.cta, ctaSize) + 56 : 0;
   const name = c.name.toUpperCase(), nameSize = 20, nameSp = 3;
-  const head = fitText(c, FACE.semi, c.headline, 40, 28, barW - padX * 2 - (c.cta ? pillW + 40 : 0), 2);
+  const head = fitText(c, c.f.semi, c.headline, 40, 28, barW - padX * 2 - (c.cta ? pillW + 40 : 0), 2);
   const lh = Math.round(head.size * 1.18);
-  const headH = (head.lines.length - 1) * lh + head.size * FACE.semi.cap;
-  const nameH = name ? nameSize * FACE.semi.cap + 18 : 0;
+  const headH = (head.lines.length - 1) * lh + head.size * c.f.semi.cap;
+  const nameH = name ? nameSize * c.f.semi.cap + 18 : 0;
   const contentH = Math.max(nameH + headH, c.cta ? pillH : 0);
   const barH = contentH + padY * 2;
   const y = c.top ? (c.tall ? c.safeTop : 0) : (c.tall ? c.h - c.safeBottom - barH : c.h - barH);
@@ -1381,19 +1828,19 @@ function drawBand(c: Ctx) {
   const tx = inset + padX;
   const pillFill = readable(c.accent, c.dark);
   const out = [`<rect x="${inset}" y="${r(y)}" width="${barW}" height="${r(barH)}" rx="${c.tall ? 24 : 0}" fill="${bg}" fill-opacity="0.94"/>`];
-  if (name) out.push(textEl(FACE.semi, nameSize, tx, textTop + nameSize * FACE.semi.cap, fg, xml(name), ` letter-spacing="${nameSp}" fill-opacity="0.55"`));
-  out.push(linesEl(FACE.semi, head.size, head.lines, tx, textTop + nameH + head.size * FACE.semi.cap, lh, fg));
+  if (name) out.push(textEl(c.f.semi, nameSize, tx, textTop + nameSize * c.f.semi.cap, fg, xml(name), ` letter-spacing="${nameSp}" fill-opacity="0.55"`));
+  out.push(linesEl(c.f.semi, head.size, head.lines, tx, textTop + nameH + head.size * c.f.semi.cap, lh, fg));
   if (c.cta) {
     const px = inset + barW - padX - pillW, py = y + padY + (contentH - pillH) / 2;
     out.push(`<rect x="${r(px)}" y="${r(py)}" width="${r(pillW)}" height="${pillH}" rx="${pillH / 2}" fill="${pillFill}"/>`);
-    out.push(textEl(FACE.semi, ctaSize, px + pillW / 2, py + pillH / 2 + ctaSize * FACE.semi.cap / 2, inkOn(pillFill), xml(c.cta), ` text-anchor="middle"`));
+    out.push(textEl(c.f.semi, ctaSize, px + pillW / 2, py + pillH / 2 + ctaSize * c.f.semi.cap / 2, inkOn(pillFill), xml(c.cta), ` text-anchor="middle"`));
   }
   return out.join("\n");
 }
 
 // One small spaced-out line and nothing else: the photo does the talking.
 function drawSignature(c: Ctx) {
-  const face = FACE.semi, sp = 6, cx = c.w / 2;
+  const face = c.f.semi, sp = 6, cx = c.w / 2;
   const text = c.headline.toUpperCase();
   const head = fitText(c, face, text, 32, 24, c.w - c.margin * 2 - 40, 2, sp);
   const lh = Math.round(head.size * 1.7);
@@ -1411,7 +1858,7 @@ function drawSignature(c: Ctx) {
 
 // The first layout (October 2026), kept only to compare against in the lab.
 function drawClassic(c: Ctx) {
-  const face = FACE.bold, w = c.w, h = c.h;
+  const face = c.f.bold, w = c.w, h = c.h;
   const head = fitText(c, face, c.headline, 108, 56, w - 144, 3);
   const size = head.size, lines = head.lines;
   const lineH = Math.round(size * 1.1);
@@ -1439,36 +1886,36 @@ const LAYOUTS: Record<string, Layout> = {
   quiet: {
     label: "Tiho", hint: "Mali naslov i diskretan poziv u uglu. Za svakodnevne razloge i navike.",
     when: "a small headline with a quiet call-to-action line in a corner - everyday reasons to come, habits, the hour of the day",
-    fonts: ["Inter 600"], draw: drawQuiet,
+    roles: ["semi"], draw: drawQuiet,
   },
   card: {
     label: "Kartica", hint: "Svetla kartica u uglu, kao etiketa na meniju. Za proizvod izbliza.",
     when: "a small light card in a corner with a serif headline, like a menu label - one product up close, something new on the menu",
-    fonts: ["Inter 600", "Playfair 600"], draw: drawCard,
+    roles: ["semi", "serif"], draw: drawCard,
   },
   editorial: {
     label: "Magazin", hint: "Centriran kurziv, kao stranica časopisa. Za ambijent, ljude i mesto.",
     when: "centred italic serif words like a magazine page - the place itself, the atmosphere, the people behind it, a special evening",
-    fonts: ["Inter 600", "Playfair 400i"], draw: drawEditorial,
+    roles: ["semi", "italic"], draw: drawEditorial,
   },
   tag: {
     label: "Etiketa (nije u dropu)", hint: "Mala obojena etiketa sa kratkom vešću. Vlasnik je odbio, nije u dropu.",
     when: "a small label in the accent colour holding a very short headline - news for today: the weather, the hour, fresh out of the oven",
-    fonts: ["Inter 600", "Inter 700"], draw: drawTag,
+    roles: ["semi", "bold"], draw: drawTag,
   },
   band: {
     label: "Traka (nije u dropu)", hint: "Traka uz ivicu sa dugmetom. Vlasnik je odbio, nije u dropu.",
     when: "a calm strip along the edge with the headline and a small button - a date coming up, an event, changed opening hours, booking",
-    fonts: ["Inter 600"], draw: drawBand,
+    roles: ["semi"], draw: drawBand,
   },
   signature: {
     label: "Potpis", hint: "Samo jedan tih red, bez dugmeta. Kad slika sama sve kaže.",
     when: "one small spaced-out line and no button - when the photo says it all; the call to action stays in the caption",
-    fonts: ["Inter 600"], draw: drawSignature,
+    roles: ["semi"], draw: drawSignature,
   },
   classic: {
     label: "Stari (za poređenje)", hint: "Prvi layout iz oktobra. Nije u dropu.",
-    when: "", fonts: ["Inter 700"], draw: drawClassic,
+    when: "", roles: ["bold"], draw: drawClassic,
   },
 };
 
@@ -1508,14 +1955,28 @@ type AdText = {
   headline: string; cta: string; name: string; accent: string;
   position: "top" | "bottom"; layout: string;
   photoTone?: "auto" | "dark" | "light";
+  // The business's look: its font pair and the light card's colours.
+  fonts?: string; paper?: string; paperInk?: string;
 };
+
+const HEX = /^#[0-9a-f]{6}$/i;
 
 // The finished ad as a PNG.
 async function renderAd(photo: Uint8Array, type: string, ratio: [number, number], t: AdText) {
   const layout = LAYOUTS[t.layout] || LAYOUTS[DROP_LAYOUTS[0]];
+  const pair = FONT_PAIRS[t.fonts || ""] || FONT_PAIRS[DEFAULT_PAIR];
   await overlayRenderer();
-  const fonts = await Promise.all(layout.fonts.map(overlayFont));
-  const metrics = new Map(layout.fonts.map((k, i) => [k, fonts[i].metrics] as [string, Metrics]));
+  // Only the files this layout writes in, so the renderer parses as little as it can.
+  const keys = [...new Set(layout.roles.map((role) => pair.faces[role].font))];
+  const fonts = await Promise.all(keys.map(overlayFont));
+  const metrics = new Map(keys.map((k, i) => [k, fonts[i].metrics] as [string, Metrics]));
+  const f = {} as Record<Role, Face>;
+  for (const role of Object.keys(pair.faces) as Role[]) {
+    const m = metrics.get(pair.faces[role].font);
+    f[role] = m ? { ...pair.faces[role], cap: m.cap } : pair.faces[role];
+  }
+  const paper = HEX.test(t.paper || "") ? t.paper! : "#FBF8F2";
+  const paperInk = HEX.test(t.paperInk || "") && Math.abs(luma(t.paperInk!) - luma(paper)) > 110 ? t.paperInk! : inkOn(paper) === "#FFFFFF" ? "#FFFFFF" : "#1C1915";
   const w = OVERLAY_WIDTH;
   const h = Math.round((w * ratio[1]) / ratio[0]);
   const href = `data:${type};base64,${base64(photo)}`;
@@ -1528,7 +1989,8 @@ async function renderAd(photo: Uint8Array, type: string, ratio: [number, number]
     safeTop: tall ? 270 : margin, safeBottom: tall ? 380 : margin,
     ink: dark ? "#FFFFFF" : "#17140F",
     headline: t.headline.trim(), cta: t.cta.trim(), name: t.name.trim().slice(0, 40),
-    accent: /^#[0-9a-f]{6}$/i.test(t.accent) ? t.accent : "#F5A524",
+    accent: HEX.test(t.accent) ? t.accent : "#F5A524",
+    f, paper, paperInk, muted: mix(paperInk, paper, 0.45),
     width: (face, text, size, spacing = 0) => {
       const m = metrics.get(face.font)!;
       let units = 0, n = 0;
@@ -1541,7 +2003,7 @@ async function renderAd(photo: Uint8Array, type: string, ratio: [number, number]
 <image href="${href}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/>
 ${layout.draw(c)}
 </svg>`;
-  const rv = new Resvg(svg, { font: { fontBuffers: fonts.map((f) => f.bytes), defaultFontFamily: "Inter", loadSystemFonts: false } });
+  const rv = new Resvg(svg, { font: { fontBuffers: fonts.map((x) => x.bytes), defaultFontFamily: pair.faces.semi.family, loadSystemFonts: false } });
   try {
     const img = rv.render();
     try { return img.asPng(); } finally { img.free(); }
@@ -1562,6 +2024,9 @@ async function composeAd(job: Job, photo: Uint8Array, type: string) {
     accent: String(o.accent || ""),
     position: o.position === "top" ? "top" : "bottom",
     layout: DROP_LAYOUTS.includes(o.layout) ? o.layout : DROP_LAYOUTS[0],
+    fonts: String(o.fonts || ""),
+    paper: String(o.paper || ""),
+    paperInk: String(o.paper_ink || ""),
   });
 }
 
@@ -1606,8 +2071,42 @@ function hfBody(job: Job, refUrl: string | null = null) {
   return { prompt: job.image_prompt, aspect_ratio, resolution: "1K", num_images: 1 };
 }
 
+// The owner's own photo as the picture: no generator, no cost, just the words
+// drawn onto it. Returns false when it can't be used (removed since, or too
+// big to draw in one call), and the ad is made by the generator instead.
+const OWN_MAX_BYTES = 3_500_000;
+
+async function ownPhoto(job: Job, attempts: number) {
+  const path = String(job.overlay.own);
+  const type = /\.png$/i.test(path) ? "image/png" : "image/jpeg";
+  const file = await db.storage.from(BRAND_BUCKET).download(path);
+  if (file.error || !file.data || file.data.size > OWN_MAX_BYTES) return false;
+  let bytes = new Uint8Array(await file.data.arrayBuffer());
+  let outType = type, note: string | null = null;
+  if (job.last_error === COMPOSE_MARK) {
+    note = "Text not added to the picture: the function ran out of resources drawing it.";
+  } else {
+    await db.from("engine_jobs").update({ last_error: COMPOSE_MARK }).eq("id", job.id);
+    try {
+      const ad = await composeAd(job, bytes, type);
+      if (ad) { bytes = ad; outType = "image/png"; }
+    } catch (err) {
+      note = "Text not added to the picture: " + (err as Error).message;
+    }
+  }
+  const url = await store({ ...job, attempts }, bytes, outType);
+  await updateJob(job, { attempts, image_url: url, status: claude ? "checking" : "ready", hf_request_id: null, last_error: note });
+  return true;
+}
+
+// Returns true when it drew an ad (heavy: nothing more is drawn in this call).
 async function submit(job: Job, log: Log) {
   const attempts = job.attempts + 1;
+  if (job.overlay?.own) {
+    if (await ownPhoto(job, attempts)) { log.submitted++; return true; }
+    job = { ...job, overlay: { ...job.overlay, own: null } };
+    await db.from("engine_jobs").update({ overlay: job.overlay }).eq("id", job.id);
+  }
   if (!higgsfield) {
     const url = await store({ ...job, attempts }, practiceImage(job), "image/svg+xml");
     await updateJob(job, { attempts, image_url: url, status: claude ? "checking" : "ready" });
@@ -1758,7 +2257,10 @@ async function check(job: Job, p: Profile, log: Log) {
             `\nAd for ${job.channel} (${job.format}). Headline on the picture: "${job.headline}"` +
             (job.overlay?.cta ? `, call to action: "${job.overlay.cta}"` : "") +
             `. Caption under it: ${job.caption}` +
-            `\nThe idea: ${job.idea || ""}\nThe prompt that made it: ${job.image_prompt}` +
+            `\nThe idea: ${job.idea || ""}` +
+            (job.overlay?.own
+              ? "\nThis is the business's own real photo, not a generated one: its real signs, labels, packaging and people are fine and are not marked down. Judge only whether it is good enough to post and whether our words read well on it."
+              : `\nThe prompt that made it: ${job.image_prompt}`) +
             (rules.length ? `\nThe business's rules: ${rules.join(" ")}` : ""),
         },
       ],
@@ -1774,7 +2276,8 @@ async function check(job: Job, p: Profile, log: Log) {
     ? { best_url: job.image_url, best_score: score }
     : { best_url: job.best_url, best_score: job.best_score };
   const note = problems.slice(0, 1000) || null;
-  if (score >= PASS_SCORE) {
+  // The owner's own photo isn't made again: another go would be the same photo.
+  if (score >= PASS_SCORE || job.overlay?.own) {
     await updateJob(job, { status: "ready", check_score: score, check_note: note, ...best });
   } else if (job.attempts >= IMAGE_ATTEMPTS) {
     await updateJob(job, { status: "ready", image_url: best.best_url, check_score: best.best_score, check_note: note, ...best });
@@ -1802,8 +2305,8 @@ async function imageStep(log: Log, started: number) {
     if (heavy) return void (await db.from("engine_jobs").update({ locked_until: null }).eq("id", job.id));
     try {
       if (job.status === "queued") {
-        await submit(job, log);
-        waiting = waiting || higgsfield;
+        if (await submit(job, log)) heavy = true;
+        else waiting = waiting || higgsfield;
       } else if (job.status === "running") {
         if (!higgsfield) return await updateJob(job, { status: "queued", hf_request_id: null });
         if ((await poll(job)) === "waiting") waiting = true; else heavy = true;

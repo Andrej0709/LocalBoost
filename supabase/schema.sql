@@ -2563,6 +2563,14 @@ on conflict (id) do update
    portal adds the column too - added here as well so this file runs first. */
 alter table public.profiles add column if not exists engine_paused_at timestamptz;
 
+/* The business's own look (brand_look in the engine): its photo style, font
+   pair, colours, voice and layouts, chosen once from its logo, photos and
+   brief so its ads look like its own and unlike the neighbours'. Written by
+   the engine only (the browser can't change it - protect_profile_billing
+   leaves it out of what a customer may edit); made again when the logo,
+   colours, vibe or type of business change. */
+alter table public.profiles add column if not exists brand_look jsonb;
+
 /* The accounts whose next drop is due now, with the week it is for and how
    many ads their plan gets. Due means: a running plan (a beta tester's
    included), not paused from the portal, the brief filled in, and no drop yet for the week.

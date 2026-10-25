@@ -8,12 +8,12 @@
 <style>
   :root {
     --bg: #f4f2ee; --panel: #ffffff; --ink: #1c1915; --muted: #6f675d; --line: #e3ded6;
-    --accent: #2f6fde; --chip: #eef3fd; --chip-ink: #2457b8; --off: #f3efe9; --off-ink: #6a6258;
+    --accent: #2f6fde; --on-accent: #ffffff; --chip: #eef3fd; --chip-ink: #2457b8; --off: #f3efe9; --off-ink: #6a6258;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #121110; --panel: #1b1a18; --ink: #f3f0ea; --muted: #a39b90; --line: #2c2a27;
-      --accent: #7aa7ff; --chip: #1d2a44; --chip-ink: #a9c4ff; --off: #26231f; --off-ink: #a39b90;
+      --accent: #7aa7ff; --on-accent: #0e1626; --chip: #1d2a44; --chip-ink: #a9c4ff; --off: #26231f; --off-ink: #a39b90;
     }
   }
   * { box-sizing: border-box; }
@@ -33,7 +33,7 @@
   .seg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
   .seg button { flex: 1; border: 0; background: var(--bg); color: var(--ink); padding: 8px 6px; font: inherit; font-size: 13px; cursor: pointer; }
   .seg button + button { border-left: 1px solid var(--line); }
-  .seg button.on { background: var(--accent); color: #fff; }
+  .seg button.on { background: var(--accent); color: var(--on-accent); }
   .drop { border: 1.5px dashed var(--line); border-radius: 12px; padding: 14px; text-align: center; color: var(--muted); cursor: pointer; font-size: 14px; }
   .drop.over { border-color: var(--accent); color: var(--accent); }
   .drop img { display: block; max-width: 100%; max-height: 140px; margin: 0 auto 8px; border-radius: 8px; }
@@ -98,6 +98,17 @@
         <input type="color" id="accent" value="#f5a524">
       </div>
     </div>
+    <label>Prikaz</label>
+    <div class="seg" id="view">
+      <button type="button" data-v="layouts" class="on">Rasporedi</button>
+      <button type="button" data-v="pairs">Fontovi brendova</button>
+    </div>
+    <label for="pair" id="pairLabel">Fontovi biznisa</label>
+    <select id="pair"></select>
+    <label for="layout" id="layoutLabel" hidden>Raspored</label>
+    <select id="layout" hidden></select>
+    <label for="paper">Boja kartice</label>
+    <input type="color" id="paper" value="#fbf8f2">
     <label>Tekst ide</label>
     <div class="seg" id="position">
       <button type="button" data-v="top">Gore</button>
@@ -132,7 +143,10 @@ async function loadEngine() {
   const a = src.indexOf("// --- overlay:start"), b = src.indexOf("// --- overlay:end");
   if (a < 0 || b < 0) throw new Error("u engine-u nema overlay oznaka");
   const js = ts.transpile(src.slice(a, b), { target: ts.ScriptTarget.ES2022 });
-  engine = new Function("Resvg", "initWasm", js + "\nreturn { renderAd, LAYOUTS, DROP_LAYOUTS };")(Resvg, initWasm);
+  engine = new Function("Resvg", "initWasm", js + "\nreturn { renderAd, LAYOUTS, DROP_LAYOUTS, FONT_PAIRS, DEFAULT_PAIR };")(Resvg, initWasm);
+  for (const [k, p] of Object.entries(engine.FONT_PAIRS)) $("pair").add(new Option(p.label, k, k === engine.DEFAULT_PAIR, k === engine.DEFAULT_PAIR));
+  for (const k of engine.DROP_LAYOUTS) $("layout").add(new Option(engine.LAYOUTS[k].label, k));
+  $("layout").value = "card";
 }
 
 // Photos are turned into JPEGs about the size Higgsfield sends (resvg reads JPEG and PNG, not WebP).
@@ -180,13 +194,20 @@ async function samplePhoto() {
   await addPhoto(await new Promise((r) => cv.toBlob(r, "image/png")));
 }
 
-const state = { position: "bottom", tone: "auto" };
+const state = { position: "bottom", tone: "auto", view: "layouts" };
 document.querySelectorAll(".seg").forEach((seg) => seg.addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
   seg.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
-  state[seg.id] = b.dataset.v; schedule();
+  state[seg.id] = b.dataset.v;
+  if (seg.id === "view") {
+    const pairs = state.view === "pairs";
+    $("pair").hidden = $("pairLabel").hidden = pairs;
+    $("layout").hidden = $("layoutLabel").hidden = !pairs;
+    buildGrid();
+  }
+  schedule();
 }));
-["headline", "cta", "name", "ratio", "accent"].forEach((id) => $(id).addEventListener("input", schedule));
+["headline", "cta", "name", "ratio", "accent", "paper", "pair", "layout"].forEach((id) => $(id).addEventListener("input", schedule));
 
 const drop = $("drop");
 drop.onclick = () => $("file").click();
@@ -202,19 +223,25 @@ window.addEventListener("paste", async (e) => {
   for (const it of e.clipboardData?.items || []) if (it.type.startsWith("image/")) await addPhoto(it.getAsFile());
 });
 
-// One card per layout, the ones in the drop first.
-const cards = {};
+// One card per layout (the ones in the drop first), or one per font pair: the
+// same ad as different businesses would get it.
+let cards = {};
 function buildGrid() {
-  const keys = [...engine.DROP_LAYOUTS, ...Object.keys(engine.LAYOUTS).filter((k) => !engine.DROP_LAYOUTS.includes(k))];
+  for (const c of Object.values(cards)) if (c.url) URL.revokeObjectURL(c.url);
+  cards = {};
+  $("grid").innerHTML = "";
+  const pairs = state.view === "pairs";
+  const keys = pairs ? Object.keys(engine.FONT_PAIRS)
+    : [...engine.DROP_LAYOUTS, ...Object.keys(engine.LAYOUTS).filter((k) => !engine.DROP_LAYOUTS.includes(k))];
   for (const key of keys) {
-    const L = engine.LAYOUTS[key], inDrop = engine.DROP_LAYOUTS.includes(key);
+    const inDrop = pairs || engine.DROP_LAYOUTS.includes(key);
     const el = document.createElement("article");
     el.className = "card";
     el.innerHTML = `<div class="pic"><span>…</span></div>
-      <div class="meta"><div class="top"><h3></h3><span class="chip${inDrop ? "" : " off"}">${inDrop ? "U dropu" : "Nije u dropu"}</span></div>
+      <div class="meta"><div class="top"><h3></h3>${pairs ? "" : `<span class="chip${inDrop ? "" : " off"}">${inDrop ? "U dropu" : "Nije u dropu"}</span>`}</div>
       <p></p><div class="top" style="margin-top:8px"><span class="key">${key}</span><a href="#" download>Sačuvaj PNG</a></div></div>`;
-    el.querySelector("h3").textContent = L.label;
-    el.querySelector("p").textContent = L.hint;
+    el.querySelector("h3").textContent = pairs ? engine.FONT_PAIRS[key].label : engine.LAYOUTS[key].label;
+    el.querySelector("p").textContent = pairs ? "Za: " + engine.FONT_PAIRS[key].when : engine.LAYOUTS[key].hint;
     el.querySelector(".pic").onclick = () => { const u = cards[key].url; if (u) { $("bigImg").src = u; $("big").showModal(); } };
     $("grid").append(el);
     cards[key] = { el, url: null };
@@ -232,19 +259,20 @@ async function renderAll() {
   $("grid").style.setProperty("--ratio", `${rw} / ${rh}`);
   const text = {
     headline: $("headline").value, cta: $("cta").value, name: $("name").value, accent: $("accent").value,
-    position: state.position, photoTone: state.tone,
+    position: state.position, photoTone: state.tone, paper: $("paper").value,
   };
   status("Crtam…");
   const started = performance.now();
   try {
     for (const key of Object.keys(cards)) {
       if (id !== run) return;
-      const png = await engine.renderAd(current.bytes, "image/jpeg", [rw, rh], { ...text, layout: key });
+      const look = state.view === "pairs" ? { layout: $("layout").value, fonts: key } : { layout: key, fonts: $("pair").value };
+      const png = await engine.renderAd(current.bytes, "image/jpeg", [rw, rh], { ...text, ...look });
       if (id !== run) return;
       const c = cards[key];
       if (c.url) URL.revokeObjectURL(c.url);
       c.url = URL.createObjectURL(new Blob([png], { type: "image/png" }));
-      c.el.querySelector(".pic").innerHTML = `<img alt="${engine.LAYOUTS[key].label}" src="${c.url}">`;
+      c.el.querySelector(".pic").innerHTML = `<img alt="" src="${c.url}">`;
       const a = c.el.querySelector("a");
       a.href = c.url; a.download = `reklama-${key}.png`;
     }

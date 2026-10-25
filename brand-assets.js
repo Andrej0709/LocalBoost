@@ -81,13 +81,16 @@
   }
 
   // Phone cameras can take photos over the 10 MB cap. Redraw one like that at
-  // 2560 px on the long side, which is still plenty for the engine.
-  function shrink(file) {
+  // 2560 px on the long side, which is still plenty for the engine. Place and
+  // product photos over 3 MB go to 2048 px: the engine can use one as the ad
+  // itself, and it can only draw on a photo that small (OWN_MAX_BYTES).
+  var PHOTO_BYTES = 3 * 1024 * 1024;
+  function shrink(file, side) {
     return new Promise(function (resolve, reject) {
       var url = URL.createObjectURL(file);
       var img = new Image();
       img.onload = function () {
-        var scale = Math.min(1, 2560 / Math.max(img.naturalWidth, img.naturalHeight));
+        var scale = Math.min(1, (side || 2560) / Math.max(img.naturalWidth, img.naturalHeight));
         var canvas = document.createElement("canvas");
         canvas.width = Math.round(img.naturalWidth * scale);
         canvas.height = Math.round(img.naturalHeight * scale);
@@ -107,7 +110,8 @@
   }
 
   async function upload(kind, file) {
-    if (file.size > MAX_BYTES && file.type !== "application/pdf") file = await shrink(file);
+    if (kind === "photos" && file.size > PHOTO_BYTES) file = await shrink(file, 2048);
+    else if (file.size > MAX_BYTES && file.type !== "application/pdf") file = await shrink(file);
     if (file.size > MAX_BYTES) throw new Error("That file is over 10 MB.");
     // Digits only before the dash (label() strips them); the random tail keeps
     // two same-named files picked together from colliding.
