@@ -149,6 +149,10 @@
     Object.keys(all).forEach(function (k) {
       all[k].forEach(function (f) { paths.push(f.path); });
     });
+    // The product photos the engine read from the business's website.
+    try {
+      (await list("site")).forEach(function (f) { paths.push(f.path); });
+    } catch (err) { /* none */ }
     await remove(paths);
   }
 

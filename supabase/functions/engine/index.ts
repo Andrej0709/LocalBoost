@@ -7,7 +7,8 @@
 //               closed from end to end gets a 'skipped' drop and no ads.
 //   2. copy     Claude writes the week's ads, a few per call: text, channel,
 //               format, posting time and a prompt for the image. It reads the
-//               brief, the uploaded logo, photos and menu, the forecast, the
+//               brief, the uploaded logo, photos and menu, the product photos
+//               read from the business's website, the forecast, the
 //               town's dates and what the owner approved, loved, edited and
 //               turned down in the last weeks. One engine_jobs row per ad.
 //   3. images   Higgsfield makes each photo (with no text in it); the headline,
@@ -382,17 +383,180 @@ async function feedback(userId: string, dropId: string) {
   return lines.slice(0, 30);
 }
 
-// Signed links to the logo, photos and menu, for Claude to look at.
+// Signed links to the logo, photos and menu, for Claude to look at. "site" is
+// the product photos read from the business's website (siteProducts).
 async function brandFiles(userId: string) {
-  const files: { kind: string; url: string; pdf: boolean }[] = [];
-  for (const [kind, max] of [["logo", 1], ["photos", 6], ["menu", 2]] as [string, number][]) {
-    const list = await db.storage.from(BRAND_BUCKET).list(`${userId}/${kind}`, { limit: 20, sortBy: { column: "created_at", order: "desc" } });
-    for (const f of (list.data || []).filter((x) => x.id).slice(0, max)) {
-      const signed = await db.storage.from(BRAND_BUCKET).createSignedUrl(`${userId}/${kind}/${f.name}`, 3600);
-      if (signed.data?.signedUrl) files.push({ kind, url: signed.data.signedUrl, pdf: /\.pdf$/i.test(f.name) });
+  const files: { kind: string; url: string; pdf: boolean; path: string }[] = [];
+  for (const [kind, max] of [["logo", 1], ["photos", 6], ["site", SITE_MAX], ["menu", 2]] as [string, number][]) {
+    const list = await db.storage.from(BRAND_BUCKET).list(`${userId}/${kind}`, { limit: 40, sortBy: { column: "created_at", order: "desc" } });
+    for (const f of (list.data || []).filter((x) => x.id && /\.(jpe?g|png|webp|pdf)$/i.test(x.name)).slice(0, max)) {
+      const path = `${userId}/${kind}/${f.name}`;
+      const signed = await db.storage.from(BRAND_BUCKET).createSignedUrl(path, 3600);
+      if (signed.data?.signedUrl) files.push({ kind, url: signed.data.signedUrl, pdf: /\.pdf$/i.test(f.name), path });
     }
   }
   return files;
+}
+
+/* The business's own product photos, read from the website they gave at   */
+/* signup, so the ads show their real products as they really look. Read   */
+/* at the start of each drop (at most once every SITE_DAYS) and kept in     */
+/* brand-assets/<user>/site/, where Claude sees them with the uploads.      */
+const SITE_MAX = 10;
+const SITE_DAYS = 6;
+const SITE_MS = 30_000;
+const SOCIAL = /(^|\.)(instagram|facebook|fb|tiktok|linktr|wa|whatsapp|google|goo|maps\.app|youtube|x|twitter)\.[a-z.]+$/i;
+
+function siteUrl(raw: string | null | undefined) {
+  let t = String(raw || "").trim();
+  if (!t || t.startsWith("@")) return null;
+  if (!/^https?:\/\//i.test(t)) t = "https://" + t;
+  try {
+    const u = new URL(t);
+    if (!u.hostname.includes(".") || SOCIAL.test(u.hostname)) return null;
+    return u;
+  } catch { return null; }
+}
+
+async function fetchText(url: string, ms: number) {
+  const res = await fetch(url, {
+    signal: AbortSignal.timeout(Math.max(1000, ms)), redirect: "follow",
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; AdronisBot/1.0)", "Accept": "text/html,*/*" },
+  });
+  if (!res.ok || !/html/i.test(res.headers.get("content-type") || "")) return "";
+  return (await res.text()).slice(0, 1_500_000);
+}
+
+function tagAttr(tag: string, name: string) {
+  const m = tag.match(new RegExp(`\\s${name}\\s*=\\s*("([^"]*)"|'([^']*)')`, "i"));
+  return m ? (m[2] ?? m[3] ?? "") : "";
+}
+
+// Every picture a page shows, the biggest version where srcset gives a choice.
+function pageImages(html: string, base: string) {
+  const out: { url: string; alt: string }[] = [];
+  const abs = (u: string) => { try { return new URL(u.replace(/&amp;/g, "&").trim(), base).href; } catch { return null; } };
+  for (const m of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const tag = m[0];
+    if (/(property|name)\s*=\s*["'](og:image|og:image:url|twitter:image)["']/i.test(tag)) {
+      const u = abs(tagAttr(tag, "content"));
+      if (u) out.push({ url: u, alt: "" });
+    }
+  }
+  for (const m of html.matchAll(/<(img|source)\b[^>]*>/gi)) {
+    const tag = m[0];
+    const set = tagAttr(tag, "data-srcset") || tagAttr(tag, "srcset");
+    let src = "";
+    if (set) {
+      const best = set.split(",").map((x) => x.trim().split(/\s+/)).filter((x) => x[0])
+        .sort((a, b) => (parseFloat(b[1] || "0") || 0) - (parseFloat(a[1] || "0") || 0))[0];
+      src = best?.[0] || "";
+    }
+    src = src || tagAttr(tag, "data-src") || tagAttr(tag, "data-lazy-src") || tagAttr(tag, "src");
+    // Wide banners and tiny thumbnails aren't product photos.
+    const w = parseInt(tagAttr(tag, "width")) || 0, h = parseInt(tagAttr(tag, "height")) || 0;
+    if (w && h && (w / h > 2.2 || h / w > 2.2 || Math.max(w, h) < 300)) continue;
+    const u = src && !src.startsWith("data:") ? abs(src) : null;
+    if (u) out.push({ url: u, alt: tagAttr(tag, "alt").slice(0, 120) });
+  }
+  // Shop pages list their product photos in JSON-LD.
+  for (const m of html.matchAll(/"image"\s*:\s*(\[[^\]]*\]|"[^"]+")/g)) {
+    for (const x of m[1].matchAll(/"(https?:[^"]+)"/g)) {
+      const u = abs(x[1].replace(/\\\//g, "/"));
+      if (u) out.push({ url: u, alt: "" });
+    }
+  }
+  return out.filter((i) => /^https?:/.test(i.url) && !/\.(svg|gif|ico)(\?|$)/i.test(i.url) &&
+    !/logo|icon|favicon|sprite|avatar|placeholder|loader|payment|flag|badge|emoji|bann?er|slider|facebook\.com\/tr/i.test(i.url));
+}
+
+// Links on the page that probably lead to the products or the menu, the
+// likeliest first.
+function productLinks(html: string, base: URL, seen: Set<string> = new Set()) {
+  const out = new Map<string, number>();
+  for (const m of html.matchAll(/<a\b[^>]*href\s*=\s*["']([^"'#]+)["'][^>]*>([\s\S]{0,300}?)<\/a>/gi)) {
+    const text = (m[1] + " " + m[2].replace(/<[^>]+>/g, " ")).toLowerCase();
+    if (/akcij|aplikacij|kontakt|contact|karijer|career|login|prijav|korpa|cart|blog|vesti|news|privacy|politik|uslovi/.test(text)) continue;
+    const score = /proizvod|product|asortiman|jelovnik|meni|menu|shop|prodavnic|ponud|производ|мени|понуд/.test(text) ? 2
+      : /torte|kola[cč]|peciv|pit[ae]|hleb|sendvi|kafa|coffee|pizza|burek|sladoled|galerij|gallery/.test(text) ? 1 : 0;
+    if (!score) continue;
+    try {
+      const u = new URL(m[1], base);
+      const href = u.href.split("#")[0];
+      if (u.hostname === base.hostname && /^https?:$/.test(u.protocol) && href !== base.href && !seen.has(href)) {
+        out.set(href, Math.max(score, out.get(href) || 0));
+      }
+    } catch { /* not a link */ }
+  }
+  return [...out.entries()].sort((a, b) => b[1] - a[1]).map((e) => e[0]).slice(0, 4);
+}
+
+// Reads the website and keeps up to SITE_MAX of its product photos. Takes at
+// most SITE_MS; a site that can't be read just leaves last time's photos.
+async function siteProducts(userId: string, website: string | null | undefined) {
+  const base = siteUrl(website);
+  if (!base) return;
+  const folder = `${userId}/site`;
+  const held = await db.storage.from(BRAND_BUCKET).list(folder, { limit: 100, sortBy: { column: "created_at", order: "desc" } });
+  const old = (held.data || []).filter((f) => f.id);
+  const newest = old[0]?.created_at ? new Date(old[0].created_at).getTime() : 0;
+  if (Date.now() - newest < SITE_DAYS * 86400000) return;
+
+  const started = Date.now();
+  const left = () => SITE_MS - (Date.now() - started);
+  const found = new Map<string, string>();
+  try {
+    // The home page, the product pages it links to, and one level under the
+    // first of those (a shop's categories). The deepest pages hold the
+    // product photos, so their pictures come first.
+    const home = await fetchText(base.href, 8000);
+    const seen = new Set([base.href]);
+    const pages: string[][] = [[home], [], []];
+    const visit = async (link: string, level: number) => {
+      if (!link || left() < 7000 || seen.has(link)) return "";
+      seen.add(link);
+      const html = await fetchText(link, Math.min(6000, left() - 6000)).catch(() => "");
+      pages[level].push(html);
+      return html;
+    };
+    const first = productLinks(home, base, seen);
+    const top = await visit(first[0] || "", 1);
+    if (top) for (const link of productLinks(top, base, seen).slice(0, 3)) await visit(link, 2);
+    for (const link of first.slice(1, 3)) await visit(link, 1);
+    for (const level of [2, 1, 0]) for (const html of pages[level]) {
+      for (const i of pageImages(html, base.href)) if (!found.has(i.url)) found.set(i.url, i.alt);
+    }
+  } catch (err) {
+    console.error("reading the website: " + (err as Error).message);
+  }
+  const kept: string[] = [];
+  const tries = [...found.keys()].slice(0, 30);
+  // A few at a time, so a slow site still gives something inside the budget.
+  for (let i = 0; i < tries.length && kept.length < SITE_MAX && left() > 1500; i += 5) {
+    await Promise.all(tries.slice(i, i + 5).map(async (url) => {
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(Math.max(1000, Math.min(6000, left()))) });
+        const type = (res.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
+        const ext = ({ "image/jpeg": "jpg", "image/jpg": "jpg", "image/png": "png", "image/webp": "webp" } as Record<string, string>)[type];
+        if (!res.ok || !ext) return;
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        // Too small to be a product photo (icons, thumbnails), or too big to keep.
+        if (bytes.length < 25_000 || bytes.length > 8 * 1024 * 1024 || kept.length >= SITE_MAX) return;
+        // The site's own file name often names the product ("bakina-pita-visnja").
+        const slug = decodeURIComponent(new URL(url).pathname.split("/").pop() || "")
+          .replace(/\.[a-z0-9]+$/i, "").replace(/-(min|scaled|\d+x\d+)$/i, "")
+          .normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50) || "photo";
+        const name = `${Date.now()}${kept.length}-${slug}.${ext}`;
+        kept.push(name);
+        const up = await db.storage.from(BRAND_BUCKET).upload(`${folder}/${name}`, bytes, { contentType: ext === "jpg" ? "image/jpeg" : type, upsert: true });
+        if (up.error) kept.splice(kept.indexOf(name), 1);
+      } catch { /* skip this one */ }
+    }));
+  }
+  // Only a read that found something replaces last time's photos.
+  if (kept.length && old.length) await db.storage.from(BRAND_BUCKET).remove(old.map((f) => `${folder}/${f.name}`));
+  console.log(`website ${base.hostname}: ${found.size} pictures seen, ${kept.length} kept`);
 }
 
 function serbian(p: Profile) {
@@ -463,7 +627,7 @@ const COPY_SYSTEM = `You write the weekly social media ads for one small local b
 What makes an ad work here:
 - It is about this business and this week, never generic. Use the real products, the real street, the real opening hours, the weather on the day it posts, and the dates people care about.
 - One idea per ad, said plainly, the way the owner would say it to a regular. Warm, specific, local. No marketing clichés, no hashtag walls, no "Discover", "Elevate", "Unleash".
-- The words are written ON the picture by our design system, small and quiet, the way a good magazine ad or a café's own Instagram would do it - never like a news headline or a banner. The headline is a hook of 2-6 words that works at a glance in a feed: the specific product, the time, the weather or the reason ("Burek je vruć do 14h"), never a slogan or a mood. It never holds the street or the address; those go in the caption. The cta is a short line or a small button: 2-4 words, one action tied to what this business really does (come, order, book, try) and, when it fits, to the day or the hour. "Call us" only where people really phone to order or book (a cake shop, a salon). Never repeat the headline in the cta, and never invent an offer, deadline or price for it.
+- The words are written ON the picture by our design system, small and quiet, the way a good magazine ad or a café's own Instagram would do it - never like a news headline or a banner. The headline is a hook of 2-6 words that works at a glance in a feed: the specific product, the time, the weather or the reason ("Burek je vruć do 14h"), never a slogan or a mood. It never holds the street or the address; those go in the caption. The cta is a short quiet line: 2-4 words, one action tied to what this business really does (come, order, book, try) and, when it fits, to the day or the hour. "Call us" only where people really phone to order or book (a cake shop, a salon). Never repeat the headline in the cta, and never invent an offer, deadline or price for it.
 - The caption is posted under the picture, so it adds what the picture can't say - the details, the hours, the street - in 1-4 short sentences, without repeating the headline or the cta. At most 3 hashtags, only when they help locally (the town, the street).
 - The ads of one week differ from each other: a product up close, the place itself, a reason to come today, a date coming up, the people behind it, a habit worth starting.
 - Respect every rule under "Never in these ads". The owner's own words there win.
@@ -471,10 +635,19 @@ What makes an ad work here:
 - Never invent facts that matter: no prices, offers, discounts, awards or events the brief doesn't give. If the brief has no offer, the ad needs none.
 - Write in the language the brief names. Serbian ads in the alphabet it names, with correct diacritics.
 
-The image prompt is for a photo generator, in English. It describes one specific scene, never a general mood: name the exact item this ad is about (the burek, the flat white, the croissant with sour cherry), what is around it, the place (the counter, the window table, the street outside), the light and the angle. The picture must look like it was shot for this business's ad campaign by a professional food and product photographer with a stylist on set - never like a snapshot by a passer-by or a guest's phone photo. So: a styled, tidy, deliberate composition with the product as the hero, fresh and at its best (a full cup with clean foam, a whole pastry, a just-poured juice); real ceramic plates, cups and glassware, never paper plates or plastic cups unless the business really serves takeaway; a clean, wiped table. Nothing used, spilled or left over: no used napkins or tissues, no spills, drips or stains, no crumbs, no half-eaten or half-drunk food, no dirty dishes, no wrappers, no tea bag tags, no receipts, no phones, no clutter. The light is soft and flattering - directional window light or a softbox, gentle shadows; colours true and appetising; sharp focus on the product with a softly blurred background, as on a 50mm or 85mm lens. It is still a real photo of a real place: believable, not CGI, not plastic, not over-saturated, not a generic stock photo. Skip the clichés - a lone cup of tea on a wooden table, a bokeh café, steam swirls - unless the ad is exactly that. If photos of the place or products were attached, describe what is really there so the picture looks like this business, and use the brand colours only where they fit naturally.
-The generator makes up letters on anything that could carry print, and they come out as nonsense words (a cup that says "Laffe"). So say that every cup, glass, plate, bag, box and bottle is plain and unbranded with nothing printed on it, and keep menus, signs, boards, labels, packaging with writing, books, newspapers and screens out of the frame.
-Leave one third of the frame calm - a soft wall, a table surface, a blurred background - because the words are laid over it, and put the subject in the rest of the frame. Say in text_position whether that calm third is at the top or at the bottom. Never ask the generator for text, letters, words, numbers, logos, menus, signs with writing or watermarks: the words are added afterwards. Avoid hands holding things up close and crowds of faces; they come out wrong.
-accent_color is the one small touch of colour in the layout (the arrow, the label, the small button): a hex like #E8742A taken from the brand's colours when the brief gives them, otherwise a warm colour that suits the business.
+The image prompt is for a photo generator, in English. Write it the way a top advertising agency's art director briefs a commercial food and product photographer for a paid campaign: one specific, deliberate scene, never a general mood.
+- The hero: name the exact item this ad is about (the burek, the flat white, the croissant with sour cherry) and make it the one clear focal point, filling a good part of the frame, fresh and at its very best - glossy where it should shine, golden where it should be baked, a full cup with clean foam, a just-poured juice.
+- Every piece of food is whole, perfect and untouched. Nothing is bitten, torn, broken, squashed, crumbled or half-eaten; no bite marks, no ragged pieces. When the inside matters (the layers of a burek, the crumb of a loaf, the filling of a pastry), show it with one clean, precise knife cut next to the whole piece, the way a stylist would.
+- The set: a styled, tidy, deliberate composition - a clean surface that suits the business (marble, light linen, warm wood, the café counter), at most two or three props that belong with the product (a linen napkin folded neatly, a few raw ingredients arranged with intent, a matching ceramic plate), real ceramic plates, cups and glassware - never paper plates or plastic cups unless the business really serves takeaway. A harmonious colour palette that suits the brand.
+- Nothing used, spilled or left over: no used napkins or tissues, no spills, drips or stains, no stray crumbs, no dirty dishes, no wrappers, no tea bag tags, no receipts, no phones, no clutter.
+- Camera and light: name the angle (a low three-quarter hero angle, straight-on at table height, or a clean overhead flat lay), the lens look (85mm or 100mm macro, shallow depth of field, sharp focus on the product, softly blurred background) and the light (soft directional window light or a large softbox, gentle shadows, a subtle rim light on the product). Colours true and appetising, crisp texture detail, high-end magazine and billboard quality.
+- It is still a real photograph of this real business: believable, not CGI, not plastic, not over-saturated, not a generic stock photo. Skip the clichés - a lone cup on a wooden table, a bokeh café, steam swirls - unless the ad is exactly that.
+- If photos of the place or products were attached, describe what is really there so the picture looks like this business, and use the brand colours only where they fit naturally.
+The generator makes up letters on anything that could carry print, and they come out as nonsense words (a cup that says "Laffe"). So say that every cup, glass, plate, bag, box and bottle is plain and unbranded with nothing printed on it, and keep menus, signs, boards, labels, packaging with writing, books, newspapers and screens out of the frame - except the real product from a reference photo, which keeps its own real packaging.
+Leave one third of the frame calm - a soft wall, a table surface, a blurred background - because a few small words are laid over it, and put the subject in the rest of the frame. Say in text_position whether that calm third is at the top or at the bottom. Never ask the generator for text, letters, words, numbers, logos, menus, signs with writing or watermarks: the words are added afterwards. Avoid hands holding things up close and crowds of faces; they come out wrong.
+
+product_photo: when the ad is about one product that is shown in one of the business's own photos (labelled P1, P2... above the brief - from their website or what they uploaded), give that label. The real photo then goes to the generator, which places that exact product into your scene, so it looks the same as in real life. Pick it only when the photo clearly shows that one product well and the ad is about it; otherwise leave it empty. With a product_photo, the image prompt describes the scene, the set, the light and the angle around "the product from the reference photo" - never re-describe the product's look, so the generator keeps it as it really is. Use the real product photos in most of the week's ads when they fit.
+accent_color is the one small touch of colour in the layout (the arrow, a thin line): a hex like #E8742A taken from the brand's colours when the brief gives them, otherwise a warm colour that suits the business.
 
 Pick a posting time on one of the given days that suits the ad and the channel: breakfast and coffee in the morning, lunch around noon, evenings for dinner and going out, weekends for families - always inside the opening hours, never on a closed day. Spread the ads over the week.`;
 
@@ -721,18 +894,29 @@ async function writeCopy(run: Run, log: Log) {
 
   let theme: string | null = null;
   let ads: any[];
+  // The business's own product photos Claude may put into an ad, by label.
+  const refs = new Map<string, string>();
   if (claude) {
+    // Once per drop: fresh product photos from the business's website.
+    if (!written.length) await siteProducts(run.user_id, p.website).catch((e) => console.error("website: " + e.message));
     const [weather, dates, liked, files] = await Promise.all([
       forecast(p, days), datesAhead(p, days), feedback(run.user_id, run.drop_id), brandFiles(run.user_id),
     ]);
     const content: any[] = [];
     for (const f of files) {
+      if (f.kind === "photos" || f.kind === "site") {
+        const label = `P${refs.size + 1}`;
+        refs.set(label, f.path);
+        const named = f.kind === "site" ? f.path.split("/").pop()!.replace(/^\d+-|\.[a-z]+$/g, "") : "";
+        content.push({ type: "text", text: `${label} - ${f.kind === "site" ? `from their website (file name "${named}")` : "uploaded by the owner"}:` });
+      }
       content.push(f.pdf
         ? { type: "document", source: { type: "url", url: f.url }, title: "Menu" }
         : { type: "image", source: { type: "url", url: f.url } });
     }
     if (files.length) {
-      content.push({ type: "text", text: `Above: the business's own ${[...new Set(files.map((f) => f.kind))].join(", ")} - look at what is really there.` });
+      content.push({ type: "text", text: `Above: the business's own ${[...new Set(files.map((f) => f.kind === "site" ? "photos from their website" : f.kind))].join(", ")} - look at what is really there and what they really sell.` +
+        (refs.size ? ` P1-P${refs.size} can go into an ad as product_photo when one clearly shows the product the ad is about; a picture of the place, a person, a logo or a banner can't.` : "") });
     }
     content.push({ type: "text", text: briefText(p, drop.data.week_starting, days, weather, dates, liked), cache_control: { type: "ephemeral" } });
     const tally: Record<string, number> = {};
@@ -778,6 +962,8 @@ async function writeCopy(run: Run, log: Log) {
         position: a.text_position === "top" ? "top" : "bottom",
         layout: DROP_LAYOUTS.includes(a.layout) ? a.layout : DROP_LAYOUTS[(written.length + i) % DROP_LAYOUTS.length],
         accent: /^#[0-9a-f]{6}$/i.test(a.accent_color || "") ? a.accent_color : null,
+        // The owner's own photo of the product, placed into the scene by the generator.
+        ref: refs.get(String(a.product_photo || "").trim().toUpperCase()) || null,
       },
       scheduled_at: localToUtc(day, time).toISOString(),
     };
@@ -1087,16 +1273,16 @@ type Layout = {
 // A small headline and a quiet line under it, in a corner.
 function drawQuiet(c: Ctx) {
   const face = FACE.semi;
-  const head = fitText(c, face, c.headline, 64, 44, 700, 3);
+  const head = fitText(c, face, c.headline, 50, 38, 640, 2);
   const lh = Math.round(head.size * 1.14);
   const headH = (head.lines.length - 1) * lh + head.size * face.cap;
-  const ctaSize = 30, gap = c.cta ? 36 : 0, ctaH = c.cta ? ctaSize * face.cap : 0;
+  const ctaSize = 26, gap = c.cta ? 30 : 0, ctaH = c.cta ? ctaSize * face.cap : 0;
   const blockH = headH + gap + ctaH;
   const y0 = c.top ? c.safeTop + 6 : c.h - c.safeBottom - blockH;
   const lift = c.dark ? LIFT : "";
   const edge = c.top ? y0 + blockH : c.h - y0;
   return [
-    c.dark ? shade(c, edge + 260, 0.6) : "",
+    c.dark ? shade(c, edge + 220, 0.45) : "",
     linesEl(face, head.size, head.lines, c.margin, y0 + head.size * face.cap, lh, c.ink, lift),
     c.cta ? arrowCta(c, FACE.semi, ctaSize, c.margin, y0 + headH + gap + ctaH, c.ink, readable(c.accent, c.dark), lift) : "",
   ].join("\n");
@@ -1108,7 +1294,7 @@ function drawCard(c: Ctx) {
   const maxText = Math.min(c.w * 0.62, 620) - pad * 2;
   const nameSize = 21, nameSp = 3.5, ctaSize = 28;
   const name = c.name.toUpperCase();
-  const head = fitText(c, FACE.serif, c.headline, 54, 36, maxText, 3);
+  const head = fitText(c, FACE.serif, c.headline, 46, 34, maxText, 2);
   const lh = Math.round(head.size * 1.16);
   const headH = (head.lines.length - 1) * lh + head.size * FACE.serif.cap;
   const nameW = name ? c.width(FACE.semi, name, nameSize, nameSp) : 0;
@@ -1120,7 +1306,7 @@ function drawCard(c: Ctx) {
   const x = c.margin, y = c.top ? c.safeTop : c.h - c.safeBottom - cardH;
   const tx = x + pad;
   let ty = y + pad;
-  const out = [`<rect x="${x}" y="${r(y)}" width="${r(cardW)}" height="${r(cardH)}" rx="26" fill="#FBF8F2" fill-opacity="0.96" filter="url(#float)"/>`];
+  const out = [`<rect x="${x}" y="${r(y)}" width="${r(cardW)}" height="${r(cardH)}" rx="26" fill="#FBF8F2" fill-opacity="0.9" filter="url(#float)"/>`];
   if (name) {
     out.push(textEl(FACE.semi, nameSize, tx, ty + nameSize * FACE.semi.cap, muted, xml(name), ` letter-spacing="${nameSp}"`));
     ty += nameH;
@@ -1136,7 +1322,7 @@ function drawEditorial(c: Ctx) {
   const cx = c.w / 2, mid = ` text-anchor="middle"`;
   const lift = c.dark ? LIFT : "";
   const name = c.name.toUpperCase(), nameSize = 22, nameSp = 6;
-  const head = fitText(c, FACE.italic, c.headline, 78, 50, c.w * 0.8, 3);
+  const head = fitText(c, FACE.italic, c.headline, 62, 44, c.w * 0.74, 2);
   const lh = Math.round(head.size * 1.1);
   const headH = (head.lines.length - 1) * lh + head.size * FACE.italic.cap;
   const ctaSize = 24, ctaSp = 4.5;
@@ -1266,12 +1452,12 @@ const LAYOUTS: Record<string, Layout> = {
     fonts: ["Inter 600", "Playfair 400i"], draw: drawEditorial,
   },
   tag: {
-    label: "Etiketa", hint: "Mala obojena etiketa sa kratkom vešću. Za vreme, sat, danas.",
+    label: "Etiketa (nije u dropu)", hint: "Mala obojena etiketa sa kratkom vešću. Vlasnik je odbio, nije u dropu.",
     when: "a small label in the accent colour holding a very short headline - news for today: the weather, the hour, fresh out of the oven",
     fonts: ["Inter 600", "Inter 700"], draw: drawTag,
   },
   band: {
-    label: "Traka", hint: "Mirna traka uz ivicu sa malim dugmetom. Za datume, događaje i radno vreme.",
+    label: "Traka (nije u dropu)", hint: "Traka uz ivicu sa dugmetom. Vlasnik je odbio, nije u dropu.",
     when: "a calm strip along the edge with the headline and a small button - a date coming up, an event, changed opening hours, booking",
     fonts: ["Inter 600"], draw: drawBand,
   },
@@ -1287,7 +1473,9 @@ const LAYOUTS: Record<string, Layout> = {
 };
 
 // The layouts the drop picks from. The lab shows all of them.
-const DROP_LAYOUTS = ["quiet", "card", "editorial", "tag", "band", "signature"];
+// Only the quiet ones: the owner turned down big headlines, coloured labels and
+// buttons (October 2026). "tag" and "band" stay in the lab for comparison.
+const DROP_LAYOUTS = ["signature", "quiet", "editorial", "card"];
 
 const OVERLAY_DEFS = `<linearGradient id="fadeUp" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#000" stop-opacity="1"/><stop offset="0.45" stop-color="#000" stop-opacity="0.62"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
 <linearGradient id="fadeDown" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="1"/><stop offset="0.45" stop-color="#000" stop-opacity="0.62"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
@@ -1401,8 +1589,11 @@ async function imageFailed(job: Job, reason: string) {
 
 // The cheapest resolution of each model, and 3:4 where 4:5 isn't offered
 // (none of these models offers it).
-function hfBody(job: Job) {
+function hfBody(job: Job, refUrl: string | null = null) {
   const aspect_ratio = job.aspect_ratio === "4:5" ? "3:4" : job.aspect_ratio;
+  if (refUrl) {
+    return { prompt: REF_PREFIX + job.image_prompt, image_urls: [refUrl], aspect_ratio, resolution: "1k", enhance_prompt: false };
+  }
   if (HF_MODEL.startsWith("marketing-studio/")) {
     return { prompt: job.image_prompt, aspect_ratio, resolution: "1k", enhance_prompt: false };
   }
@@ -1423,17 +1614,37 @@ async function submit(job: Job, log: Log) {
     log.submitted++;
     return;
   }
-  const out = await hf(HF_MODEL, {
+  let refUrl: string | null = null;
+  if (job.overlay?.ref) {
+    // Higgsfield fetches it while it works, so the link lives a day.
+    const signed = await db.storage.from(BRAND_BUCKET).createSignedUrl(job.overlay.ref, 86400);
+    refUrl = signed.data?.signedUrl || null;
+    // The photo was removed since: the ad is made from the prompt alone.
+    if (!refUrl) job = { ...job, overlay: { ...job.overlay, ref: null } };
+  }
+  const out = await hf(jobModel(job), {
     method: "POST",
     headers: { "Idempotency-Key": `${job.id}-${attempts}` },
-    body: JSON.stringify(hfBody(job)),
+    body: JSON.stringify(hfBody(job, refUrl)),
   });
   if (!out?.request_id) throw new Error("Higgsfield gave no request id.");
   await updateJob(job, {
     attempts, hf_request_id: out.request_id, submitted_at: new Date().toISOString(),
-    status: "running", image_url: null, last_error: null,
+    status: "running", image_url: null, last_error: null, overlay: job.overlay,
   });
   log.submitted++;
+}
+
+// An ad built on the business's own product photo goes to Marketing Studio
+// Image, which edits from a reference photo (Soul only takes text).
+const REF_MODEL = "marketing-studio/image";
+const REF_PREFIX = "Use the product in the reference image exactly as it really is: the same shape, size, colour, texture, " +
+  "toppings, filling and packaging - do not redraw, restyle, improve or change the product, only light it to match the scene. " +
+  "Make it the hero of a professional advertising photograph, whole and untouched, nothing bitten or broken. Leave out everything " +
+  "else from the reference photo (its background, other items, any text or logos added on top of it). The scene: ";
+
+function jobModel(job: Job) {
+  return job.overlay?.ref ? REF_MODEL : HF_MODEL;
 }
 
 // Written onto a job just before its text is drawn, and cleared once the picture
@@ -1487,7 +1698,7 @@ async function poll(job: Job) {
   const url = await store(job, bytes, type);
   // Logged once the picture is safely ours, so a retried fetch isn't counted twice.
   await logCost({
-    user_id: job.user_id, drop_id: job.drop_id, job_id: job.id, provider: "higgsfield", model: HF_MODEL,
+    user_id: job.user_id, drop_id: job.drop_id, job_id: job.id, provider: "higgsfield", model: jobModel(job),
     step: "image", units: 1, cost_usd: HF_PRICE,
     note: HF_PRICE ? `request ${job.hf_request_id}` : `request ${job.hf_request_id}; price not set (HIGGSFIELD_USD_PER_IMAGE)`,
   });
@@ -1502,11 +1713,13 @@ const CHECK_SYSTEM = `You check the pictures made for a small local business's s
 
 The picture is a finished ad: the headline, the call to action and sometimes the business's name were written onto the photo afterwards, and they are meant to be there. Read them: they must match the words you are given, be spelled right and be easy to read.
 
-Then read every other piece of writing the photo itself shows - on cups, glasses, packaging, tea bag tags, signs, boards, menus, screens. The generator invents letters, and they come out as nonsense or near-words (a cup that says "Laffe" is neither "caffe" nor "latte"). Any writing in the photo that isn't ours scores at most 4; nonsense or misspelled words score at most 3. Name the exact words you see in problems.
+Then read every other piece of writing the photo itself shows - on cups, glasses, packaging, tea bag tags, signs, boards, menus, screens. The generator invents letters, and they come out as nonsense or near-words (a cup that says "Laffe" is neither "caffe" nor "latte"). Any writing in the photo that isn't ours scores at most 4; nonsense or misspelled words score at most 3. Name the exact words you see in problems. The one exception: when the business's own product photo is attached, the real product's own packaging and labels may show, as long as they match that photo.
 
-It must look like a photo shot for the business's ad campaign by a professional - styled, tidy, the product fresh and at its best - not a snapshot by a passer-by. A used napkin or tissue, a spill or stain, crumbs, a half-eaten or half-drunk item, dirty dishes, paper plates, wrappers, tea bag tags or clutter score at most 4.
+It must look like a photo shot for the business's ad campaign by a professional - styled, tidy, the product fresh and at its best - not a snapshot by a passer-by. Every piece of food must be whole and untouched, or cut cleanly with a knife: a bitten, torn, broken, squashed or half-eaten item, bite marks, a used napkin or tissue, a spill or stain, stray crumbs, a half-drunk glass, dirty dishes, paper plates, wrappers, tea bag tags or clutter score at most 4.
 
-Score 1-10. Below ${PASS_SCORE} means it should be made again. Mark it down hard, too, for: the words hard to read or covering the main subject; warped hands, faces, food or objects; anything that breaks the business's rules; a photo that doesn't fit the business or the ad; a cheap stock-photo look; anything unappetising or unsafe. When it falls short, write a better prompt for the photo generator (a prompt for the photo only, never asking for text) that fixes what's wrong while keeping the idea, and says outright what to leave out (for example "a plain unbranded white cup with nothing printed on it", "a clean table with nothing else on it").`;
+When the business's own product photo is attached, the product in the ad must be that same product - same shape, colour, toppings, filling and packaging. A product that was changed, swapped or redrawn scores at most 4.
+
+Score 1-10. Below ${PASS_SCORE} means it should be made again. Mark it down hard, too, for: the words hard to read or covering the main subject; warped hands, faces, food or objects; anything that breaks the business's rules; a photo that doesn't fit the business or the ad; a cheap stock-photo look; anything unappetising or unsafe. When it falls short, write a better prompt for the photo generator (a prompt for the photo only, never asking for text) that fixes what's wrong while keeping the idea, and says outright what to leave out (for example "a plain unbranded white cup with nothing printed on it", "a clean table with nothing else on it"). When the product photo is attached, the better prompt describes only the scene, the set, the light and the angle around "the product from the reference photo", never the product's own look.`;
 
 const CHECK_SCHEMA = {
   type: "object",
@@ -1527,9 +1740,17 @@ async function check(job: Job, p: Profile, log: Log) {
     problems = size > CHECK_MAX_BYTES ? "Not checked: the picture is over 5 MB." : "";
   } else {
     const rules = [...(p.avoid_tags || []).map((t: string) => AVOID[t]).filter(Boolean), p.avoid_notes].filter(Boolean);
+    const refUrl = job.overlay?.ref
+      ? (await db.storage.from(BRAND_BUCKET).createSignedUrl(job.overlay.ref, 3600)).data?.signedUrl || null
+      : null;
     const out = await askClaude({
       system: CHECK_SYSTEM,
       content: [
+        ...(refUrl ? [
+          { type: "text", text: "The business's own photo of the product (the reference):" },
+          { type: "image", source: { type: "url", url: refUrl } },
+          { type: "text", text: "The ad to check:" },
+        ] : []),
         { type: "image", source: { type: "url", url: job.image_url } },
         {
           type: "text",
