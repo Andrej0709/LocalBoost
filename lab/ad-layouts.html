@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Lab za reklame</title>
+<style>
+  :root {
+    --bg: #f4f2ee; --panel: #ffffff; --ink: #1c1915; --muted: #6f675d; --line: #e3ded6;
+    --accent: #2f6fde; --chip: #eef3fd; --chip-ink: #2457b8; --off: #f3efe9; --off-ink: #6a6258;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121110; --panel: #1b1a18; --ink: #f3f0ea; --muted: #a39b90; --line: #2c2a27;
+      --accent: #7aa7ff; --chip: #1d2a44; --chip-ink: #a9c4ff; --off: #26231f; --off-ink: #a39b90;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding: 22px 24px 8px; }
+  h1 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+  header p { margin: 4px 0 0; color: var(--muted); max-width: 760px; }
+  main { display: grid; grid-template-columns: 320px 1fr; gap: 20px; padding: 16px 24px 40px; align-items: start; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; padding: 12px 16px 32px; } header { padding: 18px 16px 4px; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; position: sticky; top: 12px; }
+  @media (max-width: 860px) { .panel { position: static; } }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 5px; }
+  label:first-child { margin-top: 0; }
+  input[type=text], select { width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); color: var(--ink); font: inherit; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+  .seg button { flex: 1; border: 0; background: var(--bg); color: var(--ink); padding: 8px 6px; font: inherit; font-size: 13px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .drop { border: 1.5px dashed var(--line); border-radius: 12px; padding: 14px; text-align: center; color: var(--muted); cursor: pointer; font-size: 14px; }
+  .drop.over { border-color: var(--accent); color: var(--accent); }
+  .drop img { display: block; max-width: 100%; max-height: 140px; margin: 0 auto 8px; border-radius: 8px; }
+  .thumbs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .thumbs img { width: 48px; height: 48px; object-fit: cover; border-radius: 7px; cursor: pointer; border: 2px solid transparent; }
+  .thumbs img.on { border-color: var(--accent); }
+  input[type=color] { width: 100%; height: 38px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); padding: 3px; }
+  .status { margin-top: 14px; font-size: 13px; color: var(--muted); min-height: 1.4em; }
+  .status.err { color: #c0392b; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .card .pic { background: var(--off); aspect-ratio: var(--ratio, 4 / 5); display: grid; place-items: center; cursor: zoom-in; }
+  .card .pic img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .card .pic span { color: var(--off-ink); font-size: 13px; }
+  .card .meta { padding: 11px 13px 13px; }
+  .card .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .card h3 { margin: 0; font-size: 15px; }
+  .chip { font-size: 11px; padding: 3px 8px; border-radius: 99px; background: var(--chip); color: var(--chip-ink); white-space: nowrap; }
+  .chip.off { background: var(--off); color: var(--off-ink); }
+  .card p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+  .card .key { font-family: ui-monospace, monospace; font-size: 11px; color: var(--off-ink); }
+  .card a { font-size: 13px; color: var(--accent); text-decoration: none; }
+  dialog { border: 0; padding: 0; background: transparent; max-width: 96vw; max-height: 96vh; }
+  dialog::backdrop { background: rgba(0,0,0,.78); }
+  dialog img { display: block; max-width: 96vw; max-height: 92vh; border-radius: 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Lab za reklame</h1>
+  <p>Isprobaj raspored teksta na bilo kojoj slici bez pokretanja dropa. Slike crta isti kod koji koristi engine, pa ono što vidiš ovde izlazi i u dropu.</p>
+</header>
+<main>
+  <section class="panel" aria-label="Podešavanja">
+    <label>Slika (bez teksta)</label>
+    <div class="drop" id="drop" tabindex="0">
+      <img id="preview" alt="" hidden>
+      <span id="dropText">Prevuci sliku ovde ili klikni da izabereš</span>
+    </div>
+    <input type="file" id="file" accept="image/*" multiple hidden>
+    <div class="thumbs" id="thumbs"></div>
+
+    <label for="headline">Naslov</label>
+    <input type="text" id="headline" value="Ponedeljak ide lakše uz kafu">
+    <label for="cta">Poziv na akciju</label>
+    <input type="text" id="cta" value="Svrati na kafu">
+    <label for="name">Ime biznisa</label>
+    <input type="text" id="name" value="Kafeterija">
+    <div class="row">
+      <div>
+        <label for="ratio">Format</label>
+        <select id="ratio">
+          <option value="4:5">4:5 post</option>
+          <option value="1:1">1:1 post</option>
+          <option value="9:16">9:16 story</option>
+          <option value="4:3">4:3 Google</option>
+          <option value="2:3">2:3 Pinterest</option>
+        </select>
+      </div>
+      <div>
+        <label for="accent">Boja</label>
+        <input type="color" id="accent" value="#f5a524">
+      </div>
+    </div>
+    <label>Tekst ide</label>
+    <div class="seg" id="position">
+      <button type="button" data-v="top">Gore</button>
+      <button type="button" data-v="bottom" class="on">Dole</button>
+    </div>
+    <label>Deo slike ispod teksta</label>
+    <div class="seg" id="tone">
+      <button type="button" data-v="auto" class="on">Sam proceni</button>
+      <button type="button" data-v="dark">Taman</button>
+      <button type="button" data-v="light">Svetao</button>
+    </div>
+    <div class="status" id="status">Učitavam engine…</div>
+  </section>
+
+  <section class="grid" id="grid" aria-label="Layouti"></section>
+</main>
+<dialog id="big"><img id="bigImg" alt=""></dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typescript/5.6.3/typescript.min.js"></script>
+<script type="module">
+import { Resvg, initWasm } from "https://unpkg.com/@resvg/resvg-wasm@2.6.2/index.mjs";
+
+const $ = (id) => document.getElementById(id);
+const status = (text, err = false) => { $("status").textContent = text; $("status").className = "status" + (err ? " err" : ""); };
+
+// The layouts come straight from the engine's code, between its overlay markers.
+let engine;
+async function loadEngine() {
+  const res = await fetch("../supabase/functions/engine/index.ts", { cache: "no-store" });
+  if (!res.ok) throw new Error("engine nije nađen (" + res.status + ")");
+  const src = await res.text();
+  const a = src.indexOf("// --- overlay:start"), b = src.indexOf("// --- overlay:end");
+  if (a < 0 || b < 0) throw new Error("u engine-u nema overlay oznaka");
+  const js = ts.transpile(src.slice(a, b), { target: ts.ScriptTarget.ES2022 });
+  engine = new Function("Resvg", "initWasm", js + "\nreturn { renderAd, LAYOUTS, DROP_LAYOUTS };")(Resvg, initWasm);
+}
+
+// Photos are turned into JPEGs about the size Higgsfield sends (resvg reads JPEG and PNG, not WebP).
+const photos = [];
+let current = null;
+async function addPhoto(blob) {
+  const bmp = await createImageBitmap(blob);
+  const scale = Math.min(1, 1440 / Math.max(bmp.width, bmp.height));
+  const cv = document.createElement("canvas");
+  cv.width = Math.round(bmp.width * scale); cv.height = Math.round(bmp.height * scale);
+  cv.getContext("2d").drawImage(bmp, 0, 0, cv.width, cv.height);
+  const jpg = await new Promise((r) => cv.toBlob(r, "image/jpeg", 0.92));
+  const photo = { bytes: new Uint8Array(await jpg.arrayBuffer()), url: URL.createObjectURL(jpg) };
+  photos.push(photo);
+  pick(photo);
+}
+function pick(photo) {
+  current = photo;
+  $("preview").src = photo.url; $("preview").hidden = false;
+  $("dropText").textContent = "Klikni ili prevuci za drugu sliku";
+  $("thumbs").innerHTML = "";
+  photos.forEach((p) => {
+    const img = document.createElement("img");
+    img.src = p.url; img.alt = ""; img.className = p === current ? "on" : "";
+    img.onclick = () => pick(p);
+    $("thumbs").append(img);
+  });
+  schedule();
+}
+
+// A stand-in photo until one is added: a warm, softly lit table.
+async function samplePhoto() {
+  const cv = document.createElement("canvas"); cv.width = 1080; cv.height = 1350;
+  const g = cv.getContext("2d");
+  const bg = g.createLinearGradient(0, 0, 0, 1350);
+  bg.addColorStop(0, "#3a2f27"); bg.addColorStop(0.55, "#6b5646"); bg.addColorStop(0.56, "#c9b8a2"); bg.addColorStop(1, "#8f7b66");
+  g.fillStyle = bg; g.fillRect(0, 0, 1080, 1350);
+  const light = g.createRadialGradient(820, 260, 40, 820, 260, 700);
+  light.addColorStop(0, "rgba(255,236,200,.55)"); light.addColorStop(1, "rgba(255,236,200,0)");
+  g.fillStyle = light; g.fillRect(0, 0, 1080, 1350);
+  g.fillStyle = "rgba(0,0,0,.25)"; g.beginPath(); g.ellipse(560, 1010, 300, 70, 0, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#f6f1ea"; g.beginPath(); g.ellipse(540, 980, 280, 80, 0, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#fbf8f4"; g.beginPath(); g.moveTo(400, 760); g.lineTo(680, 760); g.lineTo(650, 960); g.quadraticCurveTo(540, 1010, 430, 960); g.closePath(); g.fill();
+  g.fillStyle = "#b07a4c"; g.beginPath(); g.ellipse(540, 762, 140, 30, 0, 0, Math.PI * 2); g.fill();
+  await addPhoto(await new Promise((r) => cv.toBlob(r, "image/png")));
+}
+
+const state = { position: "bottom", tone: "auto" };
+document.querySelectorAll(".seg").forEach((seg) => seg.addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  seg.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+  state[seg.id] = b.dataset.v; schedule();
+}));
+["headline", "cta", "name", "ratio", "accent"].forEach((id) => $(id).addEventListener("input", schedule));
+
+const drop = $("drop");
+drop.onclick = () => $("file").click();
+drop.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("file").click(); } };
+$("file").onchange = async () => { for (const f of $("file").files) await addPhoto(f); $("file").value = ""; };
+drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = async (e) => {
+  e.preventDefault(); drop.classList.remove("over");
+  for (const f of e.dataTransfer.files) if (f.type.startsWith("image/")) await addPhoto(f);
+};
+window.addEventListener("paste", async (e) => {
+  for (const it of e.clipboardData?.items || []) if (it.type.startsWith("image/")) await addPhoto(it.getAsFile());
+});
+
+// One card per layout, the ones in the drop first.
+const cards = {};
+function buildGrid() {
+  const keys = [...engine.DROP_LAYOUTS, ...Object.keys(engine.LAYOUTS).filter((k) => !engine.DROP_LAYOUTS.includes(k))];
+  for (const key of keys) {
+    const L = engine.LAYOUTS[key], inDrop = engine.DROP_LAYOUTS.includes(key);
+    const el = document.createElement("article");
+    el.className = "card";
+    el.innerHTML = `<div class="pic"><span>…</span></div>
+      <div class="meta"><div class="top"><h3></h3><span class="chip${inDrop ? "" : " off"}">${inDrop ? "U dropu" : "Nije u dropu"}</span></div>
+      <p></p><div class="top" style="margin-top:8px"><span class="key">${key}</span><a href="#" download>Sačuvaj PNG</a></div></div>`;
+    el.querySelector("h3").textContent = L.label;
+    el.querySelector("p").textContent = L.hint;
+    el.querySelector(".pic").onclick = () => { const u = cards[key].url; if (u) { $("bigImg").src = u; $("big").showModal(); } };
+    $("grid").append(el);
+    cards[key] = { el, url: null };
+  }
+}
+$("big").onclick = () => $("big").close();
+
+let timer = null, run = 0;
+function schedule() { clearTimeout(timer); timer = setTimeout(renderAll, 250); }
+
+async function renderAll() {
+  if (!engine || !current) return;
+  const id = ++run;
+  const [rw, rh] = $("ratio").value.split(":").map(Number);
+  $("grid").style.setProperty("--ratio", `${rw} / ${rh}`);
+  const text = {
+    headline: $("headline").value, cta: $("cta").value, name: $("name").value, accent: $("accent").value,
+    position: state.position, photoTone: state.tone,
+  };
+  status("Crtam…");
+  const started = performance.now();
+  try {
+    for (const key of Object.keys(cards)) {
+      if (id !== run) return;
+      const png = await engine.renderAd(current.bytes, "image/jpeg", [rw, rh], { ...text, layout: key });
+      if (id !== run) return;
+      const c = cards[key];
+      if (c.url) URL.revokeObjectURL(c.url);
+      c.url = URL.createObjectURL(new Blob([png], { type: "image/png" }));
+      c.el.querySelector(".pic").innerHTML = `<img alt="${engine.LAYOUTS[key].label}" src="${c.url}">`;
+      const a = c.el.querySelector("a");
+      a.href = c.url; a.download = `reklama-${key}.png`;
+    }
+    status(`Gotovo za ${Math.round(performance.now() - started)} ms. Klikni sliku za veći prikaz.`);
+  } catch (err) {
+    status("Greška: " + err.message, true);
+  }
+}
+
+try {
+  await loadEngine();
+  buildGrid();
+  status("Engine učitan.");
+  await samplePhoto();
+} catch (err) {
+  status("Ne mogu da učitam engine: " + err.message + ". Otvori stranu preko lokalnog servera.", true);
+}
+</script>
+</body>
+</html>

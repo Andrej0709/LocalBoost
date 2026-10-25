@@ -463,7 +463,7 @@ const COPY_SYSTEM = `You write the weekly social media ads for one small local b
 What makes an ad work here:
 - It is about this business and this week, never generic. Use the real products, the real street, the real opening hours, the weather on the day it posts, and the dates people care about.
 - One idea per ad, said plainly, the way the owner would say it to a regular. Warm, specific, local. No marketing clichés, no hashtag walls, no "Discover", "Elevate", "Unleash".
-- The words are written ON the picture by our design system, in the business's name and colours: the headline as the one big line, and a call-to-action button under it. So the headline is a hook of 3-7 words that works at a glance in a feed: the specific product, the time, the weather or the reason ("Burek je vruć do 14h"), never a slogan or a mood. The cta is the button: 2-4 words, one action tied to what this business really does (come, order, book, call, try) and, when it fits, to the day or the hour. Never repeat the headline in the cta, and never invent an offer, deadline or price for it.
+- The words are written ON the picture by our design system, small and quiet, the way a good magazine ad or a café's own Instagram would do it - never like a news headline or a banner. The headline is a hook of 2-6 words that works at a glance in a feed: the specific product, the time, the weather or the reason ("Burek je vruć do 14h"), never a slogan or a mood. It never holds the street or the address; those go in the caption. The cta is a short line or a small button: 2-4 words, one action tied to what this business really does (come, order, book, try) and, when it fits, to the day or the hour. "Call us" only where people really phone to order or book (a cake shop, a salon). Never repeat the headline in the cta, and never invent an offer, deadline or price for it.
 - The caption is posted under the picture, so it adds what the picture can't say - the details, the hours, the street - in 1-4 short sentences, without repeating the headline or the cta. At most 3 hashtags, only when they help locally (the town, the street).
 - The ads of one week differ from each other: a product up close, the place itself, a reason to come today, a date coming up, the people behind it, a habit worth starting.
 - Respect every rule under "Never in these ads". The owner's own words there win.
@@ -471,11 +471,18 @@ What makes an ad work here:
 - Never invent facts that matter: no prices, offers, discounts, awards or events the brief doesn't give. If the brief has no offer, the ad needs none.
 - Write in the language the brief names. Serbian ads in the alphabet it names, with correct diacritics.
 
-The image prompt is for a photo generator, in English. It describes one specific scene, never a general mood: name the exact item this ad is about (the burek, the flat white, the croissant with sour cherry), what is around it, the place (the counter, the window table, the street outside), the light (side light from the window, warm evening bulbs), the angle and the small imperfections that make a photo real (crumbs, a half-finished cup, a dusting of flour). The style is honest documentary food and lifestyle photography, the way a good local photographer would shoot it on a 35mm lens: natural colour, shallow depth of field, not glossy, not over-saturated, not a stock photo, no fantasy light. Skip the clichés - a lone cup of tea on a wooden table, a bokeh café, steam swirls - unless the ad is exactly that. If photos of the place or products were attached, describe what is really there so the picture looks like this business, and use the brand colours only where they fit naturally.
-Leave one third of the frame calm - a soft wall, a table surface, a blurred background - because the headline and the button are laid over it, and put the subject in the rest of the frame. Say in text_position whether that calm third is at the top or at the bottom. Never ask the generator for text, letters, words, numbers, logos, menus, signs with writing or watermarks: the words are added afterwards. Avoid hands holding things up close and crowds of faces; they come out wrong.
-accent_color is the one colour of the button and the small line above the headline: a hex like #E8742A taken from the brand's colours when the brief gives them, otherwise a warm colour that suits the business. It must be light or bright enough to stand out on a dark photo.
+The image prompt is for a photo generator, in English. It describes one specific scene, never a general mood: name the exact item this ad is about (the burek, the flat white, the croissant with sour cherry), what is around it, the place (the counter, the window table, the street outside), the light and the angle. The picture must look like it was shot for this business's ad campaign by a professional food and product photographer with a stylist on set - never like a snapshot by a passer-by or a guest's phone photo. So: a styled, tidy, deliberate composition with the product as the hero, fresh and at its best (a full cup with clean foam, a whole pastry, a just-poured juice); real ceramic plates, cups and glassware, never paper plates or plastic cups unless the business really serves takeaway; a clean, wiped table. Nothing used, spilled or left over: no used napkins or tissues, no spills, drips or stains, no crumbs, no half-eaten or half-drunk food, no dirty dishes, no wrappers, no tea bag tags, no receipts, no phones, no clutter. The light is soft and flattering - directional window light or a softbox, gentle shadows; colours true and appetising; sharp focus on the product with a softly blurred background, as on a 50mm or 85mm lens. It is still a real photo of a real place: believable, not CGI, not plastic, not over-saturated, not a generic stock photo. Skip the clichés - a lone cup of tea on a wooden table, a bokeh café, steam swirls - unless the ad is exactly that. If photos of the place or products were attached, describe what is really there so the picture looks like this business, and use the brand colours only where they fit naturally.
+The generator makes up letters on anything that could carry print, and they come out as nonsense words (a cup that says "Laffe"). So say that every cup, glass, plate, bag, box and bottle is plain and unbranded with nothing printed on it, and keep menus, signs, boards, labels, packaging with writing, books, newspapers and screens out of the frame.
+Leave one third of the frame calm - a soft wall, a table surface, a blurred background - because the words are laid over it, and put the subject in the rest of the frame. Say in text_position whether that calm third is at the top or at the bottom. Never ask the generator for text, letters, words, numbers, logos, menus, signs with writing or watermarks: the words are added afterwards. Avoid hands holding things up close and crowds of faces; they come out wrong.
+accent_color is the one small touch of colour in the layout (the arrow, the label, the small button): a hex like #E8742A taken from the brand's colours when the brief gives them, otherwise a warm colour that suits the business.
 
 Pick a posting time on one of the given days that suits the ad and the channel: breakfast and coffee in the morning, lunch around noon, evenings for dinner and going out, weekends for families - always inside the opening hours, never on a closed day. Spread the ads over the week.`;
+
+// The layouts Claude picks from, read when the prompt is sent (they are defined further down).
+function layoutGuide() {
+  return "\n\nlayout is how the words sit on the picture. Pick the one that suits the ad, and give the ads of one week different layouts:\n" +
+    DROP_LAYOUTS.map((k) => `- ${k}: ${LAYOUTS[k].when}`).join("\n");
+}
 
 function copySchema(channels: string[], days: string[]) {
   const formats = [...new Set(channels.flatMap((c) => FORMATS[c].map((f) => f.format)))];
@@ -490,18 +497,19 @@ function copySchema(channels: string[], days: string[]) {
         items: {
           type: "object",
           additionalProperties: false,
-          required: ["channel", "format", "post_on", "post_time", "idea", "headline", "cta", "caption", "image_prompt", "text_position", "accent_color"],
+          required: ["channel", "format", "post_on", "post_time", "idea", "headline", "cta", "caption", "image_prompt", "text_position", "layout", "accent_color"],
           properties: {
             channel: { type: "string", enum: [...new Set(channels)] },
             format: { type: "string", enum: formats },
             post_on: { type: "string", enum: days },
             post_time: { type: "string", description: "HH:MM, 24-hour, local time." },
             idea: { type: "string", description: "Why this ad, this day - one line in English, for the team." },
-            headline: { type: "string", description: "3-7 words, written on the picture." },
-            cta: { type: "string", description: "The button: 2-4 words." },
+            headline: { type: "string", description: "2-6 words, written on the picture." },
+            cta: { type: "string", description: "The call to action: 2-4 words." },
             caption: { type: "string" },
             image_prompt: { type: "string" },
             text_position: { type: "string", enum: ["top", "bottom"], description: "Where the calm third of the picture is." },
+            layout: { type: "string", enum: DROP_LAYOUTS, description: "How the words are laid out on the picture." },
             accent_color: { type: "string", description: "Hex colour like #E8742A." },
           },
         },
@@ -737,7 +745,7 @@ async function writeCopy(run: Run, log: Log) {
           : ""),
     });
     const out = await askClaude({
-      system: COPY_SYSTEM, content, schema: copySchema(channels, days), effort: CLAUDE_EFFORT,
+      system: COPY_SYSTEM + layoutGuide(), content, schema: copySchema(channels, days), effort: CLAUDE_EFFORT,
       maxTokens: 16000, cost, step: "copy",
     });
     theme = out.theme || null;
@@ -768,6 +776,7 @@ async function writeCopy(run: Run, log: Log) {
         name: String(p.business_name || "").slice(0, 60),
         cta: String(a.cta || "").slice(0, 40),
         position: a.text_position === "top" ? "top" : "bottom",
+        layout: DROP_LAYOUTS.includes(a.layout) ? a.layout : DROP_LAYOUTS[(written.length + i) % DROP_LAYOUTS.length],
         accent: /^#[0-9a-f]{6}$/i.test(a.accent_color || "") ? a.accent_color : null,
       },
       scheduled_at: localToUtc(day, time).toISOString(),
@@ -850,33 +859,120 @@ ${lines.map((l, i) => `<text x="64" y="${Math.round(top + i * 92)}" font-family=
 
 /* ------------------------------------------------------------------ */
 /* The words on the picture. Higgsfield makes a clean photo; the        */
-/* headline, the call-to-action button and the business's name are      */
-/* written onto it here, so the spelling, the diacritics and the colours */
-/* are always right.                                                    */
+/* headline, the call to action and the business's name are written     */
+/* onto it here, so the spelling, the diacritics and the colours are     */
+/* always right. Each ad gets one of a few quiet layouts, so a week's    */
+/* ads don't all look the same.                                         */
 /* ------------------------------------------------------------------ */
 
 // --- overlay:start
+// lab/ad-layouts.html runs this same block in the browser, so layouts can be
+// tried on any photo without a drop. Keep it to fetch, btoa, Resvg and initWasm.
+
 const OVERLAY_WASM = "https://unpkg.com/@resvg/resvg-wasm@2.6.2/index_bg.wasm";
-const OVERLAY_FONT = "https://cdn.jsdelivr.net/npm/@expo-google-fonts/inter@0.2.3/Inter_700Bold.ttf";
+const OVERLAY_FONT_CDN = "https://cdn.jsdelivr.net/npm/@expo-google-fonts";
+// Static Google Fonts with Latin, Serbian diacritics and Cyrillic.
+const OVERLAY_FONTS: Record<string, string> = {
+  "Inter 400": `${OVERLAY_FONT_CDN}/inter@0.2.3/Inter_400Regular.ttf`,
+  "Inter 600": `${OVERLAY_FONT_CDN}/inter@0.2.3/Inter_600SemiBold.ttf`,
+  "Inter 700": `${OVERLAY_FONT_CDN}/inter@0.2.3/Inter_700Bold.ttf`,
+  "Playfair 400i": `${OVERLAY_FONT_CDN}/playfair-display@0.2.3/PlayfairDisplay_400Regular_Italic.ttf`,
+  "Playfair 600": `${OVERLAY_FONT_CDN}/playfair-display@0.2.3/PlayfairDisplay_600SemiBold.ttf`,
+};
 const OVERLAY_WIDTH = 1080;
 
-let overlayWasm: Promise<void> | null = null;
-let overlayFont: Promise<Uint8Array> | null = null;
+type Face = { font: string; family: string; weight: number; italic?: boolean; cap: number };
+const FACE: Record<string, Face> = {
+  text: { font: "Inter 400", family: "Inter", weight: 400, cap: 0.73 },
+  semi: { font: "Inter 600", family: "Inter", weight: 600, cap: 0.73 },
+  bold: { font: "Inter 700", family: "Inter", weight: 700, cap: 0.73 },
+  serif: { font: "Playfair 600", family: "Playfair Display", weight: 600, cap: 0.71 },
+  italic: { font: "Playfair 400i", family: "Playfair Display", weight: 400, italic: true, cap: 0.71 },
+};
 
-function overlayEngine() {
+type Metrics = { upm: number; advance: (cp: number) => number };
+type LoadedFont = { bytes: Uint8Array; metrics: Metrics };
+
+let overlayWasm: Promise<void> | null = null;
+const overlayFonts = new Map<string, Promise<LoadedFont>>();
+
+function overlayRenderer() {
   if (!overlayWasm) {
     overlayWasm = fetch(OVERLAY_WASM)
       .then((r) => { if (!r.ok) throw new Error("renderer " + r.status); return r.arrayBuffer(); })
       .then((buf) => initWasm(buf))
       .catch((err) => { overlayWasm = null; throw err; });
   }
-  if (!overlayFont) {
-    overlayFont = fetch(OVERLAY_FONT)
+  return overlayWasm;
+}
+
+function overlayFont(key: string) {
+  let p = overlayFonts.get(key);
+  if (!p) {
+    p = fetch(OVERLAY_FONTS[key])
       .then((r) => { if (!r.ok) throw new Error("font " + r.status); return r.arrayBuffer(); })
-      .then((buf) => new Uint8Array(buf))
-      .catch((err) => { overlayFont = null; throw err; });
+      .then((buf) => { const bytes = new Uint8Array(buf); return { bytes, metrics: fontMetrics(bytes) }; });
+    p.catch(() => overlayFonts.delete(key));
+    overlayFonts.set(key, p);
   }
-  return Promise.all([overlayWasm, overlayFont]).then(([, font]) => font);
+  return p;
+}
+
+// How wide each letter is, read straight from the font file (cmap + hmtx), so
+// lines wrap and boxes fit the real text. Kerning is left out: a hair too wide.
+function fontMetrics(bytes: Uint8Array): Metrics {
+  const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const tables: Record<string, number> = {};
+  for (let i = 0, n = v.getUint16(4); i < n; i++) {
+    const o = 12 + i * 16;
+    tables[String.fromCharCode(bytes[o], bytes[o + 1], bytes[o + 2], bytes[o + 3])] = v.getUint32(o + 8);
+  }
+  const upm = v.getUint16(tables.head + 18);
+  const hMetrics = v.getUint16(tables.hhea + 34);
+  const hmtx = tables.hmtx;
+  const cmap = tables.cmap;
+  let sub = 0, fmt = 0;
+  for (let i = 0, n = v.getUint16(cmap + 2); i < n; i++) {
+    const pid = v.getUint16(cmap + 4 + i * 8), eid = v.getUint16(cmap + 6 + i * 8);
+    const at = cmap + v.getUint32(cmap + 8 + i * 8), f = v.getUint16(at);
+    if (pid === 0 || (pid === 3 && (eid === 1 || eid === 10))) {
+      if (f === 12 || (f === 4 && fmt !== 12)) { sub = at; fmt = f; }
+    }
+  }
+  const glyph = (cp: number) => {
+    if (fmt === 12) {
+      for (let i = 0, n = v.getUint32(sub + 12); i < n; i++) {
+        const g = sub + 16 + i * 12;
+        const start = v.getUint32(g);
+        if (cp >= start && cp <= v.getUint32(g + 4)) return v.getUint32(g + 8) + cp - start;
+      }
+    } else if (fmt === 4) {
+      const seg2 = v.getUint16(sub + 6);
+      const ends = sub + 14, starts = ends + seg2 + 2, deltas = starts + seg2, ranges = deltas + seg2;
+      for (let i = 0; i < seg2; i += 2) {
+        if (cp > v.getUint16(ends + i)) continue;
+        const start = v.getUint16(starts + i);
+        if (cp < start) return 0;
+        const delta = v.getUint16(deltas + i), range = v.getUint16(ranges + i);
+        if (!range) return (cp + delta) & 0xffff;
+        const g = v.getUint16(ranges + i + range + 2 * (cp - start));
+        return g ? (g + delta) & 0xffff : 0;
+      }
+    }
+    return 0;
+  };
+  const seen = new Map<number, number>();
+  return {
+    upm,
+    advance: (cp: number) => {
+      let a = seen.get(cp);
+      if (a === undefined) {
+        a = v.getUint16(hmtx + 4 * Math.min(glyph(cp), hMetrics - 1));
+        seen.set(cp, a);
+      }
+      return a;
+    },
+  };
 }
 
 function xml(s: string) {
@@ -889,97 +985,397 @@ function base64(bytes: Uint8Array) {
   return btoa(out);
 }
 
-// Inter Bold is about 0.6 em wide per character; wide enough to be safe.
-function wrapLines(text: string, size: number, maxWidth: number) {
+/* Colours */
+
+function rgb(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  return [n >> 16, (n >> 8) & 255, n & 255];
+}
+function luma(hex: string) {
+  const [r, g, b] = rgb(hex);
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+function mix(hex: string, to: string, t: number) {
+  const a = rgb(hex), b = rgb(to);
+  return "#" + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, "0")).join("");
+}
+function inkOn(hex: string) {
+  return luma(hex) > 150 ? "#17140F" : "#FFFFFF";
+}
+// The accent made bright enough to read on a dark photo, or deep enough on a light one.
+function readable(hex: string, onDark: boolean) {
+  let c = hex;
+  for (let i = 0; i < 6; i++) {
+    if (onDark ? luma(c) >= 150 : luma(c) <= 105) break;
+    c = mix(c, onDark ? "#FFFFFF" : "#000000", 0.18);
+  }
+  return c;
+}
+
+/* Text */
+
+type Ctx = {
+  w: number; h: number; tall: boolean; margin: number; safeTop: number; safeBottom: number;
+  top: boolean; dark: boolean; ink: string;
+  headline: string; cta: string; name: string; accent: string;
+  width: (face: Face, text: string, size: number, spacing?: number) => number;
+};
+
+function wrapText(c: Ctx, face: Face, text: string, size: number, maxW: number, spacing = 0) {
   const lines: string[] = [];
   for (const word of text.split(/\s+/).filter(Boolean)) {
     const last = lines[lines.length - 1];
-    if (last && (last + " " + word).length * size * 0.6 <= maxWidth) lines[lines.length - 1] = last + " " + word;
+    if (last && c.width(face, last + " " + word, size, spacing) <= maxW) lines[lines.length - 1] = last + " " + word;
     else lines.push(word);
   }
   return lines;
 }
 
-function fitHeadline(text: string, maxWidth: number) {
-  for (let size = 108; size >= 56; size -= 4) {
-    const lines = wrapLines(text, size, maxWidth);
-    if (lines.length <= 3 && lines.every((l) => l.length * size * 0.6 <= maxWidth)) return { size, lines };
+// The biggest size from max down to min that fits in maxLines, with the lines
+// evened out so no word is left alone on the last one.
+function fitText(c: Ctx, face: Face, text: string, max: number, min: number, maxW: number, maxLines: number, spacing = 0) {
+  let size = min, lines = wrapText(c, face, text, min, maxW, spacing);
+  for (let s = max; s >= min; s -= 2) {
+    const l = wrapText(c, face, text, s, maxW, spacing);
+    if (l.length <= maxLines && l.every((x) => c.width(face, x, s, spacing) <= maxW)) { size = s; lines = l; break; }
   }
-  return { size: 56, lines: wrapLines(text, 56, maxWidth).slice(0, 4) };
+  if (lines.length > 1) {
+    for (let mw = maxW - 20; mw > maxW * 0.45; mw -= 20) {
+      const l = wrapText(c, face, text, size, mw, spacing);
+      if (l.length !== lines.length || l.some((x) => c.width(face, x, size, spacing) > mw)) break;
+      lines = l;
+    }
+  }
+  const widest = Math.max(...lines.map((x) => c.width(face, x, size, spacing)));
+  return { size, lines, widest };
 }
 
-function inkOn(hex: string) {
-  const n = parseInt(hex.slice(1), 16);
-  return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 150 ? "#111111" : "#ffffff";
+const r = (n: number) => Math.round(n * 10) / 10;
+
+function textEl(face: Face, size: number, x: number, y: number, fill: string, body: string, extra = "") {
+  return `<text x="${r(x)}" y="${r(y)}" font-family="${face.family}" font-weight="${face.weight}"${face.italic ? ` font-style="italic"` : ""} font-size="${size}" fill="${fill}"${extra}>${body}</text>`;
 }
 
-function overlaySvg(o: {
-  photo: string; ratio: [number, number]; headline: string; cta: string; name: string;
-  position: "top" | "bottom"; accent: string;
-}) {
-  const w = OVERLAY_WIDTH;
-  const h = Math.round((w * o.ratio[1]) / o.ratio[0]);
-  const tall = h / w > 1.7; // stories: keep clear of the app's own buttons
-  const margin = 72;
-  const safeTop = tall ? 270 : 72;
-  const safeBottom = tall ? 360 : 84;
-  const { size, lines } = fitHeadline(o.headline, w - margin * 2);
+function linesEl(face: Face, size: number, lines: string[], x: number, firstBaseline: number, lineH: number, fill: string, extra = "") {
+  return lines.map((l, i) => textEl(face, size, x, firstBaseline + i * lineH, fill, xml(l), extra)).join("\n");
+}
+
+const LIFT = ` filter="url(#lift)"`;
+
+// A soft darkening from the edge the text sits on, only as tall as the text needs.
+function shade(c: Ctx, height: number, strength: number) {
+  const hgt = Math.min(c.h, Math.round(height));
+  return c.top
+    ? `<rect x="0" y="0" width="${c.w}" height="${hgt}" fill="url(#fadeDown)" opacity="${strength}"/>`
+    : `<rect x="0" y="${c.h - hgt}" width="${c.w}" height="${hgt}" fill="url(#fadeUp)" opacity="${strength}"/>`;
+}
+
+function arrowCta(c: Ctx, face: Face, size: number, x: number, y: number, fill: string, arrow: string, extra = "") {
+  return textEl(face, size, x, y, fill, `${xml(c.cta)}<tspan dx="${Math.round(size * 0.4)}" fill="${arrow}">→</tspan>`, extra);
+}
+
+/* Layouts. Each one draws over a 1080-wide photo and returns the SVG on top. */
+
+type Layout = {
+  label: string;      // the name in the lab
+  hint: string;       // when to use it, for the lab
+  when: string;       // when to use it, for Claude
+  fonts: string[];
+  draw: (c: Ctx) => string;
+};
+
+// A small headline and a quiet line under it, in a corner.
+function drawQuiet(c: Ctx) {
+  const face = FACE.semi;
+  const head = fitText(c, face, c.headline, 64, 44, 700, 3);
+  const lh = Math.round(head.size * 1.14);
+  const headH = (head.lines.length - 1) * lh + head.size * face.cap;
+  const ctaSize = 30, gap = c.cta ? 36 : 0, ctaH = c.cta ? ctaSize * face.cap : 0;
+  const blockH = headH + gap + ctaH;
+  const y0 = c.top ? c.safeTop + 6 : c.h - c.safeBottom - blockH;
+  const lift = c.dark ? LIFT : "";
+  const edge = c.top ? y0 + blockH : c.h - y0;
+  return [
+    c.dark ? shade(c, edge + 260, 0.6) : "",
+    linesEl(face, head.size, head.lines, c.margin, y0 + head.size * face.cap, lh, c.ink, lift),
+    c.cta ? arrowCta(c, FACE.semi, ctaSize, c.margin, y0 + headH + gap + ctaH, c.ink, readable(c.accent, c.dark), lift) : "",
+  ].join("\n");
+}
+
+// A light card in a corner, like a label on a menu.
+function drawCard(c: Ctx) {
+  const pad = 44, inkC = "#1C1915", muted = "#8C8378";
+  const maxText = Math.min(c.w * 0.62, 620) - pad * 2;
+  const nameSize = 21, nameSp = 3.5, ctaSize = 28;
+  const name = c.name.toUpperCase();
+  const head = fitText(c, FACE.serif, c.headline, 54, 36, maxText, 3);
+  const lh = Math.round(head.size * 1.16);
+  const headH = (head.lines.length - 1) * lh + head.size * FACE.serif.cap;
+  const nameW = name ? c.width(FACE.semi, name, nameSize, nameSp) : 0;
+  const ctaW = c.cta ? c.width(FACE.semi, c.cta + " →", ctaSize) + ctaSize * 0.4 : 0;
+  const cardW = Math.max(320, Math.min(maxText, Math.max(head.widest, nameW, ctaW))) + pad * 2;
+  const nameH = name ? nameSize * FACE.semi.cap + 26 : 0;
+  const ctaH = c.cta ? 34 + ctaSize * FACE.semi.cap : 0;
+  const cardH = pad + nameH + headH + ctaH + pad + 4;
+  const x = c.margin, y = c.top ? c.safeTop : c.h - c.safeBottom - cardH;
+  const tx = x + pad;
+  let ty = y + pad;
+  const out = [`<rect x="${x}" y="${r(y)}" width="${r(cardW)}" height="${r(cardH)}" rx="26" fill="#FBF8F2" fill-opacity="0.96" filter="url(#float)"/>`];
+  if (name) {
+    out.push(textEl(FACE.semi, nameSize, tx, ty + nameSize * FACE.semi.cap, muted, xml(name), ` letter-spacing="${nameSp}"`));
+    ty += nameH;
+  }
+  out.push(linesEl(FACE.serif, head.size, head.lines, tx, ty + head.size * FACE.serif.cap, lh, inkC));
+  ty += headH;
+  if (c.cta) out.push(arrowCta(c, FACE.semi, ctaSize, tx, ty + 34 + ctaSize * FACE.semi.cap, inkC, readable(c.accent, false)));
+  return out.join("\n");
+}
+
+// Centred serif words, like a magazine page.
+function drawEditorial(c: Ctx) {
+  const cx = c.w / 2, mid = ` text-anchor="middle"`;
+  const lift = c.dark ? LIFT : "";
+  const name = c.name.toUpperCase(), nameSize = 22, nameSp = 6;
+  const head = fitText(c, FACE.italic, c.headline, 78, 50, c.w * 0.8, 3);
+  const lh = Math.round(head.size * 1.1);
+  const headH = (head.lines.length - 1) * lh + head.size * FACE.italic.cap;
+  const ctaSize = 24, ctaSp = 4.5;
+  // Each part with the space under it.
+  const parts: { h: number; gap: number; draw: (y: number) => string }[] = [];
+  if (name) parts.push({ h: nameSize * FACE.semi.cap, gap: 30, draw: (y) => textEl(FACE.semi, nameSize, cx, y + nameSize * FACE.semi.cap, c.ink, xml(name), `${mid} letter-spacing="${nameSp}" fill-opacity="0.85"${lift}`) });
+  parts.push({ h: headH, gap: 34, draw: (y) => linesEl(FACE.italic, head.size, head.lines, cx, y + head.size * FACE.italic.cap, lh, c.ink, mid + lift) });
+  if (c.cta) {
+    parts.push({ h: 2, gap: 30, draw: (y) => `<rect x="${cx - 32}" y="${r(y)}" width="64" height="2" fill="${readable(c.accent, c.dark)}"/>` });
+    parts.push({ h: ctaSize * FACE.semi.cap, gap: 0, draw: (y) => textEl(FACE.semi, ctaSize, cx, y + ctaSize * FACE.semi.cap, c.ink, xml(c.cta.toUpperCase()), `${mid} letter-spacing="${ctaSp}"${lift}`) });
+  }
+  parts[parts.length - 1].gap = 0;
+  const blockH = parts.reduce((s, p) => s + p.h + p.gap, 0);
+  let y = c.top ? c.safeTop + 10 : c.h - c.safeBottom - blockH;
+  const edge = c.top ? y + blockH : c.h - y;
+  const out = [c.dark ? shade(c, edge + 260, 0.55) : ""];
+  for (const p of parts) { out.push(p.draw(y)); y += p.h + p.gap; }
+  return out.join("\n");
+}
+
+// A small coloured label with the headline, for short punchy news.
+function drawTag(c: Ctx) {
+  const face = FACE.bold, padX = 30, padY = 24;
+  const head = fitText(c, face, c.headline, 42, 30, Math.min(c.w * 0.58, 600), 2);
+  const lh = Math.round(head.size * 1.16);
+  const boxW = head.widest + padX * 2;
+  const boxH = (head.lines.length - 1) * lh + head.size * face.cap + padY * 2;
+  const ctaSize = 28, ctaGap = 30, ctaH = c.cta ? ctaGap + ctaSize * FACE.semi.cap : 0;
+  const x = c.margin, y = c.top ? c.safeTop : c.h - c.safeBottom - boxH - ctaH;
+  const lift = c.dark ? LIFT : "";
+  const edge = c.top ? y + boxH + ctaH : c.h - y;
+  return [
+    c.dark && c.cta ? shade(c, edge + 180, 0.4) : "",
+    `<rect x="${x}" y="${r(y)}" width="${r(boxW)}" height="${r(boxH)}" rx="16" fill="${c.accent}"/>`,
+    linesEl(face, head.size, head.lines, x + padX, y + padY + head.size * face.cap, lh, inkOn(c.accent)),
+    c.cta ? arrowCta(c, FACE.semi, ctaSize, x + 4, y + boxH + ctaH, c.ink, c.ink, lift) : "",
+  ].join("\n");
+}
+
+// A calm strip along the edge with the headline and a small button.
+function drawBand(c: Ctx) {
+  const inset = c.tall ? c.margin : 0;
+  const barW = c.w - inset * 2, padX = c.tall ? 44 : c.margin, padY = c.tall ? 36 : 44;
+  const bg = c.dark ? "#15120F" : "#FBF8F2", fg = c.dark ? "#FFFFFF" : "#1C1915";
+  const ctaSize = 28, pillH = 68;
+  const pillW = c.cta ? c.width(FACE.semi, c.cta, ctaSize) + 56 : 0;
+  const name = c.name.toUpperCase(), nameSize = 20, nameSp = 3;
+  const head = fitText(c, FACE.semi, c.headline, 40, 28, barW - padX * 2 - (c.cta ? pillW + 40 : 0), 2);
+  const lh = Math.round(head.size * 1.18);
+  const headH = (head.lines.length - 1) * lh + head.size * FACE.semi.cap;
+  const nameH = name ? nameSize * FACE.semi.cap + 18 : 0;
+  const contentH = Math.max(nameH + headH, c.cta ? pillH : 0);
+  const barH = contentH + padY * 2;
+  const y = c.top ? (c.tall ? c.safeTop : 0) : (c.tall ? c.h - c.safeBottom - barH : c.h - barH);
+  const textTop = y + padY + (contentH - nameH - headH) / 2;
+  const tx = inset + padX;
+  const pillFill = readable(c.accent, c.dark);
+  const out = [`<rect x="${inset}" y="${r(y)}" width="${barW}" height="${r(barH)}" rx="${c.tall ? 24 : 0}" fill="${bg}" fill-opacity="0.94"/>`];
+  if (name) out.push(textEl(FACE.semi, nameSize, tx, textTop + nameSize * FACE.semi.cap, fg, xml(name), ` letter-spacing="${nameSp}" fill-opacity="0.55"`));
+  out.push(linesEl(FACE.semi, head.size, head.lines, tx, textTop + nameH + head.size * FACE.semi.cap, lh, fg));
+  if (c.cta) {
+    const px = inset + barW - padX - pillW, py = y + padY + (contentH - pillH) / 2;
+    out.push(`<rect x="${r(px)}" y="${r(py)}" width="${r(pillW)}" height="${pillH}" rx="${pillH / 2}" fill="${pillFill}"/>`);
+    out.push(textEl(FACE.semi, ctaSize, px + pillW / 2, py + pillH / 2 + ctaSize * FACE.semi.cap / 2, inkOn(pillFill), xml(c.cta), ` text-anchor="middle"`));
+  }
+  return out.join("\n");
+}
+
+// One small spaced-out line and nothing else: the photo does the talking.
+function drawSignature(c: Ctx) {
+  const face = FACE.semi, sp = 6, cx = c.w / 2;
+  const text = c.headline.toUpperCase();
+  const head = fitText(c, face, text, 32, 24, c.w - c.margin * 2 - 40, 2, sp);
+  const lh = Math.round(head.size * 1.7);
+  const headH = (head.lines.length - 1) * lh + head.size * face.cap;
+  const rule = 2, gap = 28, blockH = rule + gap + headH;
+  const y0 = c.top ? c.safeTop + 10 : c.h - c.safeBottom - blockH;
+  const lift = c.dark ? LIFT : "";
+  const edge = c.top ? y0 + blockH : c.h - y0;
+  return [
+    c.dark ? shade(c, edge + 220, 0.45) : "",
+    `<rect x="${cx - 20}" y="${r(y0)}" width="40" height="${rule}" fill="${readable(c.accent, c.dark)}"/>`,
+    linesEl(face, head.size, head.lines, cx, y0 + rule + gap + head.size * face.cap, lh, c.ink, ` text-anchor="middle" letter-spacing="${sp}"${lift}`),
+  ].join("\n");
+}
+
+// The first layout (October 2026), kept only to compare against in the lab.
+function drawClassic(c: Ctx) {
+  const face = FACE.bold, w = c.w, h = c.h;
+  const head = fitText(c, face, c.headline, 108, 56, w - 144, 3);
+  const size = head.size, lines = head.lines;
   const lineH = Math.round(size * 1.1);
   const headH = (lines.length - 1) * lineH + Math.round(size * 1.05);
-  const bar = 8, barGap = 30, ctaGap = 46, pillH = 92, ctaSize = 40;
-  const groupH = bar + barGap + headH + (o.cta ? ctaGap + pillH : 0);
-  const top = o.position === "top";
-  const groupTop = top ? safeTop : h - safeBottom - groupH;
+  const bar = 8, barGap = 30, ctaGap = 46, pillH = 92, ctaSize = 40, m = 72;
+  const safeTop = c.tall ? 270 : 72, safeBottom = c.tall ? 360 : 84;
+  const groupH = bar + barGap + headH + (c.cta ? ctaGap + pillH : 0);
+  const groupTop = c.top ? safeTop : h - safeBottom - groupH;
   const headTop = groupTop + bar + barGap;
-  const pillW = Math.round(o.cta.length * ctaSize * 0.6 + 96);
+  const pillW = Math.round(c.width(face, c.cta, ctaSize) + 96);
   const pillY = headTop + headH + ctaGap;
-  const nameY = top ? h - safeBottom : safeTop - 14;
-  const name = o.name.length > 30 ? o.name.slice(0, 29) + "…" : o.name;
-
-  const scrimMain = top
-    ? `<rect x="0" y="0" width="${w}" height="${Math.round(h * 0.62)}" fill="url(#shadeTop)"/>`
-    : `<rect x="0" y="${Math.round(h * 0.38)}" width="${w}" height="${Math.round(h * 0.62)}" fill="url(#shadeBottom)"/>`;
-  const scrimName = top
-    ? `<rect x="0" y="${h - 300}" width="${w}" height="300" fill="url(#shadeBottom)" opacity="0.55"/>`
-    : `<rect x="0" y="0" width="${w}" height="${safeTop + 120}" fill="url(#shadeTop)" opacity="0.55"/>`;
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-<defs>
-<linearGradient id="shadeBottom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.55" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0.84"/></linearGradient>
-<linearGradient id="shadeTop" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.55" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0.84"/></linearGradient>
-</defs>
-<image href="${o.photo}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/>
-${scrimMain}
-${scrimName}
-<rect x="${margin}" y="${groupTop}" width="104" height="${bar}" rx="${bar / 2}" fill="${o.accent}"/>
-${lines.map((l, i) => `<text x="${margin}" y="${headTop + Math.round(size * 0.86) + i * lineH}" font-family="Inter" font-weight="700" font-size="${size}" fill="#ffffff">${xml(l)}</text>`).join("\n")}
-${o.cta ? `<rect x="${margin}" y="${pillY}" width="${pillW}" height="${pillH}" rx="${pillH / 2}" fill="${o.accent}"/>
-<text x="${margin + pillW / 2}" y="${pillY + Math.round(pillH / 2 + ctaSize * 0.36)}" text-anchor="middle" font-family="Inter" font-weight="700" font-size="${ctaSize}" fill="${inkOn(o.accent)}">${xml(o.cta)}</text>` : ""}
-${name ? `<text x="${margin}" y="${nameY}" font-family="Inter" font-weight="700" font-size="30" letter-spacing="5" fill="#ffffff" fill-opacity="0.92">${xml(name.toUpperCase())}</text>` : ""}
-</svg>`;
+  const nameY = c.top ? h - safeBottom : safeTop - 14;
+  return [
+    c.top ? `<rect x="0" y="0" width="${w}" height="${Math.round(h * 0.62)}" fill="url(#fadeDown)" opacity="0.84"/>`
+      : `<rect x="0" y="${Math.round(h * 0.38)}" width="${w}" height="${Math.round(h * 0.62)}" fill="url(#fadeUp)" opacity="0.84"/>`,
+    `<rect x="${m}" y="${groupTop}" width="104" height="${bar}" rx="${bar / 2}" fill="${c.accent}"/>`,
+    linesEl(face, size, lines, m, headTop + Math.round(size * 0.86), lineH, "#FFFFFF"),
+    c.cta ? `<rect x="${m}" y="${pillY}" width="${pillW}" height="${pillH}" rx="${pillH / 2}" fill="${c.accent}"/>` +
+      textEl(face, ctaSize, m + pillW / 2, pillY + Math.round(pillH / 2 + ctaSize * 0.36), inkOn(c.accent), xml(c.cta), ` text-anchor="middle"`) : "",
+    c.name ? textEl(face, 30, m, nameY, "#FFFFFF", xml(c.name.toUpperCase()), ` letter-spacing="5" fill-opacity="0.92"`) : "",
+  ].join("\n");
 }
 
-// The finished ad as a PNG, or null when there is nothing to write on it.
+const LAYOUTS: Record<string, Layout> = {
+  quiet: {
+    label: "Tiho", hint: "Mali naslov i diskretan poziv u uglu. Za svakodnevne razloge i navike.",
+    when: "a small headline with a quiet call-to-action line in a corner - everyday reasons to come, habits, the hour of the day",
+    fonts: ["Inter 600"], draw: drawQuiet,
+  },
+  card: {
+    label: "Kartica", hint: "Svetla kartica u uglu, kao etiketa na meniju. Za proizvod izbliza.",
+    when: "a small light card in a corner with a serif headline, like a menu label - one product up close, something new on the menu",
+    fonts: ["Inter 600", "Playfair 600"], draw: drawCard,
+  },
+  editorial: {
+    label: "Magazin", hint: "Centriran kurziv, kao stranica časopisa. Za ambijent, ljude i mesto.",
+    when: "centred italic serif words like a magazine page - the place itself, the atmosphere, the people behind it, a special evening",
+    fonts: ["Inter 600", "Playfair 400i"], draw: drawEditorial,
+  },
+  tag: {
+    label: "Etiketa", hint: "Mala obojena etiketa sa kratkom vešću. Za vreme, sat, danas.",
+    when: "a small label in the accent colour holding a very short headline - news for today: the weather, the hour, fresh out of the oven",
+    fonts: ["Inter 600", "Inter 700"], draw: drawTag,
+  },
+  band: {
+    label: "Traka", hint: "Mirna traka uz ivicu sa malim dugmetom. Za datume, događaje i radno vreme.",
+    when: "a calm strip along the edge with the headline and a small button - a date coming up, an event, changed opening hours, booking",
+    fonts: ["Inter 600"], draw: drawBand,
+  },
+  signature: {
+    label: "Potpis", hint: "Samo jedan tih red, bez dugmeta. Kad slika sama sve kaže.",
+    when: "one small spaced-out line and no button - when the photo says it all; the call to action stays in the caption",
+    fonts: ["Inter 600"], draw: drawSignature,
+  },
+  classic: {
+    label: "Stari (za poređenje)", hint: "Prvi layout iz oktobra. Nije u dropu.",
+    when: "", fonts: ["Inter 700"], draw: drawClassic,
+  },
+};
+
+// The layouts the drop picks from. The lab shows all of them.
+const DROP_LAYOUTS = ["quiet", "card", "editorial", "tag", "band", "signature"];
+
+const OVERLAY_DEFS = `<linearGradient id="fadeUp" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#000" stop-opacity="1"/><stop offset="0.45" stop-color="#000" stop-opacity="0.62"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+<linearGradient id="fadeDown" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="1"/><stop offset="0.45" stop-color="#000" stop-opacity="0.62"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+<filter id="lift" x="-20%" y="-60%" width="140%" height="220%"><feDropShadow dx="0" dy="2" stdDeviation="9" flood-color="#000" flood-opacity="0.45"/></filter>
+<filter id="float" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="22" flood-color="#000" flood-opacity="0.22"/></filter>`;
+
+// Whether the part of the photo under the text is dark, from a tiny copy of it.
+function zoneIsDark(href: string, w: number, h: number, top: boolean) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><image href="${href}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/></svg>`;
+  const rv = new Resvg(svg, { fitTo: { mode: "width", value: 36 }, font: { loadSystemFonts: false } });
+  try {
+    const img = rv.render();
+    try {
+      const px = img.pixels, pw = img.width, ph = img.height;
+      const from = top ? 0 : Math.floor(ph * 0.62), to = top ? Math.ceil(ph * 0.38) : ph;
+      let sum = 0, n = 0;
+      for (let y = from; y < to; y++) {
+        for (let x = 0; x < pw; x++) {
+          const i = (y * pw + x) * 4;
+          sum += 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+          n++;
+        }
+      }
+      return n ? sum / n < 150 : true;
+    } finally { img.free(); }
+  } finally { rv.free(); }
+}
+
+type AdText = {
+  headline: string; cta: string; name: string; accent: string;
+  position: "top" | "bottom"; layout: string;
+  photoTone?: "auto" | "dark" | "light";
+};
+
+// The finished ad as a PNG.
+async function renderAd(photo: Uint8Array, type: string, ratio: [number, number], t: AdText) {
+  const layout = LAYOUTS[t.layout] || LAYOUTS[DROP_LAYOUTS[0]];
+  await overlayRenderer();
+  const fonts = await Promise.all(layout.fonts.map(overlayFont));
+  const metrics = new Map(layout.fonts.map((k, i) => [k, fonts[i].metrics] as [string, Metrics]));
+  const w = OVERLAY_WIDTH;
+  const h = Math.round((w * ratio[1]) / ratio[0]);
+  const href = `data:${type};base64,${base64(photo)}`;
+  const top = t.position === "top";
+  const dark = t.photoTone === "dark" ? true : t.photoTone === "light" ? false : zoneIsDark(href, w, h, top);
+  const tall = h / w > 1.7; // stories: keep clear of the app's own buttons
+  const margin = 80;
+  const c: Ctx = {
+    w, h, tall, margin, top, dark,
+    safeTop: tall ? 270 : margin, safeBottom: tall ? 380 : margin,
+    ink: dark ? "#FFFFFF" : "#17140F",
+    headline: t.headline.trim(), cta: t.cta.trim(), name: t.name.trim().slice(0, 40),
+    accent: /^#[0-9a-f]{6}$/i.test(t.accent) ? t.accent : "#F5A524",
+    width: (face, text, size, spacing = 0) => {
+      const m = metrics.get(face.font)!;
+      let units = 0, n = 0;
+      for (const ch of text) { units += m.advance(ch.codePointAt(0)!); n++; }
+      return (units * size) / m.upm + spacing * Math.max(0, n - 1);
+    },
+  };
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+<defs>${OVERLAY_DEFS}</defs>
+<image href="${href}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/>
+${layout.draw(c)}
+</svg>`;
+  const rv = new Resvg(svg, { font: { fontBuffers: fonts.map((f) => f.bytes), defaultFontFamily: "Inter", loadSystemFonts: false } });
+  try {
+    const img = rv.render();
+    try { return img.asPng(); } finally { img.free(); }
+  } finally { rv.free(); }
+}
+// --- overlay:end
+
+// The finished ad for one job, or null when there is nothing to write on it.
 async function composeAd(job: Job, photo: Uint8Array, type: string) {
   const headline = String(job.headline || "").trim();
   if (!headline) return null;
   const o = job.overlay || {};
   const [aw, ah] = String(job.aspect_ratio).split(":").map(Number);
-  const accent = /^#[0-9a-f]{6}$/i.test(o.accent || "") ? o.accent : "#F5A524";
-  const svg = overlaySvg({
-    photo: `data:${type};base64,${base64(photo)}`,
-    ratio: [aw || 4, ah || 5],
+  return await renderAd(photo, type, [aw || 4, ah || 5], {
     headline,
-    cta: String(o.cta || "").trim(),
-    name: String(o.name || "").trim(),
+    cta: String(o.cta || ""),
+    name: String(o.name || ""),
+    accent: String(o.accent || ""),
     position: o.position === "top" ? "top" : "bottom",
-    accent,
+    layout: DROP_LAYOUTS.includes(o.layout) ? o.layout : DROP_LAYOUTS[0],
   });
-  const font = await overlayEngine();
-  const resvg = new Resvg(svg, { font: { fontBuffers: [font], defaultFontFamily: "Inter", loadSystemFonts: false } });
-  return resvg.render().asPng();
 }
-// --- overlay:end
 
 async function store(job: Job, bytes: Uint8Array, type: string) {
   const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/svg+xml": "svg" }[type] || "png";
@@ -1104,9 +1500,13 @@ async function poll(job: Job) {
 
 const CHECK_SYSTEM = `You check the pictures made for a small local business's social media ads before the owner sees them. Be the owner's critical eye: would they be glad to post this?
 
-The picture is a finished ad: the headline, a call-to-action button and the business's name were written onto the photo afterwards, and they are meant to be there. Read them: they must match the words you are given, be spelled right and be easy to read.
+The picture is a finished ad: the headline, the call to action and sometimes the business's name were written onto the photo afterwards, and they are meant to be there. Read them: they must match the words you are given, be spelled right and be easy to read.
 
-Score 1-10. Below ${PASS_SCORE} means it should be made again. Mark it down hard for: any other text, letters, numbers, logos or watermarks that the photo itself shows; the headline or button hard to read or covering the main subject; warped hands, faces, food or objects; anything that breaks the business's rules; a photo that doesn't fit the business or the ad; a cheap stock-photo look; anything unappetising or unsafe. When it falls short, write a better prompt for the photo generator (a prompt for the photo only, never asking for text) that fixes what's wrong while keeping the idea.`;
+Then read every other piece of writing the photo itself shows - on cups, glasses, packaging, tea bag tags, signs, boards, menus, screens. The generator invents letters, and they come out as nonsense or near-words (a cup that says "Laffe" is neither "caffe" nor "latte"). Any writing in the photo that isn't ours scores at most 4; nonsense or misspelled words score at most 3. Name the exact words you see in problems.
+
+It must look like a photo shot for the business's ad campaign by a professional - styled, tidy, the product fresh and at its best - not a snapshot by a passer-by. A used napkin or tissue, a spill or stain, crumbs, a half-eaten or half-drunk item, dirty dishes, paper plates, wrappers, tea bag tags or clutter score at most 4.
+
+Score 1-10. Below ${PASS_SCORE} means it should be made again. Mark it down hard, too, for: the words hard to read or covering the main subject; warped hands, faces, food or objects; anything that breaks the business's rules; a photo that doesn't fit the business or the ad; a cheap stock-photo look; anything unappetising or unsafe. When it falls short, write a better prompt for the photo generator (a prompt for the photo only, never asking for text) that fixes what's wrong while keeping the idea, and says outright what to leave out (for example "a plain unbranded white cup with nothing printed on it", "a clean table with nothing else on it").`;
 
 const CHECK_SCHEMA = {
   type: "object",
@@ -1135,7 +1535,7 @@ async function check(job: Job, p: Profile, log: Log) {
           type: "text",
           text: `Business: ${p.business_name || ""}, a ${p.vertical || "local business"} in ${p.city || "town"}. Sells: ${p.what_you_sell || ""}.` +
             `\nAd for ${job.channel} (${job.format}). Headline on the picture: "${job.headline}"` +
-            (job.overlay?.cta ? `, button: "${job.overlay.cta}"` : "") +
+            (job.overlay?.cta ? `, call to action: "${job.overlay.cta}"` : "") +
             `. Caption under it: ${job.caption}` +
             `\nThe idea: ${job.idea || ""}\nThe prompt that made it: ${job.image_prompt}` +
             (rules.length ? `\nThe business's rules: ${rules.join(" ")}` : ""),
