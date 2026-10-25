@@ -37,7 +37,7 @@ Adronis never asks the owner to make anything. No brief queue, no revision calls
 - **Beta-only until public launch (planned 1 February 2027).** Applying means signing up with the full brief; the team switches the Beta plan on in the portal. Seats are limited because every tester costs real generation money. Beta testing starts in early November 2026 — copy must say "starts soon / early November", never that it has started.
 - **Plans (VAT included):** Free (3 ads/month, 1 channel — hidden during beta), Counter €59/month (4 ads/week, 2 channels), Storefront €149/month, Franchise €490/month (sold only after a conversation, never self-serve). 20% annual discount; public code ADRONIS20; FOUNDER30 only for beta venues. All billing goes through Paddle (sandbox until launch, deliberately).
 - Publishing is manual during the beta (no Meta API yet); copy must not imply instant automatic publishing to every network until that exists.
-- Domain adronis.app is not bought yet; the live site is adronis.vercel.app. Email confirmation, password-reset mail and the privacy@/legal@/ip@ mailboxes wait for the domain.
+- Domain: the live site is www.adronis.app (adronis.app redirects there; bought 2026-10-25). Still waiting on the domain setup: Resend sending, email confirmation back on, and the privacy@/legal@/ip@ mailboxes.
 - Terms and Privacy still carry legal-entity placeholders until the founder decides with their partner who Adronis runs under. Do not fill them in.
 - Referral invites are live with no reward promised; perks are undecided.
 - No pause option and no retention offers at cancellation — only a neutral "why are you leaving?" question.
