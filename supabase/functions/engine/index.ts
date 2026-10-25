@@ -51,6 +51,8 @@
 //   HIGGSFIELD_USD_PER_IMAGE  what one image costs, for generation_costs; Higgsfield's
 //                             answer doesn't say, so without it images are logged at 0
 //   WEATHER                   "off" to stop asking Open-Meteo for the forecast
+//   PRODUCT_PHOTOS            "on" to put the business's real product photos into
+//                             the ads (Marketing Studio, paid); off by default
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase itself.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -95,6 +97,10 @@ const HF_ID = secret("HIGGSFIELD_API_KEY_ID");
 const HF_SECRET = secret("HIGGSFIELD_API_KEY_SECRET");
 // The newer keys from open.higgsfield.ai are one string, sent as "Key <key>".
 const HF_KEY = secret("HIGGSFIELD_API_KEY") || (HF_ID && HF_SECRET ? `${HF_ID}:${HF_SECRET}` : "");
+// The business's own product photos placed into the ads (Marketing Studio,
+// paid per picture). Off during the closed beta to keep costs down; set the
+// secret PRODUCT_PHOTOS to "on" to bring them back.
+const PRODUCT_PHOTOS = secret("PRODUCT_PHOTOS") === "on";
 const HF_MODEL = (secret("HIGGSFIELD_MODEL") || "higgsfield-ai/soul/standard").replace(/^\/+/, "");
 const HF_PRICE = Number(secret("HIGGSFIELD_USD_PER_IMAGE")) || 0;
 const WEATHER = secret("WEATHER").toLowerCase() !== "off";
@@ -958,8 +964,9 @@ The image prompt is for a photo generator, in English. Write it the way a top ad
 The generator makes up letters on anything that could carry print, and they come out as nonsense words (a cup that says "Laffe"). So say that every cup, glass, plate, bag, box and bottle is plain and unbranded with nothing printed on it, and keep menus, signs, boards, labels, packaging with writing, books, newspapers and screens out of the frame - except the real product from a reference photo, which keeps its own real packaging.
 Leave one third of the frame calm - a soft wall, a table surface, a blurred background - because a few small words are laid over it, and put the subject in the rest of the frame. Say in text_position whether that calm third is at the top or at the bottom. Never ask the generator for text, letters, words, numbers, logos, menus, signs with writing or watermarks: the words are added afterwards. Avoid hands holding things up close and crowds of faces; they come out wrong.
 
-product_photo: when the ad is about one product that is shown in one of the business's own photos (labelled P1, P2... above the brief - from their website or what they uploaded), give that label. The real photo then goes to the generator, which places that exact product into your scene, so it looks the same as in real life. Pick it only when the photo clearly shows that one product well and the ad is about it; otherwise leave it empty. With a product_photo, the image prompt describes the scene, the set, the light and the angle around "the product from the reference photo" - never re-describe the product's look, so the generator keeps it as it really is. Use the real product photos in most of the week's ads when they fit.
-own_photo: the business's own photo used as the picture itself, with no generator at all - the realest ad there is. Give the label of one of the owner's uploaded photos (only those marked "uploaded by the owner") when it is sharp, well lit, well framed, shows the place, the people or the product at its best, and has a calm part for the words; then the image prompt is not used, so just describe the photo in it. Use one or two of the owner's own photos a week when they are that good, never a blurry, dark, cluttered or badly framed one, and never the same photo two weeks running. Leave it empty otherwise.
+${PRODUCT_PHOTOS ? `product_photo: when the ad is about one product that is shown in one of the business's own photos (labelled P1, P2... above the brief - from their website or what they uploaded), give that label. The real photo then goes to the generator, which places that exact product into your scene, so it looks the same as in real life. Pick it only when the photo clearly shows that one product well and the ad is about it; otherwise leave it empty. With a product_photo, the image prompt describes the scene, the set, the light and the angle around "the product from the reference photo" - never re-describe the product's look, so the generator keeps it as it really is. Use the real product photos in most of the week's ads when they fit.`
+  : "product_photo: always leave it empty."}
+own_photo: always leave it empty - every picture is made by the generator.
 
 accent_color is the one small touch of colour in the layout (the arrow, a thin line), from the brand's colours.
 
@@ -1214,8 +1221,8 @@ async function writeCopy(run: Run, log: Log) {
   let ads: any[];
   // The business's own product photos Claude may put into an ad, by label.
   const refs = new Map<string, string>();
-  // The owner's own photos that can be the picture itself (JPEG and PNG: the
-  // renderer reads no WebP).
+  // The owner's own photos as the picture itself: turned off - every picture
+  // is made by the generator. The list stays empty.
   const own: string[] = [];
   // Once per drop: fresh product photos from the business's website.
   if (claude && !written.length) await siteProducts(run.user_id, p.website).catch((e) => console.error("website: " + e.message));
@@ -1233,10 +1240,9 @@ async function writeCopy(run: Run, log: Log) {
     ]);
     const content: any[] = [];
     for (const f of files) {
-      if (f.kind === "photos" || f.kind === "site") {
+      if (PRODUCT_PHOTOS && (f.kind === "photos" || f.kind === "site")) {
         const label = `P${refs.size + 1}`;
         refs.set(label, f.path);
-        if (f.kind === "photos" && /\.(jpe?g|png)$/i.test(f.path)) own.push(label);
         const named = f.kind === "site" ? f.path.split("/").pop()!.replace(/^\d+-|\.[a-z]+$/g, "") : "";
         content.push({ type: "text", text: `${label} - ${f.kind === "site" ? `from their website (file name "${named}")` : "uploaded by the owner"}:` });
       }
