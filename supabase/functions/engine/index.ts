@@ -772,10 +772,10 @@ function practiceLook(p: Profile, key: string, taken: { photo_style: string; fon
   ], Object.keys(FONT_PAIRS));
   const h = hashOf(String(p.id || p.email || key));
   // The first combination, from this account's own starting point, that no neighbour has.
-  let photo_style = styles[h % styles.length], fonts = pairs[(h >> 4) % pairs.length];
+  let photo_style = styles[h % styles.length], fonts = pairs[(h >>> 4) % pairs.length];
   outer: for (let i = 0; i < styles.length; i++) {
     for (let j = 0; j < pairs.length; j++) {
-      const s = styles[(h + i) % styles.length], f = pairs[((h >> 4) + j) % pairs.length];
+      const s = styles[(h + i) % styles.length], f = pairs[((h >>> 4) + j) % pairs.length];
       if (!taken.some((t) => t.photo_style === s && t.fonts === f)) { photo_style = s; fonts = f; break outer; }
     }
   }
@@ -784,7 +784,7 @@ function practiceLook(p: Profile, key: string, taken: { photo_style: string; fon
   const voice = /luks|luxur|fine|elegan/.test(text) ? "refined"
     : /tradic|domać|domac|kafan|pekar|bakery/.test(text) ? "homely"
     : /mlad|young|student|street/.test(text) ? "youthful"
-    : ["neighbourly", "witty", "direct"][(h >> 8) % 3];
+    : ["neighbourly", "witty", "direct"][(h >>> 8) % 3];
   const all = DROP_LAYOUTS;
   const layouts = [all[h % 4], all[(h + 1) % 4], all[(h + 2) % 4]];
   return {
