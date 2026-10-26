@@ -25,16 +25,16 @@
   if (customElements.get("lb-swipe")) return;
 
   var CARDS = [
-    { img: "examples/pizza.jpg", name: "Marko Pizza", initial: "M", tint: "#f2b27a", channel: "Instagram", day: "MON", time: "18:30",
-      alt: "Example ad for a pizza place: No ideas for dinner?", caption: "No ideas for dinner? Fresh pizza, hot from the oven tonight." },
-    { img: "examples/bakery.jpg", name: "The Corner Bakery", initial: "C", tint: "#e8d5b8", channel: "Facebook", day: "TUE", time: "07:00",
-      alt: "Example ad for a bakery: Good morning! Freshly baked donuts and pastry.", caption: "Fresh out of the oven at 7am. Grab one on your way to work." },
-    { img: "examples/salon.jpg", name: "Glow Hair Salon", initial: "G", tint: "#f0c9c9", channel: "Instagram", day: "WED", time: "12:30",
-      alt: "Example ad for a hair salon: Time for a change?", caption: "Book a quick trim this week and walk out feeling new." },
-    { img: "examples/cafe.jpg", name: "The Daily Grind Café", initial: "D", tint: "#e8d5b8", channel: "Instagram", day: "THU", time: "08:00",
-      alt: "Example story for a café: Hard Monday? Get your perfect coffee fix.", caption: "Hard week? Your perfect coffee fix is two minutes away." },
-    { img: "examples/fitness.jpg", name: "Strong Life Fitness", initial: "S", tint: "#e6c58f", channel: "TikTok", day: "FRI", time: "17:15",
-      alt: "Example ad for a gym: Time to work out!", caption: "Personal plans and expert guidance. Your first session is on us." }
+    { img: "examples/ad-1-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Instagram", day: "MON", time: "07:00",
+      alt: "Example ad for a bakery: Bread that rises for 24 hours.", caption: "Our bread rests a full day before it goes in the oven. The first batch is out at 7." },
+    { img: "examples/ad-5-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Facebook", day: "TUE", time: "11:30",
+      alt: "Example ad for a bakery: Rolls from a family recipe.", caption: "Grandma's recipe, still rolled by hand every afternoon." },
+    { img: "examples/ad-3-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Instagram", day: "WED", time: "12:00",
+      alt: "Example ad for a bakery: Something sweet for the feast.", caption: "Cakes for your celebration, made to order. Let us know a week ahead." },
+    { img: "examples/ad-6-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Instagram", day: "THU", time: "08:00",
+      alt: "Example ad for a bakery: Day off, warm croissant.", caption: "Day off? Warm croissants until 7 pm." },
+    { img: "examples/ad-2-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "TikTok", day: "FRI", time: "13:00",
+      alt: "Example ad for a bakery: Warm batch at 3 pm.", caption: "A second warm batch comes out at 3 pm. Grab one on your way home." }
   ];
 
   // How far a flick carries: Apple's projection, a touch snappier than scroll.
@@ -84,7 +84,7 @@
     ".sw-av{display:flex;align-items:center;justify-content:center;flex:none;width:30px;height:30px;border-radius:9999px;color:#16130f;font-size:13px;font-weight:700}",
     ".sw-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:600;letter-spacing:-.01em;color:#f2f4f7}",
     ".sw-ch{margin-left:auto;flex:none;padding:4px 10px;border-radius:9999px;border:1px solid rgba(255,255,255,.12);font-size:11.5px;color:#b3b9c4}",
-    ".sw-media{position:relative;aspect-ratio:307/316;background:#15171b;overflow:hidden}",
+    ".sw-media{position:relative;aspect-ratio:4/5;background:#15171b;overflow:hidden}",
     ".sw-media img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}",
     ".sw-cap{margin:0;padding:12px 16px 4px;font-size:13.5px;line-height:1.5;color:#b3b9c4;min-height:52px}",
     ".sw-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px 15px}",
@@ -255,8 +255,8 @@
       var img = el("img");
       img.src = d.img;
       img.alt = d.alt;
-      img.width = 307;
-      img.height = 316;
+      img.width = 600;
+      img.height = 750;
       img.draggable = false;
       img.decoding = "async";
       media.appendChild(img);

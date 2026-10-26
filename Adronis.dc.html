@@ -491,12 +491,12 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
 .story-bars span:first-child{background:rgba(255,255,255,.92)}
 .story-top{display:flex;align-items:center;gap:9px;padding:12px 16px}
 .story-media{flex:1;display:flex;align-items:center;padding:4px 0}
-.story-media img{display:block;width:100%;height:auto;aspect-ratio:307/316}
+.story-media img{display:block;width:100%;height:auto;aspect-ratio:4/5}
 .story-bottom{display:flex;align-items:center;gap:10px;padding:8px 16px 16px}
 .story-msg{flex:1;padding:10px 16px;border-radius:9999px;border:1px solid rgba(255,255,255,.45);font-size:13px;color:rgba(255,255,255,.85)}
 .post{display:flex;flex-direction:column;border-radius:24px;border:1px solid var(--line-2);background:#0d0f13;overflow:hidden;transition:transform .45s var(--ease),border-color .3s ease,box-shadow .45s var(--ease)}
 .post-top{display:flex;align-items:center;gap:9px;padding:12px 14px}
-.post img{display:block;width:100%;height:auto;aspect-ratio:307/316;background:#15171b}
+.post img{display:block;width:100%;height:auto;aspect-ratio:4/5;background:#15171b}
 .post-cap{padding:13px 15px 16px;font-size:13.5px;line-height:1.55;color:var(--text-2)}
 .story:hover,.post:hover{transform:translateY(-6px);border-color:rgba(124,198,255,.6);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(124,198,255,.18),0 0 44px rgba(124,198,255,.1)}
 .av{display:flex;align-items:center;justify-content:center;flex:none;width:28px;height:28px;border-radius:9999px;color:#16130f;font-size:12px;font-weight:700}
@@ -824,7 +824,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
               <div class="mk-t">Your drop is ready</div>
               <div class="mk-d">12 new ads are waiting for your OK.</div>
             </div>
-            <div class="mk-thumbs"><img src="examples/cafe.jpg" alt="" loading="lazy"><img src="examples/bakery.jpg" alt="" loading="lazy"><img src="examples/salon.jpg" alt="" loading="lazy"><img src="examples/carwash.jpg" alt="" loading="lazy"><span>+8</span></div>
+            <div class="mk-thumbs"><img src="examples/ad-1-en.jpg" alt="" loading="lazy"><img src="examples/ad-5-en.jpg" alt="" loading="lazy"><img src="examples/ad-2-en.jpg" alt="" loading="lazy"><img src="examples/ad-3-en.jpg" alt="" loading="lazy"><span>+8</span></div>
           </div>
         </div>
         <div class="step-body">
@@ -836,9 +836,9 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
       <li class="step" data-rv="how" style="transition-delay:.19s">
         <div class="step-vis" aria-hidden="true">
           <div class="mk-sched">
-            <div class="ms-row"><img src="examples/pizza.jpg" alt="" loading="lazy"><div><b>Instagram · Story</b><small><span>MON</span> 18:30</small></div><span class="ms-chip is-live">PUBLISHED</span></div>
-            <div class="ms-row"><img src="examples/bakery.jpg" alt="" loading="lazy"><div><b>Facebook · Feed</b><small><span>WED</span> 12:00</small></div><span class="ms-chip is-slot">SCHEDULED</span></div>
-            <div class="ms-row"><img src="examples/fitness.jpg" alt="" loading="lazy"><div><b>TikTok · Reel</b><small><span>FRI</span> 17:15</small></div><span class="ms-chip is-slot">SCHEDULED</span></div>
+            <div class="ms-row"><img src="examples/ad-4-en.jpg" alt="" loading="lazy"><div><b>Instagram · Story</b><small><span>MON</span> 18:30</small></div><span class="ms-chip is-live">PUBLISHED</span></div>
+            <div class="ms-row"><img src="examples/ad-5-en.jpg" alt="" loading="lazy"><div><b>Facebook · Feed</b><small><span>WED</span> 12:00</small></div><span class="ms-chip is-slot">SCHEDULED</span></div>
+            <div class="ms-row"><img src="examples/ad-2-en.jpg" alt="" loading="lazy"><div><b>TikTok · Reel</b><small><span>FRI</span> 17:15</small></div><span class="ms-chip is-slot">SCHEDULED</span></div>
           </div>
         </div>
         <div class="step-body">
@@ -870,7 +870,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
               <span class="nm">{{ st.name }}</span>
               <span class="chn">Instagram story</span>
             </div>
-            <div class="story-media"><img src="{{ st.img }}" alt="{{ st.alt }}" width="307" height="316" loading="lazy"></div>
+            <div class="story-media"><img src="{{ st.img }}" alt="{{ st.alt }}" width="600" height="750" loading="lazy"></div>
             <div class="story-bottom">
               <span class="story-msg">Send message</span>
               <span style="font-size:18px;color:#fff" aria-hidden="true">&#9825;</span>
@@ -885,7 +885,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
             <span class="nm">{{ p.name }}</span>
             <span class="chn">{{ p.channel }}</span>
           </div>
-          <img src="{{ p.img }}" alt="{{ p.alt }}" width="307" height="316" loading="lazy">
+          <img src="{{ p.img }}" alt="{{ p.alt }}" width="600" height="750" loading="lazy">
           <div class="post-cap">{{ p.caption }}</div>
         </div>
       </sc-for>
@@ -923,7 +923,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
         <p>Turn an ad down with a reason and the engine takes it into your next drop.</p>
       </div>
       <div class="tile" data-rv="ctl" style="transition-delay:.1s">
-        <div class="tile-vis" aria-hidden="true"><div class="tv-dl"><img src="examples/carwash.jpg" alt="" loading="lazy">Download image<span class="mono">↓</span></div></div>
+        <div class="tile-vis" aria-hidden="true"><div class="tv-dl"><img src="examples/ad-1-en.jpg" alt="" loading="lazy">Download image<span class="mono">↓</span></div></div>
         <h3>Download any approved ad</h3>
         <p>Keep a copy of every ad you approved and use it anywhere you like.</p>
       </div>
@@ -1301,15 +1301,15 @@ class Component extends DCLogic {
     // A week of example posts, each dressed as it would appear on its network.
     // Two example Instagram stories, stacked in the first column on desktop.
     const stories = [
-      { row: 1, name: "The Daily Grind Café", initial: "D", tint: "#e8d5b8", img: "examples/cafe.jpg", alt: "Example story for a café: Hard Monday? Get your perfect coffee fix." },
-      { row: 2, name: "Marko Pizza", initial: "M", tint: "#f2b27a", img: "examples/pizza.jpg", alt: "Example story for a pizza place: No ideas for dinner?" }
+      { row: 1, name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "examples/ad-4-en.jpg", alt: "Example story for a bakery: Everything is baked here." },
+      { row: 2, name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "examples/ad-6-en.jpg", alt: "Example story for a bakery: Day off, warm croissant." }
     ];
 
     const posts = [
-      { channel: "Instagram", name: "The Corner Bakery", initial: "C", tint: "#e8d5b8", img: "examples/bakery.jpg", alt: "Example ad for a bakery: Good morning! Freshly baked donuts and pastry.", caption: "Fresh out of the oven at 7am. Grab one on your way to work." },
-      { channel: "Facebook", name: "Glow Hair Salon", initial: "G", tint: "#f0c9c9", img: "examples/salon.jpg", alt: "Example ad for a hair salon: Time for a change?", caption: "Book a quick trim this week and walk out feeling new." },
-      { channel: "TikTok", name: "Strong Life Fitness", initial: "S", tint: "#e6c58f", img: "examples/fitness.jpg", alt: "Example ad for a gym: Time to work out!", caption: "Personal plans and expert guidance. Your first session is on us." },
-      { channel: "Google", name: "Pristine Car Wash", initial: "P", tint: "#a8c6f0", img: "examples/carwash.jpg", alt: "Example ad for a car wash: Your car deserves better!", caption: "Fast, detailed cleaning and polishing. Drive in, shine out." }
+      { channel: "Instagram", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "examples/ad-1-en.jpg", alt: "Example ad for a bakery: Bread that rises for 24 hours.", caption: "Our bread rests a full day before it goes in the oven. The first batch is out at 7." },
+      { channel: "Facebook", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "examples/ad-5-en.jpg", alt: "Example ad for a bakery: Rolls from a family recipe.", caption: "Grandma's recipe, still rolled by hand every afternoon." },
+      { channel: "TikTok", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "examples/ad-2-en.jpg", alt: "Example ad for a bakery: Warm batch at 3 pm.", caption: "A second warm batch comes out at 3 pm. Grab one on your way home." },
+      { channel: "Google", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "examples/ad-3-en.jpg", alt: "Example ad for a bakery: Something sweet for the feast.", caption: "Cakes for your celebration, made to order. Let us know a week ahead." }
     ];
 
     // value is the matching option in signup.html's business-type select.

@@ -143,6 +143,7 @@
   }
 
   function translateAttrs(el) {
+    swapAdImages(el);
     for (var i = 0; i < ATTRS.length; i++) {
       var name = ATTRS[i];
       if (!el.hasAttribute(name)) continue;
@@ -157,6 +158,21 @@
       var want = lang === "en" ? el[mark] : (lookup(el[mark]) || el[mark]);
       if (current !== want) el.setAttribute(name, want);
       el[out] = want;
+    }
+  }
+
+  // The home page's example ads are pictures with words in them, made once in
+  // each language (examples/ad-N-en.jpg and ad-N-sr.jpg). The markup always
+  // names the English file; this points it, and any background image built
+  // from it, at the reader's language.
+  var AD_IMG = /(examples\/ad-\d+)-(en|sr)(\.jpg)/g;
+  function swapAdImages(el) {
+    var names = ["src", "style"];
+    for (var i = 0; i < names.length; i++) {
+      var v = el.getAttribute(names[i]);
+      if (!v || v.indexOf("examples/ad-") < 0) continue;
+      var want = v.replace(AD_IMG, "$1-" + lang + "$3");
+      if (want !== v) el.setAttribute(names[i], want);
     }
   }
 
