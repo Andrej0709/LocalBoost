@@ -620,7 +620,7 @@
   }
 
   function brief(){
-    return {
+    var data = {
       business_name:    document.getElementById("business").value,
       country:          countrySelect.value,
       city:             document.getElementById("city").value,
@@ -648,6 +648,10 @@
       terms_accepted_at: new Date().toISOString(),
       terms_version:     TERMS_VERSION
     };
+    // The database refuses a browser that picks the Beta plan (only the portal
+    // switches it on), so an application never sends a plan at all.
+    if (BETA) delete data.plan;
+    return data;
   }
 
   // Until schema.sql has been re-run the database has no columns for the
