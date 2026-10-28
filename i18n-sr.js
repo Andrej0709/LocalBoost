@@ -2242,7 +2242,6 @@ window.LB_I18N_SR = {
     "↺ Try it again": "↺ Probaj ponovo",
 
     /* --- Home page: persuasion pass (2026-10-18) --------------------------- */
-    "Free beta from early November": "Besplatna beta od početka novembra",
     "Apply for a free place": "Prijavi se za besplatno mesto",
     "What kind of business do you run?": "Kakav biznis vodiš?",
     "Your business type": "Tip tvog biznisa",
@@ -2295,7 +2294,6 @@ window.LB_I18N_SR = {
     /* --- Home page: the Apple look (2026-10-23) ----------------------------
        Short headlines in two parts (the second half is grey and is its own
        string), the terms said once under the button, no "honest" or "catch". */
-    "Beta · starts early November": "Beta · počinje početkom novembra",
     "We make your ads.": "Mi pravimo tvoje oglase.",
     "You just say": "Ti samo kažeš",
     "A new set of ads for your business every Monday. Approve them in about two minutes. We take care of posting.":
