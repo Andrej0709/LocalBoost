@@ -714,7 +714,6 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
 <section id="top" class="hero">
   <div class="hero-grid">
     <div class="hero-copy">
-      <div class="eyebrow" data-in="1">{{ heroEyebrow }}</div>
       <h1 data-in="1" style="animation-delay:.06s"><span class="h1-line">We make your ads.</span> <span class="h1-line">You just say <em>yes</em>.</span></h1>
       <p class="hero-sub" data-in="1" style="animation-delay:.14s">A new set of ads for your business every Monday. Approve them in about two minutes. We take care of posting.</p>
       <div class="hero-ctas" data-in="1" style="animation-delay:.22s">
@@ -1432,7 +1431,6 @@ class Component extends DCLogic {
       pickHint: beta ? "Pick one and your application starts with it filled in." : "Pick one and your signup starts with it filled in.",
       pickCta: beta ? "Apply with this" : "Start with this",
       signupHref: "signup.html" + (picked ? "?type=" + encodeURIComponent(picked.value) : ""),
-      heroEyebrow: beta ? "Beta · limited places" : "Weekly ads for local businesses",
       mbarCls: "mbar" + (this.state.mbar ? " is-on" : ""),
       mbarHidden: this.state.mbar ? "false" : "true",
       mbarTab: this.state.mbar ? "0" : "-1",

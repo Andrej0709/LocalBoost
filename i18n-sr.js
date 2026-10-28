@@ -2095,7 +2095,6 @@ window.LB_I18N_SR = {
     "About Adronis": "O Adronisu",
 
     /* --- 2026 redesign: home page ---------------------------------------- */
-    "Weekly ads for local businesses": "Nedeljni oglasi za lokalne biznise",
     // The headline ends on an emphasised "yes", which already has its entry.
     "We make your ads. You just say": "Mi pravimo tvoje oglase. Ti samo kažeš",
     "Every Monday you get ready-to-post ads made for your business and sized for Instagram, Facebook and more. Approve them in about two minutes and we publish them for you.":
