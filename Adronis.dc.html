@@ -485,16 +485,17 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
 /* ----------------------------------------------------------- examples */
 .showcase{margin-top:72px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);gap:20px}
 .story{position:relative;border-radius:24px;border:1px solid var(--line-2);background:#0d0f13;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 40px 90px -30px rgba(0,0,0,.8);transition:transform .45s var(--ease),border-color .3s ease,box-shadow .45s var(--ease)}
-.story-bg{position:absolute;inset:-40px;background-position:center;background-size:cover;filter:blur(34px) brightness(.45) saturate(1.25);transform:scale(1.1)}
-.story-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0) 30%,rgba(0,0,0,0) 70%,rgba(0,0,0,.4))}
+.story{min-height:440px}
+.story-media{position:absolute;inset:0}
+.story-media img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.story:hover .story-media img{transform:scale(1.035)}
+.story-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,0) 22%,rgba(0,0,0,0) 80%,rgba(0,0,0,.45));pointer-events:none}
 .story-in{position:relative;display:flex;flex-direction:column;height:100%}
 .story-bars{display:flex;gap:4px;padding:14px 14px 0}
 .story-bars span{flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.35)}
 .story-bars span:first-child{background:rgba(255,255,255,.92)}
 .story-top{display:flex;align-items:center;gap:9px;padding:12px 16px}
-.story-media{flex:1;display:flex;align-items:center;padding:4px 0}
-.story-media img{display:block;width:100%;height:auto;aspect-ratio:4/5}
-.story-bottom{display:flex;align-items:center;gap:10px;padding:8px 16px 16px}
+.story-bottom{display:flex;align-items:center;gap:10px;margin-top:auto;padding:8px 16px 16px}
 .story-msg{flex:1;padding:10px 16px;border-radius:9999px;border:1px solid rgba(255,255,255,.45);font-size:13px;color:rgba(255,255,255,.85)}
 .post{display:flex;flex-direction:column;border-radius:24px;border:1px solid var(--line-2);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,0) 90px),#0c0e12;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 30px 60px -34px rgba(0,0,0,.85);transition:transform .45s var(--ease),border-color .3s ease,box-shadow .45s var(--ease)}
 .post-top{display:flex;align-items:center;gap:10px;padding:12px 14px}
@@ -874,7 +875,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
     <div class="showcase" data-rv="ex" style="transition-delay:.1s">
       <sc-for list="{{ stories }}" as="st" hint-placeholder-count="2">
         <div class="story" style="grid-row:{{ st.row }};grid-column:1">
-          <div class="story-bg" style="background-image:url({{ st.img }})"></div>
+          <div class="story-media"><img src="{{ st.img }}" alt="{{ st.alt }}" width="600" height="1066" loading="lazy"></div>
           <div class="story-in">
             <div class="story-bars"><span></span><span></span><span></span></div>
             <div class="story-top">
@@ -882,7 +883,6 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
               <span class="who"><span class="nm">{{ st.name }}</span><span class="sp">Sponsored</span></span>
               <span class="chn">Instagram story</span>
             </div>
-            <div class="story-media"><img src="{{ st.img }}" alt="{{ st.alt }}" width="600" height="750" loading="lazy"></div>
             <div class="story-bottom">
               <span class="story-msg">Send message</span>
               <span style="font-size:18px;color:#fff" aria-hidden="true">&#9825;</span>
@@ -1319,8 +1319,8 @@ class Component extends DCLogic {
     // A week of example posts, each dressed as it would appear on its network.
     // Two example Instagram stories, stacked in the first column on desktop.
     const stories = [
-      { row: 1, name: "Loza Wine Bar", initial: "L", tint: "#d9a7ae", img: "examples/ad-7-en.jpg", alt: "Example story for a wine bar: Wine tasting tonight." },
-      { row: 2, name: "Forno Pizzeria", initial: "F", tint: "#f2b27a", img: "examples/ad-9-en.jpg", alt: "Example story for a pizzeria: Open until 2 am." }
+      { row: 1, name: "Loza Wine Bar", initial: "L", tint: "#d9a7ae", img: "examples/ad-11-en.jpg", alt: "Example story for a wine bar: Wine tasting tonight." },
+      { row: 2, name: "Forno Pizzeria", initial: "F", tint: "#f2b27a", img: "examples/ad-12-en.jpg", alt: "Example story for a pizzeria: Open until 2 am." }
     ];
 
     const posts = [
