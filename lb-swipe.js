@@ -25,16 +25,16 @@
   if (customElements.get("lb-swipe")) return;
 
   var CARDS = [
-    { img: "examples/ad-1-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Instagram", day: "MON", time: "07:00",
+    { img: "examples/ad-8-en.jpg", name: "Loza Wine Bar", initial: "L", tint: "#d9a7ae", channel: "Instagram", day: "MON", time: "17:00",
+      alt: "Example ad for a wine bar: Rain outside, wine inside.", caption: "Rainy evening? A glass of red and a warm corner are waiting. Open until 9 pm." },
+    { img: "examples/ad-1-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Facebook", day: "TUE", time: "07:00",
       alt: "Example ad for a bakery: Bread that rises for 24 hours.", caption: "Our bread rests a full day before it goes in the oven. The first batch is out at 7." },
-    { img: "examples/ad-5-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Facebook", day: "TUE", time: "11:30",
-      alt: "Example ad for a bakery: Rolls from a family recipe.", caption: "Grandma's recipe, still rolled by hand every afternoon." },
-    { img: "examples/ad-3-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Instagram", day: "WED", time: "12:00",
-      alt: "Example ad for a bakery: Something sweet for the feast.", caption: "Cakes for your celebration, made to order. Let us know a week ahead." },
-    { img: "examples/ad-6-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Instagram", day: "THU", time: "08:00",
-      alt: "Example ad for a bakery: Day off, warm croissant.", caption: "Day off? Warm croissants until 7 pm." },
-    { img: "examples/ad-2-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "TikTok", day: "FRI", time: "13:00",
-      alt: "Example ad for a bakery: Warm batch at 3 pm.", caption: "A second warm batch comes out at 3 pm. Grab one on your way home." }
+    { img: "examples/ad-10-en.jpg", name: "Forno Pizzeria", initial: "F", tint: "#f2b27a", channel: "Instagram", day: "WED", time: "12:00",
+      alt: "Example ad for a pizzeria: 9° outside, oven on inside.", caption: "Cold out there. The wood oven is at 450°, so come warm up with a slice." },
+    { img: "examples/ad-7-en.jpg", name: "Loza Wine Bar", initial: "L", tint: "#d9a7ae", channel: "Instagram", day: "THU", time: "16:00",
+      alt: "Example story for a wine bar: Wine tasting tonight.", caption: "Five wines from small Serbian cellars, tonight from 7 pm." },
+    { img: "examples/ad-6-en.jpg", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", channel: "Instagram", day: "FRI", time: "08:00",
+      alt: "Example ad for a bakery: Day off, warm croissant.", caption: "Day off? Warm croissants until 7 pm." }
   ];
 
   // How far a flick carries: Apple's projection, a touch snappier than scroll.
