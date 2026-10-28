@@ -17,12 +17,13 @@
 <link rel="apple-touch-icon" href="icon-512.png">
 <link rel="manifest" href="site.webmanifest">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- During the beta (BETA in boot-gate.js) this page is the beta application,
-     and the title, search snippet and link previews say so. The script below
+<!-- During the beta (BETA in boot-gate.js) this page creates the account and
+     saves the business brief; applying for a beta place happens on beta.html.
+     The title, search snippet and link previews say so. The script below
      sets the plan wording outside the beta, except for these tags: crawlers and
      link previews don't run scripts, so they change by hand at launch. -->
-<title>Apply for the beta — Adronis</title>
-<meta name="description" content="Adronis is in beta until the public launch in Q1 2027. Create your account and tell us about your business — that's your application. Places are limited, nothing to pay.">
+<title>Create your account — Adronis</title>
+<meta name="description" content="Adronis is in beta until the public launch in Q1 2027. Create your account and tell us about your business. Applying for a beta place is a separate step, nothing to pay.">
 <link rel="canonical" href="https://www.adronis.app/signup.html">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="theme-color" content="#050608">
@@ -30,16 +31,16 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Adronis">
 <meta property="og:locale" content="en_US">
-<meta property="og:title" content="Apply for the Adronis beta">
-<meta property="og:description" content="Adronis is in beta until the public launch in Q1 2027. Create your account and tell us about your business — that's your application. Places are limited, nothing to pay.">
+<meta property="og:title" content="Create your Adronis account">
+<meta property="og:description" content="Adronis is in beta until the public launch in Q1 2027. Create your account and tell us about your business. Applying for a beta place is a separate step, nothing to pay.">
 <meta property="og:url" content="https://www.adronis.app/signup.html">
 <meta property="og:image" content="https://www.adronis.app/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Adronis — we make your ads, you just say yes. Two example ads for a pizza place and a bakery.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Apply for the Adronis beta">
-<meta name="twitter:description" content="Adronis is in beta until the public launch in Q1 2027. Create your account and tell us about your business — that's your application. Places are limited, nothing to pay.">
+<meta name="twitter:title" content="Create your Adronis account">
+<meta name="twitter:description" content="Adronis is in beta until the public launch in Q1 2027. Create your account and tell us about your business. Applying for a beta place is a separate step, nothing to pay.">
 <meta name="twitter:image" content="https://www.adronis.app/og-image.jpg">
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="adronis.css">
@@ -102,8 +103,8 @@
      signup: hero, plan summary and button. -->
 <header class="page-hero">
   <div class="eyebrow is-mono" id="page-eyebrow">BETA · NOTHING TO PAY</div>
-  <h1 id="plan-headline">Apply for the <em>Adronis</em> beta.</h1>
-  <p id="page-sub">Create your account and tell us about the business — that's your application. Places are limited: if your business is picked, we switch your plan on and email you. Nothing to pay until launch.</p>
+  <h1 id="plan-headline">Create your <em>Adronis</em> account.</h1>
+  <p id="page-sub">Create your account and tell us about the business. Applying for a beta place is a separate step, and you can do it whenever you like. Nothing to pay until launch.</p>
 </header>
 
 <section class="section-tight">
@@ -265,7 +266,7 @@
         You can request a copy or deletion at any time at <a href="mailto:privacy@adronis.app">privacy@adronis.app</a>.
         Creatives are AI-generated and publish only after you approve them — you remain the advertiser responsible for every ad you approve.
       </p>
-      <button type="submit" class="btn btn-lg btn-block" style="margin-top:28px">Apply for the beta<span class="mono" style="font-size:13px">→</span></button>
+      <button type="submit" class="btn btn-lg btn-block" style="margin-top:28px">Create account<span class="mono" style="font-size:13px">→</span></button>
       <p class="lock-hint" id="su-lock-hint">Tick the box above to accept the terms and continue.</p>
       <div id="signup-notice" class="notice" role="status" style="margin-top:18px" hidden></div>
     </form>
@@ -341,12 +342,12 @@
   var params = new URLSearchParams(location.search);
   // Franchise is agreed with Adronis first, never signed up for here.
   if (params.get("plan") === "franchise") { location.replace("contact.html?plan=franchise"); return; }
-  // During the beta (see BETA in auth.js) signing up is applying for a place:
-  // the account and the brief here, with no plan price shown and no checkout
-  // after. Saving the brief sends the application (LBAuth.applyForBeta), and
-  // if the business is picked the portal switches its Beta plan on. There's
-  // no Free plan in the beta, and Beta is never picked from a link: it has no
-  // price and no checkout.
+  // During the beta (see BETA in auth.js) this page creates the account and
+  // saves the brief, with no plan price shown and no checkout after. It sends
+  // no application: that is beta.html's one-click form, which the page leads
+  // to, so an account can exist without ever applying. There's no Free plan in
+  // the beta, and Beta is never picked from a link: it has no price and no
+  // checkout.
   var BETA = LBAuth.beta;
   var planKey = plans[params.get("plan")] && params.get("plan") !== "beta" ? params.get("plan") : "storefront";
   if (BETA) planKey = "beta";
@@ -410,7 +411,7 @@
   });
 
   var BETA_EYEBROW = "BETA · NOTHING TO PAY";
-  var BETA_BUTTON = 'Apply for the beta<span class="mono" style="font-size:13px">→</span>';
+  var BETA_BUTTON = 'Create account<span class="mono" style="font-size:13px">→</span>';
 
   // Named after the plan actually running on the account, not the one in the
   // URL — a paying customer who clicks another plan's button still lands here.
@@ -445,24 +446,13 @@
     return isFree ? "approvals.html" : checkoutUrl();
   }
 
-  // During the beta the brief is the application: saving it sends one
-  // (LBAuth.applyForBeta) and the page says it's in. An account whose plan
-  // is already on goes straight into the app.
+  // During the beta the brief only finishes the account: beta.html is where
+  // applying for a place happens, in one click from the saved brief. An
+  // account whose plan is already on goes straight into the app.
   async function afterBrief(){
     if (!BETA) { location.href = afterBriefUrl(); return; }
     await LBAuth.refreshProfile().catch(function(){});
-    if (LBAuth.hasActivePlan()) { location.href = "approvals.html"; return; }
-    await LBAuth.applyForBeta();
-    document.getElementById("form-view").hidden = true;
-    document.getElementById("activated-view").hidden = false;
-    document.getElementById("page-eyebrow").textContent = BETA_EYEBROW;
-    document.getElementById("plan-headline").textContent = "Your application is in.";
-    document.getElementById("page-sub").textContent = "Your account is set up and your brief is saved.";
-    document.querySelector("#activated-view .mono").textContent = "APPLICATION RECEIVED";
-    document.getElementById("activated-text").textContent = "We review every application.";
-    document.getElementById("activated-sub").textContent =
-      "If your business is picked, we switch your plan on and email you — then log in and your first drop is waiting in Approvals.";
-    window.scrollTo(0, 0);
+    location.href = LBAuth.hasActivePlan() ? "approvals.html" : "beta.html";
   }
 
   // The account exists from here on, so the email and password fields go:
@@ -494,9 +484,9 @@
     }
     if (BETA) {
       document.getElementById("page-eyebrow").textContent = BETA_EYEBROW;
-      document.getElementById("plan-headline").innerHTML = 'Apply for the <em>Adronis</em> beta.';
+      document.getElementById("plan-headline").innerHTML = 'Create your <em>Adronis</em> account.';
       document.getElementById("page-sub").textContent =
-        "Your account is ready. Tell us about the business — that's your application. If your business is picked, we switch your plan on and email you.";
+        "Your account is ready. Tell us about the business to finish setting it up. Applying for a beta place is the next step.";
       submitButton.innerHTML = BETA_BUTTON;
     }
 
@@ -689,7 +679,7 @@
           "Confirm your email, then log back in — your answers are still here, so it's one click to finish.";
         document.querySelector("#activated-view .mono").textContent = "ALMOST THERE";
         document.getElementById("activated-text").textContent = BETA
-          ? "Check your inbox — confirm your email, then log in and send your application in one click."
+          ? "Check your inbox — confirm your email, then log in. You can apply for the beta from your account."
           : "Check your inbox — confirm your email to carry on with the " + plan.name + " plan.";
       } else {
         // Session already live: mark the brief done and move on. If that or
@@ -706,26 +696,10 @@
     }
   });
 
-  // Every beta place taken (beta_seats in schema.sql): no application form
-  // until one opens. An account that already applied never gets here.
-  function showFull(){
-    document.getElementById("form-view").hidden = true;
-    document.getElementById("activated-view").hidden = false;
-    document.querySelector("#activated-view .su-done-mark").hidden = true;
-    document.getElementById("page-eyebrow").textContent = "BETA · EVERY PLACE TAKEN";
-    document.getElementById("plan-headline").textContent = "The beta is full right now.";
-    document.getElementById("page-sub").textContent = "Every place in this round is taken, so we aren't taking applications.";
-    document.querySelector("#activated-view .mono").textContent = "BETA FULL";
-    document.getElementById("activated-text").textContent = "More places open before the launch in early 2027.";
-    document.getElementById("activated-sub").textContent = "Message us and we'll write to you when a place opens.";
-    var go = document.getElementById("activated-go");
-    go.href = "message-us.html";
-    go.innerHTML = 'Message us<span class="mono">→</span>';
-  }
-
+  // A full beta doesn't stop anyone from creating an account: beta.html is
+  // where the full message shows, for the application only.
   LBAuth.ready.then(async function(){
     if (!LBAuth.isLoggedIn()) {
-      if (BETA && await LBAuth.betaFull()) showFull();
       lbBootDone();
       return;
     }
@@ -754,7 +728,6 @@
       LBGate.go(checkoutUrl());
       return;
     }
-    if (BETA && !LBAuth.betaApplied() && await LBAuth.betaFull()) { showFull(); lbBootDone(); return; }
     showBriefMode(profile);
     lbBootDone();
   }, lbBootDone);

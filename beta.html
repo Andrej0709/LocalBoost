@@ -74,14 +74,15 @@
 <section class="section-tight">
   <div class="bt-wrap">
       <div class="form-card">
-        <!-- What a visitor who isn't signed in sees. Applying is signing up:
-             the button opens signup.html, account and business brief together. -->
+        <!-- What a visitor who isn't signed in sees. The button opens
+             signup.html (account and business brief); the application itself
+             is sent from the form below, once signed in. -->
         <div id="bt-intro">
           <div class="bt-tag">HOW TO JOIN</div>
           <div class="bt-title">Apply in about ten minutes.</div>
-          <p>Create your account and tell us about the business — that's your application. If your business is picked, we switch your plan on from our side and email you. No card needed.</p>
+          <p>Create your account and tell us about the business, then apply for a place with one click. If your business is picked, we switch your plan on from our side and email you. No card needed.</p>
           <p>Beta testers pay nothing until launch, and get 30% off a monthly plan for their first 12 months after that.</p>
-          <a href="signup.html" id="bt-apply" class="btn">Apply for the beta →</a>
+          <a href="signup.html" id="bt-apply" class="btn">Create an account to apply →</a>
           <div class="bt-alt">Want to see it first? <a href="approvals.html?demo=1">Try the demo</a> — no account needed.</div>
           <div class="bt-alt" id="bt-login">Already have an account? <a href="login.html">Log in</a></div>
         </div>
@@ -184,10 +185,10 @@
 <script src="brief-fields.js"></script>
 <script>
 /* Where everyone who isn't a beta tester ends up during the beta (BETA in
-   auth.js). Applying is signing up: a visitor creates the account and the
-   business brief on signup.html, which sends the application. A signed-in
-   account that never applied applies here in one click, asked only for what
-   its brief is missing; one that applied waits here. Applications land in
+   auth.js). A visitor creates the account and the business brief on
+   signup.html, which sends no application. A signed-in account that never
+   applied applies here in one click, asked only for what its brief is
+   missing; one that applied waits here. Applications land in
    contact_requests with plan_interest "beta" (apply_for_beta in schema.sql). */
 (function(){
   // After launch this page has nothing to do: plans are bought at checkout.

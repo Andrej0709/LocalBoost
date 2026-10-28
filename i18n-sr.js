@@ -1672,6 +1672,21 @@ window.LB_I18N_SR = {
     "Check your inbox — confirm your email, then log in and send your application in one click.":
       "Proveri sanduče — potvrdi email, pa se prijavi i pošalji prijavu jednim klikom.",
     "Brief saved.": "Brif sačuvan.",
+    // Signing up only creates the account; applying is a separate step (beta.html).
+    "Create your account — Adronis": "Napravi nalog — Adronis",
+    "Create your": "Napravi svoj",
+    "account.": "nalog.",
+    "Create your account and tell us about the business. Applying for a beta place is a separate step, and you can do it whenever you like. Nothing to pay until launch.":
+      "Napravi nalog i reci nam nešto o biznisu. Prijava za mesto u beti je poseban korak i možeš je poslati kad god želiš. Bez plaćanja do lansiranja.",
+    "Your account is ready. Tell us about the business to finish setting it up. Applying for a beta place is the next step.":
+      "Nalog ti je spreman. Reci nam nešto o biznisu da ga završiš. Prijava za mesto u beti je sledeći korak.",
+    "Check your inbox — confirm your email, then log in. You can apply for the beta from your account.":
+      "Proveri sanduče — potvrdi email, pa se prijavi. Za betu se možeš prijaviti iz svog naloga.",
+    "Create your account and tell us about the business, then apply for a place with one click. If your business is picked, we switch your plan on from our side and email you. No card needed.":
+      "Napravi nalog i reci nam nešto o biznisu, pa se prijavi za mesto jednim klikom. Ako tvoj biznis bude izabran, uključujemo ti plan sa naše strane i javljamo mejlom. Kartica nije potrebna.",
+    "Create an account to apply →": "Napravi nalog da se prijaviš →",
+    "Create an account": "Napravi nalog",
+    "— you can apply for the beta afterwards.": "— za betu se možeš prijaviti posle.",
 
     /* --- Account: what the script writes --------------------------------- */
     "Active — nothing to pay": "Aktivan — nema plaćanja",
