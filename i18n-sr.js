@@ -922,8 +922,8 @@ window.LB_I18N_SR = {
     "1. Who you are contracting with": "1. Sa kim zaključuješ ugovor",
     "Adronis (\"Adronis\", \"we\", \"us\") is a software service operated by":
       "Adronis („Adronis“, „mi“, „nas“) je softverska usluga koju pruža",
-    ", a private individual resident in [CITY], Republic of Serbia, who runs Adronis as a freelancer. Adronis is not a registered company, so it has no company registration number or VAT number. Paid plans are sold and invoiced by Paddle.com as Merchant of Record (clause 5).":
-      ", fizičko lice sa prebivalištem u mestu [GRAD], Republika Srbija, koje Adronis vodi kao frilenser. Adronis nije registrovano privredno društvo, pa nema matični broj ni PIB. Plaćene planove prodaje i fakturiše Paddle.com kao prodavac (Merchant of Record) (klauzula 5).",
+    ", a private individual resident in Belgrade, Republic of Serbia, who runs Adronis as a freelancer. Adronis is not a registered company, so it has no company registration number or VAT number. Paid plans are sold and invoiced by Paddle.com as Merchant of Record (clause 5).":
+      ", fizičko lice sa prebivalištem u Beogradu, Republika Srbija, koje Adronis vodi kao frilenser. Adronis nije registrovano privredno društvo, pa nema matični broj ni PIB. Plaćene planove prodaje i fakturiše Paddle.com kao prodavac (Merchant of Record) (klauzula 5).",
     "Contractual and general legal questions:": "Ugovorna i opšta pravna pitanja:",
     "Privacy and data requests:": "Privatnost i zahtevi za podatke:",
     "Copyright and IP complaints:": "Prijave zbog autorskih prava i intelektualne svojine:",
@@ -1091,8 +1091,8 @@ window.LB_I18N_SR = {
     "We email active accounts at least 14 days before a material change takes effect and update the date at the top of this page. If you do not accept a change, cancel before it takes effect; continued use afterwards means you accept the updated terms.":
       "Aktivnim nalozima šaljemo email najmanje 14 dana pre nego što bitna izmena stupi na snagu i ažuriramo datum na vrhu ove stranice. Ako izmenu ne prihvataš, otkaži pre nego što stupi na snagu; nastavak korišćenja posle toga znači da prihvataš ažurirane uslove.",
     "20. Governing law and disputes": "20. Merodavno pravo i sporovi",
-    "This agreement and any dispute arising out of it are governed by the law of the Republic of Serbia, excluding its conflict-of-law rules and the UN Convention on Contracts for the International Sale of Goods. The competent court in [CITY], Republic of Serbia, has exclusive jurisdiction, except that either party may seek injunctive relief in any competent court. Where mandatory law in your country gives you the right to bring proceedings elsewhere, that right is unaffected.":
-      "Na ovaj ugovor i svaki spor koji iz njega proizlazi primenjuje se pravo Republike Srbije, uz isključenje njegovih kolizionih pravila i Konvencije UN o ugovorima o međunarodnoj prodaji robe. Isključivo je nadležan stvarno nadležni sud u mestu [GRAD], Republika Srbija, s tim što svaka strana može tražiti privremenu meru pred bilo kojim nadležnim sudom. Ako ti prinudni propisi tvoje zemlje daju pravo da postupak pokreneš drugde, to pravo ostaje netaknuto.",
+    "This agreement and any dispute arising out of it are governed by the law of the Republic of Serbia, excluding its conflict-of-law rules and the UN Convention on Contracts for the International Sale of Goods. The competent court in Belgrade, Republic of Serbia, has exclusive jurisdiction, except that either party may seek injunctive relief in any competent court. Where mandatory law in your country gives you the right to bring proceedings elsewhere, that right is unaffected.":
+      "Na ovaj ugovor i svaki spor koji iz njega proizlazi primenjuje se pravo Republike Srbije, uz isključenje njegovih kolizionih pravila i Konvencije UN o ugovorima o međunarodnoj prodaji robe. Isključivo je nadležan stvarno nadležni sud u Beogradu, Republika Srbija, s tim što svaka strana može tražiti privremenu meru pred bilo kojim nadležnim sudom. Ako ti prinudni propisi tvoje zemlje daju pravo da postupak pokreneš drugde, to pravo ostaje netaknuto.",
     "Before starting proceedings, please write to": "Pre pokretanja postupka, piši na",
     "so we can try to resolve the matter directly.":
       "kako bismo pokušali da stvar rešimo neposredno.",
@@ -1132,8 +1132,8 @@ window.LB_I18N_SR = {
     "1. Who is responsible for your data": "1. Ko je odgovoran za tvoje podatke",
     "The controller of the personal data described here is":
       "Rukovalac ličnim podacima opisanim ovde je",
-    ", a private individual resident in [CITY], Republic of Serbia, who operates Adronis as a freelancer. Adronis is not a registered company. More about who you are dealing with is on our":
-      ", fizičko lice sa prebivalištem u mestu [GRAD], Republika Srbija, koje Adronis vodi kao frilenser. Adronis nije registrovano privredno društvo. Više o tome s kim posluješ piše ovde:",
+    ", a private individual resident in Belgrade, Republic of Serbia, who operates Adronis as a freelancer. Adronis is not a registered company. More about who you are dealing with is on our":
+      ", fizičko lice sa prebivalištem u Beogradu, Republika Srbija, koje Adronis vodi kao frilenser. Adronis nije registrovano privredno društvo. Više o tome s kim posluješ piše ovde:",
     "terms page": "stranica sa uslovima",
     "Data protection contact:": "Kontakt za zaštitu podataka:",
     "2. Two different roles": "2. Dve različite uloge",
@@ -1233,8 +1233,8 @@ window.LB_I18N_SR = {
       "Servis za obaveštenja tvog pregledača",
     "(Apple, Google or Mozilla, depending on your device) — only if you switch on notifications, to deliver them to your device. The message content is encrypted on its way through.":
       "(Apple, Google ili Mozilla, zavisno od uređaja) — samo ako uključiš obaveštenja, da bi ih isporučio na tvoj uređaj. Sadržaj poruke je šifrovan dok prolazi kroz njega.",
-    "[FULL NAME]":
-      "[IME I PREZIME]",
+    "Dušan Imperl":
+      "Dušan Imperl",
     "Platforms you connect yourself": "Platforme koje sam povežeš",
     "— Instagram, Facebook, TikTok, Google Business, LinkedIn, Pinterest. We exchange data with them to publish creatives you approved and to read back performance metrics. They handle that data under their own privacy policies, as independent controllers.":
       "— Instagram, Facebook, TikTok, Google Business, LinkedIn, Pinterest. Sa njima razmenjujemo podatke da bismo objavili kreative koje si odobrio i očitali metrike rezultata. Oni tim podacima rukuju po sopstvenim politikama privatnosti, kao samostalni rukovaoci.",
