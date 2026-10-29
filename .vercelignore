@@ -1,2 +1,15 @@
 # Internal tools, not part of the site.
 lab/
+
+# Server code, SQL and internal notes: they run or live elsewhere, and
+# publishing them would show how the backend works (and any private notes).
+supabase/
+PRODUCT.md
+make-ads.ps1
+.claude/
+.impeccable/
+
+# Local working folders that are not in git, in case of a CLI deploy.
+founder/
+instagram/
+shots/

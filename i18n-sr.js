@@ -1564,7 +1564,7 @@ window.LB_I18N_SR = {
     "PLAN ACTIVE": "PLAN AKTIVAN",
     "20% off every drop, for as long as you stay.": "20% popusta na svaki drop, dok god si sa nama.",
     "10% off every drop, for as long as you stay.": "10% popusta na svaki drop, dok god si sa nama.",
-    // The founder code for the beta venues (FOUNDER30 in Paddle).
+    // The founder code for the beta venues.
     "30% off your first 12 monthly charges.": "30% popusta na prvih 12 mesečnih naplata.",
     "25% off your first year.": "25% popusta na prvu godinu.",
     "Couldn't load your account system. Refresh the page and try again.":

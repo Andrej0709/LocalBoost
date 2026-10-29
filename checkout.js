@@ -53,8 +53,8 @@
   // Promo codes live only in Paddle (Catalog > Discounts) and are checked by
   // the paddle Edge Function, so a private one never sits in this file.
   // ADRONIS20 is the public one, shown in the pricing section of
-  // Adronis.dc.html and Adronis-full.html. FOUNDER30 is for the beta venues
-  // only: monthly Counter or Storefront, first 12 charges, 8 uses.
+  // Adronis.dc.html and Adronis-full.html. Private codes are never named in
+  // any file that gets deployed.
 
   // ------------------------------------------------------------------- state
   var params = new URLSearchParams(location.search);

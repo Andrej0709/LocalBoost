@@ -1597,6 +1597,45 @@ drop policy if exists "messages insert public" on public.messages;
 create policy "messages insert public" on public.messages
   for insert to anon, authenticated with check (status = 'new');
 
+/* The same table also takes beta feedback from the in-app button. A message */
+/* only counts as a tester's when it comes from a signed-in session: the     */
+/* trigger stamps user_id from the session and takes the email and business  */
+/* name from that account, so nobody can send feedback in a tester's name.   */
+/* An anonymous message that pretends to be feedback is refused.             */
+alter table public.messages
+  add column if not exists user_id uuid references public.profiles (id) on delete set null;
+
+create or replace function public.stamp_message()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if current_user not in ('authenticated', 'anon') then
+    return new;
+  end if;
+  new.user_id := auth.uid();
+  new.created_at := now();
+  if new.message like 'Beta feedback%' and new.user_id is null then
+    raise exception 'Sign in to send feedback.';
+  end if;
+  if new.user_id is not null then
+    select u.email into new.email from auth.users u where u.id = new.user_id;
+    select coalesce(nullif(p.business_name, ''), new.full_name) into new.full_name
+      from public.profiles p where p.id = new.user_id;
+  end if;
+  return new;
+end;
+$$;
+
+revoke execute on function public.stamp_message() from public, anon, authenticated;
+
+drop trigger if exists messages_stamp on public.messages;
+create trigger messages_stamp
+  before insert on public.messages
+  for each row execute function public.stamp_message();
+
 /* ------------------------------------------------------------ */
 /* demo_events - what visitors do in the public demo (demo.js), so the   */
 /* Adronis Portal can tell whether it sells: opened, tried approving or  */

@@ -77,7 +77,9 @@ begin
       '',
       'Reply to this email to answer them directly, or open the Inbox in the portal.');
   else
-    subject := case when new.message like 'Beta feedback%'
+    -- Only a signed-in tester's message counts as feedback (user_id is
+    -- stamped by the messages_stamp trigger in schema.sql).
+    subject := case when new.message like 'Beta feedback%' and new.user_id is not null
                     then 'Beta tester feedback: '
                     else 'New message: ' end
                || coalesce(nullif(new.full_name, ''), new.email);

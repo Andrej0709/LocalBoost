@@ -1401,7 +1401,7 @@ class Component extends DCLogic {
         perAd: p.perWeek ? cents(monthly / (p.perWeek * WEEKS_PER_MONTH)) : "",
         showSave: annual && p.base > 0,
         save: euro(p.base * 12 * 0.2),
-        // FOUNDER30: beta venues get 30% off a monthly plan for 12 months.
+        // Beta venues get 30% off a monthly plan for 12 months.
         showFounder: beta && paidTrial,
         founder: cents(p.base * 0.7),
         after: beta && paidTrial ? "Free during the beta"
