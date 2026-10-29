@@ -65,9 +65,12 @@
     return "en";
   }
 
+  // A page under /sr/ is the Serbian page in its own right (the address search
+  // engines index for Serbian), so there the address decides the language.
+  var pathLang = /^\/sr(\/|$)/.test(location.pathname) ? "sr" : null;
   var queryLang = fromQuery();
-  if (queryLang) remember(queryLang);
-  var lang = queryLang || stored() || fromBrowser();
+  if (pathLang || queryLang) remember(pathLang || queryLang);
+  var lang = pathLang || queryLang || stored() || fromBrowser();
 
   /* --- Translating the page ------------------------------------------------
      Every node the pass touches keeps its English original on the node itself,
@@ -330,6 +333,12 @@
 
   function setLang(next) {
     if (!LANGS[next] || next === lang) return;
+    // On a /sr/ page the English page is the same address without /sr.
+    if (pathLang && next !== pathLang) {
+      remember(next);
+      location.href = location.pathname.replace(/^\/sr(\/|$)/, "/") + location.search + location.hash;
+      return;
+    }
     lang = next;
     remember(next);
     apply();

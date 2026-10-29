@@ -12,6 +12,9 @@
 <title>Dates worth an ad — Adronis</title>
 <meta name="description" content="Every date in the next 12 months worth an ad for a café, restaurant or shop in Serbia, with an idea for each and when to post it. Free, no sign-up.">
 <link rel="canonical" href="https://www.adronis.app/calendar.html">
+<link rel="alternate" hreflang="en" href="https://www.adronis.app/calendar.html">
+<link rel="alternate" hreflang="sr" href="https://www.adronis.app/sr/calendar.html">
+<link rel="alternate" hreflang="x-default" href="https://www.adronis.app/calendar.html">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="theme-color" content="#050608">
 <meta name="color-scheme" content="dark">
@@ -72,7 +75,7 @@
 <body>
 
 <nav class="nav" aria-label="Main">
-  <a href="/#top" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
+  <a href="/" class="nav-logo"><img src="logo-128.png" alt="" class="nav-logo-img">Adronis</a>
   <div class="nav-links">
     <a href="/#drop">How it works</a>
     <a href="/#engine">Examples</a>
@@ -159,7 +162,7 @@
   }
 
   function render() {
-    document.title = T("Dates worth an ad — Adronis", "Datumi vredni oglasa — Adronis");
+    document.title = T("Dates worth an ad — Adronis", "Kalendar praznika za objave · kafići i restorani");
     $("dc-eyebrow").textContent = T("FREE · FOR CAFÉS, RESTAURANTS AND SHOPS", "BESPLATNO · ZA KAFIĆE, RESTORANE I RADNJE");
     $("dc-title").textContent = T("Every date worth an ad, for the next 12 months.", "Svi datumi vredni oglasa, za narednih 12 meseci.");
     $("dc-lead").textContent = T(

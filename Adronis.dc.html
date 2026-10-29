@@ -22,6 +22,9 @@ html.lb-booted #lb-boot{display:none}
 <title>Adronis — weekly ad drops for local business</title>
 <meta name="description" content="Weekly ready-to-post ads for local businesses. You approve them in about two minutes and Adronis publishes them for you. Free beta for a limited number of businesses until launch in Q1 2027.">
 <link rel="canonical" href="https://www.adronis.app/">
+<link rel="alternate" hreflang="en" href="https://www.adronis.app/">
+<link rel="alternate" hreflang="sr" href="https://www.adronis.app/sr/">
+<link rel="alternate" hreflang="x-default" href="https://www.adronis.app/">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="theme-color" content="#050608">
 <meta name="color-scheme" content="dark">
@@ -130,7 +133,7 @@ function lbShowPricing(done) {
 // In a browser tab document.referrer tells the two apart. The installed app
 // can't use it — standalone iOS web apps often omit it even for in-app link
 // clicks — so there it routes once per app session instead.
-// A link to a specific section ("/#drop", "/#top" from the nav logo) is also
+// A link to a specific section ("/#drop", "/#faq") is also
 // left alone: the visitor asked for this page.
 var lbAlreadyBooted = false;
 if (lbStandalone) {
@@ -1319,15 +1322,15 @@ class Component extends DCLogic {
     // A week of example posts, each dressed as it would appear on its network.
     // Two example Instagram stories, stacked in the first column on desktop.
     const stories = [
-      { row: 1, name: "Loza Wine Bar", initial: "L", tint: "#d9a7ae", img: "examples/ad-11-en.jpg", alt: "Example story for a wine bar: Wine tasting tonight." },
-      { row: 2, name: "Forno Pizzeria", initial: "F", tint: "#f2b27a", img: "examples/ad-12-en.jpg", alt: "Example story for a pizzeria: Open until 2 am." }
+      { row: 1, name: "Loza Wine Bar", initial: "L", tint: "#d9a7ae", img: "/examples/ad-11-en.jpg", alt: "Example story for a wine bar: Wine tasting tonight." },
+      { row: 2, name: "Forno Pizzeria", initial: "F", tint: "#f2b27a", img: "/examples/ad-12-en.jpg", alt: "Example story for a pizzeria: Open until 2 am." }
     ];
 
     const posts = [
-      { channel: "Instagram", name: "Loza Wine Bar", initial: "L", tint: "#d9a7ae", img: "examples/ad-8-en.jpg", alt: "Example ad for a wine bar: Rain outside, wine inside.", caption: "Rainy evening? A glass of red and a warm corner are waiting. Open until 9 pm." },
-      { channel: "Facebook", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "examples/ad-1-en.jpg", alt: "Example ad for a bakery: Bread that rises for 24 hours.", caption: "Our bread rests a full day before it goes in the oven. The first batch is out at 7." },
-      { channel: "Instagram", name: "Forno Pizzeria", initial: "F", tint: "#f2b27a", img: "examples/ad-10-en.jpg", alt: "Example ad for a pizzeria: 9° outside, oven on inside.", caption: "Cold out there. The wood oven is at 450°, so come warm up with a slice." },
-      { channel: "TikTok", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "examples/ad-5-en.jpg", alt: "Example ad for a bakery: Rolls from a family recipe.", caption: "Grandma's recipe, still rolled by hand every afternoon." }
+      { channel: "Instagram", name: "Loza Wine Bar", initial: "L", tint: "#d9a7ae", img: "/examples/ad-8-en.jpg", alt: "Example ad for a wine bar: Rain outside, wine inside.", caption: "Rainy evening? A glass of red and a warm corner are waiting. Open until 9 pm." },
+      { channel: "Facebook", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "/examples/ad-1-en.jpg", alt: "Example ad for a bakery: Bread that rises for 24 hours.", caption: "Our bread rests a full day before it goes in the oven. The first batch is out at 7." },
+      { channel: "Instagram", name: "Forno Pizzeria", initial: "F", tint: "#f2b27a", img: "/examples/ad-10-en.jpg", alt: "Example ad for a pizzeria: 9° outside, oven on inside.", caption: "Cold out there. The wood oven is at 450°, so come warm up with a slice." },
+      { channel: "TikTok", name: "Kora Bakery", initial: "K", tint: "#e8d5b8", img: "/examples/ad-5-en.jpg", alt: "Example ad for a bakery: Rolls from a family recipe.", caption: "Grandma's recipe, still rolled by hand every afternoon." }
     ];
 
     // value is the matching option in signup.html's business-type select.
@@ -1501,6 +1504,7 @@ class Component extends DCLogic {
 }
 </script>
 <script src="cookies.js"></script>
+<script src="anchors.js"></script>
 <script src="i18n-sr.js"></script>
 <script src="i18n.js"></script>
 </body>

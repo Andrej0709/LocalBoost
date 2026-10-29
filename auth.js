@@ -214,7 +214,9 @@
   }
 
   function siteOrigin() {
-    return location.origin + location.pathname.replace(/[^/]*$/, "");
+    // Links in emails point at the root pages, the addresses Supabase allows.
+    // A page under /sr/ shares them.
+    return location.origin + location.pathname.replace(/^\/sr(?=\/)/, "").replace(/[^/]*$/, "");
   }
 
   async function loadProfile() {

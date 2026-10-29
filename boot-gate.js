@@ -162,6 +162,7 @@
   var LANG_SAFETY_MS = 3000;
 
   function readsSerbian() {
+    if (/^\/sr(\/|$)/.test(location.pathname)) return true;
     var query = /[?&]lang=([a-z-]+)/i.exec(location.search);
     var asked = query && query[1].toLowerCase().slice(0, 2);
     if (asked === "sr" || asked === "en") return asked === "sr";
