@@ -67,6 +67,24 @@
         ],
         "createdAt": "2026-10-23T16:19:04.077Z",
         "reason": "user asked on 2026-10-23 to restore the original look (planet, sky-blue glows, the lit headline word) after rejecting the flat restyle"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "instagram/nedelja-u-adronisu/izvor/slides.html"
+        ],
+        "createdAt": "2026-11-05T20:51:48.144Z",
+        "reason": "Brand system: adronis.css lights headline <em> with this exact gradient; slides must match the site look the user chose to keep (2026-10-23)"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "instagram/nedelja-u-adronisu/izvor/slides.html"
+        ],
+        "createdAt": "2026-11-05T20:51:48.521Z",
+        "reason": "Brand system: adronis.css --glow-acc and the planet rim glow; slides must match the site look the user chose to keep (2026-10-23)"
       }
     ]
   }
