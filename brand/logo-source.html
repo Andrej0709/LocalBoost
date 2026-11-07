@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Source for the PNG logo files in this folder. Render with tools/render-logo.ps1. -->
+<style>
+@font-face{font-family:'Geist';font-weight:100 900;src:url(../fonts/geist-gyByhwUxId8gMEwcGFU.woff2) format('woff2')}
+html,body{margin:0;background:transparent}
+.lockup{display:inline-flex;align-items:center;padding:40px;font-family:'Geist',sans-serif;font-weight:600;letter-spacing:-.02em;line-height:1}
+.lockup svg{display:block;flex-shrink:0}
+</style></head><body>
+<div class="lockup" id="l"></div>
+<script>
+const p = new URLSearchParams(location.search);
+const size = +(p.get('size') || 512);
+const text = p.get('text'); // 'dark' | 'light' | null
+const mark = `<svg width="${size}" height="${size}" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="116" fill="#6fc3ff"/>
+  <polygon points="222,211 268,211 212,367 140,367" fill="#08111a"/>
+  <polygon points="244,144 290,144 373,367 322,367" fill="#38607e"/>
+  <polygon points="200,283 306,283 320,322.5 190,322.5" fill="#08111a"/>
+</svg>`;
+const l = document.getElementById('l');
+if (!text) { l.style.padding = '0'; l.innerHTML = mark; }
+else {
+  l.innerHTML = mark + `<span style="margin-left:${size*0.38}px;font-size:${size*0.66}px;color:${text==='light'?'#f2f4f7':'#03111d'}">Adronis</span>`;
+}
+</script></body></html>
