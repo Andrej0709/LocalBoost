@@ -973,6 +973,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
           <li><span class="tick" aria-hidden="true">✓</span>No card, nothing to pay</li>
           <li><span class="tick" aria-hidden="true">✓</span>No contract, leave whenever you like</li>
           <li><span class="tick" aria-hidden="true">✓</span>30% off for 12 months if you stay after launch</li>
+          <li><span class="tick" aria-hidden="true">✓</span>A person on our team posts every ad you approve</li>
         </ul>
       </div>
       <ol class="beta-steps" data-rv="beta" style="transition-delay:.12s">
@@ -982,7 +983,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
         </li>
         <li class="beta-step">
           <div class="beta-when">NEXT</div>
-          <div><h3>We read every application</h3><p>A person on our small team looks at each one and picks the businesses for the beta.</p></div>
+          <div><h3>We read every application</h3><p>A person on our small team looks at each one and picks the businesses for the beta. If there's no place for you yet, your account and brief stay saved for launch.</p></div>
         </li>
         <li class="beta-step">
           <div class="beta-when">EARLY NOVEMBER</div>
@@ -1084,6 +1085,7 @@ button.vchip{font-family:var(--font);cursor:pointer;min-height:44px}
       <a href="{{ signupHref }}" class="btn btn-lg">{{ mainCta }}<span class="mono" aria-hidden="true">→</span></a>
     </div>
     <p class="hero-fine">{{ fineLine }}</p>
+    <div class="final-alt"><span>Not ready yet?</span> <a href="approvals.html?demo=1">Open a sample drop</a> <span>— no account needed.</span></div>
     <sc-if value="{{ notBeta }}" hint-placeholder-val="{{ true }}">
     <div class="final-alt"><a href="signup.html?plan=free">Or start on the Free plan</a> — <span>no card needed.</span></div>
     </sc-if>
@@ -1425,7 +1427,9 @@ class Component extends DCLogic {
       mainCta: beta ? "Request a place" : "Try it free",
       // The terms, said once in small grey under the button, instead of a
       // row of ticks.
-      fineLine: beta ? "Free during the beta. No card needed." : "Free plan with no card. Cancel any time.",
+      // Activation energy: the cost of the first step (time, card) is named
+      // right under the button, so it never has to be guessed.
+      fineLine: beta ? "Free during the beta. No card needed. About ten minutes to apply." : "Free plan with no card. Cancel any time.",
       pricingLede: beta
         ? "These are the prices from launch in Q1 2027, alongside a Free plan with 3 ads a month on one network and no card needed. Until then, Adronis is free for the businesses picked for the beta."
         : "Start free, or try any paid plan free for 7 days.",

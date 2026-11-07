@@ -104,6 +104,8 @@
     ".sw-done-title{margin:20px 0 0;font-size:26px;font-weight:600;line-height:1.15;letter-spacing:-.03em;color:#f2f4f7;text-wrap:balance}",
     ".sw-done-tally{display:flex;gap:18px;margin:14px 0 0;font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.06em;color:#878d98}",
     ".sw-done-tally b{margin-left:6px;font-family:'Geist',sans-serif;font-size:15px;color:#f2f4f7}",
+    ".sw-done-time{margin:10px 0 0;font-size:14px;font-weight:600;color:#9fd7b0}",
+    ".sw-done-time:empty{display:none}",
     ".sw-done-text{margin:16px 0 0;max-width:30ch;font-size:15px;line-height:1.55;color:#b3b9c4}",
     ".sw-done .btn{margin-top:24px}",
     ".sw-replay{margin-top:8px;min-height:44px;padding:0 14px;border:none;background:none;color:#878d98;font-family:inherit;font-size:13.5px;cursor:pointer;border-radius:9999px}",
@@ -171,6 +173,9 @@
       this.cards = [];
       this.results = [];
       this.touched = false;
+      // When the visitor first touched the deck, so the done card can say how
+      // long their own week took. Their real time, never a made-up number.
+      this.t0 = 0;
 
       var region = (this.region = el("div", "sw-region"));
       region.tabIndex = 0;
@@ -286,6 +291,8 @@
       done.setAttribute("aria-hidden", "true");
       done.appendChild(el("div", "sw-done-mark", "✓"));
       done.appendChild(el("div", "sw-done-title", "That's your week, sorted."));
+      this.timeLine = el("div", "sw-done-time", "");
+      done.appendChild(this.timeLine);
 
       var tally = el("div", "sw-done-tally");
       var a = el("span");
@@ -302,7 +309,7 @@
 
       done.appendChild(el("p", "sw-done-text", "That's the whole job. Every Monday, a fresh drop made for your business waits for you like this."));
 
-      var cta = el("a", "btn");
+      var cta = (this.cta = el("a", "btn"));
       cta.href = "signup.html";
       cta.appendChild(el("span", "", "Get ads like these"));
       var arrow = el("span", "mono", "→");
@@ -335,6 +342,7 @@
       node.addEventListener("pointerdown", function (e) {
         if (c !== self.top()) return;
         if (e.pointerType === "mouse" && e.button !== 0) return;
+        if (!self.t0) self.t0 = Date.now();
         // Caught mid-throw: it stops being thrown and follows the hand again.
         c.leaving = 0;
         var box = node.getBoundingClientRect();
@@ -409,6 +417,7 @@
       var c = this.top();
       if (!c || c.leaving) return;
       this.touched = true;
+      if (!this.t0) this.t0 = Date.now();
       this.send(c, dir, dir * 1500, -120);
     }
 
@@ -465,6 +474,16 @@
       var yes = this.results.filter(function (r) { return r > 0; }).length;
       this.nYes.textContent = String(yes);
       this.nNo.textContent = String(this.results.length - yes);
+      // How long the visitor's own week took. Left out if they wandered off
+      // mid-deck, since then the number says nothing.
+      var secs = this.t0 ? Math.max(1, Math.round((Date.now() - this.t0) / 1000)) : 0;
+      this.timeLine.textContent = secs && secs <= 180
+        ? "Done in " + secs + (secs === 1 ? " second." : " seconds.")
+        : "";
+      // The business type picked on the home page rides along into signup.
+      var pick = null;
+      try { pick = sessionStorage.getItem("lb-pick"); } catch (e) {}
+      this.cta.href = "signup.html" + (pick ? "?type=" + encodeURIComponent(pick) : "");
       this.done.classList.add("is-on");
       this.done.removeAttribute("aria-hidden");
       this.noBtn.disabled = true;

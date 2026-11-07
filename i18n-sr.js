@@ -2353,6 +2353,22 @@ window.LB_I18N_SR = {
       "Prijava traje oko deset minuta. Broj mesta je ograničen jer tokom bete mi plaćamo svaki oglas.",
     "Beta · limited places": "Beta · ograničen broj mesta",
 
+    /* --- Psychology pass (2026-11-07): home, swipe demo, signup meter ----- */
+    "Free during the beta. No card needed. About ten minutes to apply.":
+      "Besplatno tokom bete. Bez kartice. Prijava traje oko deset minuta.",
+    "A person on our team posts every ad you approve": "Neko iz našeg tima objavljuje svaki oglas koji odobriš",
+    "A person on our small team looks at each one and picks the businesses for the beta. If there's no place for you yet, your account and brief stay saved for launch.":
+      "Neko iz našeg malog tima pogleda svaku i bira biznise za betu. Ako za tebe još nema mesta, tvoj nalog i brif ostaju sačuvani za lansiranje.",
+    "Not ready yet?": "Još nisi spreman?",
+    "Open a sample drop": "Otvori primer dropa",
+    "— no account needed.": "— nalog nije potreban.",
+    "About ten minutes. Every answer makes your ads more yours.": "Oko deset minuta. Svaki odgovor čini oglase još više tvojim.",
+    "Good start — keep going.": "Dobar početak — samo nastavi.",
+    "Halfway there.": "Na pola si puta.",
+    "Almost done — just a few answers left.": "Skoro gotovo — još samo par odgovora.",
+    "Everything's filled in. One tap left.": "Sve je popunjeno. Još samo jedan klik.",
+    "Done in 1 second.": "Gotovo za 1 sekundu.",
+
     /* --- 2026 redesign: about, contact, message us, log in -------------- */
     "Drops per year": "Dropova godišnje",
     "Channels supported": "Podržanih kanala",
@@ -2523,6 +2539,10 @@ window.LB_I18N_SR = {
      through the dictionary above before it is put back, so a word like
      "monthly" is translated while a date or a plan name passes through. */
   patterns: [
+    // The swipe demo's own time (lb-swipe.js), with Serbian plural forms.
+    [/^Done in ((?:\d*[02-9])?1) seconds\.$/, "Gotovo za $1 sekundu."],
+    [/^Done in ((?:\d*[02-9])?[234]) seconds\.$/, "Gotovo za $1 sekunde."],
+    [/^Done in (\d+) seconds\.$/, "Gotovo za $1 sekundi."],
     [/^(\d+) ads$/, "$1 oglasa"],
     [/^(\d+) approved ads are set to post while you're closed\. Pick another time for them under Scheduled to post\.$/,
       "Odobrenih oglasa koji treba da izađu dok ne radiš: $1. Izaberi im drugo vreme pod „Zakazano za objavu“."],

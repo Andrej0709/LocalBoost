@@ -83,6 +83,18 @@
   #plan-summary{position:static;order:-1}
 }
 @media (prefers-reduced-motion:reduce){.su-bar span{transition:none}}
+/* The brief's progress, pinned under the nav while the form is filled in. The
+   desktop plan summary has its own copy, so this one shows only where that
+   summary is missing (the beta) or scrolls away (phones). */
+.su-meter{display:none;position:sticky;top:84px;z-index:5;margin:0 0 24px;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(12,14,18,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.su-grid.is-beta .su-meter{display:block}
+.su-meter-top{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13.5px;color:var(--text-2)}
+.su-meter-top b{flex:none;font-family:var(--mono);font-size:12.5px;font-weight:500;color:var(--acc)}
+.su-meter .su-bar{margin-top:9px}
+@media (max-width:860px){
+  .su-meter{display:block;top:80px}
+  #plan-summary .su-progress{display:none}
+}
 </style>
 </head>
 <body>
@@ -125,6 +137,11 @@
   <div id="form-view" class="su-grid is-beta">
 
     <form id="signup-form" class="form-card">
+
+      <div class="su-meter">
+        <div class="su-meter-top"><span class="su-meter-msg" aria-live="polite">About ten minutes. Every answer makes your ads more yours.</span><b class="su-meter-pct" aria-hidden="true">0%</b></div>
+        <div class="su-bar" aria-hidden="true"><span class="su-meter-fill"></span></div>
+      </div>
 
       <div class="section-label" id="account-label">ACCOUNT</div>
       <div class="field">
@@ -742,9 +759,20 @@
 // never writes to it, and the page script above owns what gets submitted.
 (function () {
   var form = document.getElementById("signup-form");
-  var fill = document.getElementById("su-progress-fill");
-  var pct = document.getElementById("su-progress-pct");
-  if (!form || !fill || !pct) return;
+  var fills = document.querySelectorAll("#su-progress-fill, .su-meter-fill");
+  var pcts = document.querySelectorAll("#su-progress-pct, .su-meter-pct");
+  var msg = document.querySelector(".su-meter-msg");
+  var lastMsg = msg ? msg.textContent : "";
+  if (!form || !fills.length) return;
+  // A word of encouragement at each stretch of the form: people speed up as
+  // the finish comes into sight, so the meter says when it's close.
+  function message(value) {
+    if (value >= 100) return "Everything's filled in. One tap left.";
+    if (value >= 80) return "Almost done — just a few answers left.";
+    if (value >= 50) return "Halfway there.";
+    if (value > 0) return "Good start — keep going.";
+    return "About ten minutes. Every answer makes your ads more yours.";
+  }
   function update() {
     var fields = Array.prototype.filter.call(form.querySelectorAll("[required]"), function (el) {
       return !el.closest("[hidden]");
@@ -756,8 +784,12 @@
       return el.type === "checkbox" ? el.checked : String(el.value || "").trim() !== "";
     }).length;
     var value = Math.round(done / fields.length * 100);
-    fill.style.width = value + "%";
-    pct.textContent = value + "%";
+    Array.prototype.forEach.call(fills, function (f) { f.style.width = value + "%"; });
+    Array.prototype.forEach.call(pcts, function (p) { p.textContent = value + "%"; });
+    // Compared with the last English line, not the node: i18n.js may have
+    // translated the node since.
+    var text = message(value);
+    if (msg && text !== lastMsg) { msg.textContent = text; lastMsg = text; }
   }
   form.addEventListener("input", update);
   form.addEventListener("change", update);
